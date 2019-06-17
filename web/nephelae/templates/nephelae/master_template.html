@@ -1,0 +1,50 @@
+<!--
+Q : Why is this index file in such a convoluted tree of folders ?
+A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
+-->
+
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+
+    <!-- Load static CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'nephelae/static/master_style.css' %}" />
+
+    <!-- Load fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="external-wrapper">
+        <div id="nav" class="pill-nav">
+            {% block nav %} {% endblock nav %}
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    /*function selectedMenu() {
+                                    var nav = document.getElementById("nav");
+                                    var buttons = nav.getElementsByClassName("a");
+                                    console.log(buttons);
+
+                                    // Loop through the buttons and add the active class to the current/clicked button
+                                    for (var i = 0; i < buttons.length; i++) {
+                                        buttons[i].addEventListener("click", function() {
+                                            var current = document.getElementsByClassName("active");
+                                            current[0].className = current[0].className.replace(
+                                                " active",
+                                                ""
+                                            );
+                                            this.className += " active";
+                                        });
+                                    }
+                                }*/
+</script>
