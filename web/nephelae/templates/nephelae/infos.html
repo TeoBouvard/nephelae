@@ -1,5 +1,8 @@
-{% extends 'nephelae/master_template.html' %} {% block nav %}
+{% extends 'nephelae/base.html' %}
+{% load static %}
 
-<a href="{% url 'preview' %}">3D Preview</a>
-<a href="{% url 'cross-sections' %}">Cross Sections</a>
-<a class="active" href="{% url 'infos' %}">Infos</a> {% endblock nav %}
+{% block nav %}
+    <a href="{% url 'preview' %}">3D Preview</a>
+    <a href="{% url 'cross-sections' %}">Cross Sections</a>
+    <a class="active" href="{% url 'infos' %}">Infos</a> 
+{% endblock nav %}

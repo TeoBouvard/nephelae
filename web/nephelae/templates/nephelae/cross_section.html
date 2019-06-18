@@ -1,5 +1,26 @@
-{% extends 'nephelae/master_template.html' %} {% block nav %}
+{% extends 'nephelae/base.html' %}
+{% load static %}
 
-<a href="{% url 'preview' %}">3D Preview</a>
-<a class="active" href="{% url 'cross-sections' %}">Cross Sections</a>
-<a href="{% url 'infos' %}">Infos</a> {% endblock nav %}
+<!-- Load specific CSS -->
+{% block additional_head %}
+	<link rel="stylesheet" type="text/css" href="{% static 'nephelae/static/css/cross_section.css' %}" />
+{% endblock %}
+
+<!-- Load specific javascript -->
+{% block additional_scripts %}
+	<script type="text/javascript" src="{% static 'nephelae/static/js/cross_section.js' %}"></script>
+{% endblock %}
+
+<!-- Activate current menu in nav -->
+{% block nav %}
+    <a href="{% url 'preview' %}">3D Preview</a>
+    <a class="active" href="{% url 'cross-sections' %}">Cross Sections</a>
+    <a href="{% url 'infos' %}">Infos</a> 
+{% endblock nav %}
+
+{% block page %}
+    <div class="slidecontainer">
+        <input id="time_slider" type="range" min="0" max="100" value="0" class="slider">
+    </div>
+    <div id="time"/>
+{% endblock %}

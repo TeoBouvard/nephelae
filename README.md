@@ -6,6 +6,7 @@
 
 -   authentication ?
 -   approximate mesh from points cloud
+-   csrf token to prevent Cross Site Request
 
 ## Ideas
 
