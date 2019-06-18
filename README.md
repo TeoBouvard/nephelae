@@ -2,6 +2,13 @@
 
 ## TODO
 
+Slider onchange/consecutive POST requests crashes browser or NetCDF ?
+get right altitude and time on model
+
+## Modules 
+
+jinja2, mpld3
+
 ## Questions
 
 -   authentication ?

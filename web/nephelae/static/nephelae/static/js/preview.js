@@ -1,5 +1,5 @@
 var time_slider = document.getElementById('time_slider');
-var time = document.getElementById('time');
+var time = document.getElementById('time_display');
 time.innerHTML = time_slider.value;
 
 // Update the current slider value

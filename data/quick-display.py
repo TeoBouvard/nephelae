@@ -46,7 +46,6 @@ atm = MFDataset('/Users/arthurdent/Documents/dev/nephelae/data/data.nc')
 atmShape = type('AtmShape', (), {})()
 atmShape.t = len(atm.variables['time'][:])
 atmShape.z = len(atm.variables['VLEV'][:,0,0])
-# atmShape.z = len(atm.variables['vertical_levels'][:])
 atmShape.x = len(atm.variables['W_E_direction'][:])
 atmShape.y = len(atm.variables['S_N_direction'][:])
 
@@ -63,9 +62,6 @@ var1 = 'WT'     # vertical wind
 # var1 = 'SVT001' # User data (?)
 # var1 = 'SVT002' # User data (?)
 # var1 = 'SVT003'  # User data (?)
-
-# var0 = 'objets'
-# var1 = 'objets'
 
 z0 = 44
 y0 = 175
@@ -85,11 +81,6 @@ axes[1][0].invert_yaxis()
 varDisp3 = axes[1][1].imshow(atm.variables[var1][0,:,:,y0])
 axes[1][1].invert_yaxis()
 
-# update_ticks_labelXY(axes[0][0])
-# update_ticks_labelXY(axes[0][1])
-# update_ticks_labelXZ(axes[1][0])
-# update_ticks_labelXZ(axes[1][1])
-
 t0 = atm.variables['time'][0]
 tStart = -1
 
@@ -108,7 +99,6 @@ newIndex = 1
 def init():
 
     varDisp0.set_data(atm.variables[var0][0,z0,:,:])
-    # varDisp0.set_data(np.where(atm.variables[var0][0,z0,:,:] > rctTh, 0.0, 1.0))
     varDisp1.set_data(atm.variables[var1][0,z0,:,:])
     varDisp2.set_data(atm.variables[var0][0,:,y0,:])
     varDisp3.set_data(atm.variables[var1][0,:,y0,:])
@@ -126,32 +116,11 @@ def update(i):
     global newData
     global tStart
 
-    # t = time.time() - tStart
-    # t = 10*time.time() - tStart
-    # r = t / 2.0 - oldIndex
-    # r = t / 5.0 - oldIndex
-
-    # if r > 1.0:
-    #     oldIndex = newIndex
-    #     newIndex = oldIndex + 1
-    #     oldData = newData
-    #     newData = [atm.variables[var0][newIndex % t,z0,:,:],
-    #                atm.variables[var1][newIndex % t,z0,:,:],
-    #                atm.variables[var0][newIndex % t,:,y0,:],
-    #                atm.variables[var1][newIndex % t,:,y0,:]]
-    #     r = r - 1.0
-
-    # varDisp0.set_data((1.0-r)*oldData[0] + r*newData[0])
-    # varDisp1.set_data((1.0-r)*oldData[1] + r*newData[1])
-    # varDisp2.set_data((1.0-r)*oldData[2] + r*newData[2])
-    # varDisp3.set_data((1.0-r)*oldData[3] + r*newData[3])
-
     index = i % atmShape.t
     varDisp0.set_data(atm.variables[var0][index,z0,:,:])
     varDisp1.set_data(atm.variables[var1][index,z0,:,:])
     varDisp2.set_data(atm.variables[var0][index,:,y0,:])
     varDisp3.set_data(atm.variables[var1][index,:,y0,:])
-    # varDisp0.set_data(np.where(atm.variables[var0][index,z0,:,:] > rctTh, 0.0, 1.0))
 
 anim = animation.FuncAnimation(
     fig,

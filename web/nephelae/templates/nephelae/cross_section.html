@@ -14,7 +14,7 @@
 <!-- Activate current menu in nav -->
 {% block nav %}
     <a href="{% url 'preview' %}">3D Preview</a>
-    <a class="active" href="{% url 'cross-sections' %}">Cross Sections</a>
+    <a class="active" href="{% url 'cross_sections' %}">Cross Sections</a>
     <a href="{% url 'infos' %}">Infos</a> 
 {% endblock nav %}
 
@@ -22,5 +22,5 @@
     <div class="slidecontainer">
         <input id="time_slider" type="range" min="0" max="100" value="0" class="slider">
     </div>
-    <div id="time"/>
+    <div id="time_display"/>
 {% endblock %}
