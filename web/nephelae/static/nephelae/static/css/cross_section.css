@@ -14,12 +14,11 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 }
 
 .img_container {
-    flex: 40%;
+    flex: 100%;
 }
 
 #altitude_display{
-    position: relative;
-    top: 50%;
+    vertical-align: top;
 }
 
 #time_display{
@@ -29,9 +28,7 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 /* Slider container style */
 .time_slider_container {
     width: 100%;
-    /* Width of the outside container */
     position: relative;
-    justify-content: center;
 }
 
 /* The slider itself */
@@ -43,12 +40,14 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 }
 
 .altitude_slider_container {
-    width: 20%;
-    justify-content: center;
-    text-align: center;
+    width: 100%;
+    position: relative;
 }
 
 #altitude_slider {
-    -webkit-appearance: slider-vertical;
+    -webkit-appearance: slider-horizontal;
     position: relative;
+    width: 50%;
+    left: 25%;
+    
 }

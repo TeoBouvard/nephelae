@@ -28,15 +28,15 @@ def cross_section(request):
         hcs.altitude_index = altitude
 
         #base64 strings representing cross section images
-        cloud_string = hcs.print_clouds()
-        thermals_string = hcs.print_thermals()
+        #cloud_string = hcs.print_clouds()
+        #thermals_string = hcs.print_thermals()
 
         #int64 have to be casted to int to be JSON serializable
         response = JsonResponse({
             'date': int(hcs.get_date()),
             'altitude': int(hcs.get_altitude()),
-            'clouds': cloud_string,
-            'thermals': thermals_string,
+            'clouds': "cloud_string",
+            'thermals': "thermals_string",
         })
         
         return response
