@@ -10,28 +10,6 @@ hcs = HorizontalCrossSection()
 def preview(request):
     return render(request, 'nephelae/preview.html')
 
-def display_clouds(request):
-    try:
-        with open('nephelae/img/clouds.jpg', "rb") as f:
-            response = HttpResponse(f.read(), content_type="image/jpeg")
-            return response
-    except IOError:
-        red = Image.new('RGBA', (1, 1), (255,0,0,0))
-        response = HttpResponse(content_type="image/jpeg")
-        red.save(response, "JPEG")
-        return response
-
-def display_thermals(request):
-    try:
-        with open('nephelae/img/thermals.jpg', "rb") as f:
-            response = HttpResponse(f.read(), content_type="image/jpeg")
-            return response
-    except IOError:
-        red = Image.new('RGBA', (1, 1), (255,0,0,0))
-        response = HttpResponse(content_type="image/jpeg")
-        red.save(response, "JPEG")
-        return response
-
 def cross_section(request):
 
     # Handler for altitude and time sliders -> actuate cross section
@@ -50,17 +28,15 @@ def cross_section(request):
         hcs.altitude_index = altitude
 
         #base64 strings representing cross section images
-        #cloud_string = hcs.print_clouds()
-        hcs.print_clouds_img()
-        #thermals_string = hcs.print_thermals()
-        hcs.print_thermals_img()
+        cloud_string = hcs.print_clouds()
+        thermals_string = hcs.print_thermals()
 
         #int64 have to be casted to int to be JSON serializable
         response = JsonResponse({
             'date': int(hcs.get_date()),
             'altitude': int(hcs.get_altitude()),
-            #'clouds': cloud_string,
-            #'thermals': thermals_string,
+            'clouds': cloud_string,
+            'thermals': thermals_string,
         })
         
         return response

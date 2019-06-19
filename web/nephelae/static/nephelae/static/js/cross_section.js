@@ -34,10 +34,8 @@ function displayImage(time_percentage, altitude_percentage){
         },
         success: function(response) {
             console.log(response);
-            //$('#clouds_div').html('<img src="' + response.clouds + '">');
-            //$('#thermals_div').html('<img src="' + response.thermals + '">');
-            //$('#clouds_img').attr('src','img/clouds.jpg');
-            //$('#thermals_img').attr('src','img/thermals.jpg');
+            $('#clouds_div').html('<img src="' + response.clouds + '">');
+            $('#thermals_div').html('<img src="' + response.thermals + '">');
 
             $('#time_display').html(toDateTime(response.date))
             $('#altitude_display').html(response.altitude + "m ASL")

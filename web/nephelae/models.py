@@ -52,6 +52,7 @@ class HorizontalCrossSection(models.Model):
         ]
         return dict(zip(keys,values))
 
+    # Returns a base64 encoded string containing hcs upwind data
     def print_thermals(self):
         thermals = self.dataset.variables[var_upwind][self.time_index,self.altitude_index,:,:]
         image = plt.imshow(thermals, origin='lower')
@@ -86,7 +87,7 @@ class HorizontalCrossSection(models.Model):
     def get_date(self):
         return self.dataset.variables[var_time][self.time_index]
 
-    # Get altitude !in meters! from altitude_index
+    # Get altitude !in meters! from altitude_index !CHECK THIS METHOD CORRECTNESS!
     def get_altitude(self):
         return 1000*self.dataset.variables[var_altitude][self.altitude_index, 0, 0]
 
