@@ -3,11 +3,60 @@ Q : Why is this stylesheet in such a convoluted tree of files ?
 A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 */
 
-#time {
-    position: relative;
+.plot_container {
+    display: flex;
+}
+
+.info {
+    font-size: 17px;
+    font-family: "Roboto";
     text-align: center;
 }
 
-#plot {
+.img_container {
+    flex: 40%;
+}
+
+#altitude_display{
+    position: absolute;
+    top: 50%;
+}
+
+#time_display{
+    vertical-align: top;
+}
+
+/* Slider container style */
+.time_slider_container {
+    width: 100%;
+    /* Width of the outside container */
+    position: absolute;
+    /* Stick it to base of window */
+    bottom: 20px;
+    /* Height from the base */
+    justify-content: center;
+}
+
+/* The slider itself */
+#time_slider {
+    -webkit-appearance: slider-horizontal;
+    position: absolute;
+    width: 50%;
+    left: 25%;
+}
+
+.altitude_slider_container {
+    height: 100%;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    justify-content: center;
     text-align: center;
+}
+
+#altitude_slider {
+    -webkit-appearance: slider-vertical;
+    position: absolute;
+    top: 25%;
+    height: 50%;
 }

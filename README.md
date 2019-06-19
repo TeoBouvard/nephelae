@@ -2,8 +2,9 @@
 
 ## TODO
 
-- get right altitude and time on model with sliders
+- assertion failed when idle and action
 - dimensions of map in km ?
+- collect requirements and dependencies !
 
 
 ## Modules 

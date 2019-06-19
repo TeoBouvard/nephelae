@@ -19,12 +19,26 @@
 {% endblock nav %}
 
 {% block page %}
-    <div id='plot' class='plotcontainer'>
+    <!-- Display cross sections images -->
+    <div class='plot_container'>
+        <div class='img_container' id='clouds_div'>
+            <img id='cloud_img' src='clouds.jpg'></img>
+        </div>
+        <div class='img_container' id='thermals_div'>
+            <img id='thermals_img' src='thermals.jpg'></img>
+        </div>
     </div>
 
-    <div class="slidecontainer">
+    <!-- Display altitude slider -->
+    <div class="altitude_slider_container">
+        <div id="altitude_display" class="info"></div>
+        <input id="altitude_slider" type="range" min="0" max="100" value="0" class="slider">
+    </div>
+
+    <!-- Display time slider -->
+    <div class="time_slider_container">
+        <div id="time_display" class="info"></div>
         <input id="time_slider" type="range" min="0" max="100" value="0" class="slider">
-        <div id="time_display"></div>
     </div>
  
 {% endblock %}

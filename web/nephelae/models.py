@@ -1,15 +1,13 @@
 from django.db import models
 import matplotlib.pyplot as plt, mpld3
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import numpy as np
 import io, base64, urllib
 from netCDF4 import MFDataset
-import json
 
 var_time = 'time'        # Time in seconds since 1995-1-1 00:00:00
-var_altitude = 'VLEV'    # Vertical levels in km
-var_upwind = 'WT'        # Upwind
-var_lwc = 'RCT'          # Liquid water content
+var_altitude = 'VLEV'    # Vertical levels in km ASL
+var_upwind = 'WT'        # Upwind in m/s
+var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
 
 class HorizontalCrossSection(models.Model):
@@ -36,7 +34,7 @@ class HorizontalCrossSection(models.Model):
             self.time_index = time_index
 
     def __str__(self):
-        shape = self.getShape()
+        shape = self.get_shape()
         infos = "Shape : ("
         infos += str(shape[var_time]) + ', '
         infos += str(shape[var_altitude]) + ', '
@@ -44,7 +42,7 @@ class HorizontalCrossSection(models.Model):
         infos += str(shape['S_N_direction']) + ")"
         return infos
     
-    def getShape(self):
+    def get_shape(self):
         keys = [var_time,var_altitude, 'W_E_direction', 'S_N_direction']
         values = [
             len(self.dataset.variables[var_time][:]),
@@ -53,20 +51,10 @@ class HorizontalCrossSection(models.Model):
             len(self.dataset.variables['S_N_direction'][:])
         ]
         return dict(zip(keys,values))
-    
-    def getUpwind(self):
-        return self.dataset.variables[var_upwind][self.time_index,self.altitude_index,:,:]
-    
-    def getCloud(self):
-        return self.dataset.variables[var_lwc][self.time_index,self.altitude_index,:,:]
 
-    def printUpwind(self):
-        image = plt.imshow(self.getUpwind(), origin='lower')
-        #plt.show()
-        return plt
-    
-    def printCloudString(self):
-        image = plt.imshow(self.getCloud(), origin='lower')
+    def print_thermals(self):
+        thermals = self.dataset.variables[var_upwind][self.time_index,self.altitude_index,:,:]
+        image = plt.imshow(thermals, origin='lower')
         buf = io.BytesIO()
         plt.savefig(buf, format='jpg')
         buf.seek(0)
@@ -74,43 +62,45 @@ class HorizontalCrossSection(models.Model):
         string = 'data:image/jpg;base64,' + urllib.parse.quote(data)
         return string
     
+    def print_thermals_img(self):
+        thermals = self.dataset.variables[var_upwind][self.time_index,self.altitude_index,:,:]
+        image = plt.imshow(thermals, origin='lower')
+        plt.savefig('nephelae/img/thermals.jpg', format='jpg') 
+    
+    def print_clouds(self):
+        clouds = self.dataset.variables[var_lwc][self.time_index,self.altitude_index,:,:]
+        image = plt.imshow(clouds, origin='lower')
+        buf = io.BytesIO()
+        plt.savefig(buf, format='jpg')
+        buf.seek(0)
+        data = base64.b64encode(buf.read())
+        string = 'data:image/jpg;base64,' + urllib.parse.quote(data)
+        return string
+    
+    def print_clouds_img(self):
+        clouds = self.dataset.variables[var_lwc][self.time_index,self.altitude_index,:,:]
+        image = plt.imshow(clouds, origin='lower')
+        plt.savefig('nephelae/img/clouds.jpg', format='jpg') 
+    
+    # Get date !in seconds since epoch! from time_index
     def get_date(self):
         return self.dataset.variables[var_time][self.time_index]
 
-    # Compute acquisition duration
-    def min_time(self):
-        return self.dataset.variables[var_time][0]
-    
-    def max_time(self):
-        return self.dataset.variables[var_time][-1]
+    # Get altitude !in meters! from altitude_index
+    def get_altitude(self):
+        return 1000*self.dataset.variables[var_altitude][self.altitude_index, 0, 0]
 
+    # Compute acquisition duration
     def time_range(self):
-        return (self.max_time() - self.min_time())
+        return (self.dataset.variables[var_time][-1] - self.dataset.variables[var_time][0])
 
     def max_time_index(self):
         return len(self.dataset.variables[var_time]) - 1
 
     # Compute altitude range
-    def min_altitude(self):
-        return min(getattr(self.dataset.variables[var_altitude], 'actual_range'))
-    
-    def max_altitude(self):
-        return max(getattr(self.dataset.variables[var_altitude], 'actual_range'))
-    
     def altitude_range(self):
-        return self.max_altitude()-self.min_altitude()
+        return max(getattr(self.dataset.variables[var_altitude], 'actual_range'))-min(getattr(self.dataset.variables[var_altitude], 'actual_range'))
     
     def max_altitude_index(self):
         return len(self.dataset.variables[var_altitude]) - 1
     
-    '''
-    # Compute upwind range
-    def min_upwind(self):
-        return np.amin(self.dataset.variables[var_upwind])
-    
-    def max_upwind(self):
-        return np.amax(self.dataset.variables[var_upwind])
-    
-    def upwind_range(self):
-        return self.max_upwind()-self.min_upwind()
-    '''

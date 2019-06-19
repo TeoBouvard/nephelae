@@ -21,7 +21,7 @@ class ModelTests(TestCase):
             'W_E_direction': 256, 
             'S_N_direction': 256
             }
-        self.assertDictEqual(hcs.getShape(),test_dict)
+        self.assertDictEqual(hcs.get_shape(),test_dict)
     
     def test_hcs_duration(self):
         test_duration = 715
@@ -33,6 +33,11 @@ class ModelTests(TestCase):
         self.assertAlmostEqual(hcs.altitude_range(), test_range, places=4)
 
     def test_print_cloud_string(self):
-        string_image = hcs.printCloudString()
+        string_image = hcs.print_cloud_string()
         #print(string_image)
+        return True
+
+    def test_altitude(self):
+        altitude = hcs.dataset.variables['VLEV'][hcs.altitude_index,0,0]
+        print(altitude)
         return True
