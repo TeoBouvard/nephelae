@@ -11,7 +11,7 @@ var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
 
 class HorizontalCrossSection(models.Model):
-    
+
     # Load file into dataset
     dataset = MFDataset('../data/data.nc')
     altitude_index = models.IntegerField()
@@ -87,7 +87,7 @@ class HorizontalCrossSection(models.Model):
     def get_date(self):
         return self.dataset.variables[var_time][self.time_index]
 
-    # Get altitude !in meters! from altitude_index !CHECK THIS METHOD CORRECTNESS!
+    # Get altitude !in meters! from altitude_index !CHECK THIS METHOD'S CORRECTNESS!
     def get_altitude(self):
         return 1000*self.dataset.variables[var_altitude][self.altitude_index, 0, 0]
 
