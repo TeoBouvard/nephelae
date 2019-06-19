@@ -6,10 +6,9 @@ import matplotlib.pyplot as plt, mpld3
 def preview(request):
     return render(request, 'nephelae/preview.html')
 
-
 def cross_section(request):
 
-    # Handler for altitude and time sliders
+    # Handler for altitude and time sliders -> actuate cross section
     if request.method == 'POST':
 
         # Create cross section
@@ -17,24 +16,26 @@ def cross_section(request):
 
         # Compute time of cross section with duration of acquisition
         time_percentage = 0.01*int(request.POST['time_percentage'])
-        time = hcs.min_time() + time_percentage*hcs.duration()
+        time = int(time_percentage*hcs.max_time_index())
 
-        #Compute altitude level
-        altitude_percentage = 0.01*42.0 #TODO 
-        altitude = hcs.min_level() + altitude_percentage*hcs.altitude_range()
+        #Compute altitude of cross section with altitude range
+        altitude_percentage = 0.01*int(42) #TODO 
+        altitude = 42#int(altitude_percentage*hcs.max_altitude_index())
 
-        #set cross section attributes
-        hcs.time = time
-        hcs.altitude = altitude
+        #set cross section attributes, WARNING : use existing indices
+        hcs.time_index = time
+        hcs.altitude_index = altitude
 
-        #image = hcs.printUpwind()
+        #base64 string representing cross section image
+        cross_section_string = hcs.printCloudString()
 
         #int64 have to be casted to int to be JSON serializable
         response = JsonResponse({
-            'time': int(hcs.time),
-            'altitude': int(hcs.altitude),
-            #'image': hcs.printUpwind().savefig('cs.png')
+            'date': int(hcs.get_date()),
+            'altitude': int(hcs.altitude_index),
+            'image': cross_section_string
         })
+        
         return response
 
     # Render HTML template

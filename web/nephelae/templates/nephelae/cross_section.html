@@ -19,8 +19,12 @@
 {% endblock nav %}
 
 {% block page %}
+    <div id='plot' class='plotcontainer'>
+    </div>
+
     <div class="slidecontainer">
         <input id="time_slider" type="range" min="0" max="100" value="0" class="slider">
+        <div id="time_display"></div>
     </div>
-    <div id="time_display"/>
+ 
 {% endblock %}

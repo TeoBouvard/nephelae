@@ -1,7 +1,7 @@
 from django.test import TestCase
 from .models import HorizontalCrossSection
 
-hcs = HorizontalCrossSection(42,0)
+hcs = HorizontalCrossSection()
 
 class ModelTests(TestCase):
     
@@ -9,9 +9,11 @@ class ModelTests(TestCase):
         self.assertTrue(True)
     
     def test_hcs_creation(self):
-        self.assertAlmostEqual(hcs.altitude,42)
-        self.assertAlmostEqual(hcs.time,0)
-
+        #print(hcs.altitude_index)
+        #print(hcs.time_index)
+        self.assertAlmostEqual(hcs.altitude_index,0)
+        self.assertAlmostEqual(hcs.time_index,0)
+    
     def test_hcs_shape(self):
         test_dict = {
             'time': 144, 
@@ -23,9 +25,14 @@ class ModelTests(TestCase):
     
     def test_hcs_duration(self):
         test_duration = 715
-        self.assertAlmostEqual(hcs.duration(), test_duration)
-        #hcs.printUpwind()
+        self.assertAlmostEqual(hcs.time_range(), test_duration)
 
+    
     def test_hcs_altitude_range(self):
         test_range = 3.975
-        self.assertAlmostEqual(hcs.altitude_range(), test_range)
+        self.assertAlmostEqual(hcs.altitude_range(), test_range, places=4)
+
+    def test_print_cloud_string(self):
+        string_image = hcs.printCloudString()
+        #print(string_image)
+        return True

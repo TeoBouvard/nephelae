@@ -96,6 +96,7 @@ newData = [atm.variables[var0][1,z0,:, :],
            atm.variables[var0][1,:,y0,:],
            atm.variables[var1][1,:,y0,:]]
 newIndex = 1
+
 def init():
 
     varDisp0.set_data(atm.variables[var0][0,z0,:,:])

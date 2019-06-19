@@ -2,12 +2,13 @@
 
 ## TODO
 
-Slider onchange/consecutive POST requests crashes browser or NetCDF ?
-get right altitude and time on model
+- get right altitude and time on model with sliders
+- dimensions of map in km ?
+
 
 ## Modules 
 
-jinja2, mpld3
+jinja2, mpld3, PIL
 
 ## Questions
 
