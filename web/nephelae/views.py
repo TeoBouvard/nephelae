@@ -1,8 +1,9 @@
-from django.shortcuts import render
+import matplotlib.pyplot as plt
+import mpld3
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import render
+
 from .models import HorizontalCrossSection
-import matplotlib.pyplot as plt, mpld3
-from PIL import Image
 
 # Create horizontal cross section
 hcs = HorizontalCrossSection()

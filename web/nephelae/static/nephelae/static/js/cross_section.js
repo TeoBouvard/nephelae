@@ -17,6 +17,7 @@ time_slider.onchange = function() {
 // Update the current slider value and display image accordingly
 altitude_slider.oninput = function() {
     altitude_display.innerHTML = '...';
+    console.log(this.value)
 }
 altitude_slider.onchange = function() {
     displayImage(time_slider.value,this.value);

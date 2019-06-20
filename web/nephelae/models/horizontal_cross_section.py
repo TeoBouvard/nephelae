@@ -1,7 +1,11 @@
-from django.db import models
-import matplotlib.pyplot as plt, mpld3
+import base64
+import io
+import urllib
+
+import matplotlib.pyplot as plt
+import mpld3
 import numpy as np
-import io, base64, urllib
+from django.db import models
 from netCDF4 import MFDataset
 
 var_time = 'time'        # Time in seconds since 1995-1-1 00:00:00
@@ -104,4 +108,3 @@ class HorizontalCrossSection(models.Model):
     
     def max_altitude_index(self):
         return len(self.dataset.variables[var_altitude]) - 1
-    
