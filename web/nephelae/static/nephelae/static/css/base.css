@@ -10,6 +10,8 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 /* Style of links inside the navigation menu */
 .pill-nav {
     width: 100%;
+    position: relative;
+    padding: 10px;
 }
 
 .pill-nav a {
@@ -18,10 +20,10 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
     text-align: center;
     padding: 10px;
     text-decoration: none;
-    font-size: 17px;
+    font-size: 18px;
     font-family: "Roboto";
     border-style: none;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
 

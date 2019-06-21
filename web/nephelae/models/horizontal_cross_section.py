@@ -58,13 +58,26 @@ class HorizontalCrossSection(models.Model):
 
     # Returns a base64 encoded string containing hcs upwind data
     def print_thermals(self):
+
         thermals = self.dataset.variables[var_upwind][self.time_index,self.altitude_index,:,:]
-        image = plt.imshow(thermals, origin='lower')
+
+        # Create pyplot image
+        image = plt.imshow(thermals, origin='lower', vmin=self.min_upwind(), vmax=self.max_upwind())
+        title = ''
+        plt.title('Vertical air speed in m/s')
+        plt.colorbar()
+
+        # Write image to buffer
         buf = io.BytesIO()
         plt.savefig(buf, format='jpg')
+        plt.close()
+
+        # Encode buffer in base64 string
         buf.seek(0)
         data = base64.b64encode(buf.read())
+        buf.close()
         string = 'data:image/jpg;base64,' + urllib.parse.quote(data)
+
         return string
     
     def print_thermals_img(self):
@@ -73,13 +86,26 @@ class HorizontalCrossSection(models.Model):
         plt.savefig('nephelae/img/thermals.jpg', format='jpg') 
     
     def print_clouds(self):
+        
         clouds = self.dataset.variables[var_lwc][self.time_index,self.altitude_index,:,:]
-        image = plt.imshow(clouds, origin='lower')
+
+        # Create pyplot image
+        plt.imshow(clouds, origin='lower',vmin=0, vmax=self.max_lwc())
+        title = 'Liquid Water Content in kg/kg' #at ' + str(int(self.get_altitude())) + 'm ASL'
+        plt.title(title)
+        plt.colorbar()
+
+        # Write image to buffer
         buf = io.BytesIO()
         plt.savefig(buf, format='jpg')
+        plt.close()
+
+        # Encode buffer in base64 string
         buf.seek(0)
         data = base64.b64encode(buf.read())
+        buf.close()
         string = 'data:image/jpg;base64,' + urllib.parse.quote(data)
+
         return string
     
     def print_clouds_img(self):
@@ -108,3 +134,15 @@ class HorizontalCrossSection(models.Model):
     
     def max_altitude_index(self):
         return len(self.dataset.variables[var_altitude]) - 1
+    
+    # Compute max upwind to fix plot colorbar
+    def max_upwind(self):
+        return max(getattr(self.dataset.variables[var_upwind], 'actual_range'))
+    
+    # Compute min upwind to fix plot colorbar
+    def min_upwind(self):
+        return min(getattr(self.dataset.variables[var_upwind], 'actual_range'))
+
+    # Compute max LWC to fix plot colorbar
+    def max_lwc(self):
+        return max(getattr(self.dataset.variables[var_lwc], 'actual_range'))

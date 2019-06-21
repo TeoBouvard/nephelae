@@ -7,6 +7,7 @@ from netCDF4 import MFDataset
 var_time = 'time'        # Time in seconds since 1995-1-1 00:00:00
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 var_altitude = 'VLEV'    # Vertical levels in km ASL
+cloud_threshold = 10**-5
 
 # Load file into dataset
 dataset = MFDataset('./data/data.nc')
@@ -23,19 +24,19 @@ def load_pickle():
 
 def create_points_cloud(time_index):
     
-    points = []
+    points = [[0,0,0]]
         
     # Compute altitudes having clouds
-    cloud_altitudes = np.where(dataset.variables[var_lwc][time_index,:,:,:] > 0)[0]
+    cloud_altitudes = np.where(dataset.variables[var_lwc][time_index,:,:,:] > cloud_threshold)[0]
     cloud_altitudes = list(set(cloud_altitudes))
 
     for altitude_index in cloud_altitudes:
         altitude = int(dataset.variables[var_altitude][altitude_index,0,0])
 
         #Compute positions having clouds
-        cloud_positions = np.where(dataset.variables[var_lwc][time_index,altitude_index,:,:] > 0)
-        x_cloud_positions = cloud_positions[0]
-        y_cloud_positions = cloud_positions[1]
+        cloud_positions = np.where(dataset.variables[var_lwc][time_index,altitude_index,:,:] > cloud_threshold)
+        x_cloud_positions = cloud_positions[0] + cloud_altitudes[0]
+        y_cloud_positions = cloud_positions[1] + cloud_altitudes[0]
 
         for i in range(len(x_cloud_positions)):
             points.append([x_cloud_positions[i],y_cloud_positions[i],altitude_index])
@@ -48,11 +49,18 @@ if __name__ == "__main__":
     #save_pickle(lwc)
     #lwc = load_pickle()
 
-    
-    for i in range(2):
-        lwc = create_points_cloud(i)
-        height = [position[2] for position in lwc]
-        v = pptk.viewer(lwc)
-        v.color_map('gray')
-        v.attributes(height)
-        v.set(point_size=1)
+    points = create_points_cloud(66)
+    height = [position[2] for position in points]
+
+    v = pptk.viewer(points, height)
+    v.color_map('gray',scale=[10,65])
+    v.set(point_size=0.8)
+    v.set()
+
+    #poses = []
+    #poses.append([0, 0, 0, 0 * np.pi/2, np.pi/4, 5])
+    #poses.append([0, 0, 0, 1 * np.pi/2, np.pi/4, 5])
+    #poses.append([0, 0, 0, 2 * np.pi/2, np.pi/4, 5])
+    #poses.append([0, 0, 0, 3 * np.pi/2, np.pi/4, 5])
+    #poses.append([0, 0, 0, 4 * np.pi/2, np.pi/4, 5])
+    #v.play(poses, 2 * np.arange(5), repeat=True, interp='linear')

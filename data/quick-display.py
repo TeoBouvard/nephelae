@@ -52,8 +52,8 @@ atmShape.y = len(atm.variables['S_N_direction'][:])
 print("Shape : (", atmShape.t, atmShape.z, atmShape.x, atmShape.y, ")")
 
 var0 = 'RCT'
-# var1 = 'UT'     # WE wind (?)
-# var1 = 'VT'     # SN wind (?)
+# var1 = 'UT'     # WE wind
+# var1 = 'VT'     # SN wind
 var1 = 'WT'     # vertical wind
 # var1 = 'TKET'   # Turbulent kinetic energy
 # var1 = 'PABST'  # Absolute pressure

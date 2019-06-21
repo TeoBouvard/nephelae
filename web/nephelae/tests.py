@@ -1,4 +1,7 @@
+from timeit import default_timer as timer
+
 from django.test import TestCase
+
 from .models import HorizontalCrossSection
 
 hcs = HorizontalCrossSection()
@@ -33,11 +36,23 @@ class ModelTests(TestCase):
         self.assertAlmostEqual(hcs.altitude_range(), test_range, places=4)
 
     def test_print_cloud_string(self):
-        string_image = hcs.print_cloud_string()
+        string_image = hcs.print_clouds()
         #print(string_image)
         return True
 
     def test_altitude(self):
         altitude = hcs.dataset.variables['VLEV'][hcs.altitude_index,0,0]
-        print(altitude)
+        #print(altitude)
         return True
+
+    def test_max_upwind(self):
+        max_upwind = hcs.dataset.variables['WT']
+        print(max_upwind)
+        return True
+
+    def test_benchmark_encoding(self):
+        start = timer()
+        for i in range(10):
+            hcs.print_clouds()
+        end = timer()
+        print('Encoding of the image took',round(1000*(end-start)/10),'ms')

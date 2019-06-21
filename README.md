@@ -3,8 +3,11 @@
 ## TODO
 
 - assertion failed when idle and action
+- Assertion failed: (pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent), function px_rel, file posixio.c, line 449.
 - dimensions of map in km ?
-- collect requirements and dependencies !
+- collect requirements and dependencies ! -> pip install -r requirements.txt
+
+## Benchmark
 
 
 ## Modules 
@@ -36,11 +39,11 @@ jinja2, mpld3, PIL
     -   emagrammes
     -   infos drones
 
-## Libs
+## 3D preview
 
 -   Cesium (ok mais fort couplage maps)
 -   I3S bof
 -   Flyvast (\$\$)
 -   three.js (pas mal, doc++)
 -   Potree (open source, doc--, win--)
--   PPTK
+-   PPTK (simple à mettre en place, pas beaucoup de possibilités)
