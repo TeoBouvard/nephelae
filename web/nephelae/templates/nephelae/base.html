@@ -18,22 +18,28 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
 		<!-- Load icons -->
 		<link rel="shortcut icon" href="#">
+		<!-- Load require.js -->
+		<!--<script src="{% static 'nephelae/static/js/require.js' %}"></script>-->
+		<!-- Load jquery -->
+		<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
 		{% block additional_head %}{% endblock %}
 	</head>
 
 	<body>
 			<div class="external-wrapper">
 				<div id="nav" class="pill-nav">
-					{% block nav %}{% endblock %}
+					{% block nav %}
+					<a class='inactive' id='nav_preview' href="{% url 'preview' %}">3D Preview</a>
+					<a class='inactive' id='nav_map' href="{% url 'map' %}">Map</a>
+    				<a class='inactive' id='nav_cross_section' href="{% url 'cross_sections' %}">Cross Sections</a>
+   					<a class='inactive' id='nav_infos' href="{% url 'infos' %}">Infos</a> 
+					{% endblock %}
 				</div>
 				{% block page %}{% endblock %}
 			</div>
-
-		<!-- Load javascript -->
-		<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-		<script type="text/javascript" src="{% static 'nephelae/static/js/base.js' %}"></script>
-		<!-- Load require.js -->
-		<script data-main="{% static 'nephelae/static/js/base.js' %}" src="{% static 'nephelae/static/js/require.js' %}"></script>		
+		
+		<!-- Load additional_scripts -->
 		{% block additional_scripts %}{% endblock %}
 	</body>
 

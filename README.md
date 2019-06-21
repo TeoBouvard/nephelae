@@ -3,9 +3,11 @@
 ## TODO
 
 - assertion failed when idle and action
-- Assertion failed: (pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent), function px_rel, file posixio.c, line 449.
+- Assertion failed: (pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent), function px_rel, file posixio.c, line 449. -> instance every time ? no
 - dimensions of map in km ?
 - collect requirements and dependencies ! -> pip install -r requirements.txt
+- dissociate views
+- maps : https://leaflet-extras.github.io/leaflet-providers/preview/
 
 ## Benchmark
 
@@ -13,6 +15,7 @@
 ## Modules 
 
 jinja2, mpld3, PIL
+npm leaflet-rotatedmarker
 
 ## Questions
 

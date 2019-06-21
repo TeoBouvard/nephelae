@@ -1,8 +1,7 @@
 {% extends 'nephelae/base.html' %}
 {% load static %}
 
-{% block nav %}
-    <a href="{% url 'preview' %}">3D Preview</a>
-    <a href="{% url 'cross_sections' %}">Cross Sections</a>
-    <a class="active" href="{% url 'infos' %}">Infos</a> 
-{% endblock nav %}
+<!-- Load specific javascript -->
+{% block additional_scripts %}
+	<script type="text/javascript" src="{% static 'nephelae/static/js/infos.js' %}"></script>
+{% endblock %}

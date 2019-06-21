@@ -1,10 +1,16 @@
+// Activate current menu in nav
+document.getElementById('nav_cross_section').className = 'active';
+
 var time_slider = document.getElementById('time_slider');
 var altitude_slider = document.getElementById('altitude_slider');
 var time_display = document.getElementById('time_display');
 var altitude_display = document.getElementById('altitude_display');
 
-// Display first image on window load
-window.onload = displayImage(0,0);
+
+$(document).ready(function(){
+    // Display first image
+    displayImage(0,0);
+});
 
 // Update the current slider value and display image accordingly
 time_slider.oninput = function() {
@@ -12,12 +18,12 @@ time_slider.oninput = function() {
 }
 time_slider.onchange = function() {
     displayImage(this.value, altitude_slider.value);
+    document.getElementById('nav_cross_section').className = 'active';
 }
 
 // Update the current slider value and display image accordingly
 altitude_slider.oninput = function() {
     altitude_display.innerHTML = '...';
-    console.log(this.value)
 }
 altitude_slider.onchange = function() {
     displayImage(time_slider.value,this.value);
@@ -32,15 +38,13 @@ function displayImage(time_percentage, altitude_percentage){
         data: {
             time_percentage: time_percentage,
             altitude_percentage: altitude_percentage,
-        },
-        success: function(response) {
-            console.log(response);
-            $('#clouds_div').html('<img src="' + response.clouds + '">');
-            $('#thermals_div').html('<img src="' + response.thermals + '">');
-
-            $('#time_display').html(toDateTime(response.date))
-            $('#altitude_display').html(response.altitude + "m ASL")
         }
+    }).done(function(response){
+        console.debug(response);
+        $('#clouds_div').html('<img src="' + response.clouds + '">');
+        $('#thermals_div').html('<img src="' + response.thermals + '">');
+        $('#time_display').html(toDateTime(response.date))
+        $('#altitude_display').html(response.altitude + "m ASL")
     });
 }
 

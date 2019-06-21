@@ -2,16 +2,49 @@ from timeit import default_timer as timer
 
 import matplotlib.pyplot as plt
 import mpld3
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse, Http404
 from django.shortcuts import render
 
 from .models import HorizontalCrossSection
 
-# Create horizontal cross section
+# Create horizontal cross section -> separate views later
 hcs = HorizontalCrossSection()
 
-def preview(request):
-    return render(request, 'nephelae/preview.html')
+def update_map(request):
+    positions = []
+
+    drone_id1 = 1
+    drone_position1 = [43.6077, 1.4482]
+
+    drone_id2 = 2
+    drone_position2 = [43.6097, 1.4452]
+
+    positions.append({'drone_id' : drone_id1, 'position' : drone_position1})
+    positions.append({'drone_id' : drone_id2, 'position' : drone_position2})
+
+    response = JsonResponse({
+        'positions' : positions
+        })
+
+    return response
+
+def get_drones(request):
+    drones = []
+
+    drone_id1 = 1
+    drone_position1 = [43.6047, 1.4442]
+
+    drone_id2 = 2
+    drone_position2 = [43.6057, 1.4452]
+
+    drones.append({'drone_id' : drone_id1, 'position' : drone_position1})
+    drones.append({'drone_id' : drone_id2, 'position' : drone_position2})
+
+    response = JsonResponse({
+        'drones': drones,
+        })
+
+    return response
 
 def cross_section(request):
 
@@ -56,7 +89,7 @@ def cross_section(request):
 
         print('Benchmark :')
         print('Server took',1000*(end1 - start),'ms to get POST parameters')
-        print('Server took',1000*(end2 - end1),'ms to set hcs attributes')
+        print('Server took',1000*(end2 - end1),'ms to create cross section')
         print('Server took',1000*(end3 - end2),'ms to encode strings in base64')
         print('Server took',1000*(end - start),'ms to craft an answer')
 
@@ -67,5 +100,19 @@ def cross_section(request):
         return render(request, 'nephelae/cross_section.html')
 
 
+# Rendering of empty pages
 def infos(request):
     return render(request, 'nephelae/infos.html')
+
+def preview(request):
+    return render(request, 'nephelae/preview.html')
+
+def map(request):
+    return render(request, 'nephelae/map.html')
+
+def img(request):
+    try:
+        with open('nephelae/img/plane_icon.png', "rb") as f:
+            return HttpResponse(f.read(), content_type="image/png")
+    except IOError:
+        return Http404()

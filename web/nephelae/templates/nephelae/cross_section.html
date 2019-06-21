@@ -11,13 +11,6 @@
 	<script type="text/javascript" src="{% static 'nephelae/static/js/cross_section.js' %}"></script>
 {% endblock %}
 
-<!-- Activate current menu in nav -->
-{% block nav %}
-    <a href="{% url 'preview' %}">3D Preview</a>
-    <a class="active" href="{% url 'cross_sections' %}">Cross Sections</a>
-    <a href="{% url 'infos' %}">Infos</a> 
-{% endblock nav %}
-
 {% block page %}
 
     <!-- Display cross sections images -->
