@@ -26,7 +26,7 @@ function initializeMap(){
         iconUrl: '/img/plane_icon.png', // comment accéder à ce putain de fichier ?
         iconSize:     [50, 50], // size of the icon
         iconAnchor:   [25, 25], // marker's location
-        popupAnchor:  [0, 30] // relative to the iconAnchor
+        popupAnchor:  [0, 25] // relative to the iconAnchor
     });
 }
 
@@ -68,16 +68,5 @@ function updateDrones(){
         }
     });
 
-    $(drones).each(function () {            
-        var deg = $(this).data('rotate') || 0;
-        var rotate = 'rotate(' + $(this).data('rotate') + 'deg) scale(0.5,0.5)';
-        $(this).css({
-            '-webkit-transform': rotate,
-            '-moz-transform': rotate,
-            '-o-transform': rotate,
-            '-ms-transform': rotate,
-            'transform': rotate
-        });
-    });
 }
 

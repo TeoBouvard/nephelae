@@ -7,7 +7,8 @@
 - dimensions of map in km ?
 - collect requirements and dependencies ! -> pip install -r requirements.txt
 - dissociate views
-- maps : https://leaflet-extras.github.io/leaflet-providers/preview/
+- maps : https://leaflet-extras.github.io/leaflet-providers/preview/ + logo png
+- start info page
 
 ## Benchmark
 
@@ -20,7 +21,7 @@ npm leaflet-rotatedmarker
 ## Questions
 
 -   authentication ?
--   approximate mesh from points cloud
+-   approximate mesh from points cloud -> big points
 -   csrf token to prevent Cross Site Request
 
 ## Ideas
