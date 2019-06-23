@@ -3,10 +3,17 @@ Q : Why is this stylesheet in such a convoluted tree of files ?
 A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 */
 
-#map { 
-    height: 400px; 
+#map {
+    margin: auto;
+    height: 400px;
+    width: 90%;
 }
 
-#altitude_chart { 
-    height: 200px !important;
+#graph {
+    max-height: 200px;
+    position: relative;
+    margin: auto;
+    width: 90%;
 }
+
+
