@@ -17,5 +17,5 @@ urlpatterns = [
     
     path('infos/', views.infos, name='infos'),
 
-    path('img/plane_icon.png', views.img, name='img'),
+    path('img/plane_icon/<int:index>', views.plane_icon, name='plane_icon'),
 ]

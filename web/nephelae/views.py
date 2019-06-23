@@ -1,8 +1,10 @@
+import os
+import random
 from timeit import default_timer as timer
 
 import matplotlib.pyplot as plt
 import mpld3
-from django.http import HttpRequest, HttpResponse, JsonResponse, Http404
+from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from .models import HorizontalCrossSection
@@ -10,6 +12,8 @@ from .models import HorizontalCrossSection
 # Create horizontal cross section -> separate views later
 hcs = HorizontalCrossSection()
 
+
+# update_map and get_drones are redundant, delete later !
 def update_map(request):
     positions = []
 
@@ -110,9 +114,7 @@ def preview(request):
 def map(request):
     return render(request, 'nephelae/map.html')
 
-def img(request):
-    try:
-        with open('nephelae/img/plane_icon.png', "rb") as f:
-            return HttpResponse(f.read(), content_type="image/png")
-    except IOError:
-        return Http404()
+# Render icons for drones
+def plane_icon(request, index):
+    with open('nephelae/img/icons/plane_icon' + str(index) + '.png', "rb") as f:
+        return HttpResponse(f.read(), content_type="image/png")
