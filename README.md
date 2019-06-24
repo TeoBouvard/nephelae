@@ -1,4 +1,4 @@
-# nephelae
+# NEPHELAE : Network for studying Entrainment and microPHysics of cLouds using Adaptive Exploration
 
 ## TODO
 
