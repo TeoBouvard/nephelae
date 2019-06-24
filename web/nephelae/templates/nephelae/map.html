@@ -11,11 +11,11 @@
 
 {% block additional_scripts %}
     <!-- Load leaflet js + oriented marker (drone heading) + UTM translation -->
-    <script type="text/javascript" src="{% static 'nephelae/static/js/leaflet.js' %}"></script>
-    <script type="text/javascript" src="{% static 'nephelae/static/js/oriented_marker.js' %}"></script>
-    <script type="text/javascript" src="{% static 'nephelae/static/js/L.LatLng.UTM.js' %}"></script>
+    <script type="text/javascript" src="{% static 'nephelae/static/js/libs/leaflet.js' %}"></script>
+    <script type="text/javascript" src="{% static 'nephelae/static/js/libs/oriented_marker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'nephelae/static/js/libs/L.LatLng.UTM.js' %}"></script>
     <!-- Load charts js -->
-    <script type="text/javascript" src="{% static 'nephelae/static/js/chart.js' %}"></script>
+    <script type="text/javascript" src="{% static 'nephelae/static/js/libs/chart.js' %}"></script>
 	<!-- Load specific javascript -->
 	<script type="text/javascript" src="{% static 'nephelae/static/js/map.js' %}"></script>
 {% endblock %}
