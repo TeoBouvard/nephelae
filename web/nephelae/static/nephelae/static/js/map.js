@@ -12,6 +12,8 @@ $(document).ready(function(){
     initializeDrones();
     
     setTimeout(updateDrones, 2000);
+    setTimeout(updateDrones, 2000);
+    setTimeout(updateDrones, 2000);
     //updateDrones();
     //setInterval(updateDrones, 2000);
 });
@@ -46,7 +48,7 @@ function initializeMap(){
 
 function initializeDrones(){
     var addedDrones = [];
-    var colors = ["red", "blue", "green"];
+    var colors = ["red", "blue", "green"]; // Add colors for more drones
 
     $.ajax({ url: 'drones/', type: 'GET' }).done(function(response){
 
@@ -59,11 +61,12 @@ function initializeDrones(){
             var marker = L.marker(position, {icon: icons[i]});
 
             drones.push({id : drone_id, position : marker, altitude : altitude});
-            drones[i].position.addTo(flight_map).bindPopup('Drone n°' + drone_id);
+            drones[i].position.addTo(flight_map).bindPopup('Drone ' + drone_id);
             addedDrones.push(drone_id);
 
             chart.data.datasets.push({
-                label: "Drone " + (i+1),
+                id: i,
+                label: "Drone " + i,
                 borderColor: colors[i],
                 fill: 'false',
                 data: [altitude],
@@ -76,48 +79,45 @@ function initializeDrones(){
 
 function updateDrones(){
     var updatedDrones = [];
-    // Request new postitions of drones
+
+    // Request updated data from the server
     $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
 
-        // Update markers
+        // Parse response
         for (var i = 0; i < response.positions.length; i++){
             var drone_id = response.positions[i].drone_id;
             var position = response.positions[i].position;
-            
-            // THIS WILL BE PART OF THE RESPONSE IN VIEWS.PY !
-            var past_positions = [
-                [43.6077, 1.4482],
-                [43.6080, 1.4482],
-                [43.6090, 1.4482],
-                [43.6100, 1.4482],
-                [43.6110, 1.4482],
-            ];
-            
-            var future_positions = [
-                [43.6120, 1.4482],
-                [43.6130, 1.4482],
-                [43.6140, 1.4482],
-                [43.6150, 1.4482],
-                [43.6160, 1.4482],
-            ]; 
+            var altitude = response.positions[i].altitude;
+            var past_positions = response.positions[i].past_positions;
+            var future_positions = response.positions[i].future_positions;
 
-            var trail = L.polyline(past_positions, {color : 'grey'}).addTo(flight_map);
-            var intentions = L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
-            
-            // Identify corresponding drone
+            // Identify corresponding drone ...
             var drone_to_update = drones.find(x => x.id == drone_id);
+            var altitude_to_update = chart.data.datasets.find(x => x.id == drone_id);
 
-            // Update corresponding drone
-            if(drone_to_update != undefined){
+            // ... and update it
+            if(drone_to_update && altitude_to_update){
+
+                // Update markers
                 drone_to_update.position.setLatLng(position);
-                drone_to_update.position.setRotationAngle(90); // compute heading in the future
+                drone_to_update.position.setRotationAngle(0); // compute heading in the future
+
+                // Add trails and intentions to the map
+                L.polyline(past_positions, {color : 'grey'}).addTo(flight_map);
+                L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
+
+                // Add new altitude to the chart
+                altitude_to_update.data.push(altitude)
+
+                // Log changes
                 updatedDrones.push(drone_id);
             } 
-            // Or display error message
+            // ... or display error message if drone id does not match
             else {
                 console.error("no drone with id ", drone_id, " found !")
             }
         }
+        chart.update();
         console.debug('positions of drones', updatedDrones, ' updated');
     });
 

@@ -11,9 +11,11 @@
 - drone icon : https://www.iconfinder.com/editor/?id=322416&size=512&hash=35e99f72b6a7fe901ef630ae0ef71ac68a9e7efcdc24e720b4cd5d2a
 - start info page
 - plotly or chart.js ?
+- cross section dropdown
 
 ## Benchmark
 
+- display cross section : 400ms, mostly due to base64 image encoding
 
 ## Questions
 

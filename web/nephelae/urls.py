@@ -4,7 +4,7 @@ from django.views.generic import RedirectView
 from . import views
 
 urlpatterns = [
-    path('', RedirectView.as_view(url='preview')),
+    path('', RedirectView.as_view(url='map')),
 
     path('preview/', views.preview, name='preview'),
 

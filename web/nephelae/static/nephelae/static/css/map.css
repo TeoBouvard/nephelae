@@ -4,10 +4,10 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 */
 
 #map {
-    top: 20px;
+    top: 0px;
     margin: auto;
     height: 400px;
-    width: 90%;
+    width: 100%;
 }
 
 #graph {
@@ -15,7 +15,7 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
     height: 200px;
     position: relative;
     margin: auto;
-    width: 90%;
+    width: 95%;
 }
 
 
