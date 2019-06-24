@@ -1,4 +1,5 @@
 .vscode
 .DS_Store
 data.nc
-__pycache__
+/**/__pycache__/*
+virtual_env

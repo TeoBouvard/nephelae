@@ -3,8 +3,6 @@ import io
 import urllib
 
 import matplotlib.pyplot as plt
-import mpld3
-import numpy as np
 from django.db import models
 from netCDF4 import MFDataset
 
@@ -14,7 +12,8 @@ var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
 # Load file into dataset
-dataset = MFDataset('../data/data.nc')
+dataset = MFDataset('../data/mock_data.nc')
+
 
 class HorizontalCrossSection(models.Model):
 
@@ -45,7 +44,7 @@ class HorizontalCrossSection(models.Model):
         infos += str(shape['W_E_direction']) + ', '
         infos += str(shape['S_N_direction']) + ")"
         return infos
-    
+        
     def get_shape(self):
         keys = [var_time,var_altitude, 'W_E_direction', 'S_N_direction']
         values = [
@@ -81,13 +80,13 @@ class HorizontalCrossSection(models.Model):
         return string
     
     def print_thermals_img(self):
-        thermals = dataset.variables[var_upwind][self.time_index,self.altitude_index,:,:]
+        thermals = dataset.variables[var_upwind][self.time_index, self.altitude_index, :, :]
         image = plt.imshow(thermals, origin='lower')
         plt.savefig('nephelae/img/thermals.jpg', format='jpg') 
     
     def print_clouds(self):
         
-        clouds = dataset.variables[var_lwc][self.time_index,self.altitude_index,:,:]
+        clouds = dataset.variables[var_lwc][self.time_index, self.altitude_index, :,:]
 
         # Create pyplot image
         plt.imshow(clouds, origin='lower',vmin=0, vmax=self.max_lwc())
