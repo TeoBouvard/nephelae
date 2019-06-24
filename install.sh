@@ -13,5 +13,3 @@ pip3 install -r requirements.txt
 
 cd web
 source runserver.sh
-deactivate
-
