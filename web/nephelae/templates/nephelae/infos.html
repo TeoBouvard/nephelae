@@ -1,8 +1,10 @@
 {% extends 'nephelae/base.html' %}
 {% load static %}
 
-<!-- Load specific javascript -->
 {% block additional_scripts %}
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<!-- Load specific javascript -->
 	<script type="text/javascript" src="{% static 'nephelae/static/js/infos.js' %}"></script>
+	<!-- Load charts js -->
+ 	<script type="text/javascript" src="{% static 'nephelae/static/js/chart.js"></script>
+	<script type="text/javascript" src="{% static 'nephelae/static/js/map.js' %}"></script>
 {% endblock %}

@@ -5,17 +5,18 @@
     <!-- Load specific CSS -->
 	<link rel="stylesheet" type="text/css" href="{% static 'nephelae/static/css/map.css' %}"/>
     <!-- Load leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'nephelae/static/css/leaflet.css' %}"/>
 {% endblock %}
 
-<!-- Load specific javascript -->
+
 {% block additional_scripts %}
     <!-- Load leaflet js + oriented marker (drone heading) + UTM translation -->
-    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    <script type="text/javascript" src="{% static 'nephelae/static/js/leaflet.js' %}"></script>
     <script type="text/javascript" src="{% static 'nephelae/static/js/oriented_marker.js' %}"></script>
     <script type="text/javascript" src="{% static 'nephelae/static/js/L.LatLng.UTM.js' %}"></script>
     <!-- Load charts js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script type="text/javascript" src="{% static 'nephelae/static/js/chart.js"></script>
+	<!-- Load specific javascript -->
 	<script type="text/javascript" src="{% static 'nephelae/static/js/map.js' %}"></script>
 {% endblock %}
 
