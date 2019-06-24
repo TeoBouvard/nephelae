@@ -3,41 +3,40 @@ Q : Why is this stylesheet in such a convoluted tree of files ?
 A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 */
 
-.body {
-    background: white;
+* {
+    margin: 0;
 }
 
 /* Style of links inside the navigation menu */
 .pill-nav {
-    width: 100%;
+    list-style-type: none;
     position: relative;
-    padding: 10px;
+    top: 0px;
+    overflow: hidden;
+    background-color: whitesmoke;
 }
 
 .pill-nav a {
-    display: inline-block;
+    float: left;
+    display: block;
     color: black;
     text-align: center;
-    padding: 10px;
-    text-decoration: none;
-    font-size: 18px;
+    padding: 14px 14px;
     font-family: "Roboto";
-    border-style: none;
-    border-radius: 4px;
+    font-size: 17px;
+    text-decoration: none;
 }
 
-
 /* Change the color of links on mouse-over */
-.pill-nav a:hover {
+.pill-nav a:hover:not(.active) {
     background-color: #ddd;
-    color: black;
 }
 
 
 /* Add a color to the active/current link */
 .pill-nav a.active {
-    background-color: dodgerblue;
     color: white;
+    background-color: dodgerblue;
 }
 
 /* Images fill parent divs */

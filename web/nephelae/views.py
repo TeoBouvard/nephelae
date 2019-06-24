@@ -37,12 +37,14 @@ def get_drones(request):
 
     drone_id1 = 1
     drone_position1 = [43.6047, 1.4442]
+    drone_altitude1 = 100
 
     drone_id2 = 2
     drone_position2 = [43.6057, 1.4452]
+    drone_altitude2 = 50
 
-    drones.append({'drone_id' : drone_id1, 'position' : drone_position1})
-    drones.append({'drone_id' : drone_id2, 'position' : drone_position2})
+    drones.append({'drone_id' : drone_id1, 'position' : drone_position1, 'altitude' : drone_altitude1})
+    drones.append({'drone_id' : drone_id2, 'position' : drone_position2, 'altitude' : drone_altitude2})
 
     response = JsonResponse({
         'drones': drones,

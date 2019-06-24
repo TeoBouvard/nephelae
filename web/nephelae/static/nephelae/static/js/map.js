@@ -8,12 +8,12 @@ var flight_map;
 
 $(document).ready(function(){
     initializeMap();
-    initializeDrones();
     initializeChart();
-
+    initializeDrones();
+    
     setTimeout(updateDrones, 2000);
     //updateDrones();
-    //window.setInterval(updateDrones, 2000);
+    //setInterval(updateDrones, 2000);
 });
 
 
@@ -31,8 +31,8 @@ function initializeMap(){
     // Icon class
     var planeIcon = L.Icon.extend({
         options: { 
-            iconSize:     [30, 30], // size of the icon
-            iconAnchor:   [15, 15], // marker's location
+            iconSize:     [20, 20], // size of the icon
+            iconAnchor:   [10, 10], // marker's location
             popupAnchor:  [0, 0]    // relative to the iconAnchor
         }
     });
@@ -45,25 +45,37 @@ function initializeMap(){
 }
 
 function initializeDrones(){
+    var addedDrones = [];
+    var colors = ["red", "blue", "green"];
+
     $.ajax({ url: 'drones/', type: 'GET' }).done(function(response){
 
         // Initialize drone array with drone_id and position marker
         for (var i = 0; i < response.drones.length; i++){
             let drone_id = response.drones[i].drone_id;
             let position = response.drones[i].position;
+            let altitude = response.drones[i].altitude;
 
             var marker = L.marker(position, {icon: icons[i]});
 
-            drones.push({id : drone_id, position : marker});
-            drones[i].position.addTo(flight_map).bindPopup('Drone n°' + drone_id);;
-            console.debug('drone[', drones[i].id, "] added to the map");
+            drones.push({id : drone_id, position : marker, altitude : altitude});
+            drones[i].position.addTo(flight_map).bindPopup('Drone n°' + drone_id);
+            addedDrones.push(drone_id);
+
+            chart.data.datasets.push({
+                label: "Drone " + (i+1),
+                borderColor: colors[i],
+                fill: 'false',
+                data: [altitude],
+            });
         }
-
+        console.debug('drones', addedDrones, 'added to the map');
+        chart.update();
     });
-
 }
 
 function updateDrones(){
+    var updatedDrones = [];
     // Request new postitions of drones
     $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
 
@@ -89,8 +101,8 @@ function updateDrones(){
                 [43.6160, 1.4482],
             ]; 
 
-            var trail = L.polyline(past_positions, {color : 'blue'}).addTo(flight_map);
-            var intentions = L.polyline(future_positions,{color : 'grey', dashArray: '10,10'}).addTo(flight_map);
+            var trail = L.polyline(past_positions, {color : 'grey'}).addTo(flight_map);
+            var intentions = L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
             
             // Identify corresponding drone
             var drone_to_update = drones.find(x => x.id == drone_id);
@@ -99,13 +111,14 @@ function updateDrones(){
             if(drone_to_update != undefined){
                 drone_to_update.position.setLatLng(position);
                 drone_to_update.position.setRotationAngle(90); // compute heading in the future
-                console.debug('position of drone[', drones[i].id, "] updated");
+                updatedDrones.push(drone_id);
             } 
             // Or display error message
             else {
                 console.error("no drone with id ", drone_id, " found !")
-            }    
+            }
         }
+        console.debug('positions of drones', updatedDrones, ' updated');
     });
 
 }
@@ -115,12 +128,16 @@ function initializeChart(){
     
     chart = new Chart(chart_canvas, {
         type: 'line',
-        data: {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [{
-                label: 'Drone n°1',
-                borderColor: 'rgb(255, 99, 132)',
-                data: [0, 10, 5, 2, 20, 30, 45]
+
+        scales: {
+            xAxes: [{
+                type: 'time',
+                time: {
+                    displayFormats: {
+                        second: 'h:mm:ss',
+                        distribution: 'series',
+                    }
+                }
             }]
         },
 
@@ -128,6 +145,6 @@ function initializeChart(){
         options: {
             responsive: true,
             maintainAspectRatio: false,
-        }
+        },
     });
 }

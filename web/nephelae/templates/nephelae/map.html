@@ -10,9 +10,10 @@
 
 <!-- Load specific javascript -->
 {% block additional_scripts %}
-    <!-- Load leaflet js + oriented marker (drone heading) -->
+    <!-- Load leaflet js + oriented marker (drone heading) + UTM translation -->
     <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
     <script type="text/javascript" src="{% static 'nephelae/static/js/oriented_marker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'nephelae/static/js/L.LatLng.UTM.js' %}"></script>
     <!-- Load charts js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 	<script type="text/javascript" src="{% static 'nephelae/static/js/map.js' %}"></script>
@@ -21,6 +22,6 @@
 {% block page %}
     <div id="map"></div>
     <div id="graph">
-        <canvas id="altitude_chart" height='200px'></canvas>
+        <canvas id="altitude_chart"></canvas>
     </div>
 {% endblock %}
