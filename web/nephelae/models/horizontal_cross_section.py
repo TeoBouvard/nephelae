@@ -61,7 +61,7 @@ class HorizontalCrossSection(models.Model):
         thermals = dataset.variables[var_upwind][self.time_index,self.altitude_index,:,:]
 
         # Create pyplot image
-        image = plt.imshow(thermals, origin='lower', vmin=self.min_upwind(), vmax=self.max_upwind())
+        plt.imshow(thermals, origin='lower', vmin=self.min_upwind(), vmax=self.max_upwind())
         title = ''
         plt.title('Vertical air speed in m/s')
         plt.colorbar()
@@ -81,7 +81,7 @@ class HorizontalCrossSection(models.Model):
     
     def print_thermals_img(self):
         thermals = dataset.variables[var_upwind][self.time_index, self.altitude_index, :, :]
-        image = plt.imshow(thermals, origin='lower')
+        plt.imshow(thermals, origin='lower')
         plt.savefig('nephelae/img/thermals.jpg', format='jpg') 
     
     def print_clouds(self):
