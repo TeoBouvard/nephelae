@@ -14,12 +14,10 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<title>Nephelae</title>
 		<!-- Load static CSS -->
 		<link rel="stylesheet" type="text/css" href="{% static 'nephelae/static/css/base.css' %}" />
-		<!-- Load fonts -->
-		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
 		<!-- Load icons -->
 		<link rel="shortcut icon" href="#">
 		<!-- Load jquery -->
-		<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+		<script type="text/javascript" src="{% static 'nephelae/static/js/jquery.js' %}"></script>
 
 		{% block additional_head %}{% endblock %}
 	</head>

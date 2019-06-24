@@ -7,6 +7,13 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
     margin: 0;
 }
 
+/* Import local font */
+@font-face {
+    font-family: 'Roboto';
+    src: url('../fonts/Roboto-Light.ttf')  
+         format("truetype");
+  }
+
 /* Style of links inside the navigation menu */
 .pill-nav {
     list-style-type: none;
