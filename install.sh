@@ -15,5 +15,4 @@ pip3 install -r requirements.txt
 mv virtual_env/lib/python3.6/site-packages/pptk/libs/libz.so.1 virtual_env/lib/python3.6/site-packages/pptk/libs/libz.so.1.old
 sudo ln -s /lib/x86_64-linux-gnu/libz.so.1 virtual_env/lib/python3.6/site-packages/pptk/libs/
 
-cd web
 source runserver.sh
