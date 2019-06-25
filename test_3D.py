@@ -6,11 +6,10 @@ from netCDF4 import MFDataset
 
 var_time = 'time'        # Time in seconds since 1995-1-1 00:00:00
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
-var_altitude = 'VLEV'    # Vertical levels in km ASL
+var_altitude = 'VLEV'
 cloud_threshold = 10**-5
-
 # Load file into dataset
-dataset = MFDataset('./data/data.nc')
+dataset = MFDataset('./data/MesoNH.nc')
 
 def save_pickle(array):
     print('starting to save pickle ...')
@@ -49,18 +48,18 @@ if __name__ == "__main__":
     #save_pickle(lwc)
     #lwc = load_pickle()
 
-    points = create_points_cloud(66)
+    points = create_points_cloud(0)
     height = [position[2] for position in points]
+
 
     v = pptk.viewer(points, height)
     v.color_map('gray',scale=[10,65])
     v.set(point_size=0.8)
-    v.set()
 
-    #poses = []
-    #poses.append([0, 0, 0, 0 * np.pi/2, np.pi/4, 5])
-    #poses.append([0, 0, 0, 1 * np.pi/2, np.pi/4, 5])
-    #poses.append([0, 0, 0, 2 * np.pi/2, np.pi/4, 5])
-    #poses.append([0, 0, 0, 3 * np.pi/2, np.pi/4, 5])
-    #poses.append([0, 0, 0, 4 * np.pi/2, np.pi/4, 5])
+    poses = []
+    poses.append([128, 128, 25, 0 * np.pi/2, np.pi/4, 500])
+    poses.append([128, 128, 25, 1 * np.pi/2, np.pi/4, 500])
+    poses.append([128, 128, 25, 2 * np.pi/2, np.pi/4, 500])
+    poses.append([128, 128, 25, 3 * np.pi/2, np.pi/4, 500])
+    poses.append([128, 128, 25, 4 * np.pi/2, np.pi/4, 500])
     #v.play(poses, 2 * np.arange(5), repeat=True, interp='linear')

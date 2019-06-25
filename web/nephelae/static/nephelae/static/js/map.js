@@ -1,21 +1,26 @@
 // Activate current menu in nav
 document.getElementById('nav_map').className = 'active';
 
-var chart;
+var chart, flight_map;
+var colors = ["red", "blue", "green", "yellow", "orange"]; // Add colors for more drones
 var icons = [];
 var drones = {};
-var flight_map;
+var refresh_rate = 200 //ms
+
 
 $(document).ready(function(){
+    // Initialize document elements
     initializeMap();
     initializeChart();
     initializeDrones();
 
-    setInterval(updateDrones, 2000);
+    // Update elements every 'refresh_rate' ms
+    setInterval(updateDrones, refresh_rate);
 });
 
 
 function initializeMap(){
+
     // Map
     flight_map = L.map('map');
 
@@ -36,7 +41,7 @@ function initializeMap(){
     });
 
     // Create an icon for each image in the icon folder
-    for(var i = 0; i < 8; i++){
+    for(var i = 0; i < colors.length; i++){
         var random_icon = new planeIcon({iconUrl: '/img/plane_icon/' + i})
         icons.push(random_icon);
     }
@@ -45,12 +50,10 @@ function initializeMap(){
 function initializeDrones(){
     var addedDrones = [];
     var index_icon = 0;
-    var colors = ["red", "blue", "green"]; // Add colors for more drones
 
     $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
 
         // Initialize drone array with drone_id and position marker
-        console.debug(response);
         for (var key in response.data){
             // Parse response data
             var drone_id = key;
@@ -107,8 +110,6 @@ function updateDrones(){
             var altitude = response.data[key].altitude.toFixed(2);
             var heading = response.data[key].heading.toFixed(0);
             var time = response.data[key].time;
-
-            //console.log(past_positions);
 
             // Identify corresponding drone ...
             var drone_to_update = drones[drone_id];

@@ -9,6 +9,7 @@
 - plotly or chart.js ?
 - cross section dropdown
 - split utmtolatlng in another module
+- BUG posixio.c:449: px_rel: Assertion `pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent' failed.
 
 
 ## Benchmark
