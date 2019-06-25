@@ -11,7 +11,7 @@ var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
 # Load file into dataset
-dataset = MFDataset('../data/MesoNH.nc')
+dataset = MFDataset('../../MesoNH/MesoNH.nc')
 
 
 class HorizontalCrossSection():
