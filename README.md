@@ -14,7 +14,7 @@
 
 ## Benchmark
 
-- display cross section : 400ms, mostly due to base64 image encoding, have to try get images
+- display cross section : 400ms, mostly due to base64 image encoding, have to try get images -> as long ...
 
 ## Questions
 

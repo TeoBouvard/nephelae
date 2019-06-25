@@ -31,8 +31,6 @@ def cross_section(request):
         #base64 strings representing cross section images
         cloud_string = cross_section.print_clouds()
         thermals_string = cross_section.print_thermals()
-        #hcs.print_clouds_img()
-        #hcs.print_thermals_img()
 
         end3 = timer()
 
