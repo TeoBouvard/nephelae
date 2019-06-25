@@ -10,11 +10,11 @@ var_altitude = 'VLEV'    # Vertical levels in km ASL
 var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
-# Load file into dataset
+# IMPORTANT -> UPDATE YOUR MESONH FILE PATH
 dataset = MFDataset('../../MesoNH/MesoNH.nc')
 
 
-class HorizontalCrossSection():
+class HorizontalCrossSection:
 
     # Initialize horizontal cross section with altitude and time
     def __init__(self, altitude_index=0, time_index=0):
