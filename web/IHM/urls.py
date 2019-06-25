@@ -20,7 +20,6 @@ from django.contrib.staticfiles.urls import static, staticfiles_urlpatterns
 
 urlpatterns = [
     path('', include('nephelae.urls')),
-    path('admin/', admin.site.urls),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

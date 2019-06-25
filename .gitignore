@@ -1,7 +1,6 @@
 .vscode
 .DS_Store
-data.nc
 __pycache__/
 virtual_env
 *.pyc
-MesoNH.nc
+db.sqlite3
