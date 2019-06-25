@@ -10,12 +10,8 @@ $(document).ready(function(){
     initializeMap();
     initializeChart();
     initializeDrones();
-    
-    //setTimeout(updateDrones, 2000);
-    //setTimeout(updateDrones, 2000);
-    //setTimeout(updateDrones, 2000);
-    //updateDrones();
-    setInterval(updateDrones, 1000);
+
+    setInterval(updateDrones, 2000);
 });
 
 
@@ -35,7 +31,6 @@ function initializeMap(){
         options: { 
             iconSize:     [20, 20], // size of the icon
             iconAnchor:   [10, 10], // marker's location.setView([43.6047, 1.4442], 13);
-
             popupAnchor:  [0, 0]    // relative to the iconAnchor
         }
     });
@@ -57,31 +52,42 @@ function initializeDrones(){
         // Initialize drone array with drone_id and position marker
         console.debug(response);
         for (var key in response.data){
+            // Parse response data
             var drone_id = key;
             var position = response.data[key].position;
-            var altitude = response.data[key].altitude;
+            var altitude = response.data[key].altitude.toFixed(2);
             var heading = response.data[key].heading;
-
-
+            
+            // Create leaflet marker at drone position
             var marker = L.marker(position, {icon: icons[index_icon]});
 
-            drones[drone_id] = ({position : marker, altitude : altitude, heading: heading});
-            drones[drone_id].position.addTo(flight_map).setRotationAngle(heading).bindPopup('Drone ' + drone_id);
+            // Update drones dictionnary with discovered drone
+            drones[drone_id] = ({
+                color : colors[index_icon], 
+                position : marker, 
+                altitude : altitude, 
+                heading: heading, 
+                past_positions:[position]
+            });
+
+            // Add drone marker to the map
+            drones[drone_id].position.addTo(flight_map).setRotationAngle(heading);
+            drones[drone_id].position.bindPopup(infosToString(drone_id, altitude, heading));
             addedDrones.push(drone_id);
 
+            // Update chart data with new dataset and line color corresponding to the icon
             chart.data.datasets.push({
                 id: drone_id,
                 label: "Drone " + drone_id,
+                data: [altitude],
                 pointRadius: 1,
                 pointHoverRadius: 1,
                 borderColor: colors[index_icon++],
                 fill: 'false',
-                data: [altitude],
-                
             });
         }
         console.debug('drones', addedDrones, 'added to the map');
-        chart.update();
+        chart.update(0);
 
         // Center map on drone last drone added
         flight_map.setView(position, 16);
@@ -98,9 +104,8 @@ function updateDrones(){
         for (var key in response.data){
             var drone_id = key;
             var position = response.data[key].position;
-            var past_positions = response.data[key].past_positions;
-            var altitude = response.data[key].altitude;
-            var heading = response.data[key].heading;
+            var altitude = response.data[key].altitude.toFixed(2);
+            var heading = response.data[key].heading.toFixed(0);
             var time = response.data[key].time;
 
             //console.log(past_positions);
@@ -113,27 +118,39 @@ function updateDrones(){
             if(drone_to_update && altitude_to_update){
 
                 // Update markers
-                drone_to_update.position.setLatLng(position);
-                drone_to_update.position.setRotationAngle(heading); // compute heading in the future
+                drone_to_update.position.setLatLng(position).setRotationAngle(heading);
+                drone_to_update.position.setPopupContent(infosToString(drone_id, altitude, heading));
+
+                // Update past positions
+                drone_to_update.past_positions.push(position);
 
                 // Add trails and intentions to the map
-                //L.polyline(past_positions, {color : 'grey'}).addTo(flight_map);
+                L.polyline(
+                    drone_to_update.past_positions, {
+                    color : drone_to_update.color, 
+                    weight : '2',
+                    dashArray : '5,7',
+                    }).addTo(flight_map);
                 //L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
 
                 // Add new altitude to the chart
-                // console.debug(time + ":" + altitude + "m");     
-                chart.data.labels.push(time);
+                if (time%10 <= 1){
+                    chart.data.labels.push(''); // -> display time once in a while ?
+                } else {
+                    chart.data.labels.push('');
+                }
                 altitude_to_update.data.push(altitude);
 
                 // Log changes
                 updatedDrones.push(drone_id);
             } 
-            // ... or display error message if drone id does not match
+            // ... or display error message if drone id does not match -> update drones dictionnary and start tracking it
             else {
-                console.error("no drone with id ", drone_id, " found !")
+                console.error("no drone with id ", drone_id, " found !");
+                initializeDrones(); // NOT SURE IF THIS IS WORKING
             }
         }
-        chart.update();
+        chart.update(0);
         console.debug('positions of drones', updatedDrones, ' updated');
     });
 
@@ -145,22 +162,33 @@ function initializeChart(){
     chart = new Chart(chart_canvas, {
         type: 'line',
 
-        scales: {
-            xAxes: [{
-                type: 'time',
-                time: {
-                    displayFormats: {
-                        second: 'h:mm:ss',
-                        distribution: 'series',
-                    }
-                }
-            }]
-        },
-
         // Configuration options
         options: {
             responsive: true,
             maintainAspectRatio: false,
-        },
+            events: [],
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        display: false,
+                    }      
+                }],
+                yAxes: [{   
+                }],
+            }
+        }
     });
+}
+
+// Print HTML formatted string so that it can be added to marker popup
+function infosToString(id, altitude, heading){
+    var infos = '<p style=text-align:center>';
+
+    infos += 'Drone ';
+    infos += id + ' <br> ' ;
+    infos += altitude + 'm <br> ';
+    infos += heading + '° <br> ';
+    infos += '</p>'
+
+    return infos;
 }

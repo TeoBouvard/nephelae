@@ -49,10 +49,9 @@ class PprzGpsGrabber:
 
         self.uavs[uavId] = {
             "time" : float(words[10]) / 1.0e3,        # gps time (ms)
-            "altitude" : round(float(words[6]),0)  / 1.0e3,    # utmZ (mm)    
-            "heading" : float(words[5])  / 10.0,      # heading
+            "altitude" : float(words[6]) / 1.0e3,    # utmZ (mm)    
+            "heading" : float(words[5]) / 10.0,      # heading
             "position" : [lat, lng],
-            #"past_positions" : self.uavs[uavId].past_positions.append([lat, lng])
         }
     
     def utmToLatLng(self, zone, easting, northing, northernHemisphere=True):
