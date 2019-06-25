@@ -10,7 +10,6 @@ urlpatterns = [
 
     path('map/', views.map, name='map'),
     path('map/update/', views.update_map, name='update_map'),
-    path('map/drones/', views.get_drones, name='get_drones'),
 
 
     path('cross_sections/', views.cross_section, name='cross_sections'),

@@ -1,5 +1,4 @@
 import os
-import random
 from timeit import default_timer as timer
 
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse

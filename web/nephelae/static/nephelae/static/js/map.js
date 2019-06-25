@@ -3,7 +3,7 @@ document.getElementById('nav_map').className = 'active';
 
 var chart;
 var icons = [];
-var drones = [];
+var drones = {};
 var flight_map;
 
 $(document).ready(function(){
@@ -11,17 +11,17 @@ $(document).ready(function(){
     initializeChart();
     initializeDrones();
     
-    setTimeout(updateDrones, 2000);
-    setTimeout(updateDrones, 2000);
-    setTimeout(updateDrones, 2000);
+    //setTimeout(updateDrones, 2000);
+    //setTimeout(updateDrones, 2000);
+    //setTimeout(updateDrones, 2000);
     //updateDrones();
-    //setInterval(updateDrones, 2000);
+    setInterval(updateDrones, 1000);
 });
 
 
 function initializeMap(){
     // Map
-    flight_map = L.map('map').setView([43.6047, 1.4442], 13);
+    flight_map = L.map('map');
 
     // Tiles
     L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png',
@@ -34,7 +34,8 @@ function initializeMap(){
     var planeIcon = L.Icon.extend({
         options: { 
             iconSize:     [20, 20], // size of the icon
-            iconAnchor:   [10, 10], // marker's location
+            iconAnchor:   [10, 10], // marker's location.setView([43.6047, 1.4442], 13);
+
             popupAnchor:  [0, 0]    // relative to the iconAnchor
         }
     });
@@ -48,32 +49,42 @@ function initializeMap(){
 
 function initializeDrones(){
     var addedDrones = [];
+    var index_icon = 0;
     var colors = ["red", "blue", "green"]; // Add colors for more drones
 
-    $.ajax({ url: 'drones/', type: 'GET' }).done(function(response){
+    $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
 
         // Initialize drone array with drone_id and position marker
-        for (var i = 0; i < response.drones.length; i++){
-            let drone_id = response.drones[i].drone_id;
-            let position = response.drones[i].position;
-            let altitude = response.drones[i].altitude;
+        console.debug(response);
+        for (var key in response.data){
+            var drone_id = key;
+            var position = response.data[key].position;
+            var altitude = response.data[key].altitude;
+            var heading = response.data[key].heading;
 
-            var marker = L.marker(position, {icon: icons[i]});
 
-            drones.push({id : drone_id, position : marker, altitude : altitude});
-            drones[i].position.addTo(flight_map).bindPopup('Drone ' + drone_id);
+            var marker = L.marker(position, {icon: icons[index_icon]});
+
+            drones[drone_id] = ({position : marker, altitude : altitude, heading: heading});
+            drones[drone_id].position.addTo(flight_map).setRotationAngle(heading).bindPopup('Drone ' + drone_id);
             addedDrones.push(drone_id);
 
             chart.data.datasets.push({
-                id: i,
-                label: "Drone " + i,
-                borderColor: colors[i],
+                id: drone_id,
+                label: "Drone " + drone_id,
+                pointRadius: 1,
+                pointHoverRadius: 1,
+                borderColor: colors[index_icon++],
                 fill: 'false',
                 data: [altitude],
+                
             });
         }
         console.debug('drones', addedDrones, 'added to the map');
         chart.update();
+
+        // Center map on drone last drone added
+        flight_map.setView(position, 16);
     });
 }
 
@@ -84,15 +95,18 @@ function updateDrones(){
     $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
 
         // Parse response
-        for (var i = 0; i < response.positions.length; i++){
-            var drone_id = response.positions[i].drone_id;
-            var position = response.positions[i].position;
-            var altitude = response.positions[i].altitude;
-            var past_positions = response.positions[i].past_positions;
-            var future_positions = response.positions[i].future_positions;
+        for (var key in response.data){
+            var drone_id = key;
+            var position = response.data[key].position;
+            var past_positions = response.data[key].past_positions;
+            var altitude = response.data[key].altitude;
+            var heading = response.data[key].heading;
+            var time = response.data[key].time;
+
+            //console.log(past_positions);
 
             // Identify corresponding drone ...
-            var drone_to_update = drones.find(x => x.id == drone_id);
+            var drone_to_update = drones[drone_id];
             var altitude_to_update = chart.data.datasets.find(x => x.id == drone_id);
 
             // ... and update it
@@ -100,14 +114,16 @@ function updateDrones(){
 
                 // Update markers
                 drone_to_update.position.setLatLng(position);
-                drone_to_update.position.setRotationAngle(0); // compute heading in the future
+                drone_to_update.position.setRotationAngle(heading); // compute heading in the future
 
                 // Add trails and intentions to the map
-                L.polyline(past_positions, {color : 'grey'}).addTo(flight_map);
-                L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
+                //L.polyline(past_positions, {color : 'grey'}).addTo(flight_map);
+                //L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
 
                 // Add new altitude to the chart
-                altitude_to_update.data.push(altitude)
+                // console.debug(time + ":" + altitude + "m");     
+                chart.data.labels.push(time);
+                altitude_to_update.data.push(altitude);
 
                 // Log changes
                 updatedDrones.push(drone_id);

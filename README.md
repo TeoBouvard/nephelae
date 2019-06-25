@@ -2,14 +2,14 @@
 
 ## TODO
 
-- assertion failed when idle and action
-- assertion failed: (pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent), function px_rel, file posixio.c, line 449. -> instance every time ? no
 - dimensions of map in km cross sections ?
 - maps : https://leaflet-extras.github.io/leaflet-providers/preview/
 - drone icon : https://www.iconfinder.com/editor/?id=322416&size=512&hash=35e99f72b6a7fe901ef630ae0ef71ac68a9e7efcdc24e720b4cd5d2a
 - start info page
 - plotly or chart.js ?
 - cross section dropdown
+- split utmtolatlng in another module
+
 
 ## Benchmark
 
