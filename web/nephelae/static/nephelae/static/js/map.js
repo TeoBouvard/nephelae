@@ -6,22 +6,23 @@ var colors = ["red", "blue", "green", "yellow", "orange"];
 var icons = [];
 
 var chart, flight_map;
-var trails_overlay, markers_overlay;
+var tiles_overlay, trails_overlay, markers_overlay;
 
 /*
     drones     : { key           :   drone_id,   values : value_dict }
     value_dict : { color         :   colors[index_icon], 
                    position      :   marker, 
                    altitude      :   float, 
-                   heading       :   float, 
+                   heading       :   float,
+                   polyline      :   L.Polyline,
                    past_positions:   [positions]
                  }
 */
 var drones = {};
 
 // Parameters 
-var refresh_rate = 1000 //milliseconds
-var approximately_same_position = 5 //meters
+var refresh_rate = 500; //milliseconds
+var approximately_same_position = 5; //meters
 
 
 $(document).ready(function(){
@@ -58,7 +59,7 @@ function initializeMap(){
     }
 
     // Layers
-    var tiles = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom: 15});
+    tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom: 18});
     trails_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
 
@@ -66,7 +67,7 @@ function initializeMap(){
     };
 
     var overlays = {
-        "Map": tiles,
+        "Map": tiles_overlay,
         "Trails": trails_overlay,
         "Markers": markers_overlay,
     };
@@ -74,11 +75,9 @@ function initializeMap(){
     // Map
     flight_map = L.map('map_container');
 
-    // Add layers to the map
+    // Add layers to the map and display everything
     L.control.layers(base_layers, overlays).addTo(flight_map);
-    for(key in overlays){
-        overlays[key].addTo(flight_map);
-    }
+    for(key in overlays) { overlays[key].addTo(flight_map); }
 }
 
 function initializeDrones(){
@@ -89,46 +88,54 @@ function initializeDrones(){
 
         // Initialize drone array with drone_id and position marker
         for (var key in response.data){
+
+            // Get color and icon of markers
+            var drone_color = colors[index_icon%colors.length];
+            var drone_icon = icons[index_icon%colors.length];
+
             // Parse response data
             var drone_id = key;
-            var position = response.data[key].position;
-            var altitude = response.data[key].altitude.toFixed(2);
-            var heading = response.data[key].heading;
+            var drone_position = response.data[key].position;//.toFixed(4);
+            var drone_altitude = response.data[key].altitude.toFixed(2);
+            var drone_heading = response.data[key].heading;
             
-            // Create leaflet marker at drone position
-            var marker = L.marker(position, {icon: icons[index_icon%colors.length]});
-
+            // Create leaflet marker and polyline at drone position
+            var drone_marker = L.marker(drone_position, {icon: drone_icon});
+            var drone_polyline = L.polyline([drone_position], {color : drone_color, weight : '2', dashArray : '5,7'});
+            
             // Update drones dictionnary with discovered drone
             drones[drone_id] = ({
-                color : colors[index_icon%colors.length], 
-                position : marker, 
-                altitude : altitude, 
-                heading: heading, 
-                past_positions:[position]
+                color : drone_color, 
+                position : drone_marker, 
+                altitude : drone_altitude, 
+                heading: drone_heading,
+                past_positions:[drone_position],
+                polyline : drone_polyline,
             });
 
             // Add drone marker to layer group
-            drones[drone_id].position.setRotationAngle(heading).addTo(markers_overlay);
-            drones[drone_id].position.bindPopup(infosToString(drone_id, altitude, heading));
+            drones[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
+            drones[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading));
+            drones[drone_id].polyline.addTo(trails_overlay);
             addedDrones.push(drone_id);
 
             // Update chart data with new dataset and line color corresponding to the icon
             chart.data.datasets.push({
                 id: drone_id,
                 label: "Drone " + drone_id,
-                data: [altitude],
+                data: [drone_altitude],
                 pointRadius: 1,
-                pointHoverRadius: 1,
-                borderColor: colors[index_icon++%colors.length],
+                borderColor: drone_color,
                 fill: 'false',
             });
+        index_icon++;    
         }
 
         console.debug('drones', addedDrones, 'added to overlays');
         chart.update(0);
 
         // Center map on drone last drone added
-        flight_map.setView(position, 15);
+        flight_map.setView(drone_position, 15);
     });
 }
 
@@ -141,17 +148,19 @@ function updateDrones(){
         // Parse response
         for (var key in response.data){
             var drone_id = key;
-            var position = response.data[key].position;
+            var position = response.data[key].position.;
             var altitude = response.data[key].altitude.toFixed(2);
             var heading = response.data[key].heading.toFixed(0);
-            var time = response.data[key].time;
+            var time = response.data[key].time.toFixed(0);
+            
 
-            // Identify corresponding drone ...
+            // Identify corresponding drone ...;
             var drone_to_update = drones[drone_id];
             var altitude_to_update = chart.data.datasets.find(x => x.id == drone_id);
 
             // ... and update it
             if(drone_to_update && altitude_to_update){
+                console.log(drone_to_update);
 
                 // Update markers
                 drone_to_update.position.setLatLng(position).setRotationAngle(heading);
@@ -162,20 +171,12 @@ function updateDrones(){
                     drone_to_update.past_positions.push(position);
                 }
 
-                // Add trails and intentions to the map
-                L.polyline(
-                    drone_to_update.past_positions, {
-                        color : drone_to_update.color, 
-                        weight : '2',
-                        dashArray : '5,7',
-                        id : key
-                    }).addTo(trails_overlay);
-                
+                drone_to_update.polyline.addLatLng(position);             
                 //L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
 
                 // Add new altitude to the chart
-                if (time%10 <= 1){
-                    chart.data.labels.push(''); // -> display time once in a while ?
+                if (time%5 <= 10){
+                    chart.data.labels.push(time); // -> display time once in a while ?
                 } else {
                     chart.data.labels.push('');
                 }
@@ -187,7 +188,7 @@ function updateDrones(){
             // ... or display error message if drone id does not match -> update drones dictionnary and start tracking it
             else {
                 console.error("no drone with id ", drone_id, " found !");
-                initializeDrones(); // NOT SURE IF THIS IS WORKING
+                initializeDrones(); // NOT SURE IF THIS IS WORKING, CAN'T TEST ?
             }
         }
         chart.update(0);
@@ -218,11 +219,6 @@ function initializeChart(){
             }
         }
     });
-}
-
-function toggleLayer(layer_name){
-    console.log(layer_name);
-
 }
 
 // Print HTML formatted string so that it can be added to marker popup
