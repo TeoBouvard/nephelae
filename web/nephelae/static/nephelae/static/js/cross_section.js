@@ -52,7 +52,7 @@ function displayImage(time_percentage, altitude_percentage){
 function toDateTime(secs) {
     var t = new Date(1995, 0, 1); // Epoch of dataset
     t.setSeconds(secs);
-    formatted_date = apz(t.getDate()) + "/" 
+    var formatted_date = apz(t.getDate()) + "/" 
                    + apz(t.getMonth()+1) + "/" 
                    + apz(t.getFullYear()) + " - "
                    + apz(t.getHours()) + ":"

@@ -7,6 +7,7 @@ var icons = [];
 
 var chart, flight_map;
 var tiles_overlay, trails_overlay, markers_overlay;
+var last_time_label;
 
 /*
     drones     : { key           :   drone_id,   values : value_dict }
@@ -16,13 +17,15 @@ var tiles_overlay, trails_overlay, markers_overlay;
                    heading       :   float,
                    polyline      :   L.Polyline,
                    past_positions:   [positions]
+                   last_position :   LatLng
                  }
 */
 var drones = {};
 
 // Parameters 
-var refresh_rate = 500; //milliseconds
-var approximately_same_position = 5; //meters
+var refresh_rate = 300; //milliseconds
+var close_position = 10; //meters
+var close_time = 10; //seconds
 
 
 $(document).ready(function(){
@@ -89,15 +92,17 @@ function initializeDrones(){
         // Initialize drone array with drone_id and position marker
         for (var key in response.data){
 
-            // Get color and icon of markers
+            // Get color and icon of markers, increment index_icon for next drone 
             var drone_color = colors[index_icon%colors.length];
-            var drone_icon = icons[index_icon%colors.length];
+            var drone_icon = icons[index_icon++%colors.length];
 
             // Parse response data
             var drone_id = key;
             var drone_position = response.data[key].position;//.toFixed(4);
             var drone_altitude = response.data[key].altitude.toFixed(2);
             var drone_heading = response.data[key].heading;
+            var time = response.data[key].time.toFixed(0);
+
             
             // Create leaflet marker and polyline at drone position
             var drone_marker = L.marker(drone_position, {icon: drone_icon});
@@ -111,6 +116,7 @@ function initializeDrones(){
                 heading: drone_heading,
                 past_positions:[drone_position],
                 polyline : drone_polyline,
+                last_position : L.latLng(drone_position),//{lat: drone_position[0], lng: drone_position[1]},
             });
 
             // Add drone marker to layer group
@@ -127,11 +133,13 @@ function initializeDrones(){
                 pointRadius: 1,
                 borderColor: drone_color,
                 fill: 'false',
-            });
-        index_icon++;    
+            }); 
         }
 
+        //Update chart, keep track of last time label added
         console.debug('drones', addedDrones, 'added to overlays');
+        last_time_label = time;
+        chart.data.labels.push(secToDate(time)); 
         chart.update(0);
 
         // Center map on drone last drone added
@@ -148,7 +156,7 @@ function updateDrones(){
         // Parse response
         for (var key in response.data){
             var drone_id = key;
-            var position = response.data[key].position.;
+            var position = response.data[key].position;
             var altitude = response.data[key].altitude.toFixed(2);
             var heading = response.data[key].heading.toFixed(0);
             var time = response.data[key].time.toFixed(0);
@@ -160,26 +168,31 @@ function updateDrones(){
 
             // ... and update it
             if(drone_to_update && altitude_to_update){
-                console.log(drone_to_update);
 
                 // Update markers
                 drone_to_update.position.setLatLng(position).setRotationAngle(heading);
                 drone_to_update.position.setPopupContent(infosToString(drone_id, altitude, heading));
 
-                // Add position to past positions only if it is far enough from last past position
-                if(calc_dist(drone_to_update.past_positions.slice(-1)[0], position) > approximately_same_position){
-                    drone_to_update.past_positions.push(position);
+                // Add position to past_positions if it is far enough from last position and not on past positions path
+                if(L.GeometryUtil.distance(flight_map,drone_to_update.last_position, position) > close_position){
+                    if(!isPointOnLine(L.latLng(position), drone_to_update.polyline.getLatLngs())){
+                        drone_to_update.last_position = L.latLng(position);
+                        drone_to_update.polyline.addLatLng(position);             
+                    } else {
+                        console.debug('Position for drone', drone_id, 'was not added to his path because another close point is already present');
+                    }
                 }
-
-                drone_to_update.polyline.addLatLng(position);             
                 //L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
 
-                // Add new altitude to the chart
-                if (time%5 <= 10){
-                    chart.data.labels.push(time); // -> display time once in a while ?
+                // Add new label to the chart if last label is long ago
+                if(time - last_time_label >= close_time){
+                    last_time_label = time;
+                    chart.data.labels.push(secToDate(time));
                 } else {
-                    chart.data.labels.push('');
+                    chart.data.labels.push('');                    
                 }
+
+                // Add new altitude to the chart
                 altitude_to_update.data.push(altitude);
 
                 // Log changes
@@ -212,9 +225,13 @@ function initializeChart(){
                 xAxes: [{
                     gridLines: {
                         display: false,
-                    }      
+                    },
                 }],
-                yAxes: [{   
+                yAxes: [{
+                    ticks: {
+                        //suggestedMin: 0,
+                        //suggestedMax:500,
+                    } 
                 }],
             }
         }
@@ -232,4 +249,31 @@ function infosToString(id, altitude, heading){
     infos += '</p>'
 
     return infos;
+}
+
+// Print formatted string from secs
+function secToDate(secs){
+    var t = new Date(1995, 0, 1); // Epoch of dataset
+    t.setSeconds(secs);
+    var formatted_date = apz(t.getHours()) + ":"
+                   + apz(t.getMinutes()) + ":"
+                   + apz(t.getSeconds());
+    return formatted_date;
+}
+
+// Append leading zeros in date strings
+function apz(n){
+    if(n <= 9){
+      return "0" + n;
+    }
+    return n
+}
+
+function isPointOnLine(point, path) {
+    for (var i = 0; i < path.length - 1; i++) {
+        if (L.GeometryUtil.belongsSegment(point, path[i], path[i + 1], 0.1)) {
+            return true;
+        }
+    }
+    return false;
 }
