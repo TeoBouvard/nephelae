@@ -10,11 +10,18 @@
 - cross section dropdown
 - split utmtolatlng in another module
 - BUG posixio.c:449: px_rel: Assertion `pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent' failed.
+- os.environ['MESO_NH'], os.environ['MAP_TILES']
 
 
 ## Benchmark
 
 - display cross section : 400ms, mostly due to base64 image encoding, have to try get images -> as long ...
+
+## Install
+
+MesoNH correct path data (MesoNH/MesoNH.nc) -> will solve later with paths
+maps folder in nephelae/web/nephelae
+- ./install.sh with 
 
 ## Questions
 

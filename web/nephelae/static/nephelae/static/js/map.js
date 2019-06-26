@@ -2,34 +2,55 @@
 document.getElementById('nav_map').className = 'active';
 
 var chart, flight_map;
-var colors = ["red", "blue", "green", "yellow", "orange"]; // Add colors for more drones
+var layers = {};
+
+// Add CSS colors (corresponding to icons folder) for more drones
+var colors = ["red", "blue", "green", "yellow", "orange"];
+
 var icons = [];
+
+/*
+    drones     : { key           :   drone_id,   values : value_dict }
+    value_dict : { color         :   colors[index_icon], 
+                   position      :   marker, 
+                   altitude      :   float, 
+                   heading       :   float, 
+                   past_positions:   [positions]
+                 }
+*/
 var drones = {};
-var refresh_rate = 200 //ms
+
+var refresh_rate = 2000 //milliseconds
+var approximately_same_position = 5 //meters
 
 
 $(document).ready(function(){
     // Initialize document elements
     initializeMap();
     initializeChart();
+
     initializeDrones();
 
     // Update elements every 'refresh_rate' ms
     setInterval(updateDrones, refresh_rate);
+    setInterval(logMap, 2000);
 });
+
+// TO DELETE
+function logMap(){
+    console.log(flight_map);
+}
 
 
 function initializeMap(){
 
     // Map
     flight_map = L.map('map');
-
-    // Tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png',
-        {
-            maxZoom: 18,
-        }
-        ).addTo(flight_map);
+    
+    // Layers -> change tile layer to local
+    layers['tiles'] = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom: 15});
+    layers['trails'] = L.layerGroup();
+    layers['markers'] = L.layerGroup();
     
     // Icon class
     var planeIcon = L.Icon.extend({
@@ -42,8 +63,13 @@ function initializeMap(){
 
     // Create an icon for each image in the icon folder
     for(var i = 0; i < colors.length; i++){
-        var random_icon = new planeIcon({iconUrl: '/img/plane_icon/' + i})
+        var random_icon = new planeIcon({iconUrl: '/map/plane_icon/' + i})
         icons.push(random_icon);
+    }
+
+    // Add layers to the map
+    for(var layer in layers){
+        layers[layer].addTo(flight_map);
     }
 }
 
@@ -62,11 +88,11 @@ function initializeDrones(){
             var heading = response.data[key].heading;
             
             // Create leaflet marker at drone position
-            var marker = L.marker(position, {icon: icons[index_icon]});
+            var marker = L.marker(position, {icon: icons[index_icon%colors.length]});
 
             // Update drones dictionnary with discovered drone
             drones[drone_id] = ({
-                color : colors[index_icon], 
+                color : colors[index_icon%colors.length], 
                 position : marker, 
                 altitude : altitude, 
                 heading: heading, 
@@ -74,7 +100,7 @@ function initializeDrones(){
             });
 
             // Add drone marker to the map
-            drones[drone_id].position.addTo(flight_map).setRotationAngle(heading);
+            drones[drone_id].position.setRotationAngle(heading).addTo(layers['markers']);
             drones[drone_id].position.bindPopup(infosToString(drone_id, altitude, heading));
             addedDrones.push(drone_id);
 
@@ -85,7 +111,7 @@ function initializeDrones(){
                 data: [altitude],
                 pointRadius: 1,
                 pointHoverRadius: 1,
-                borderColor: colors[index_icon++],
+                borderColor: colors[index_icon++%colors.length],
                 fill: 'false',
             });
         }
@@ -122,16 +148,20 @@ function updateDrones(){
                 drone_to_update.position.setLatLng(position).setRotationAngle(heading);
                 drone_to_update.position.setPopupContent(infosToString(drone_id, altitude, heading));
 
-                // Update past positions
-                drone_to_update.past_positions.push(position);
+                // Add position to past positions only if it is far enough from last past position
+                if(calc_dist(drone_to_update.past_positions.slice(-1)[0], position) > approximately_same_position){
+                    drone_to_update.past_positions.push(position);
+                }
 
                 // Add trails and intentions to the map
                 L.polyline(
                     drone_to_update.past_positions, {
-                    color : drone_to_update.color, 
-                    weight : '2',
-                    dashArray : '5,7',
-                    }).addTo(flight_map);
+                        color : drone_to_update.color, 
+                        weight : '2',
+                        dashArray : '5,7',
+                        id : key
+                    }).addTo(layers['trails']);
+                
                 //L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
 
                 // Add new altitude to the chart

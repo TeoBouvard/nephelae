@@ -20,7 +20,7 @@ def update_map(request):
     response = JsonResponse({'data': data})
     return response
 
-
+# Render base page
 def map(request):
     return render(request, 'nephelae/map.html')
 
@@ -28,3 +28,13 @@ def map(request):
 def plane_icon(request, index):
     with open('nephelae/img/icons/plane_icon' + str(index) + '.png', "rb") as f:
         return HttpResponse(f.read(), content_type="image/png")
+
+# Render icons for drones
+def map_tiles(request, z, x, y):
+    try:
+        path = 'nephelae/maps/' + str(z) + '/' + str(x) + '/' + str(y) + '.png'
+        with open(path, "rb") as f:
+            return HttpResponse(f.read(), content_type="image/png")
+    except IOError:
+        print('COUCOU')
+        return False
