@@ -25,7 +25,7 @@ var drones = {};
 // Parameters 
 var refresh_rate = 300; //milliseconds
 var close_position = 10; //meters
-var close_time = 10; //seconds
+var close_time = 30; //seconds
 
 
 $(document).ready(function(){
@@ -175,12 +175,12 @@ function updateDrones(){
 
                 // Add position to past_positions if it is far enough from last position and not on past positions path
                 if(L.GeometryUtil.distance(flight_map,drone_to_update.last_position, position) > close_position){
-                    if(!isPointOnLine(L.latLng(position), drone_to_update.polyline.getLatLngs())){
+                    //if(!isPointOnLine(L.latLng(position), drone_to_update.polyline.getLatLngs())){
                         drone_to_update.last_position = L.latLng(position);
                         drone_to_update.polyline.addLatLng(position);             
-                    } else {
-                        console.debug('Position for drone', drone_id, 'was not added to his path because another close point is already present');
-                    }
+                    //} else {
+                    //   console.debug('Position for drone', drone_id, 'was not added to his path because another close point is already present');
+                    //}
                 }
                 //L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
 
@@ -189,7 +189,7 @@ function updateDrones(){
                     last_time_label = time;
                     chart.data.labels.push(secToDate(time));
                 } else {
-                    chart.data.labels.push('');                    
+                    //chart.data.labels.push('');                    
                 }
 
                 // Add new altitude to the chart

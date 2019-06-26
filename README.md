@@ -11,6 +11,7 @@
 - split utmtolatlng in another module
 - BUG posixio.c:449: px_rel: Assertion `pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent' failed.
 - os.environ['MESO_NH'], os.environ['MAP_TILES']
+- Last position polyline -> path jumps from one new point to another
 
 
 ## Benchmark
