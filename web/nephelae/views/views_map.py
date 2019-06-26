@@ -2,7 +2,7 @@ import os
 import random
 from timeit import default_timer as timer
 
-from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpResponseNotFound, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from ..models import PprzGpsGrabber
@@ -26,8 +26,12 @@ def map(request):
 
 # Render icons for drones
 def plane_icon(request, index):
-    with open('nephelae/img/icons/plane_icon' + str(index) + '.png', "rb") as f:
-        return HttpResponse(f.read(), content_type="image/png")
+    try:
+        path = 'nephelae/img/icons/plane_icon' + str(index) + '.png'
+        with open(path, "rb") as f:
+            return HttpResponse(f.read(), content_type="image/png")
+    except IOError:
+        return HttpResponseNotFound()
 
 # Render icons for drones
 def map_tiles(request, z, x, y):
@@ -36,5 +40,4 @@ def map_tiles(request, z, x, y):
         with open(path, "rb") as f:
             return HttpResponse(f.read(), content_type="image/png")
     except IOError:
-        print('COUCOU')
-        return False
+        return HttpResponseNotFound()
