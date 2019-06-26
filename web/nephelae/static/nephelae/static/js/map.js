@@ -2,7 +2,7 @@
 document.getElementById('nav_map').className = 'active';
 
 // Add CSS colors (corresponding to icons folder) for more drones
-var icons, colors = ["red", "blue", "green", "yellow", "orange"];
+var colors = ["red", "blue", "green", "yellow", "orange"];
 var icons = [];
 
 var chart, flight_map;
@@ -20,7 +20,7 @@ var trails_overlay, markers_overlay;
 var drones = {};
 
 // Parameters 
-var refresh_rate = 2000 //milliseconds
+var refresh_rate = 1000 //milliseconds
 var approximately_same_position = 5 //meters
 
 
@@ -40,7 +40,6 @@ function logMap(){
     console.log(flight_map);
 }
 
-
 function initializeMap(){
 
     // Icon class
@@ -59,24 +58,27 @@ function initializeMap(){
     }
 
     // Layers
-    var map = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom: 15});
+    var tiles = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom: 15});
     trails_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
 
-    // Map
-    flight_map = L.map('map', {layers: map, trails_overlay, markers_overlay});
-
-    var base_layers = {
-        "Map": map,
+    var base_layers = {     
     };
 
     var overlays = {
+        "Map": tiles,
         "Trails": trails_overlay,
-        "UAVs": markers_overlay,
+        "Markers": markers_overlay,
     };
+
+    // Map
+    flight_map = L.map('map_container');
 
     // Add layers to the map
     L.control.layers(base_layers, overlays).addTo(flight_map);
+    for(key in overlays){
+        overlays[key].addTo(flight_map);
+    }
 }
 
 function initializeDrones(){
@@ -122,7 +124,7 @@ function initializeDrones(){
             });
         }
 
-        console.debug('drones', addedDrones, 'added to layers[markers]');
+        console.debug('drones', addedDrones, 'added to overlays');
         chart.update(0);
 
         // Center map on drone last drone added
