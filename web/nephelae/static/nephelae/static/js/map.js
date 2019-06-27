@@ -23,7 +23,7 @@ var last_time_label;
 var drones = {};
 
 // Parameters 
-var refresh_rate = 1000; //milliseconds
+var refresh_rate = 500; //milliseconds
 var close_position = 10; //meters
 var close_time = 30; //seconds
 
@@ -67,7 +67,7 @@ function initializeMap(){
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
 
-    var base_layers = {     
+    var base_layers = {
     };
 
     var overlays = {
@@ -103,8 +103,9 @@ function initializeDrones(){
             var drone_altitude = response[key].altitude;
             var drone_heading = response[key].heading;
             var drone_path = response[key].path;
+            var past_altitudes = response[key].past_altitudes;
+            var log_times = response[key].log_times;
             var time = response[key].time;
-
             
             // Create leaflet marker and polyline at drone position
             var marker = L.marker(drone_position, {icon: drone_icon});
@@ -127,10 +128,11 @@ function initializeDrones(){
 
             // Update chart data with new dataset and line color corresponding to the icon
             var update = {
-                x: [time],
+                x: [secToDate(time)],
                 y: [drone_altitude],
+                name: drone_id,
             };
-            Plotly.addTraces('chart', update, [0]);
+            Plotly.addTraces('chart', update);
         }
 
         //Update chart, keep track of last time label added
@@ -154,12 +156,14 @@ function updateDrones(){
             var drone_altitude = response[key].altitude;
             var drone_heading = response[key].heading;
             var drone_path = response[key].path;
-            var time = response[key].time; 
-            console.log(drone_path);
-
-            // Identify corresponding drone ...;
+            var past_altitudes = response[key].past_altitudes;
+            var log_times = response[key].log_times;
+            var time = response[key].time;
+            
+            // Identify corresponding drone ... AUCUNE PUTAIN DE LOGIQUE
             var drone_to_update = drones[drone_id];
-            //var altitude_to_update = chart.data.datasets.find(x => x.id == drone_id);
+            var trace = document.getElementById('chart').data.find(x => x.name == drone_id);
+            var trace_index = document.getElementById('chart').data.indexOf(trace);
 
             // ... and update it
             if(drone_to_update){
@@ -169,7 +173,16 @@ function updateDrones(){
                 drone_to_update.position.setPopupContent(infosToString(drone_id, drone_altitude, drone_heading));
 
                 // Update polyline
-                drone_to_update.path.setLatLngs(drone_path);            
+                drone_to_update.path.setLatLngs(drone_path);
+
+                // Update chart
+                var update = {
+                    x: [[time]],
+                    y: [[drone_altitude]],
+                    //name: drone_id,
+                };
+                
+                Plotly.extendTraces('chart', update, [trace_index]);
 
                 // Log changes
                 updatedDrones.push(drone_id);
@@ -180,6 +193,7 @@ function updateDrones(){
                 initializeDrones(); // NOT SURE IF THIS IS WORKING, CAN'T TEST ?
             }
         }
+        //console.log(log_times);
         console.debug('positions of drones', updatedDrones, ' updated');
     });
 
@@ -188,7 +202,7 @@ function updateDrones(){
 function initializeChart(){
 
     var data = [];
-    var layout = {};
+    var layout = {title: 'Altitudes', font: {size: 18}};
     var config = { responsive : true };
 
     Plotly.newPlot('chart', data, layout, config);
