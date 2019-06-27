@@ -199,7 +199,15 @@ function updateDrones(){
 function initializeChart(){
 
     var data = [];
-    var layout = {title: 'Altitudes', font: {size: 18}};
+    var layout = {
+        title: '',
+        xaxis: {
+            title: 'Heure'
+        },
+        yaxis: {
+            title: 'Altitude (m ASL)?'
+        }
+    };
     var config = { responsive : true };
 
     Plotly.newPlot('chart', data, layout, config);
