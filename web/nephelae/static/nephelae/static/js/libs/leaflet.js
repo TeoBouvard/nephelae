@@ -14775,6 +14775,9 @@ return L.GeometryUtil;
 
 }));
 
+/* --------------------- ADDED METHODS ---------------------  */
+
+// Rotated Marker
 (function() {
     // save these original methods before they are overwritten
     var proto_initIcon = L.Marker.prototype._initIcon;
@@ -14832,3 +14835,13 @@ return L.GeometryUtil;
         }
     });
 })();
+
+// Check if point is on path
+function isPointOnLine(point, path) {
+    for (var i = 0; i < path.length - 1; i++) {
+        if (L.GeometryUtil.belongsSegment(point, path[i], path[i + 1], 0.1)) {
+            return true;
+        }
+    }
+    return false;
+}

@@ -11,14 +11,7 @@ pprz = PprzGpsGrabber()
 pprz.start()
 
 def update_map(request):
-
-    data = {}
-
-    for key, value in pprz.uavs.items():
-        data[key] = value
-
-    response = JsonResponse({'data': data})
-    return response
+    return JsonResponse(pprz.uavs)
 
 # Render base page
 def map(request):
@@ -36,7 +29,7 @@ def plane_icon(request, index):
 # Render icons for drones
 def map_tiles(request, z, x, y):
     try:
-        path = 'nephelae/maps/' + str(z) + '/' + str(x) + '/' + str(y) + '.png'
+        path = '/home/arthurdent/Documents/maps/' + str(z) + '/' + str(x) + '/' + str(y) + '.png'
         with open(path, "rb") as f:
             return HttpResponse(f.read(), content_type="image/png")
     except IOError:

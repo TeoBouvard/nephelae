@@ -6,12 +6,8 @@
 - maps : https://leaflet-extras.github.io/leaflet-providers/preview/ / mobile atlas creator, create script ?
 - drone icon : https://www.iconfinder.com/editor/?id=322416&size=512&hash=35e99f72b6a7fe901ef630ae0ef71ac68a9e7efcdc24e720b4cd5d2a
 - start info page
-- plotly or chart.js ?
 - cross section dropdown
-- split utmtolatlng in another module
-- BUG posixio.c:449: px_rel: Assertion `pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent' failed. -> was due to django server
-- os.environ['MESO_NH'], os.environ['MAP_TILES']
-- Last position polyline -> path jumps from one new point to another
+- os.environ['MESO_NH'], os.environ['MAP_TILES'] -> define env variables in install script
 - ngrok for fast global serving
 
 
@@ -21,9 +17,8 @@
 
 ## Install
 
-MesoNH correct path data (MesoNH/MesoNH.nc) -> will solve later with paths
-maps folder in nephelae/web/nephelae
-- ./install.sh with 
+MesoNH correct path data (MesoNH/MesoNH.nc) -> will solve later with env variables
+- ./install.sh
 
 ## Questions
 

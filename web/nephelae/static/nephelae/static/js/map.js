@@ -5,8 +5,8 @@ document.getElementById('nav_map').className = 'active';
 var colors = ["red", "blue", "green", "yellow", "orange"];
 var icons = [];
 
-var chart, flight_map;
-var tiles_overlay, trails_overlay, markers_overlay;
+var flight_map;
+var tiles_overlay, path_overlay, markers_overlay;
 var last_time_label;
 
 /*
@@ -34,6 +34,7 @@ $(document).ready(function(){
     initializeChart();
     initializeDrones();
 
+    //updateDrones();
     // Update elements every 'refresh_rate' ms
     setInterval(updateDrones, refresh_rate);
     //setInterval(logMap, 2000);
@@ -63,7 +64,7 @@ function initializeMap(){
 
     // Layers
     tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom: 18});
-    trails_overlay = L.layerGroup();
+    path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
 
     var base_layers = {     
@@ -71,7 +72,7 @@ function initializeMap(){
 
     var overlays = {
         "Map": tiles_overlay,
-        "Trails": trails_overlay,
+        "Trails": path_overlay,
         "Markers": markers_overlay,
     };
 
@@ -90,7 +91,7 @@ function initializeDrones(){
     $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
 
         // Initialize drone array with drone_id and position marker
-        for (var key in response.data){
+        for (var key in response){
 
             // Get color and icon of markers, increment index_icon for next drone 
             var drone_color = colors[index_icon%colors.length];
@@ -98,49 +99,42 @@ function initializeDrones(){
 
             // Parse response data
             var drone_id = key;
-            var drone_position = response.data[key].position;//.toFixed(4);
-            var drone_altitude = response.data[key].altitude.toFixed(2);
-            var drone_heading = response.data[key].heading;
-            var time = response.data[key].time.toFixed(0);
+            var drone_position = response[key].position;
+            var drone_altitude = response[key].altitude;
+            var drone_heading = response[key].heading;
+            var drone_path = response[key].path;
+            var time = response[key].time;
 
             
             // Create leaflet marker and polyline at drone position
-            var drone_marker = L.marker(drone_position, {icon: drone_icon});
-            var drone_polyline = L.polyline([drone_position], {color : drone_color, weight : '2', dashArray : '5,7'});
+            var marker = L.marker(drone_position, {icon: drone_icon});
+            var polyline = L.polyline([drone_path], {color : drone_color, weight : '2', dashArray : '5,7'});
             
             // Update drones dictionnary with discovered drone
             drones[drone_id] = ({
                 color : drone_color, 
-                position : drone_marker, 
+                position : marker, 
                 altitude : drone_altitude, 
                 heading: drone_heading,
-                past_positions:[drone_position],
-                polyline : drone_polyline,
-                last_position : L.latLng(drone_position),//{lat: drone_position[0], lng: drone_position[1]},
+                path : polyline,
             });
 
             // Add drone marker to layer group
             drones[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
             drones[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading));
-            drones[drone_id].polyline.addTo(trails_overlay);
+            drones[drone_id].path.addTo(path_overlay);
             addedDrones.push(drone_id);
 
             // Update chart data with new dataset and line color corresponding to the icon
-            chart.data.datasets.push({
-                id: drone_id,
-                label: "Drone " + drone_id,
-                data: [drone_altitude],
-                pointRadius: 1,
-                borderColor: drone_color,
-                fill: 'false',
-            }); 
+            var update = {
+                x: [time],
+                y: [drone_altitude],
+            };
+            Plotly.addTraces('chart', update, [0]);
         }
 
         //Update chart, keep track of last time label added
         console.debug('drones', addedDrones, 'added to overlays');
-        last_time_label = time;
-        chart.data.labels.push(secToDate(time)); 
-        chart.update(0);
 
         // Center map on drone last drone added
         flight_map.setView(drone_position, 15);
@@ -154,44 +148,28 @@ function updateDrones(){
     $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
 
         // Parse response
-        for (var key in response.data){
+        for (var key in response){
             var drone_id = key;
-            var position = response.data[key].position;
-            var altitude = response.data[key].altitude.toFixed(2);
-            var heading = response.data[key].heading.toFixed(0);
-            var time = response.data[key].time.toFixed(0);
-            
+            var drone_position = response[key].position;
+            var drone_altitude = response[key].altitude;
+            var drone_heading = response[key].heading;
+            var drone_path = response[key].path;
+            var time = response[key].time; 
+            console.log(drone_path);
 
             // Identify corresponding drone ...;
             var drone_to_update = drones[drone_id];
-            var altitude_to_update = chart.data.datasets.find(x => x.id == drone_id);
+            //var altitude_to_update = chart.data.datasets.find(x => x.id == drone_id);
 
             // ... and update it
-            if(drone_to_update && altitude_to_update){
+            if(drone_to_update){
 
                 // Update markers
-                drone_to_update.position.setLatLng(position).setRotationAngle(heading);
-                drone_to_update.position.setPopupContent(infosToString(drone_id, altitude, heading));
+                drone_to_update.position.setLatLng(drone_position).setRotationAngle(drone_heading);
+                drone_to_update.position.setPopupContent(infosToString(drone_id, drone_altitude, drone_heading));
 
-                // Add position to past_positions if it is far enough from last position and not on past positions path
-                if(L.GeometryUtil.distance(flight_map,drone_to_update.last_position, position) > close_position){
-                    drone_to_update.last_position = L.latLng(position);
-                    drone_to_update.polyline.addLatLng(position);             
-                }
-                //L.polyline(future_positions,{color : 'grey', dashArray: '5,7'}).addTo(flight_map);
-
-                // Add new label to the chart if last label is long ago
-                if(time - last_time_label >= close_time){
-                    last_time_label = time;
-                    chart.data.labels.push(secToDate(time));
-                } else {
-                    chart.data.labels.push('');                    
-                }
-
-                // Add new altitude to the chart and remove old ones
-                altitude_to_update.data.push(altitude);
-                if(time - chart.data)
-
+                // Update polyline
+                drone_to_update.path.setLatLngs(drone_path);            
 
                 // Log changes
                 updatedDrones.push(drone_id);
@@ -202,38 +180,18 @@ function updateDrones(){
                 initializeDrones(); // NOT SURE IF THIS IS WORKING, CAN'T TEST ?
             }
         }
-        chart.update(0);
         console.debug('positions of drones', updatedDrones, ' updated');
     });
 
 }
 
 function initializeChart(){
-    var chart_canvas = 'altitude_chart'
-    
-    chart = new Chart(chart_canvas, {
-        type: 'line',
 
-        // Configuration options
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            events: [],
-            scales: {
-                xAxes: [{
-                    gridLines: {
-                        display: false,
-                    },
-                }],
-                yAxes: [{
-                    ticks: {
-                        //suggestedMin: 0,
-                        //suggestedMax:500,
-                    } 
-                }],
-            }
-        }
-    });
+    var data = [];
+    var layout = {};
+    var config = { responsive : true };
+
+    Plotly.newPlot('chart', data, layout, config);
 }
 
 // Print HTML formatted string so that it can be added to marker popup
@@ -267,11 +225,3 @@ function apz(n){
     return n
 }
 
-function isPointOnLine(point, path) {
-    for (var i = 0; i < path.length - 1; i++) {
-        if (L.GeometryUtil.belongsSegment(point, path[i], path[i + 1], 0.1)) {
-            return true;
-        }
-    }
-    return false;
-}

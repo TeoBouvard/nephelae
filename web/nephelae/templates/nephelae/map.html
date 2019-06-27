@@ -12,8 +12,8 @@
 {% block additional_scripts %}
     <!-- Load leaflet js + oriented marker (drone heading) -->
     <script type="text/javascript" src="{% static 'nephelae/static/js/libs/leaflet.js' %}"></script>
-    <!-- Load charts js -->
-    <script type="text/javascript" src="{% static 'nephelae/static/js/libs/chart.js' %}"></script>
+    <!-- Load plotly js -->
+    <script type="text/javascript" src="{% static 'nephelae/static/js/libs/plotly.min.js' %}"></script>
 	<!-- Load specific javascript -->
 	<script type="text/javascript" src="{% static 'nephelae/static/js/map.js' %}"></script>
 {% endblock %}
@@ -22,12 +22,6 @@
 
     <div id="map_container"></div>
 
-    <div id="checkboxes">
-        
-    </div>
-
-    <div id="graph">
-        <canvas id="altitude_chart"></canvas>
-    </div>
+    <div id="chart"></div>
 
 {% endblock %}
