@@ -7,8 +7,6 @@ from pprint import pprint
 
 from ivy.std_api import IvyBindMsg, IvyInit, IvyStart, IvyStop, IvyUnBindMsg
 
-log_length = 20
-
 class PprzGpsGrabber:
 
     def __init__(self, ipp="127.255.255.255:2010"):

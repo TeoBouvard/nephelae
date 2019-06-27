@@ -3,15 +3,16 @@
 ## TODO
 
 - dimensions of map in km cross sections ?
-- maps : https://leaflet-extras.github.io/leaflet-providers/preview/
+- maps : https://leaflet-extras.github.io/leaflet-providers/preview/ / mobile atlas creator, create script ?
 - drone icon : https://www.iconfinder.com/editor/?id=322416&size=512&hash=35e99f72b6a7fe901ef630ae0ef71ac68a9e7efcdc24e720b4cd5d2a
 - start info page
 - plotly or chart.js ?
 - cross section dropdown
 - split utmtolatlng in another module
-- BUG posixio.c:449: px_rel: Assertion `pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent' failed.
+- BUG posixio.c:449: px_rel: Assertion `pxp->bf_offset <= offset && offset < pxp->bf_offset + (off_t) pxp->bf_extent' failed. -> was due to django server
 - os.environ['MESO_NH'], os.environ['MAP_TILES']
 - Last position polyline -> path jumps from one new point to another
+- ngrok for fast global serving
 
 
 ## Benchmark
@@ -28,7 +29,6 @@ maps folder in nephelae/web/nephelae
 
 -   authentication ?
 -   approximate mesh from points cloud -> big points sufficient ?
--   csrf token to prevent Cross Site Request
 
 ## Ideas
 
@@ -62,3 +62,4 @@ maps folder in nephelae/web/nephelae
 -   three.js (pas mal, doc++)
 -   Potree (open source, doc--, win--)
 -   PPTK (simple à mettre en place, pas beaucoup de possibilités)
+-   Chart.js

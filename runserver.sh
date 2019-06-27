@@ -1,7 +1,7 @@
 #!/bin/bash
 while true; do
-  echo "Re-starting Django runserver on broadcast"
+  echo "Re-starting server on 0.0.0.0:8000"
   cd ./web
-  python3 manage.py runserver 0:8000
+  gunicorn --bind 0.0.0.0:8000 IHM.wsgi  
   sleep 2
 done
