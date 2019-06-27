@@ -9,6 +9,7 @@
 - cross section dropdown
 - os.environ['MESO_NH'], os.environ['MAP_TILES'] -> define env variables in install script
 - ngrok for fast global serving
+- leaflet realtime plugin ? (webgl) heatmaps ? Leaflet.heat ? zoomhome, fullscreen ? leaflet-velocity
 
 
 ## Benchmark

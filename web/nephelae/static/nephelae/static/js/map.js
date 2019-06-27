@@ -23,9 +23,7 @@ var last_time_label;
 var drones = {};
 
 // Parameters 
-var refresh_rate = 500; //milliseconds
-var close_position = 10; //meters
-var close_time = 30; //seconds
+var refresh_rate = 1000; //milliseconds
 
 
 $(document).ready(function(){
@@ -39,11 +37,6 @@ $(document).ready(function(){
     setInterval(updateDrones, refresh_rate);
     //setInterval(logMap, 2000);
 });
-
-// TO DELETE
-function logMap(){
-    console.log(flight_map);
-}
 
 function initializeMap(){
 
@@ -128,9 +121,13 @@ function initializeDrones(){
 
             // Update chart data with new dataset and line color corresponding to the icon
             var update = {
-                x: [secToDate(time)],
-                y: [drone_altitude],
+                x: [log_times],
+                y: [past_altitudes],
                 name: drone_id,
+                mode: 'lines',
+                line: {
+                    color: drone_color,
+                    }
             };
             Plotly.addTraces('chart', update);
         }
@@ -177,12 +174,12 @@ function updateDrones(){
 
                 // Update chart
                 var update = {
-                    x: [[time]],
-                    y: [[drone_altitude]],
+                    x: [log_times],
+                    y: [past_altitudes],
                     //name: drone_id,
                 };
                 
-                Plotly.extendTraces('chart', update, [trace_index]);
+                Plotly.restyle('chart', update, [trace_index]);
 
                 // Log changes
                 updatedDrones.push(drone_id);
