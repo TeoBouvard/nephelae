@@ -30,12 +30,9 @@ $(document).ready(function(){
     // Initialize document elements
     initializeMap();
     initializeChart();
-    initializeDrones();
 
-    //updateDrones();
     // Update elements every 'refresh_rate' ms
-    setInterval(updateDrones, refresh_rate);
-    //setInterval(logMap, 2000);
+    displayDrones();
 });
 
 function initializeMap(){
@@ -77,7 +74,7 @@ function initializeMap(){
     for(key in overlays) { overlays[key].addTo(flight_map); }
 }
 
-function initializeDrones(){
+function displayDrones(){
     var addedDrones = [];
     var index_icon = 0;
 
@@ -136,7 +133,12 @@ function initializeDrones(){
         console.debug('drones', addedDrones, 'added to overlays');
 
         // Center map on drone last drone added
-        flight_map.setView(drone_position, 15);
+        if(addedDrones.length != 0){
+            flight_map.setView(drone_position, 15);
+            setInterval(updateDrones, refresh_rate);
+        } else {
+            alert("No drones detected, try launching the simulation and refresh the page");
+        }
     });
 }
 
