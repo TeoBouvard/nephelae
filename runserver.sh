@@ -12,7 +12,7 @@ trap finish SIGINT
 while : 
   do
     echo "Activating virtual environement"
-    source virtual_env/bin/activate
+    source venv/bin/activate
     echo "Starting server on 0.0.0.0:8000"
     COMMAND="$(nproc)"
     N_WORKERS=$((${COMMAND}))
