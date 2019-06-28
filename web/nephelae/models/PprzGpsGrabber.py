@@ -10,7 +10,7 @@ from geopy.distance import distance
 from ivy.std_api import IvyBindMsg, IvyInit, IvyStart, IvyStop, IvyUnBindMsg
 
 close_enough = 0.01 # in kilometers
-log_size = 100 # number of past_positions kept in memory
+log_size = 10 # number of past_positions kept in memory
 
 class PprzGpsGrabber:
 
@@ -87,4 +87,3 @@ if __name__ == '__main__':
     while True:
         pprint(p.uavs)
         time.sleep(1.0 - ((time.time() - starttime) % 1.0))
-        pprint(len(p.uavs[100]))

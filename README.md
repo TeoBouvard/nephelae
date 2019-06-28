@@ -10,6 +10,8 @@
 - os.environ['MESO_NH'], os.environ['MAP_TILES'] -> define env variables in install script
 - ngrok for fast global serving
 - leaflet realtime plugin ? (webgl) heatmaps ? Leaflet.heat ? zoomhome, fullscreen ? leaflet-velocity
+- implement general method for cross section with variable name parameter
+- plotly update button
 
 
 ## Benchmark
@@ -20,6 +22,27 @@
 
 MesoNH correct path data (MesoNH/MesoNH.nc) -> will solve later with env variables
 - ./install.sh
+
+## Infos from users
+
+-Infos (passé, présent, futur)
+    - Nuage ()
+    - Flotte
+    - Infos générales
+        - Wind (U)
+        - Temps (t)
+        - Gradients verticaux
+        - Lift condensation level
+
+- Destinataires
+    - Metéo
+    - Algos
+    - Dronistes
+
+- Instructions
+    - Meteo
+    - Algos
+
 
 ## Questions
 

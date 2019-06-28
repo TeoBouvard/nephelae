@@ -43,28 +43,7 @@ function displayImage(time_percentage, altitude_percentage){
         console.debug(response);
         $('#clouds_div').html('<img src="' + response.clouds + '">');
         $('#thermals_div').html('<img src="' + response.thermals + '">');
-        $('#time_display').html(toDateTime(response.date))
+        $('#time_display').html(secToDate(1995, response.date))
         $('#altitude_display').html(response.altitude + "m ASL")
     });
-}
-
-// Translate seconds since epoch to formatted date
-function toDateTime(secs) {
-    var t = new Date(1995, 0, 1); // Epoch of dataset
-    t.setSeconds(secs);
-    var formatted_date = apz(t.getDate()) + "/" 
-                   + apz(t.getMonth()+1) + "/" 
-                   + apz(t.getFullYear()) + " - "
-                   + apz(t.getHours()) + ":"
-                   + apz(t.getMinutes()) + ":"
-                   + apz(t.getSeconds());
-    return formatted_date;
-}
-
-// Append leading zeros in date strings
-function apz(n){
-    if(n <= 9){
-      return "0" + n;
-    }
-    return n
 }

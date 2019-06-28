@@ -1,17 +1,12 @@
 // Activate current menu in nav
 document.getElementById('nav_map').className = 'active';
 
-// Add CSS colors (corresponding to icons folder) for more drones
-var colors = ["red", "blue", "green", "yellow", "orange"];
-var icons = [];
-
-var flight_map;
-var tiles_overlay, path_overlay, markers_overlay;
-var last_time_label;
+var flight_map, zoom_home;
+var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 
 /*
     drones     : { key           :   drone_id,   values : value_dict }
-    value_dict : { color         :   colors[index_icon], 
+    value_dict : { color         :   global_colors[index_icon], 
                    position      :   marker, 
                    altitude      :   float, 
                    heading       :   float,
@@ -35,27 +30,39 @@ $(document).ready(function(){
     displayDrones();
 });
 
+// TO CHANGE WITH GET REQUEST
+function logValue(value) {
+    console.log(value);
+}
+
 function initializeMap(){
+    // Map
+    flight_map = L.map('map_container', {zoomControl: false});
 
-    // Icon class
-    var planeIcon = L.Icon.extend({
-        options: { 
-            iconSize:     [20, 20], // size of the icon
-            iconAnchor:   [10, 10], // marker's location.setView([43.6047, 1.4442], 13);
-            popupAnchor:  [0, 0]    // relative to the iconAnchor
-        }
-    });
+    // Home button
+    zoomHome = L.Control.zoomHome();
 
-    // Create an icon for each image in the icon folder
-    for(var i = 0; i < colors.length; i++){
-        var random_icon = new planeIcon({iconUrl: '/map/plane_icon/' + i})
-        icons.push(random_icon);
+    // Sliders
+    var options = {
+        orientation: 'vertical',
+        position: 'bottomright',
+        logo: 'A',
+        min: 0,
+        max: 2000,
+        value: 0,
+        collapsed: true,
+        increment: true,
+        width: '300px'
+
     }
+    var altitude_slider = L.control.slider(logValue, options).addTo(flight_map);
 
     // Layers
-    tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom: 18});
+    //tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
+    tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}');
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
+    //cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}');
 
     var base_layers = {
     };
@@ -64,10 +71,8 @@ function initializeMap(){
         "Map": tiles_overlay,
         "Trails": path_overlay,
         "Markers": markers_overlay,
+        //"Clouds": cloud_overlay,
     };
-
-    // Map
-    flight_map = L.map('map_container');
 
     // Add layers to the map and display everything
     L.control.layers(base_layers, overlays).addTo(flight_map);
@@ -84,8 +89,8 @@ function displayDrones(){
         for (var key in response){
 
             // Get color and icon of markers, increment index_icon for next drone 
-            var drone_color = colors[index_icon%colors.length];
-            var drone_icon = icons[index_icon++%colors.length];
+            var drone_color = global_colors[index_icon%global_colors.length];
+            var drone_icon = global_icons[index_icon++%global_colors.length];
 
             // Parse response data
             var drone_id = key;
@@ -96,6 +101,11 @@ function displayDrones(){
             var past_altitudes = response[key].past_altitudes;
             var log_times = response[key].log_times;
             var time = response[key].time;
+            var past_longitudes = []; // MOVE THIS ON SERVER
+
+            for(position in drone_path){
+                past_longitudes.push(drone_path[position][1]);
+            }
             
             // Create leaflet marker and polyline at drone position
             var marker = L.marker(drone_position, {icon: drone_icon});
@@ -118,13 +128,14 @@ function displayDrones(){
 
             // Update chart data with new dataset and line color corresponding to the icon
             var update = {
-                x: [log_times],
+                x: [past_longitudes],
                 y: [past_altitudes],
                 name: drone_id,
                 mode: 'lines',
                 line: {
-                    color: drone_color,
-                    }
+                        color: drone_color,
+                        dash: 'dashdot',
+                      }
             };
             Plotly.addTraces('chart', update);
         }
@@ -135,6 +146,7 @@ function displayDrones(){
         // Center map on drone last drone added
         if(addedDrones.length != 0){
             flight_map.setView(drone_position, 15);
+            zoomHome.addTo(flight_map);
             setInterval(updateDrones, refresh_rate);
         } else {
             alert("No drones detected, try launching the simulation and refresh the page");
@@ -158,8 +170,14 @@ function updateDrones(){
             var past_altitudes = response[key].past_altitudes;
             var log_times = response[key].log_times;
             var time = response[key].time;
+            var past_longitudes = [];
+
+            for(position in drone_path){
+                //console.log(drone_path[position][1]);
+                past_longitudes.push(drone_path[position][1]);
+            }
             
-            // Identify corresponding drone ... AUCUNE PUTAIN DE LOGIQUE
+            // Identify corresponding drone ...
             var drone_to_update = drones[drone_id];
             var trace = document.getElementById('chart').data.find(x => x.name == drone_id);
             var trace_index = document.getElementById('chart').data.indexOf(trace);
@@ -176,7 +194,7 @@ function updateDrones(){
 
                 // Update chart
                 var update = {
-                    x: [log_times],
+                    x: [past_longitudes],
                     y: [past_altitudes],
                     //name: drone_id,
                 };
@@ -192,7 +210,8 @@ function updateDrones(){
                 initializeDrones(); // NOT SURE IF THIS IS WORKING, CAN'T TEST ?
             }
         }
-        //console.log(log_times);
+        // Update home button coordinates 
+        zoomHome.setHomeCoordinates(drone_position);
         console.debug('positions of drones', updatedDrones, ' updated');
     });
 
@@ -204,11 +223,14 @@ function initializeChart(){
     var layout = {
         title: '',
         xaxis: {
-            title: 'Heure'
+            title: 'Longitude',
+            //range : [0,1]
         },
         yaxis: {
-            title: 'Altitude (m ASL)?'
+            title: 'Altitude (m ASL)?',
+            min: 0,
         }
+
     };
     var config = { responsive : true };
 
@@ -227,22 +249,3 @@ function infosToString(id, altitude, heading){
 
     return infos;
 }
-
-// Print formatted string from secs
-function secToDate(secs){
-    var t = new Date(1995, 0, 1); // Epoch of dataset
-    t.setSeconds(secs);
-    var formatted_date = apz(t.getHours()) + ":"
-                   + apz(t.getMinutes()) + ":"
-                   + apz(t.getSeconds());
-    return formatted_date;
-}
-
-// Append leading zeros in date strings
-function apz(n){
-    if(n <= 9){
-      return "0" + n;
-    }
-    return n
-}
-
