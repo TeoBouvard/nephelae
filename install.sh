@@ -1,6 +1,6 @@
 #!/bin/bash
 #sudo apt-get update
-sudo apt-get -y install git python3-pip python3-venv
+sudo apt-get -y install git python3-pip python3-venv python-pip
 
 rm -rf nephelae
 git clone https://github.com/TeoBouvard/nephelae.git

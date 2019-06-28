@@ -1,6 +1,7 @@
 import base64
 import io
 import urllib
+import os
 
 import matplotlib.pyplot as plt
 from netCDF4 import MFDataset
@@ -11,7 +12,11 @@ var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
 # IMPORTANT -> UPDATE YOUR MESONH FILE PATH
-dataset = MFDataset('../../MesoNH/MesoNH.nc')
+if 'MESO_NH' in os.environ :
+    dataset = MFDataset(os.environ['MESO_NH'])
+else :
+    print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
+    exit()
 
 
 class HorizontalCrossSection:

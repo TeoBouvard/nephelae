@@ -2,7 +2,6 @@
 
 ## TODO
 
-- dimensions of map in km cross sections ?
 - maps : https://leaflet-extras.github.io/leaflet-providers/preview/ / mobile atlas creator, create script ?
 - drone icon : https://www.iconfinder.com/editor/?id=322416&size=512&hash=35e99f72b6a7fe901ef630ae0ef71ac68a9e7efcdc24e720b4cd5d2a
 - start info page
