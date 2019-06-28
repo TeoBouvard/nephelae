@@ -24,7 +24,6 @@ var refresh_rate = 1000; //milliseconds
 $(document).ready(function(){
     // Initialize document elements
     initializeMap();
-    initializeChart();
 
     // Update elements every 'refresh_rate' ms
     displayDrones();
@@ -101,11 +100,6 @@ function displayDrones(){
             var past_altitudes = response[key].past_altitudes;
             var log_times = response[key].log_times;
             var time = response[key].time;
-            var past_longitudes = []; // MOVE THIS ON SERVER
-
-            for(position in drone_path){
-                past_longitudes.push(drone_path[position][1]);
-            }
             
             // Create leaflet marker and polyline at drone position
             var marker = L.marker(drone_position, {icon: drone_icon});
@@ -125,19 +119,6 @@ function displayDrones(){
             drones[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading));
             drones[drone_id].path.addTo(path_overlay);
             addedDrones.push(drone_id);
-
-            // Update chart data with new dataset and line color corresponding to the icon
-            var update = {
-                x: [past_longitudes],
-                y: [past_altitudes],
-                name: drone_id,
-                mode: 'lines',
-                line: {
-                        color: drone_color,
-                        dash: 'dashdot',
-                      }
-            };
-            Plotly.addTraces('chart', update);
         }
 
         //Update chart, keep track of last time label added
@@ -149,7 +130,7 @@ function displayDrones(){
             zoomHome.addTo(flight_map);
             setInterval(updateDrones, refresh_rate);
         } else {
-            alert("No drones detected, try launching the simulation and refresh the page");
+            alert("No drones detected, try launching the simulation and restart the server");
         }
     });
 }
@@ -170,17 +151,9 @@ function updateDrones(){
             var past_altitudes = response[key].past_altitudes;
             var log_times = response[key].log_times;
             var time = response[key].time;
-            var past_longitudes = [];
 
-            for(position in drone_path){
-                //console.log(drone_path[position][1]);
-                past_longitudes.push(drone_path[position][1]);
-            }
-            
             // Identify corresponding drone ...
             var drone_to_update = drones[drone_id];
-            var trace = document.getElementById('chart').data.find(x => x.name == drone_id);
-            var trace_index = document.getElementById('chart').data.indexOf(trace);
 
             // ... and update it
             if(drone_to_update){
@@ -191,15 +164,6 @@ function updateDrones(){
 
                 // Update polyline
                 drone_to_update.path.setLatLngs(drone_path);
-
-                // Update chart
-                var update = {
-                    x: [past_longitudes],
-                    y: [past_altitudes],
-                    //name: drone_id,
-                };
-                
-                Plotly.restyle('chart', update, [trace_index]);
 
                 // Log changes
                 updatedDrones.push(drone_id);
@@ -215,26 +179,6 @@ function updateDrones(){
         console.debug('positions of drones', updatedDrones, ' updated');
     });
 
-}
-
-function initializeChart(){
-
-    var data = [];
-    var layout = {
-        title: '',
-        xaxis: {
-            title: 'Longitude',
-            //range : [0,1]
-        },
-        yaxis: {
-            title: 'Altitude (m ASL)?',
-            min: 0,
-        }
-
-    };
-    var config = { responsive : true };
-
-    Plotly.newPlot('chart', data, layout, config);
 }
 
 // Print HTML formatted string so that it can be added to marker popup

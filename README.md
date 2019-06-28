@@ -11,6 +11,8 @@
 - leaflet realtime plugin ? (webgl) heatmaps ? Leaflet.heat ? zoomhome, fullscreen ? leaflet-velocity
 - implement general method for cross section with variable name parameter
 - plotly update button
+- requête repère mobile au mapping
+- cross section GET with URL parameters rather than POST
 
 
 ## Benchmark

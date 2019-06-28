@@ -11,7 +11,6 @@ var_altitude = 'VLEV'    # Vertical levels in km ASL
 var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
-# IMPORTANT -> UPDATE YOUR MESONH FILE PATH
 if 'MESO_NH' in os.environ :
     dataset = MFDataset(os.environ['MESO_NH'])
 else :
@@ -38,22 +37,17 @@ class HorizontalCrossSection:
             self.time_index = time_index
 
     def __str__(self):
-        return dataset
+        infos = 'Horizontal cross section | altitude : '
+        infos += str(self.altitude_index) + '/' + str(self.max_altitude_index())
+        infos += ' , time : '
+        infos += str(self.time_index) + '/' + str(self.max_time_index())
+        return infos
         
-    def get_shape(self):
-        keys = [var_time,var_altitude, 'W_E_direction', 'S_N_direction']
-        values = [
-            len(dataset.variables[var_time][:]),
-            len(dataset.variables[var_altitude][:]),
-            len(dataset.variables['W_E_direction'][:]),
-            len(dataset.variables['S_N_direction'][:])
-        ]
-        return dict(zip(keys,values))
-
+       
     # Returns a base64 encoded string containing hcs upwind data
     def print_thermals(self):
 
-        thermals = dataset.variables[var_upwind][self.time_index,self.altitude_index,:,:]
+        thermals = self.get_slice(var_upwind)
 
         # Create pyplot image
         plt.imshow(thermals, origin='lower', vmin=self.min_upwind(), vmax=self.max_upwind())
@@ -73,10 +67,6 @@ class HorizontalCrossSection:
 
         return string
     
-    def print_thermals_img(self):
-        thermals = dataset.variables[var_upwind][self.time_index, self.altitude_index, :, :]
-        plt.imshow(thermals, origin='lower')
-        plt.savefig('nephelae/img/thermals.png', format='png') 
     
     def print_clouds(self):
         
@@ -104,18 +94,30 @@ class HorizontalCrossSection:
     def print_clouds_img(self):
         clouds = dataset.variables[var_lwc][self.time_index,self.altitude_index,:,:]
         plt.imshow(clouds, origin='lower')
-        plt.savefig('nephelae/img/clouds.jpg', format='jpg') 
+        plt.savefig('nephelae/img/clouds.jpg', format='jpg')
     
+    def get_slice(self, dimension, x1=None, x2=None, y1=None, y2=None):
+        return dataset.variables[dimension][self.time_index, self.altitude_index, x1:x2, y1:y2]
+
+
+
+
+
+
+
+
+
     # Get date !in seconds since epoch! from time_index
-    def get_date(self):
+    def get_seconds(self):
         return dataset.variables[var_time][self.time_index]
+    
 
     # Get altitude !in meters! from altitude_index !CHECK THIS METHOD'S CORRECTNESS!
     def get_altitude(self):
         return 1000*dataset.variables[var_altitude][self.altitude_index, 0, 0]
 
     @staticmethod
-    # Compute acquisition duration
+    # Compute acquisition duration in seconds
     def time_range():
         return (dataset.variables[var_time][-1] - dataset.variables[var_time][0])
 
