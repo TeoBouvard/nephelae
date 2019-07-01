@@ -40,7 +40,8 @@ def horizontal_slice(variable, time_index=0, altitude_index=0, x1=None, x2=None,
     except ValueError:
         logging.error('Indexes must be valid')
 
-def horizontal_clouds(x, y, z):
+def horizontal_clouds(x, y, z, altitude):
+    print(altitude)
 
     # Get size of MesoNH simulation
     square_size = 1000 * hypercube.variables['W_E_direction'][-1] - hypercube.variables['W_E_direction'][0]
@@ -55,17 +56,18 @@ def horizontal_clouds(x, y, z):
     x2 = int(x1 + (t_size/square_size)*255)
     y1 = int(y2 - (t_size/square_size)*255)
 
-    if x1 > 0 and x2 > x1 and y1 > 0 and y2 > y1:
-
+    if 0 <= x1 < x2 < 256 and 0 <= y1 < y2 < 256:
         # Get slice
-        h_slice = horizontal_slice(var_lwc, 0, 42, y1, y2, x1, x2)
+        h_slice = horizontal_slice(var_lwc, 24, altitude, y1, y2, x1, x2)
+    else:
+        h_slice = np.zeros((256, 256))
 
-        # Write image to buffer
-        buf = io.BytesIO()
-        plt.imsave(buf, h_slice, origin='lower', cmap=transparent_cmap('Purples'), format='png')
-        plt.close()
-        buf.seek(0)
-        return buf
+    # Write image to buffer
+    buf = io.BytesIO()
+    plt.imsave(buf, h_slice, origin='lower', vmin=0, cmap=transparent_cmap('Purples'), format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
 
 def unproject(x, y, z):
     R = 40075016.686
@@ -77,3 +79,6 @@ def unproject(x, y, z):
     tile_size = R * math.cos(lat_rad) / n
 
     return lat_deg, lon_deg, tile_size
+
+def max_lwc():
+    return max(getattr(hypercube.variables[var_lwc], 'actual_range'))

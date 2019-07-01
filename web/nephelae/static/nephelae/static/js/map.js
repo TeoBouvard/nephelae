@@ -31,6 +31,7 @@ $(document).ready(function(){
 
 // TO CHANGE WITH GET REQUEST
 function logValue(value) {
+    cloud_overlay.setUrl('clouds/{z}/{x}/{y}/'+value, noRedraw=false);
     console.log(value);
 }
 
@@ -41,28 +42,28 @@ function initializeMap(){
     // Home button
     zoomHome = L.Control.zoomHome();
 
+
+    // Layers (add/remove .grayscale() if you want a colored map)
+    //tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
+    tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}');
+    path_overlay = L.layerGroup();
+    markers_overlay = L.layerGroup();
+    cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}/{alt}', {alt : 0}).setOpacity(0.8);
+
     // Sliders
     var options = {
         orientation: 'vertical',
         position: 'bottomright',
         logo: 'A',
         min: 0,
-        max: 2000,
+        max: 159, // -> set dynamically with request
         value: 0,
         collapsed: true,
         increment: true,
         height: '300px'
-
     }
 
     var altitude_slider = L.control.slider(logValue, options).addTo(flight_map);
-
-    // Layers (add/remove .grayscale() if you want a colored map)
-    tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
-    //tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}');
-    path_overlay = L.layerGroup();
-    markers_overlay = L.layerGroup();
-    cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}').setOpacity(0.8);
 
     var base_layers = {
     };

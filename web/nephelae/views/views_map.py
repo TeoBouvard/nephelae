@@ -29,15 +29,15 @@ def plane_icon(request, index):
 # Render map tiles
 def map_tiles(request, z, x, y):
     try:
-        path = os.environ.get('MAP_TILES', 'setenv') + '/' + str(z) + '/' + str(x) + '/' + str(y) + '.png'
+        path = os.environ.get('MAP_TILES') + '/' + str(z) + '/' + str(x) + '/' + str(y) + '.png'
         with open(path, "rb") as f:
             return HttpResponse(f.read(), content_type="image/png")
     except IOError:
         return HttpResponseNotFound()
 
 # Render cloud tiles
-def cloud_tiles(request, x, y, z):
-	buf = hypercube.horizontal_clouds(x, y, z)
+def cloud_tiles(request, x, y, z, altitude):
+	buf = hypercube.horizontal_clouds(x, y, z, altitude)
 	if buf is not None:
 		return HttpResponse(buf.read(), content_type="image/png")
 	else:
