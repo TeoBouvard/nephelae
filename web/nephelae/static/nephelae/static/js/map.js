@@ -18,7 +18,7 @@ var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 var drones = {};
 
 // Parameters 
-var refresh_rate = 1000; //milliseconds
+var refresh_rate = 3000; //milliseconds
 
 
 $(document).ready(function(){
@@ -51,17 +51,18 @@ function initializeMap(){
         value: 0,
         collapsed: true,
         increment: true,
-        width: '300px'
+        height: '300px'
 
     }
+
     var altitude_slider = L.control.slider(logValue, options).addTo(flight_map);
 
-    // Layers
-    //tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
-    tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}');
+    // Layers (add/remove .grayscale() if you want a colored map)
+    tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
+    //tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}');
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
-    //cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}');
+    cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}').setOpacity(0.8);
 
     var base_layers = {
     };
@@ -70,7 +71,7 @@ function initializeMap(){
         "Map": tiles_overlay,
         "Trails": path_overlay,
         "Markers": markers_overlay,
-        //"Clouds": cloud_overlay,
+        "Clouds": cloud_overlay,
     };
 
     // Add layers to the map and display everything
@@ -121,12 +122,12 @@ function displayDrones(){
             addedDrones.push(drone_id);
         }
 
-        //Update chart, keep track of last time label added
+        // Log added drones 
         console.debug('drones', addedDrones, 'added to overlays');
 
         // Center map on drone last drone added
         if(addedDrones.length != 0){
-            flight_map.setView(drone_position, 15);
+            flight_map.setView([43.6047,1.4442], 13);
             zoomHome.addTo(flight_map);
             setInterval(updateDrones, refresh_rate);
         } else {
@@ -193,3 +194,53 @@ function infosToString(id, altitude, heading){
 
     return infos;
 }
+
+
+/* USEFUL FOR HEATMAP */
+
+function getVisibleTilesCoords(map){
+      
+    // get bounds, zoom and tileSize        
+    var bounds = map.getPixelBounds();
+    var zoom = map.getZoom();
+    var tileSize = 256;
+    var tileCoordsContainer = [];
+
+
+    // get NorthWest and SouthEast points
+    var nwTilePoint = new L.Point(Math.floor(bounds.min.x / tileSize),
+        Math.floor(bounds.min.y / tileSize));
+
+    var seTilePoint = new L.Point(Math.floor(bounds.max.x / tileSize),
+        Math.floor(bounds.max.y / tileSize));
+
+    // get max number of tiles in this zoom level
+    var max = map.options.crs.scale(zoom) / tileSize; 
+
+    // enumerate visible tiles 
+    for (var x = nwTilePoint.x; x <= seTilePoint.x; x++) 
+    {
+        for (var y = nwTilePoint.y; y <= seTilePoint.y; y++) 
+        {
+
+        var xTile = Math.abs(x % max);
+        var yTile = Math.abs(y % max);
+        
+        tileCoordsContainer.push({ 'x':xTile, 'y':yTile });
+
+        console.log('tile ' + xTile + ' ' + yTile);
+        }
+    }
+    
+    return tileCoordsContainer;
+};
+
+function getTileURL(lat, lon, zoom) {
+	    var xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
+	    var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
+	    return "" + zoom + "/" + xtile + "/" + ytile;
+}
+
+/*flight_map.on('click', function (e) {
+    url = getTileURL(e.latlng.lat, e.latlng.lng, map.getZoom())
+    console.log(url);*/

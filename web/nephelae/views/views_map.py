@@ -2,10 +2,10 @@ import os
 import random
 from timeit import default_timer as timer
 
-from django.http import HttpResponseNotFound, HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
 
-from ..models import PprzGpsGrabber
+from ..models import PprzGpsGrabber, hypercube
 
 pprz = PprzGpsGrabber()
 pprz.start()
@@ -26,11 +26,20 @@ def plane_icon(request, index):
     except IOError:
         return HttpResponseNotFound()
 
-# Render icons for drones
+# Render map tiles
 def map_tiles(request, z, x, y):
     try:
-        path = '/home/arthurdent/Documents/maps/' + str(z) + '/' + str(x) + '/' + str(y) + '.png'
+        path = os.environ.get('MAP_TILES', 'setenv') + '/' + str(z) + '/' + str(x) + '/' + str(y) + '.png'
         with open(path, "rb") as f:
             return HttpResponse(f.read(), content_type="image/png")
     except IOError:
         return HttpResponseNotFound()
+
+# Render cloud tiles
+def cloud_tiles(request, x, y, z):
+	buf = hypercube.horizontal_clouds(x, y, z)
+	if buf is not None:
+			return HttpResponse(buf.read(), content_type="image/png")
+	else:
+			return HttpResponseNotFound()
+

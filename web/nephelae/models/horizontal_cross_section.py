@@ -52,6 +52,7 @@ class HorizontalCrossSection:
         # Create pyplot image
         plt.imshow(thermals, origin='lower', vmin=self.min_upwind(), vmax=self.max_upwind())
         plt.title('Vertical air speed in m/s')
+        plt.set_cmap('viridis')
         plt.colorbar()
 
         # Write image to buffer
@@ -76,6 +77,7 @@ class HorizontalCrossSection:
         plt.imshow(clouds, origin='lower',vmin=0, vmax=self.max_lwc())
         title = 'Liquid Water Content in kg/kg' #at ' + str(int(self.get_altitude())) + 'm ASL'
         plt.title(title)
+        plt.set_cmap('viridis')
         plt.colorbar()
 
         # Write image to buffer
@@ -91,20 +93,9 @@ class HorizontalCrossSection:
 
         return string
     
-    def print_clouds_img(self):
-        clouds = dataset.variables[var_lwc][self.time_index,self.altitude_index,:,:]
-        plt.imshow(clouds, origin='lower')
-        plt.savefig('nephelae/img/clouds.jpg', format='jpg')
-    
+
     def get_slice(self, dimension, x1=None, x2=None, y1=None, y2=None):
         return dataset.variables[dimension][self.time_index, self.altitude_index, x1:x2, y1:y2]
-
-
-
-
-
-
-
 
 
     # Get date !in seconds since epoch! from time_index
