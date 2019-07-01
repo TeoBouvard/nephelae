@@ -41,7 +41,6 @@ def horizontal_slice(variable, time_index=0, altitude_index=0, x1=None, x2=None,
         logging.error('Indexes must be valid')
 
 def horizontal_clouds(x, y, z, altitude):
-    print(altitude)
 
     # Get size of MesoNH simulation
     square_size = 1000 * hypercube.variables['W_E_direction'][-1] - hypercube.variables['W_E_direction'][0]
@@ -58,13 +57,13 @@ def horizontal_clouds(x, y, z, altitude):
 
     if 0 <= x1 < x2 < 256 and 0 <= y1 < y2 < 256:
         # Get slice
-        h_slice = horizontal_slice(var_lwc, 24, altitude, y1, y2, x1, x2)
+        h_slice = horizontal_slice(var_lwc, 50, altitude, y1, y2, x1, x2)
     else:
         h_slice = np.zeros((256, 256))
 
     # Write image to buffer
     buf = io.BytesIO()
-    plt.imsave(buf, h_slice, origin='lower', vmin=0, cmap=transparent_cmap('Purples'), format='png')
+    plt.imsave(buf, h_slice, origin='lower', vmin=0, vmax=max_lwc(), cmap=transparent_cmap('Purples'), format='png')
     plt.close()
     buf.seek(0)
     return buf

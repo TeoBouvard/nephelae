@@ -29,10 +29,9 @@ $(document).ready(function(){
     displayDrones();
 });
 
-// TO CHANGE WITH GET REQUEST
-function logValue(value) {
+// Change cross section altitude on slider input
+function changeAltitude(value) {
     cloud_overlay.setUrl('clouds/{z}/{x}/{y}/'+value, noRedraw=false);
-    console.log(value);
 }
 
 function initializeMap(){
@@ -48,22 +47,7 @@ function initializeMap(){
     tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}');
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
-    cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}/{alt}', {alt : 0}).setOpacity(0.8);
-
-    // Sliders
-    var options = {
-        orientation: 'vertical',
-        position: 'bottomright',
-        logo: 'A',
-        min: 0,
-        max: 159, // -> set dynamically with request
-        value: 0,
-        collapsed: true,
-        increment: true,
-        height: '300px'
-    }
-
-    var altitude_slider = L.control.slider(logValue, options).addTo(flight_map);
+    cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}/{alt}', {alt : 0}).setOpacity(0.95);
 
     var base_layers = {
     };
@@ -75,6 +59,14 @@ function initializeMap(){
         "Clouds": cloud_overlay,
     };
 
+    // Sliders
+    var options = {
+        min: 0,
+        max: 159, // -> set dynamically with request
+        value: 45,
+    }
+    var altitude_slider = L.control.slider(changeAltitude, options).addTo(flight_map);
+
     // Add layers to the map and display everything
     L.control.layers(base_layers, overlays).addTo(flight_map);
     for(key in overlays) { overlays[key].addTo(flight_map); }
@@ -84,7 +76,7 @@ function displayDrones(){
     var addedDrones = [];
     var index_icon = 0;
 
-    $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
+    $.get('update/', function(response){
 
         // Initialize drone array with drone_id and position marker
         for (var key in response){
@@ -141,7 +133,7 @@ function updateDrones(){
     var updatedDrones = [];
 
     // Request updated data from the server
-    $.ajax({ url: 'update/', type: 'GET' }).done(function(response){
+    $.get('update/', function(response){
 
         // Parse response
         for (var key in response){
@@ -195,53 +187,3 @@ function infosToString(id, altitude, heading){
 
     return infos;
 }
-
-
-/* USEFUL FOR HEATMAP */
-
-function getVisibleTilesCoords(map){
-      
-    // get bounds, zoom and tileSize        
-    var bounds = map.getPixelBounds();
-    var zoom = map.getZoom();
-    var tileSize = 256;
-    var tileCoordsContainer = [];
-
-
-    // get NorthWest and SouthEast points
-    var nwTilePoint = new L.Point(Math.floor(bounds.min.x / tileSize),
-        Math.floor(bounds.min.y / tileSize));
-
-    var seTilePoint = new L.Point(Math.floor(bounds.max.x / tileSize),
-        Math.floor(bounds.max.y / tileSize));
-
-    // get max number of tiles in this zoom level
-    var max = map.options.crs.scale(zoom) / tileSize; 
-
-    // enumerate visible tiles 
-    for (var x = nwTilePoint.x; x <= seTilePoint.x; x++) 
-    {
-        for (var y = nwTilePoint.y; y <= seTilePoint.y; y++) 
-        {
-
-        var xTile = Math.abs(x % max);
-        var yTile = Math.abs(y % max);
-        
-        tileCoordsContainer.push({ 'x':xTile, 'y':yTile });
-
-        console.log('tile ' + xTile + ' ' + yTile);
-        }
-    }
-    
-    return tileCoordsContainer;
-};
-
-function getTileURL(lat, lon, zoom) {
-	    var xtile = parseInt(Math.floor( (lon + 180) / 360 * (1<<zoom) ));
-	    var ytile = parseInt(Math.floor( (1 - Math.log(Math.tan(lat.toRad()) + 1 / Math.cos(lat.toRad())) / Math.PI) / 2 * (1<<zoom) ));
-	    return "" + zoom + "/" + xtile + "/" + ytile;
-}
-
-/*flight_map.on('click', function (e) {
-    url = getTileURL(e.latlng.lat, e.latlng.lng, map.getZoom())
-    console.log(url);*/

@@ -14846,24 +14846,28 @@ function isPointOnLine(point, path) {
     return false;
 }
 
-/* Leaflet slider */
+/* 
+Leaflet slider 
+https://github.com/Eclipse1979/leaflet-slider
+*/
+
 L.Control.Slider = L.Control.extend({
     update: function(value){
         return value;
     },
 
     options: {
-        size: '100px',
-        position: 'topright',
+        size: '300px',
+        position: 'bottomright',
         min: 0,
-        max: 250,
+        max: 160,
         step: 1,
         id: "slider",
         value: 50,
         collapsed: true,
         title: 'Leaflet Slider',
-        logo: 'S',
-        orientation: 'horizontal',
+        logo: 'A',
+        orientation: 'vertical',
         increment: false,
         getValue: function(value) {
             return value;
