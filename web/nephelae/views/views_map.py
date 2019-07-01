@@ -39,7 +39,7 @@ def map_tiles(request, z, x, y):
 def cloud_tiles(request, x, y, z):
 	buf = hypercube.horizontal_clouds(x, y, z)
 	if buf is not None:
-			return HttpResponse(buf.read(), content_type="image/png")
+		return HttpResponse(buf.read(), content_type="image/png")
 	else:
-			return HttpResponseNotFound()
+		return HttpResponseNotFound()
 

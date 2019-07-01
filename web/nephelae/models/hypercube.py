@@ -42,22 +42,22 @@ def horizontal_slice(variable, time_index=0, altitude_index=0, x1=None, x2=None,
 
 def horizontal_clouds(x, y, z):
 
-    # Get real-world coordinates of tile
+    # Get size of MesoNH simulation
+    square_size = 1000 * hypercube.variables['W_E_direction'][-1] - hypercube.variables['W_E_direction'][0]
+
+    # Get real-world dimensions of requested tile
     lat, lng, t_size = unproject(x, y, z)
-    #print(lng, ',', lat, ':', t_size)
     
-    # Compute array bounds
-    x1 = int(np.interp(lng,[1.4442,1.7547],[0,255],0,0))
-    y2 = int(np.interp(lat,[43.6047,43.8295],[0,255],0,0))
+    # Compute (fictional) array bounds
+    x1 = int(np.interp(lng,[1.27, 1.3489],[0,255], 256, 256))
+    y2 = int(np.interp(lat,[43.46, 43.5173],[0,255], 256, 256))
 
-    x2 = int(x1 + (t_size/6000)*255)
-    y1 = int(y2 - (t_size/6000)*255)
+    x2 = int(x1 + (t_size/square_size)*255)
+    y1 = int(y2 - (t_size/square_size)*255)
 
-    #print(x, y, x1, x2, y1, y2)
-    
-    #print(x1, x2, y1, y2)
     if x1 > 0 and x2 > x1 and y1 > 0 and y2 > y1:
-        # Get desired slice
+
+        # Get slice
         h_slice = horizontal_slice(var_lwc, 0, 42, y1, y2, x1, x2)
 
         # Write image to buffer

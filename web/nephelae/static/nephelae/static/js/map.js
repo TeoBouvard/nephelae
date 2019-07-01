@@ -127,7 +127,7 @@ function displayDrones(){
 
         // Center map on drone last drone added
         if(addedDrones.length != 0){
-            flight_map.setView([43.6047,1.4442], 13);
+            flight_map.setView(drone_position, 14);
             zoomHome.addTo(flight_map);
             setInterval(updateDrones, refresh_rate);
         } else {
