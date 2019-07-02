@@ -7,7 +7,7 @@ urlpatterns = [
     # URL for empty path
     path('', RedirectView.as_view(url='preview')),
 
-    # URL for preview page
+    # URL for preview page, update requests routed to map update view
     path('preview/', views.preview, name='preview'),
     path('preview/update/', views.update_map, name='update_chart'),
 

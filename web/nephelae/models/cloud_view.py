@@ -1,3 +1,4 @@
+import os
 import pickle
 
 import numpy as np
@@ -9,8 +10,11 @@ var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 var_altitude = 'VLEV'
 cloud_threshold = 10**-5
 
-# IMPORTANT -> UPDATE YOUR MESONH FILE PATH
-dataset = MFDataset('../../MesoNH/MesoNH.nc')
+if 'MESO_NH' in os.environ :
+    dataset = MFDataset(os.environ['MESO_NH'])
+else :
+    print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
+    exit()
 
 def save_pickle(array):
     print('starting to save pickle ...')
