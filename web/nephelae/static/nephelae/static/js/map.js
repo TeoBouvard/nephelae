@@ -36,7 +36,7 @@ function changeAltitude(value) {
 
 function initializeMap(){
     // Map
-    flight_map = L.map('map_container', {zoomControl: false});
+    flight_map = L.map('map_container', {zoomControl: false, maxZoom : 15});
 
     // Home button
     zoomHome = L.Control.zoomHome();
@@ -44,7 +44,7 @@ function initializeMap(){
 
     // Layers (add/remove .grayscale() if you want a colored map)
     //tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
-    tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}');
+    tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
     cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}/{alt}', {alt : 0}).setOpacity(0.95);
@@ -120,7 +120,7 @@ function displayDrones(){
 
         // Center map on drone last drone added
         if(addedDrones.length != 0){
-            flight_map.setView(drone_position, 14);
+            flight_map.setView(drone_position, 15);
             zoomHome.addTo(flight_map);
             setInterval(updateDrones, refresh_rate);
         } else {

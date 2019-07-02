@@ -55,15 +55,17 @@ def horizontal_clouds(x, y, z, altitude):
     x2 = int(x1 + (t_size/square_size)*255)
     y1 = int(y2 - (t_size/square_size)*255)
 
-    if 0 <= x1 < x2 < 256 and 0 <= y1 < y2 < 256:
-        # Get slice
+    print(x, y, x1, x2, y1, y2)
+
+    # Get slice
+    if 0 <= x1 <= x2 < 256 and 0 <= y1 <= y2 < 256:
         h_slice = horizontal_slice(var_lwc, 50, altitude, y1, y2, x1, x2)
     else:
         h_slice = np.zeros((256, 256))
 
     # Write image to buffer
     buf = io.BytesIO()
-    plt.imsave(buf, h_slice, origin='lower', vmin=0, vmax=max_lwc(), cmap=transparent_cmap('Purples'), format='png')
+    plt.imsave(buf, h_slice, origin='lower', vmin=0, cmap=transparent_cmap('Purples'), format='png')
     plt.close()
     buf.seek(0)
     return buf

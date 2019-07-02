@@ -42,4 +42,3 @@ def cloud_tiles(request, x, y, z, altitude):
 		return HttpResponse(buf.read(), content_type="image/png")
 	else:
 		return HttpResponseNotFound()
-
