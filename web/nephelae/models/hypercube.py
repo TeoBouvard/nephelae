@@ -55,7 +55,7 @@ def horizontal_clouds(x, y, z, altitude):
     x2 = int(x1 + (t_size/square_size)*255)
     y1 = int(y2 - (t_size/square_size)*255)
 
-    print(x, y, x1, x2, y1, y2)
+    #print(x, y, x1, x2, y1, y2)
 
     # Get slice
     if 0 <= x1 <= x2 < 256 and 0 <= y1 <= y2 < 256:
