@@ -1,9 +1,19 @@
 {% extends "nephelae/base.html" %}
 {% load static %}
 
-<!-- Load specific javascript -->
+{% block additional_head%}
+	<!-- Load specific CSS -->
+	<link rel="stylesheet" type="text/css" href="{% static 'nephelae/static/css/map.css' %}"/>
+{% endblock %}
+
+
 {% block additional_scripts %}
+	<!-- Load specific javascript -->
 	<script type="text/javascript" src="{% static 'nephelae/static/js/preview.js' %}"></script>
+	<!-- Load plotly js -->
+    <script type="text/javascript" src="{% static 'nephelae/static/js/libs/plotly.min.js' %}"></script>
+	<!-- Load global variables and specific javascript -->
+	<script type="text/javascript" src="{% static 'nephelae/static/js/base_colors.js' %}"></script>
 {% endblock %}
 
 {% block page %}
