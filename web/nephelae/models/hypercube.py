@@ -2,6 +2,8 @@ import io
 import logging
 import math
 import os
+import urllib
+import base64
 
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -70,6 +72,55 @@ def horizontal_clouds(x, y, z, altitude):
     buf.seek(0)
     return buf
 
+# Returns a base64 encoded string containing hcs cloud data
+def print_horizontal_clouds(time_index, altitude_index):
+
+    # Get slice
+    h_slice = horizontal_slice(var_lwc, time_index, altitude_index)
+    # Create pyplot image
+    plt.imshow(h_slice, origin='lower',vmin=0, vmax=max_lwc())
+    title = 'Liquid Water Content in kg/kg' #at ' + str(int(self.get_altitude())) + 'm ASL'
+    plt.title(title)
+    plt.set_cmap('viridis')
+    plt.colorbar()
+
+    # Write image to buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+
+    # Encode buffer in base64 string
+    buf.seek(0)
+    data = base64.b64encode(buf.read())
+    buf.close()
+    encodedImage = 'data:image/jpg;base64,' + urllib.parse.quote(data)
+
+    return encodedImage
+
+# Returns a base64 encoded string containing hcs upwind data
+def print_horizontal_thermals(time_index, altitude_index):
+
+    h_slice = horizontal_slice(var_upwind, time_index, altitude_index)
+
+    # Create pyplot image
+    plt.imshow(h_slice, origin='lower', vmin=min_upwind(), vmax=max_upwind())
+    plt.title('Vertical air speed in m/s')
+    plt.set_cmap('viridis')
+    plt.colorbar()
+
+    # Write image to buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+
+    # Encode buffer in base64 string
+    buf.seek(0)
+    data = base64.b64encode(buf.read())
+    buf.close()
+    encodedImage = 'data:image/png;base64,' + urllib.parse.quote(data)
+
+    return encodedImage
+
 def unproject(x, y, z):
     R = 40075016.686
     n = 2 ** z
@@ -81,5 +132,40 @@ def unproject(x, y, z):
 
     return lat_deg, lon_deg, tile_size
 
+
+
+########## UTILITY METHODS ##########
+
 def max_lwc():
     return max(getattr(hypercube.variables[var_lwc], 'actual_range'))
+
+def max_time_index():
+    return len(hypercube.variables[var_time]) - 1
+
+def max_altitude_index():
+    return len(hypercube.variables[var_altitude]) - 1
+
+# Compute max upwind to fix plot colorbar
+def max_upwind():
+    return max(getattr(hypercube.variables[var_upwind], 'actual_range'))
+
+# Compute min upwind to fix plot colorbar
+def min_upwind():
+    return min(getattr(hypercube.variables[var_upwind], 'actual_range'))
+
+# Get altitude !in meters! from altitude_index !CHECK THIS METHOD'S CORRECTNESS!
+def get_altitude(altitude_index):
+    return 1000*hypercube.variables[var_altitude][altitude_index, 0, 0]
+
+# Get date !in seconds since epoch! from time_index
+def get_seconds(time_index):
+    return hypercube.variables[var_time][time_index]
+
+def index_from_ratio(time_ratio, altitude_ratio):
+    time_percentage = 0.01*time_ratio
+    time_index = int(time_percentage*max_time_index())
+
+    altitude_percentage = 0.01*altitude_ratio
+    altitude_index = int(altitude_percentage*max_altitude_index())
+
+    return time_index, altitude_index

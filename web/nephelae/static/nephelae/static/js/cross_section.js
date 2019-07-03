@@ -30,20 +30,15 @@ altitude_slider.onchange = function() {
 }
 
 function displayImage(time_percentage, altitude_percentage){
+    
     // Request the frame corresponding to selected time
-    $.ajax({
-        url: '',
-        type: 'POST',
-        dataType: 'json',
-        data: {
-            time_percentage: time_percentage,
-            altitude_percentage: altitude_percentage,
-        }
-    }).done(function(response){
-        console.debug(response);
+    var url = time_percentage + '/' + altitude_percentage;
+
+    $.getJSON(url, function(response){
         $('#clouds_div').html('<img src="' + response.clouds + '">');
         $('#thermals_div').html('<img src="' + response.thermals + '">');
         $('#time_display').html(secToDate(1995, response.date))
         $('#altitude_display').html(response.altitude + "m ASL")
     });
+
 }

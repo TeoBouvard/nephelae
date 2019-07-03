@@ -20,6 +20,7 @@ urlpatterns = [
 
     # URL for cross_sections page
     path('cross_sections/', views.cross_section, name='cross_sections'),
+    path('cross_sections/<int:time_ratio>/<int:altitude_ratio>', views.print_img, name='cross_sections'),
     
     # URL for infos page
     path('infos/', views.infos, name='infos'),
