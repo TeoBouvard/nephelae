@@ -10,7 +10,7 @@ urlpatterns = [
     # URL for preview page, update requests routed to map update view
     path('preview/', views.preview, name='preview'),
     path('preview/update/', views.update_map, name='update_chart'),
-    path('preview/box/', views.box, name='update_chart'),
+    path('preview/box/', views.get_box, name='update_chart'),
 
     # URL for map page
     path('map/', views.map, name='map'),

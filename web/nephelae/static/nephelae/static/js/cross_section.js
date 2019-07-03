@@ -18,7 +18,6 @@ time_slider.oninput = function() {
 }
 time_slider.onchange = function() {
     displayImage(this.value, altitude_slider.value);
-    document.getElementById('nav_cross_section').className = 'active';
 }
 
 // Update the current slider value and display image accordingly

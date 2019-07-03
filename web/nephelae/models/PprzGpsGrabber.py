@@ -86,7 +86,13 @@ class PprzGpsGrabber:
                     self.uavs[uavId]['past_latitudes'].pop(0)
                     self.uavs[uavId]['log_times'].pop(0)
     
-
+def box():
+    box = {
+        'latitude_range': [43.46, 43.47],
+        'longitude_range': [1.27, 1.28],
+        'altitude_range': [200, 300],
+    }
+    return box
 
 if __name__ == '__main__':
     p = PprzGpsGrabber()

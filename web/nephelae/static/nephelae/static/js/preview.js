@@ -4,9 +4,9 @@ document.getElementById('nav_preview').className = 'active';
 // Define graph settings
 var layout = {
             scene: {
-                xaxis:{title: 'Longitude',showgrid: true}, // range: [1.2, 1.3],},
-                yaxis:{title: 'Latitude', showgrid: true}, //range: [43.4, 43.5],},
-                zaxis:{title: 'Altitude', range: [0, 300],},
+                xaxis:{title: 'Longitude', range: [] },
+                yaxis:{title: 'Latitude', range: [] },
+                zaxis:{title: 'Altitude', range: [] },
 		        aspectratio: {x:1.3, y:1.3, z:0.9},
             },
             showlegend: false,
@@ -30,8 +30,8 @@ var refresh_rate = 3000; //milliseconds
 var isAlreadyDrawn = false;
 
 $(document).ready(function(){
+    // Start by getting 3d evolution box of the drones
     getBox();
-    displayDrones();
 });
 
 function displayDrones(){
@@ -101,6 +101,11 @@ function displayDrones(){
 
 function getBox(){
     $.getJSON('box', function(response){
-        console.log('OK');
+        layout.scene.xaxis.range = response.longitude_range;
+        layout.scene.yaxis.range = response.latitude_range;
+        layout.scene.zaxis.range = response.altitude_range;
+
+        // And then display the drones in the box
+        displayDrones();
     })
 }
