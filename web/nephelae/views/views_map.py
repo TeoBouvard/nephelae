@@ -37,14 +37,6 @@ def map_tiles(request, z, x, y):
     except IOError:
         return HttpResponseNotFound()
 
-# Render clouds tiles
-def clouds_tiles(request, x, y, z, altitude):
-    buf = hypercube.horizontal_clouds(x, y, z, altitude)
-    if buf is not None:
-        return HttpResponse(buf.read(), content_type="image/png")
-    else:
-        return HttpResponseNotFound()
-
 # Render clouds image
 def clouds_img(request, time, altitude):
     buf = hypercube.print_horizontal_clouds(time, altitude)

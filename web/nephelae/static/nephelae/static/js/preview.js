@@ -4,8 +4,8 @@ document.getElementById('nav_preview').className = 'active';
 // Define graph settings
 var layout = {
             scene: {
-                xaxis:{title: 'Latitude',showgrid: true}, // range: [1.2, 1.3],},
-                yaxis:{title: 'Longitude', showgrid: true}, //range: [43.4, 43.5],},
+                xaxis:{title: 'Longitude',showgrid: true}, // range: [1.2, 1.3],},
+                yaxis:{title: 'Latitude', showgrid: true}, //range: [43.4, 43.5],},
                 zaxis:{title: 'Altitude', range: [0, 300],},
 		        aspectratio: {x:1.3, y:1.3, z:0.9},
             },
@@ -30,6 +30,7 @@ var refresh_rate = 3000; //milliseconds
 var isAlreadyDrawn = false;
 
 $(document).ready(function(){
+    getBox();
     displayDrones();
 });
 
@@ -53,22 +54,22 @@ function displayDrones(){
             // Update chart data with new dataset and line color corresponding to the icon
             var updatePath = {
                 type: 'scatter3d',
-                x: past_longitudes,
-                y: past_latitudes,
+                x: past_longitudes.slice(-50),
+                y: past_latitudes.slice(-50),
                 z: past_altitudes,
                 name: drone_id,
                 mode: 'lines',
                 line:{
                     color: drone_color,
                     shape: 'spline',
-                    dash: 'dash',
+                    dash: 'solid',
                 }
             };
             
             var updateMarker = {
                 type: 'scatter3d',
-                x: [drone_position[0]],
-                y: [drone_position[1]],
+                x: [drone_position[1]],
+                y: [drone_position[0]],
                 z: [drone_altitude],
                 name: drone_id,
                 mode: 'markers',
@@ -82,9 +83,8 @@ function displayDrones(){
             data.push(updateMarker);
         }
 
-        //console.log(data);
-
         if(isAlreadyDrawn){
+            // Update chart if it already exists
             Plotly.react('chart', data, layout, config)
         } else {
             // Launch livetracking if response contains data
@@ -97,4 +97,10 @@ function displayDrones(){
             }
         }
     });
+}
+
+function getBox(){
+    $.getJSON('box', function(response){
+        console.log('OK');
+    })
 }

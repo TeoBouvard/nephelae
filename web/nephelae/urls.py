@@ -10,12 +10,12 @@ urlpatterns = [
     # URL for preview page, update requests routed to map update view
     path('preview/', views.preview, name='preview'),
     path('preview/update/', views.update_map, name='update_chart'),
+    path('preview/box/', views.box, name='update_chart'),
 
     # URL for map page
     path('map/', views.map, name='map'),
     path('map/update/', views.update_map, name='update_map'),
     path('map/tile/<int:z>/<int:x>/<int:y>', views.map_tiles, name='map_tiles'),
-    path('map/clouds_tile/<int:z>/<int:x>/<int:y>/<int:altitude>', views.clouds_tiles, name='cloud_tiles'),
     path('map/plane_icon/<int:index>', views.plane_icon, name='plane_icon'),
     path('map/clouds_img/<int:time>/<int:altitude>', views.clouds_img, name='plane_icon'),
 

@@ -14860,7 +14860,7 @@ L.Control.Slider = L.Control.extend({
         size: '300px',
         position: 'bottomright',
         min: 0,
-        max: 160,
+        max: 100,
         step: 1,
         id: "slider",
         value: 50,
@@ -14870,9 +14870,6 @@ L.Control.Slider = L.Control.extend({
         orientation: 'vertical',
         increment: false,
         getValue: function(value) {
-            return value;
-        },
-		getAltitude: function(value) {
             return value;
         },
         showValue: true,

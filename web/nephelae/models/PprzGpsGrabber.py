@@ -9,8 +9,8 @@ from pprint import pprint
 from geopy.distance import distance
 from ivy.std_api import IvyBindMsg, IvyInit, IvyStart, IvyStop, IvyUnBindMsg
 
-close_enough = 0.01 # in kilometers
-log_size = 10 # number of past_positions kept in memory
+close_enough = 0.005 # in kilometers
+log_size = 100 # number of past_positions kept in memory
 
 class PprzGpsGrabber:
 
@@ -57,8 +57,8 @@ class PprzGpsGrabber:
                 "heading" :  heading,
                 "position" : position,
                 "path" : [position],
-                "past_longitudes" : [position[0]],
-                "past_latitudes" : [position[1]],
+                "past_longitudes" : [position[1]],
+                "past_latitudes" : [position[0]],
                 "past_altitudes" : [altitude],
                 "log_times" : [m_time],
             }
@@ -75,8 +75,8 @@ class PprzGpsGrabber:
             if(distance(position, self.uavs[uavId]['path'][-1]) > close_enough):
                 self.uavs[uavId]['path'].append(position)
                 self.uavs[uavId]['past_altitudes'].append(altitude)
-                self.uavs[uavId]['past_longitudes'].append(position[0])
-                self.uavs[uavId]['past_latitudes'].append(position[1])
+                self.uavs[uavId]['past_longitudes'].append(position[1])
+                self.uavs[uavId]['past_latitudes'].append(position[0])
                 self.uavs[uavId]['log_times'].append(m_time)
                 # Delete old positions
                 if(len(self.uavs[uavId]['path']) > log_size):
@@ -85,6 +85,11 @@ class PprzGpsGrabber:
                     self.uavs[uavId]['past_longitudes'].pop(0)
                     self.uavs[uavId]['past_latitudes'].pop(0)
                     self.uavs[uavId]['log_times'].pop(0)
+    
+    def box(self):
+        box = {
+            'max_lat': 
+        }
 
 
 if __name__ == '__main__':

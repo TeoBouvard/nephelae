@@ -60,7 +60,7 @@ function initializeMap(){
     tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
-    cloud_overlay = L.imageOverlay('clouds_img/0/' + altitude_slider.value, imageBounds); 
+    cloud_overlay = L.imageOverlay('clouds_img/' + time_index + '/' + altitude_index, imageBounds); 
 
     // Set layers names
     var base_layers = {
@@ -90,7 +90,7 @@ function displayDrones(){
         // Initialize drone array with drone_id and position marker
         for (var key in response){
 
-            // Get color and icon of markers, increment index_icon for next drone 
+            // Compute color and icon of markers, increment index_icon for next drone 
             var drone_color = global_colors[index_icon%global_colors.length];
             var drone_icon = global_icons[index_icon++%global_colors.length];
 
@@ -100,9 +100,6 @@ function displayDrones(){
             var drone_altitude = response[key].altitude;
             var drone_heading = response[key].heading;
             var drone_path = response[key].path;
-            var past_altitudes = response[key].past_altitudes;
-            var log_times = response[key].log_times;
-            var time = response[key].time;
             
             // Create leaflet marker and polyline at drone position
             var marker = L.marker(drone_position, {icon: drone_icon});
@@ -150,9 +147,6 @@ function updateDrones(){
             var drone_altitude = response[key].altitude;
             var drone_heading = response[key].heading;
             var drone_path = response[key].path;
-            var past_altitudes = response[key].past_altitudes;
-            var log_times = response[key].log_times;
-            var time = response[key].time;
 
             // Identify corresponding drone ...
             var drone_to_update = drones[drone_id];
@@ -175,6 +169,7 @@ function updateDrones(){
         }
         // Update home button coordinates and cloud overlay
         zoomHome.setHomeCoordinates(drone_position);
+        time_index = time_index++%max_time_index;
         cloud_overlay.setUrl('clouds_img/'+ time_index++ +'/'+ altitude_index);
     });
 
