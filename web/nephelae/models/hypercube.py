@@ -102,7 +102,6 @@ def encode_horizontal_thermals(time_index, altitude_index):
 
     return encodedImage
 
-def box():
 ########## UTILITY METHODS ##########
 
 def max_lwc():
