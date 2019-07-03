@@ -4,8 +4,8 @@ document.getElementById('nav_preview').className = 'active';
 // Define graph settings
 var layout = {
             scene: {
-                xaxis:{title: 'Longitude',showgrid: false}, // range: [1.2, 1.3],},
-                yaxis:{title: 'Latitude', showgrid: false}, //range: [43.4, 43.5],},
+                xaxis:{title: 'Latitude',showgrid: true}, // range: [1.2, 1.3],},
+                yaxis:{title: 'Longitude', showgrid: true}, //range: [43.4, 43.5],},
                 zaxis:{title: 'Altitude', range: [0, 300],},
 		        aspectratio: {x:1.3, y:1.3, z:0.9},
             },
@@ -16,6 +16,7 @@ var layout = {
                 r: 0, //right margin
                 b: 100, //bottom margin
             },
+            uirevision: 'true',
         };
 
 var config = { 
@@ -25,12 +26,11 @@ var config = {
 };
 
 // Parameters 
-var refresh_rate = 1000; //milliseconds
+var refresh_rate = 3000; //milliseconds
 var isAlreadyDrawn = false;
 
 $(document).ready(function(){
-    setInterval(displayDrones, refresh_rate);
-    //displayDrones();
+    displayDrones();
 });
 
 function displayDrones(){
@@ -74,6 +74,7 @@ function displayDrones(){
                 mode: 'markers',
                 marker:{
                     color: drone_color,
+                    size: 5,
                 }
             };
 
@@ -92,6 +93,7 @@ function displayDrones(){
             } else {
                 Plotly.newPlot('chart', data, layout, config);
                 isAlreadyDrawn = true;
+                setInterval(displayDrones, refresh_rate);
             }
         }
     });

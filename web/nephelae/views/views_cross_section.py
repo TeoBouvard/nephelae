@@ -11,8 +11,8 @@ def print_img(request, time_ratio, altitude_ratio):
     # Compute time of cross section with duration of acquisition
     time_index, altitude_index = hypercube.index_from_ratio(time_ratio, altitude_ratio)
 
-    raw_clouds_image = hypercube.print_horizontal_clouds(time_index, altitude_index)
-    raw_thermals_image = hypercube.print_horizontal_thermals(time_index, altitude_index)
+    raw_clouds_image = hypercube.encode_horizontal_clouds(time_index, altitude_index)
+    raw_thermals_image = hypercube.encode_horizontal_thermals(time_index, altitude_index)
 
 	#int64 have to be casted to int to be JSON serializable
     response = JsonResponse({

@@ -42,28 +42,9 @@ def horizontal_slice(variable, time_index=0, altitude_index=0, x1=None, x2=None,
     except ValueError:
         logging.error('Indexes must be valid')
 
-def horizontal_clouds(x, y, z, altitude):
-
-    # Get size of MesoNH simulation
-    square_size = 1000 * hypercube.variables['W_E_direction'][-1] - hypercube.variables['W_E_direction'][0]
-
-    # Get real-world dimensions of requested tile
-    lat, lng, t_size = unproject(x, y, z)
-    
-    # Compute (fictional) array bounds
-    x1 = int(np.interp(lng,[1.27, 1.3489],[0,255], 256, 256))
-    y2 = int(np.interp(lat,[43.46, 43.5173],[0,255], 256, 256))
-
-    x2 = int(x1 + (t_size/square_size)*255)
-    y1 = int(y2 - (t_size/square_size)*255)
-
-    #print(x, y, x1, x2, y1, y2)
-
+def print_horizontal_clouds(time, altitude):
     # Get slice
-    if 0 <= x1 <= x2 < 256 and 0 <= y1 <= y2 < 256:
-        h_slice = horizontal_slice(var_lwc, 50, altitude, y1, y2, x1, x2)
-    else:
-        h_slice = np.zeros((256, 256))
+    h_slice = horizontal_slice(var_lwc, time, altitude)
 
     # Write image to buffer
     buf = io.BytesIO()
@@ -73,7 +54,7 @@ def horizontal_clouds(x, y, z, altitude):
     return buf
 
 # Returns a base64 encoded string containing hcs cloud data
-def print_horizontal_clouds(time_index, altitude_index):
+def encode_horizontal_clouds(time_index, altitude_index):
 
     # Get slice
     h_slice = horizontal_slice(var_lwc, time_index, altitude_index)
@@ -98,7 +79,7 @@ def print_horizontal_clouds(time_index, altitude_index):
     return encodedImage
 
 # Returns a base64 encoded string containing hcs upwind data
-def print_horizontal_thermals(time_index, altitude_index):
+def encode_horizontal_thermals(time_index, altitude_index):
 
     h_slice = horizontal_slice(var_upwind, time_index, altitude_index)
 
@@ -120,19 +101,6 @@ def print_horizontal_thermals(time_index, altitude_index):
     encodedImage = 'data:image/png;base64,' + urllib.parse.quote(data)
 
     return encodedImage
-
-def unproject(x, y, z):
-    R = 40075016.686
-    n = 2 ** z
-    lon_deg = ((x / n) * 360.0) - 180.0
-    lat_rad = math.atan(math.sinh(math.pi * (1 - ((2 * y) / n))))
-    lat_deg = math.degrees(lat_rad)
-
-    tile_size = R * math.cos(lat_rad) / n
-
-    return lat_deg, lon_deg, tile_size
-
-
 
 ########## UTILITY METHODS ##########
 

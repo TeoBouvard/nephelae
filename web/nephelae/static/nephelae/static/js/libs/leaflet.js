@@ -14872,8 +14872,11 @@ L.Control.Slider = L.Control.extend({
         getValue: function(value) {
             return value;
         },
+		getAltitude: function(value) {
+            return value;
+        },
         showValue: true,
-        syncSlider: false
+        syncSlider: true
     },
     initialize: function (f, options) {
         L.setOptions(this, options);

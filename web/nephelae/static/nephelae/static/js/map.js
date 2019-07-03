@@ -4,6 +4,11 @@ document.getElementById('nav_map').className = 'active';
 var flight_map, zoom_home;
 var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 
+// Data from MESO_NH, will come from mapping later
+var imageBounds = [[43.432883, 1.247409], [43.490199, 1.327060]];
+var max_time_index = 143;
+var altitude_index = 0, time_index = 0;
+
 /*
     drones     : { key           :   drone_id,   values : value_dict }
     value_dict : { color         :   global_colors[index_icon], 
@@ -18,7 +23,7 @@ var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 var drones = {};
 
 // Parameters 
-var refresh_rate = 3000; //milliseconds
+var refresh_rate = 500; //milliseconds
 
 
 $(document).ready(function(){
@@ -31,7 +36,8 @@ $(document).ready(function(){
 
 // Change cross section altitude on slider input
 function changeAltitude(value) {
-    cloud_overlay.setUrl('clouds/{z}/{x}/{y}/'+value, noRedraw=false);
+    altitude_index = value;
+    cloud_overlay.setUrl('clouds_img/'+ time_index +'/'+ altitude_index);
 }
 
 function initializeMap(){
@@ -41,14 +47,22 @@ function initializeMap(){
     // Home button
     zoomHome = L.Control.zoomHome();
 
+    // Slider
+    var options = {
+        min: 0,
+        max: 159, // -> set dynamically with request
+        value: 45,
+    }
+    altitude_slider = L.control.slider(changeAltitude, options);
 
-    // Layers (add/remove .grayscale() if you want a colored map)
+    // Create layers (add/remove .grayscale() if you want a grey/colored map)
     //tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
     tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
-    cloud_overlay = L.tileLayer('clouds/{z}/{x}/{y}/{alt}', {alt : 0}).setOpacity(0.95);
+    cloud_overlay = L.imageOverlay('clouds_img/0/' + altitude_slider.value, imageBounds); 
 
+    // Set layers names
     var base_layers = {
     };
 
@@ -59,16 +73,11 @@ function initializeMap(){
         "Clouds": cloud_overlay,
     };
 
-    // Sliders
-    var options = {
-        min: 0,
-        max: 159, // -> set dynamically with request
-        value: 45,
-    }
-    var altitude_slider = L.control.slider(changeAltitude, options).addTo(flight_map);
-
-    // Add layers to the map and display everything
+    // Add layers and slider to the map
     L.control.layers(base_layers, overlays).addTo(flight_map);
+    altitude_slider.addTo(flight_map);
+
+    // Display everything on initialization
     for(key in overlays) { overlays[key].addTo(flight_map); }
 }
 
@@ -76,7 +85,7 @@ function displayDrones(){
     var addedDrones = [];
     var index_icon = 0;
 
-    $.get('update/', function(response){
+    $.getJSON('update/', function(response){
 
         // Initialize drone array with drone_id and position marker
         for (var key in response){
@@ -130,10 +139,9 @@ function displayDrones(){
 }
 
 function updateDrones(){
-    var updatedDrones = [];
 
     // Request updated data from the server
-    $.get('update/', function(response){
+    $.getJSON('update/', function(response){
 
         // Parse response
         for (var key in response){
@@ -158,9 +166,6 @@ function updateDrones(){
 
                 // Update polyline
                 drone_to_update.path.setLatLngs(drone_path);
-
-                // Log changes
-                updatedDrones.push(drone_id);
             } 
             // ... or display error message if drone id does not match -> update drones dictionnary and start tracking it
             else {
@@ -168,9 +173,9 @@ function updateDrones(){
                 initializeDrones(); // NOT SURE IF THIS IS WORKING, CAN'T TEST ?
             }
         }
-        // Update home button coordinates 
+        // Update home button coordinates and cloud overlay
         zoomHome.setHomeCoordinates(drone_position);
-        console.debug('positions of drones', updatedDrones, ' updated');
+        cloud_overlay.setUrl('clouds_img/'+ time_index++ +'/'+ altitude_index);
     });
 
 }

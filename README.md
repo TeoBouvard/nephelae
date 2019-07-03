@@ -11,11 +11,8 @@
 - leaflet/plotly fullscreen ? leaflet-velocity
 - plotly update button
 - requête repère mobile au mapping
-- cross section GET with URL parameters rather than POST
 
 ## Benchmark
-
-- display cross section : 400ms, mostly due to base64 image encoding, have to try get images -> as long ...
 
 ## Install
 
