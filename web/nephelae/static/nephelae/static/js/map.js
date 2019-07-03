@@ -23,7 +23,7 @@ var altitude_index = 0, time_index = 0;
 var drones = {};
 
 // Parameters 
-var refresh_rate = 2000; //milliseconds
+var refresh_rate = 800; //milliseconds
 
 
 $(document).ready(function(){

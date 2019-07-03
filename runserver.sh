@@ -16,5 +16,5 @@ trap finish SIGINT
   COMMAND="$(nproc)"
   N_WORKERS=$((${COMMAND}))
 	cd ./web
-  gunicorn --workers=1 --bind 0.0.0.0:8000 IHM.wsgi
+  gunicorn --workers=1 --reload --access-logfile '-' --bind 0.0.0.0:8000 IHM.wsgi
 

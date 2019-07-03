@@ -9,8 +9,8 @@ from pprint import pprint
 from geopy.distance import distance
 from ivy.std_api import IvyBindMsg, IvyInit, IvyStart, IvyStop, IvyUnBindMsg
 
-close_enough = 0.005 # in kilometers
-log_size = 100 # number of past_positions kept in memory
+close_enough = 1 # in seconds
+log_size = 500 # number of past_positions kept in memory
 
 class PprzGpsGrabber:
 
@@ -72,7 +72,7 @@ class PprzGpsGrabber:
             })
 
             # Add position to path only if it is far enough from last position
-            if(distance(position, self.uavs[uavId]['path'][-1]) > close_enough):
+            if m_time - self.uavs[uavId]['log_times'][-1] > close_enough :
                 self.uavs[uavId]['path'].append(position)
                 self.uavs[uavId]['past_altitudes'].append(altitude)
                 self.uavs[uavId]['past_longitudes'].append(position[1])

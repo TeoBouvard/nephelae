@@ -12,12 +12,12 @@
 - requête repère mobile au mapping
 - requête box au mapping
 - map legend ?
+- drag problem in 3d
 
 ## Benchmark
 
 ## Install
 
-MesoNH correct path data (MesoNH/MesoNH.nc) -> will solve later with env variables
 - ./install.sh
 
 ## Infos from users

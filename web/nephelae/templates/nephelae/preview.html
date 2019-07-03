@@ -18,6 +18,13 @@
 
 {% block page %}
 
+ <!-- Display 3d plot -->
 <div id='chart'></div>
+
+ <!-- Display time slider -->
+<div class="slider_container">
+	<div id="length_display" class="info"></div>
+	<input id="length_slider" type="range" min="1" max="501" value="50" class="slider">
+</div>
 
 {% endblock %}

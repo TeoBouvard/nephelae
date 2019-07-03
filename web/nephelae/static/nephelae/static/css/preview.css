@@ -4,5 +4,29 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 */
 
 #chart {
-    height: 100%; 
+    height: 80%; 
+}
+
+.info {
+    font-size: 17px;
+    color: darkslategray;
+}
+
+
+/* Slider container style */
+.slider_container {
+    width: 100%;
+    position: relative;
+}
+
+#length_display {
+    position: relative;
+    left: 10%;
+}
+
+/* The slider itself */
+#length_slider {
+    position: relative;
+    width: 50%;
+    left: 10%;
 }
