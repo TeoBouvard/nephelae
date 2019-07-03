@@ -86,10 +86,6 @@ class PprzGpsGrabber:
                     self.uavs[uavId]['past_latitudes'].pop(0)
                     self.uavs[uavId]['log_times'].pop(0)
     
-    def box(self):
-        box = {
-            'max_lat': 
-        }
 
 
 if __name__ == '__main__':
