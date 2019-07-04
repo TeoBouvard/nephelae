@@ -29,8 +29,15 @@
 
     <!-- Display trail length slider -->
     <div class="slider_container">
-        <div id="length_display" class="info"></div>
-        <input id="length_slider" type="range" min="1" max="501" value="50" class="slider">
+        <div id="length">
+            <div id="length_display" class="info"></div>
+            <input id="length_slider" type="range" min="1" max="501" value="61" class="slider">
+        </div>
+
+        <div id="altitude">
+            <div id="altitude_display" class="info"></div>
+            <input id="altitude_slider" type="range" min="0" max="159" value="42" class="slider">
+        </div>
     </div>
 
 {% endblock %}

@@ -30,7 +30,7 @@ altitude_slider.onchange = function() {
 
 function displayImage(time_percentage, altitude_percentage){
     
-    // Request the frame corresponding to selected time
+    // Request the frame corresponding to selected time and altitude
     var url = time_percentage + '/' + altitude_percentage;
 
     $.getJSON(url, function(response){

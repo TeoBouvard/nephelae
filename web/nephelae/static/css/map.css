@@ -7,24 +7,30 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
     top: 0px;
     margin: auto;
     height: 75vh;
-    width: 100%;
+    width: 100vw;
 }
+
 
 /* Slider container style */
 .slider_container {
-    width: 15em;
+    width: 80%;
     position: relative;
-    top: 1em;
-    left: 1em;
-}
-
-#length_display {
-    position: relative;
-    text-align: center;
+    top: 2em;
+    margin: 0 auto;
 }
 
 /* The slider itself */
-#length_slider {
+.slider {
     position: relative;
-    width: 100%;
+    width: 20em;
+}
+
+#altitude {
+    width: 40%;
+    float: right;
+}
+
+#length {
+    width: 40%;
+    float: left;
 }

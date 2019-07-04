@@ -130,10 +130,8 @@ def get_seconds(time_index):
     return hypercube.variables[var_time][time_index]
 
 def index_from_ratio(time_ratio, altitude_ratio):
-    time_percentage = 0.01*time_ratio
-    time_index = int(time_percentage*max_time_index())
 
-    altitude_percentage = 0.01*altitude_ratio
-    altitude_index = int(altitude_percentage*max_altitude_index())
+    time_index = int(0.01*time_ratio*max_time_index())
+    altitude_index = int(0.01*altitude_ratio*max_altitude_index())
 
     return time_index, altitude_index

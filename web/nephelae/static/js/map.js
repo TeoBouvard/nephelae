@@ -1,7 +1,5 @@
 // Activate current menu in nav
 document.getElementById('nav_map').className = 'active';
-var length_display = document.getElementById('length_display');
-var length_slider = document.getElementById('length_slider');
 
 var flight_map, zoom_home;
 var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
@@ -9,7 +7,7 @@ var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 // Data from MESO_NH, will come from mapping later
 var imageBounds = [[43.432883, 1.247409], [43.490199, 1.327060]];
 var max_time_index = 143;
-var altitude_index = 0, time_index = 0;
+var time_index = 0;
 
 /*
     drones     : { key           :   drone_id,   values : value_dict }
@@ -18,7 +16,7 @@ var altitude_index = 0, time_index = 0;
                    altitude      :   float, 
                    heading       :   float,
                    polyline      :   L.Polyline,
-                   past_positions:   [positions] -> NOT USED NOW
+                   past_positions:   [positions]
                    last_position :   LatLng
                  }
 */
@@ -26,36 +24,19 @@ var drones = {};
 
 // Parameters 
 var refresh_rate = 800; //milliseconds
-var trail_length = 60;
+var trail_length = length_slider.value;
+var clouds_altitude = altitude_slider.value;
 
 $(document).ready(function(){
-    // Display original trail length
-    length_display.innerHTML = "trail length : last " + trail_length + " seconds";
-    
     // Initialize document elements
     initializeMap();
+
+    // Display initial info
+    updateInfo();
 
     // Update elements every 'refresh_rate' ms
     displayDrones();
 });
-
-// Update trail length, display 0 when slider is 1 to not slice(0)
-length_slider.oninput = function() {
-    if(this.value == 1){
-        length_display.innerHTML = "no trail";
-    } else if (this.value == 2){
-        length_display.innerHTML = "trail length : last second";
-    } else {
-        length_display.innerHTML = "trail length : last " + (this.value - 1) + " seconds";
-    }
-    trail_length = this.value;
-}
-
-// Change cross section altitude on slider input
-function changeAltitude(value) {
-    altitude_index = value;
-    cloud_overlay.setUrl('clouds_img/'+ time_index +'/'+ altitude_index);
-}
 
 function initializeMap(){
     // Map
@@ -64,20 +45,12 @@ function initializeMap(){
     // Home button
     zoomHome = L.Control.zoomHome();
 
-    // Slider
-    var options = {
-        min: 0,
-        max: 159, // -> set dynamically with request
-        value: 45,
-    }
-    altitude_slider = L.control.slider(changeAltitude, options);
-
     // Create layers (add/remove .grayscale() if you want a grey/colored map)
     //tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
     tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
-    cloud_overlay = L.imageOverlay('clouds_img/' + time_index + '/' + altitude_index, imageBounds); 
+    cloud_overlay = L.imageOverlay('clouds_img/' + time_index + '/' + clouds_altitude, imageBounds); 
 
     // Set layers names
     var base_layers = {
@@ -90,9 +63,8 @@ function initializeMap(){
         "Clouds": cloud_overlay,
     };
 
-    // Add layers and slider to the map
+    // Add layers to the map
     L.control.layers(base_layers, overlays).addTo(flight_map);
-    altitude_slider.addTo(flight_map);
 
     // Display everything on initialization
     for(key in overlays) { overlays[key].addTo(flight_map); }
@@ -116,7 +88,7 @@ function displayDrones(){
             var drone_position = response[key].position;
             var drone_altitude = response[key].altitude;
             var drone_heading = response[key].heading;
-            var drone_path = response[key].path;
+            var drone_path = response[key].path.slice(-trail_length);
             
             // Create leaflet marker and polyline at drone position
             var marker = L.marker(drone_position, {icon: drone_icon});
@@ -163,7 +135,7 @@ function updateDrones(){
             var drone_position = response[key].position;
             var drone_altitude = response[key].altitude;
             var drone_heading = response[key].heading;
-            var drone_path = response[key].path;
+            var drone_path = response[key].path.slice(-trail_length);
 
             // Identify corresponding drone ...
             var drone_to_update = drones[drone_id];
@@ -187,9 +159,34 @@ function updateDrones(){
         // Update home button coordinates and cloud overlay
         zoomHome.setHomeCoordinates(drone_position);
         time_index = time_index++%max_time_index;
-        cloud_overlay.setUrl('clouds_img/'+ time_index++ +'/'+ altitude_index);
+        cloud_overlay.setUrl('clouds_img/'+ time_index++ +'/'+ clouds_altitude);
     });
 
+}
+
+function updateInfo(){
+    if(trail_length == 1){
+        length_display.innerHTML = "no trail";
+    } else if (trail_length == 2){
+        length_display.innerHTML = "trail length : last second";
+    } else {
+        length_display.innerHTML = "trail length : last " + (trail_length - 1) + " seconds";
+    }
+
+    altitude_display.innerHTML = "clouds altitude : " + clouds_altitude + " (MesoNH index)";
+    cloud_overlay.setUrl('clouds_img/'+ time_index +'/'+ clouds_altitude);
+}
+
+// Update trail length, display 0 when slider is 1 to not slice(0)
+length_slider.oninput = function() {
+    trail_length = this.value;
+    updateInfo();
+}
+
+// Update cross section altitude, display 0 when slider is 1 to not slice(0)
+altitude_slider.oninput = function() {
+    clouds_altitude = this.value;
+    updateInfo();
 }
 
 // Print HTML formatted string so that it can be added to marker popup
@@ -204,3 +201,4 @@ function infosToString(id, altitude, heading){
 
     return infos;
 }
+
