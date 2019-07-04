@@ -12,11 +12,16 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 	<head>
 		<meta charset="utf-8" />
 		<title>Nephelae</title>
+
 		<!-- Load static CSS -->
 		<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
 		<link rel="stylesheet" type="text/css" href="{% static 'css/font_awesome.css' %}" />
+		<link rel="stylesheet" type="text/css" href="{% static 'css/powerange.css' %}" />
 		<!-- Load icons -->
 		<link rel="shortcut icon" href="#">
+
+		<!-- Load powerange js -->
+		<script type="text/javascript" src="{% static 'js/libs/powerange.js' %}"></script>
 		<!-- Load jquery -->
 		<script type="text/javascript" src="{% static 'js/libs/jquery.js' %}"></script>
 		<!-- Load specific js -->
@@ -26,7 +31,7 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 	</head>
 
 	<body>
-			<div class="external-wrapper">
+			<div id="external-wrapper">
 				<div id="nav" class="pill-nav">
 					{% block nav %}
 					<a id='nav_preview' href="{% url 'preview' %}">3D Preview</a>

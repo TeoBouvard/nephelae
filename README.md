@@ -1,6 +1,6 @@
 # NEPHELAE : Network for studying Entrainment and microPHysics of cLouds using Adaptive Exploration
 
-## Documentation
+## Documentation  
 
 Q : What is this ?  
 A : This is a web application designed as an interface between a fleet of UAV frome the Nephelae project and Météo-France users. It comprises various tools to help them visualize the data being acquired from the drones.
@@ -46,10 +46,7 @@ A : You can reference any *.nc file with your $MESO_NH environment variable, and
 - map legend ?
 - drag problem in 3d -> three.js instead of plot ?
 - frontend (bootstrap or more lightweight)
-
-## Install
-
-- ./install.sh
+- ask for slider appearance/functionnality
 
 ## Infos from users
 
@@ -75,7 +72,7 @@ A : You can reference any *.nc file with your $MESO_NH environment variable, and
 ## Questions
 
 -   authentication ?
--   approximate mesh from points cloud -> big points sufficient ?
+-   approximate mesh from points cloud -> big points sufficient/convex hull
 
 ## Ideas
 

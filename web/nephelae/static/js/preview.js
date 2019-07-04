@@ -2,6 +2,7 @@
 document.getElementById('nav_preview').className = 'active';
 var length_display = document.getElementById('length_display');
 var length_slider = document.getElementById('length_slider');
+var init = new Powerange(length_slider, { min: 0, max: 500, start: 60});
 
 // Define graph settings
 var layout = {
@@ -37,19 +38,20 @@ var isAlreadyDrawn = false;
 var trail_length = 60;
 
 // Update trail length, display 0 when slider is 1 to not slice(0)
-length_slider.oninput = function() {
-    if(this.value == 1){
+length_slider.onchange = function() {
+    if(this.value == 0){
         length_display.innerHTML = "no trail";
-    } else if (this.value == 2){
+    } else if (this.value == 1){
         length_display.innerHTML = "trail length : last second";
     } else {
-        length_display.innerHTML = "trail length : last " + (this.value - 1) + " seconds";
+        length_display.innerHTML = "trail length : last " + (this.value) + " seconds";
     }
     trail_length = this.value;
 }
 
 
 $(document).ready(function(){
+    
     // Display original trail length
     length_display.innerHTML = "trail length : last " + trail_length + " seconds";
 
@@ -81,9 +83,9 @@ function displayDrones(){
             // Update chart data with new dataset and line color corresponding to the icon
             var updatePath = {
                 type: 'scatter3d',
-                x: past_longitudes.slice(-trail_length),
-                y: past_latitudes.slice(-trail_length),
-                z: past_altitudes.slice(-trail_length),
+                x: past_longitudes.slice(-trail_length-1),
+                y: past_latitudes.slice(-trail_length-1),
+                z: past_altitudes.slice(-trail_length-1),
                 name: drone_id,
                 mode: 'lines',
                 line:{

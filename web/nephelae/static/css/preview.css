@@ -9,18 +9,15 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 
 /* Slider container style */
 .slider_container {
-    width: 100%;
+    width: 50%;
     position: relative;
+    top: 1em;
+    margin: 0 auto;
 }
 
 #length_display {
     position: relative;
-    left: 10%;
-}
-
-/* The slider itself */
-#length_slider {
-    position: relative;
-    width: 50%;
-    left: 10%;
+    width: 100%;
+    text-align: center;
+    bottom: 1em;
 }

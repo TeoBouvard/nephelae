@@ -7,8 +7,10 @@
 {% endblock %}
 
 {% block additional_scripts %}
-	<!-- Load plotly js -->
-	<script type="text/javascript" src="{% static 'js/libs/plotly.min.js' %}"></script>
+	<!-- Load three js -->
+	<script type="text/javascript" src="{% static 'js/libs/three.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/libs/OrbitControls.js' %}"></script>
+
 	<!-- Load global variables and specific javascript -->
 	<script type="text/javascript" src="{% static 'js/base_colors.js' %}"></script>
 	<script type="text/javascript" src="{% static 'js/simulation.js' %}"></script>
