@@ -23,12 +23,6 @@ var layout = {
         r: 0, //right margin
         b: 0, //bottom margin
     },
-    //THIS DOES NOT WORK
-    projection: {
-        z:{
-            show: true,
-        }
-    }
 };
 
 var config = { 
@@ -40,7 +34,7 @@ var config = {
 // Parameters 
 var refresh_rate = 2000; //milliseconds
 var isAlreadyDrawn = false;
-var trail_length = 50;
+var trail_length = 60;
 
 // Update trail length, display 0 when slider is 1 to not slice(0)
 length_slider.oninput = function() {
@@ -56,7 +50,9 @@ length_slider.oninput = function() {
 
 
 $(document).ready(function(){
+    // Display original trail length
     length_display.innerHTML = "trail length : last " + trail_length + " seconds";
+
     // Start by getting 3d evolution box of the drones
     getBox();
 });

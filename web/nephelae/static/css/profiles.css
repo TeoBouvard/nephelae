@@ -3,12 +3,3 @@ Q : Why is this stylesheet in such a convoluted tree of files ?
 A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 */
 
-#chart_container {
-    top: 20px;
-    height: 200px;
-    position: relative;
-    margin: auto;
-    width: 95%;
-}
-
-

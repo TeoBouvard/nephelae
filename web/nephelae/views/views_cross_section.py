@@ -27,4 +27,4 @@ def print_img(request, time_ratio, altitude_ratio):
 
 # Render HTML template
 def cross_section(request):
-    return render(request, 'nephelae/cross_section.html')
+    return render(request, 'cross_section.html')

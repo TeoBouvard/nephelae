@@ -3,30 +3,28 @@ Q : Why is this stylesheet in such a convoluted tree of files ?
 A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 */
 
-#chart {
-    height: 80%; 
+#map_container {
+    top: 0px;
+    margin: auto;
+    height: 75vh;
+    width: 100%;
 }
-
-.info {
-    font-size: 17px;
-    color: darkslategray;
-}
-
 
 /* Slider container style */
 .slider_container {
-    width: 100%;
+    width: 15em;
     position: relative;
+    top: 1em;
+    left: 1em;
 }
 
 #length_display {
     position: relative;
-    left: 10%;
+    text-align: center;
 }
 
 /* The slider itself */
 #length_slider {
     position: relative;
-    width: 50%;
-    left: 10%;
+    width: 100%;
 }

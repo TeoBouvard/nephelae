@@ -1,5 +1,7 @@
 // Activate current menu in nav
 document.getElementById('nav_map').className = 'active';
+var length_display = document.getElementById('length_display');
+var length_slider = document.getElementById('length_slider');
 
 var flight_map, zoom_home;
 var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
@@ -24,15 +26,30 @@ var drones = {};
 
 // Parameters 
 var refresh_rate = 800; //milliseconds
-
+var trail_length = 60;
 
 $(document).ready(function(){
+    // Display original trail length
+    length_display.innerHTML = "trail length : last " + trail_length + " seconds";
+    
     // Initialize document elements
     initializeMap();
 
     // Update elements every 'refresh_rate' ms
     displayDrones();
 });
+
+// Update trail length, display 0 when slider is 1 to not slice(0)
+length_slider.oninput = function() {
+    if(this.value == 1){
+        length_display.innerHTML = "no trail";
+    } else if (this.value == 2){
+        length_display.innerHTML = "trail length : last second";
+    } else {
+        length_display.innerHTML = "trail length : last " + (this.value - 1) + " seconds";
+    }
+    trail_length = this.value;
+}
 
 // Change cross section altitude on slider input
 function changeAltitude(value) {

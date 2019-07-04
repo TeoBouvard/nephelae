@@ -16,7 +16,7 @@ def update_map(request):
 
 # Render base page
 def map(request):
-    return render(request, 'nephelae/map.html')
+    return render(request, 'map.html')
 
 # Render icons for drones
 def plane_icon(request, index):

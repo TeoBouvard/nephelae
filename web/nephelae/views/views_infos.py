@@ -7,4 +7,4 @@ from django.shortcuts import render
 
 # Rendering of empty pages
 def infos(request):
-    return render(request, 'nephelae/infos.html')
+    return render(request, 'infos.html')

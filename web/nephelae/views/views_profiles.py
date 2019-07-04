@@ -5,8 +5,5 @@ from django.shortcuts import render
 
 from ..models.PprzGpsGrabber import box
 
-def get_box(request):
-    return JsonResponse(box())
-
-def preview(request):
-    return render(request, 'preview.html')
+def profiles(request):
+    return render(request, 'profiles.html')

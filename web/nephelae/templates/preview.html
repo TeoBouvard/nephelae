@@ -1,19 +1,19 @@
-{% extends "nephelae/base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block additional_head%}
 	<!-- Load specific CSS -->
-	<link rel="stylesheet" type="text/css" href="{% static 'nephelae/static/css/preview.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/preview.css' %}"/>
 {% endblock %}
 
 
 {% block additional_scripts %}
 	<!-- Load specific javascript -->
-	<script type="text/javascript" src="{% static 'nephelae/static/js/preview.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/preview.js' %}"></script>
 	<!-- Load plotly js -->
-    <script type="text/javascript" src="{% static 'nephelae/static/js/libs/plotly.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/libs/plotly.min.js' %}"></script>
 	<!-- Load global variables and specific javascript -->
-	<script type="text/javascript" src="{% static 'nephelae/static/js/base_colors.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/base_colors.js' %}"></script>
 {% endblock %}
 
 {% block page %}
@@ -21,7 +21,7 @@
  <!-- Display 3d plot -->
 <div id='chart'></div>
 
- <!-- Display time slider -->
+ <!-- Display trail length slider -->
 <div class="slider_container">
 	<div id="length_display" class="info"></div>
 	<input id="length_slider" type="range" min="1" max="501" value="50" class="slider">

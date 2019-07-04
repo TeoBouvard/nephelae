@@ -25,5 +25,8 @@ urlpatterns = [
     
     # URL for infos page
     path('infos/', views.infos, name='infos'),
+
+    # URL for vertical profiles page
+    path('profiles/', views.profiles, name='profiles'),
     
 ]

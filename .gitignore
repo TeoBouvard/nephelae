@@ -1,7 +1,7 @@
 .vscode
 .DS_Store
 __pycache__
-venv
 *.pyc
 db.sqlite3
+venv
 maps

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block additional_head %}
+    <!-- Load specific CSS -->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/infos.css' %}"/>
+{% endblock %}
+
+{% block additional_scripts %}
+	<!-- Load plotly js -->
+	<script type="text/javascript" src="{% static 'js/libs/plotly.min.js' %}"></script>
+	<!-- Load global variables and specific javascript -->
+	<script type="text/javascript" src="{% static 'js/base_colors.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/infos.js' %}"></script>
+{% endblock %}
+
+{% block page %}
+
+    <div id="chart"></div>
+
+{% endblock %}

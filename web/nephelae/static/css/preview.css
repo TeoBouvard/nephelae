@@ -1,0 +1,26 @@
+/* 
+Q : Why is this stylesheet in such a convoluted tree of files ?
+A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
+*/
+
+#chart {
+    height: 80vh; 
+}
+
+/* Slider container style */
+.slider_container {
+    width: 100%;
+    position: relative;
+}
+
+#length_display {
+    position: relative;
+    left: 10%;
+}
+
+/* The slider itself */
+#length_slider {
+    position: relative;
+    width: 50%;
+    left: 10%;
+}
