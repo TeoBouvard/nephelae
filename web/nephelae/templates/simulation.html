@@ -3,7 +3,7 @@
 
 {% block additional_head %}
     <!-- Load specific CSS -->
-	<link rel="stylesheet" type="text/css" href="{% static 'css/infos.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/simulation.css' %}"/>
 {% endblock %}
 
 {% block additional_scripts %}
@@ -11,11 +11,9 @@
 	<script type="text/javascript" src="{% static 'js/libs/plotly.min.js' %}"></script>
 	<!-- Load global variables and specific javascript -->
 	<script type="text/javascript" src="{% static 'js/base_colors.js' %}"></script>
-	<script type="text/javascript" src="{% static 'js/infos.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/simulation.js' %}"></script>
 {% endblock %}
 
 {% block page %}
-
-    <div id="chart"></div>
 
 {% endblock %}

@@ -4,13 +4,13 @@
 
 {% block additional_head%}
 	<!-- Load specific CSS -->
-	<link rel="stylesheet" type="text/css" href="{% static 'css/profiles.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/cloud_data.css' %}"/>
 {% endblock %}
 
 
 {% block additional_scripts %}
 	<!-- Load specific javascript -->
-	<script type="text/javascript" src="{% static 'js/profiles.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/cloud_data.js' %}"></script>
 	<!-- Load plotly js -->
     <script type="text/javascript" src="{% static 'js/libs/plotly.min.js' %}"></script>
 	<!-- Load global variables and specific javascript -->
@@ -23,12 +23,23 @@
  <!-- Display charts -->
  <div class="row">
 	<div class="column">
-		<div id='temperature_chart'></div>	
+		<div id='volume_chart'></div>	
 	</div>
 	<div class="column">
-		<div id='humidity_chart'></div>
+		<div id='height_chart'></div>
 	</div>
 </div>
+
+ <div class="row">
+	<div class="column">
+		<div id='radius_chart'></div>
+	</div>
+	<div class="column">
+		<div id='zx_chart'></div>
+	</div>
+</div>
+
+
 
 
 {% endblock %}

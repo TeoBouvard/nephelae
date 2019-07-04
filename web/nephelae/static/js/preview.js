@@ -59,7 +59,7 @@ $(document).ready(function(){
 
 function displayDrones(){
     var data = [];
-    $.get('update/', function(response){
+    $.getJSON('update/', function(response){
 
         // Initialize drone array with drone_id and position marker
         for (var key in response){

@@ -45,6 +45,7 @@ A : You can reference any *.nc file with your $MESO_NH environment variable, and
 - requête box au mapping
 - map legend ?
 - drag problem in 3d -> three.js instead of plot ?
+- frontend (bootstrap or more lightweight)
 
 ## Install
 
