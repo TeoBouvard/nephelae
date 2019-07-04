@@ -11,6 +11,11 @@ import numpy as np
 from matplotlib.colors import ListedColormap
 from netCDF4 import MFDataset
 
+
+from nephelae_simulation.mesonh_interface import ScaledArray
+from nephelae_simulation.mesonh_interface import DimensionHelper
+from nephelae_simulation.mesonh_interface import MesoNHVariable
+
 var_time = 'time'        # Time in seconds since 1995-1-1 00:00:00
 var_altitude = 'VLEV'    # Vertical levels in km ASL
 var_upwind = 'WT'        # Upwind in m/s
@@ -18,6 +23,8 @@ var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
 if 'MESO_NH' in os.environ :
     hypercube = MFDataset(os.environ['MESO_NH'])
+    clouds = MesoNHVariable(hypercube, var_lwc, interpolation='linear')
+    thermals = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
 else :
     print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
     exit()
@@ -54,13 +61,15 @@ def print_horizontal_clouds(time, altitude):
     return buf
 
 # Returns a base64 encoded string containing hcs cloud data
-def encode_horizontal_clouds(time_index, altitude_index):
+def encode_horizontal_clouds(computed_time, computed_altitude):
 
     # Get slice
-    h_slice = horizontal_slice(var_lwc, time_index, altitude_index)
+    #h_slice = horizontal_slice(var_lwc, time_index, altitude_index)
+    h_slice = clouds[computed_time, computed_altitude, :, :].data
+
     # Create pyplot image
     plt.imshow(h_slice, origin='lower',vmin=0, vmax=max_lwc())
-    title = 'Liquid Water Content in kg/kg' #at ' + str(int(self.get_altitude())) + 'm ASL'
+    title = 'Liquid Water Content in kg/kg'
     plt.title(title)
     plt.set_cmap('viridis')
     plt.colorbar()
@@ -79,9 +88,10 @@ def encode_horizontal_clouds(time_index, altitude_index):
     return encodedImage
 
 # Returns a base64 encoded string containing hcs upwind data
-def encode_horizontal_thermals(time_index, altitude_index):
+def encode_horizontal_thermals(computed_time, computed_altitude):
 
-    h_slice = horizontal_slice(var_upwind, time_index, altitude_index)
+    #h_slice = horizontal_slice(var_upwind, time_index, altitude_index)
+    h_slice = thermals[computed_time, computed_altitude, :, :].data
 
     # Create pyplot image
     plt.imshow(h_slice, origin='lower', vmin=min_upwind(), vmax=max_upwind())
@@ -107,11 +117,11 @@ def encode_horizontal_thermals(time_index, altitude_index):
 def max_lwc():
     return max(getattr(hypercube.variables[var_lwc], 'actual_range'))
 
-def max_time_index():
-    return len(hypercube.variables[var_time]) - 1
+def max_time():
+    return hypercube.variables[var_time][-1] - hypercube.variables[var_time][0] 
 
-def max_altitude_index():
-    return len(hypercube.variables[var_altitude]) - 1
+def max_altitude():
+    return 1000*hypercube.variables[var_altitude][-1, 0, 0]
 
 # Compute max upwind to fix plot colorbar
 def max_upwind():
@@ -121,17 +131,9 @@ def max_upwind():
 def min_upwind():
     return min(getattr(hypercube.variables[var_upwind], 'actual_range'))
 
-# Get altitude !in meters! from altitude_index !CHECK THIS METHOD'S CORRECTNESS!
-def get_altitude(altitude_index):
-    return 1000*hypercube.variables[var_altitude][altitude_index, 0, 0]
+def dimensions_from_ratio(time_ratio, altitude_ratio):
 
-# Get date !in seconds since epoch! from time_index
-def get_seconds(time_index):
-    return hypercube.variables[var_time][time_index]
+    computed_time = int(0.01*time_ratio*max_time())
+    computed_altitude = int(0.01*altitude_ratio*max_altitude())
 
-def index_from_ratio(time_ratio, altitude_ratio):
-
-    time_index = int(0.01*time_ratio*max_time_index())
-    altitude_index = int(0.01*altitude_ratio*max_altitude_index())
-
-    return time_index, altitude_index
+    return computed_time, computed_altitude

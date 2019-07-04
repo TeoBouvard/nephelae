@@ -9,7 +9,7 @@ var altitude_display = document.getElementById('altitude_display');
 
 $(document).ready(function(){
     // Display first image
-    displayImage(0,0);
+    displayImage(altitude_slider.value, time_slider.value);
 });
 
 // Update the current slider value and display image accordingly
@@ -36,7 +36,7 @@ function displayImage(time_percentage, altitude_percentage){
     $.getJSON(url, function(response){
         $('#clouds_div').html('<img src="' + response.clouds + '">');
         $('#thermals_div').html('<img src="' + response.thermals + '">');
-        $('#time_display').html(secToDate(1995, response.date))
+        $('#time_display').html(response.date + "s")
         $('#altitude_display').html(response.altitude + "m ASL")
     });
 

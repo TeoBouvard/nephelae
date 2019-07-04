@@ -5,6 +5,8 @@ Jinja2
 netCDF4
 geopy
 utm
+scipy
+sh
 #Server
 gunicorn
 #useless in future

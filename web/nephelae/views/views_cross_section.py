@@ -9,15 +9,17 @@ from ..models import hypercube
 def print_img(request, time_ratio, altitude_ratio):
 
     # Compute time of cross section with duration of acquisition
-    time_index, altitude_index = hypercube.index_from_ratio(time_ratio, altitude_ratio)
+    computed_time, computed_altitude = hypercube.dimensions_from_ratio(time_ratio, altitude_ratio)
 
-    raw_clouds_image = hypercube.encode_horizontal_clouds(time_index, altitude_index)
-    raw_thermals_image = hypercube.encode_horizontal_thermals(time_index, altitude_index)
+    print(computed_time, computed_altitude)
+
+    raw_clouds_image = hypercube.encode_horizontal_clouds(time_ratio, altitude_ratio)
+    raw_thermals_image = hypercube.encode_horizontal_thermals(time_ratio, altitude_ratio)
 
 	#int64 have to be casted to int to be JSON serializable
     response = JsonResponse({
-		'date': int(hypercube.get_seconds(time_index)),
-		'altitude': int(hypercube.get_altitude(altitude_index)),
+		'date': int(computed_time),
+		'altitude': int(computed_altitude),
 		'clouds': raw_clouds_image,
 		'thermals': raw_thermals_image,
 	})

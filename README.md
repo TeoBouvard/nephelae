@@ -29,7 +29,7 @@ A : For updates concerning server-side programming files to take place, you have
 
 
 Q : I do not have a Meso_NH.nc file, what can I do ?  
-A : You can reference any *.nc file with your $MESO_NH environment variable, and it will *work*. The original file is 70GB so it did not fit in a commit, sorry.
+A : You can reference any .nc file with your $MESO_NH environment variable, and it will *work*. The original file is 70GB so it did not fit in a commit, sorry.
 
 
 
@@ -47,6 +47,8 @@ A : You can reference any *.nc file with your $MESO_NH environment variable, and
 - drag problem in 3d -> three.js instead of plot ?
 - frontend (bootstrap or more lightweight)
 - ask for slider appearance/functionnality
+
+- zero index altitude ? -> get interpolation range
 
 ## Infos from users
 
