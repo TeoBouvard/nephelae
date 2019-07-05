@@ -120,9 +120,7 @@ function displayDrones(){
             drones[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading));
             drones[drone_id].path.addTo(path_overlay);
         }
-
-        console.log(drones.le);
-
+        
         // Center map on drone last drone added
         if(Object.keys(drones).length != 0){
             flight_map.setView(drone_position, 15);

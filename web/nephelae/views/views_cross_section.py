@@ -13,10 +13,10 @@ def mesonh_box(request):
         
     return JsonResponse(box, safe=False)
 
-def print_img(request, time_value, altitude_value):
+def print_img(request, time_value, altitude_value, x0, x1, y0, y1):
 
-    raw_clouds_image = hypercube.encode_horizontal_clouds(time_value, altitude_value)
-    raw_thermals_image = hypercube.encode_horizontal_thermals(time_value, altitude_value)
+    raw_clouds_image = hypercube.encode_horizontal_clouds(time_value, altitude_value, x0, x1, y0, y1)
+    raw_thermals_image = hypercube.encode_horizontal_thermals(time_value, altitude_value, x0, x1, y0, y1)
 
 	#int64 have to be casted to int to be JSON serializable
     response = JsonResponse({

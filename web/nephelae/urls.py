@@ -23,7 +23,7 @@ urlpatterns = [
     # URL for cross_sections page
     path('cross_sections/', views.cross_section, name='cross_sections'),
     path('cross_sections/box/', views.mesonh_box, name='mesonh_box'),
-    path('cross_sections/<int:time_value>/<int:altitude_value>', views.print_img, name='cross_sections'),
+    path('cross_sections/<int:time_value>/<int:altitude_value>/<int:x0>,<int:x1>/<int:y0>,<int:y1>', views.print_img, name='cross_sections'),
     
     # URL for simulation page
     path('simulation/', views.simulation, name='simulation'),

@@ -50,11 +50,11 @@ def print_horizontal_clouds(u_time, u_altitude):
     return buf
 
 # Returns a base64 encoded string containing hcs cloud data
-def encode_horizontal_clouds(u_time, u_altitude):
+def encode_horizontal_clouds(u_time, u_altitude, x0, x1, y0, y1):
 
     # Get slice
     #h_slice = horizontal_slice(var_lwc, time_index, altitude_index)
-    h_slice = clouds[u_time, u_altitude, 12.5:6387.5, 12.5:6387.5].data
+    h_slice = clouds[u_time, u_altitude, y0:y1, x0:x1].data
 
     # Create pyplot image
     plt.imshow(h_slice, origin='lower',vmin=0, vmax=max_lwc())
@@ -77,10 +77,10 @@ def encode_horizontal_clouds(u_time, u_altitude):
     return encodedImage
 
 # Returns a base64 encoded string containing hcs upwind data
-def encode_horizontal_thermals(u_time, u_altitude):
+def encode_horizontal_thermals(u_time, u_altitude, x0, x1, y0, y1):
 
     #h_slice = horizontal_slice(var_upwind, time_index, altitude_index)
-    h_slice = thermals[u_time, u_altitude, 12.5:6387.5, 12.5:6387.5].data
+    h_slice = thermals[u_time, u_altitude, y0:y1, x0:x1].data
 
     # Create pyplot image
     plt.imshow(h_slice, origin='lower', vmin=min_upwind(), vmax=max_upwind())
