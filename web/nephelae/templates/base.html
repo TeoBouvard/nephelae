@@ -39,7 +39,6 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 	<body>
 			<div id="external-wrapper">
 				<div id="nav" class="pill-nav">
-					{% block nav %}
 					<a id='nav_preview' href="{% url 'preview' %}">3D Preview</a>
 					<a id='nav_map' href="{% url 'map' %}">Map</a>
    					<a id='nav_profiles' href="{% url 'profiles' %}">Vertical Profiles</a>
@@ -49,8 +48,22 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 					<a href="javascript:void(0);" class="icon" onclick="open_navbar()">
     					<i class="fa fa-bars"></i>
 					</a>
-					{% endblock %}
 				</div>
+
+				{% block loader %}
+					<div id="loader" class="preloader-wrapper big active">
+						<div class="spinner-layer">
+							<div class="circle-clipper left">
+								<div class="circle"></div>
+								</div><div class="gap-patch">
+								<div class="circle"></div>
+								</div><div class="circle-clipper right">
+								<div class="circle"></div>
+							</div>
+						</div>
+					</div>
+				{% endblock %}
+				
 				{% block page %}{% endblock %}
 			</div>
 		

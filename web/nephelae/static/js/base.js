@@ -6,3 +6,10 @@ function open_navbar(){
         x.className = "pill-nav";
     }
 }
+
+function removeLoader(){
+    var element = document.getElementById("loader");
+    element.parentNode.removeChild(element);
+}
+
+window.onload = removeLoader;

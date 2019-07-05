@@ -13,6 +13,7 @@ var y_display = document.getElementById('y_display');
 $(document).ready(function(){
     // set sliders min and max values to prevent value errors, display first image on ajax call return
     init();
+
 });
 
 function init(){

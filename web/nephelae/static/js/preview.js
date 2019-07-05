@@ -44,12 +44,12 @@ length_slider.oninput = function() {
 
 
 $(document).ready(function(){
-    
-    // Display original trail length
-    updateInfo();
 
     // Start by getting 3d evolution box of the drones, display drones on ajax call response
     getBox();
+
+    // Display original trail length
+    updateInfo();
 
 });
 
