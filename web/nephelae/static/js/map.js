@@ -34,8 +34,6 @@ $(document).ready(function(){
 
     // Update elements every 'refresh_rate' ms
     displayDrones();
-
-    removeLoader();
 });
 
 function initializeSliders(){

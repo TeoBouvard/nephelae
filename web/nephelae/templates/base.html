@@ -25,12 +25,14 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<link rel="shortcut icon" href="#">
 		<!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
 
+		<!-- Load jquery -->
+		<script type="text/javascript" src="{% static 'js/libs/jquery.js' %}"></script>
+
 		<!-- Load materialize js -->
 		<script type="text/javascript" src="{% static 'js/libs/materialize.min.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/libs/nouislider.js' %}"></script>
-		<!-- Load jquery -->
-		<script type="text/javascript" src="{% static 'js/libs/jquery.js' %}"></script>
-		<!-- Load specific js -->
+
+		<!-- Load main js -->
 		<script type="text/javascript" src="{% static 'js/base.js' %}"></script>
 
 		{% block additional_head %}{% endblock %}
@@ -43,12 +45,17 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 					<a id='nav_map' href="{% url 'map' %}">Map</a>
    					<a id='nav_profiles' href="{% url 'profiles' %}">Vertical Profiles</a>
    					<a id='nav_cloud_data' href="{% url 'cloud_data' %}">Cloud Data</a>
-    				<a id='nav_cross_section' href="{% url 'cross_sections' %}">Cross Sections</a>
+    				<a id='nav_cross_section' href="#!" class='dropdown-trigger' data-target='dropdown_cs'>Cross Sections</a>
    					<a id='nav_simulation' href="{% url 'simulation' %}">Simulation (soon)</a>
 					<a href="javascript:void(0);" class="icon" onclick="open_navbar()">
     					<i class="fa fa-bars"></i>
 					</a>
 				</div>
+
+				<ul id='dropdown_cs' class='dropdown-content'>
+					<li><a href="{% url 'cross_sections' %}" >Image Cross Section</a></li>
+					<li><a href="#!">Plot Cross Section (soon)</a></li>
+				</ul>
 
 				{% block loader %}
 					<div id="loader" class="preloader-wrapper big active">

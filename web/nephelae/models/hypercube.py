@@ -60,7 +60,7 @@ def encode_horizontal_clouds(u_time, u_altitude, x0, x1, y0, y1):
     plt.imshow(h_slice, origin='lower',vmin=0, vmax=max_lwc())
     title = 'Liquid Water Content in kg/kg'
     plt.title(title)
-    plt.set_cmap('Greys')
+    plt.set_cmap('Purples')
     plt.colorbar()
 
     # Write image to buffer

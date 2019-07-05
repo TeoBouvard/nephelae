@@ -1,5 +1,5 @@
 // Activate current menu in nav
-document.getElementById('nav_cross_section').className = 'active';
+document.getElementById('nav_cross_section').classList.add('active');
 
 var time_slider = document.getElementById('time_slider');
 var altitude_slider = document.getElementById('altitude_slider');

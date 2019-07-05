@@ -7,10 +7,6 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
     margin: 0;
 }
 
-.external-wrapper {
-    height : 100vh;
-}
-
 /* Import local font */
 @font-face {
     font-family: 'Roboto';
@@ -60,7 +56,6 @@ body {
 .pill-nav a:hover:not(.active) {
     background-color: #ddd;
 }
-
 
 /* Add a color to the active/current link */
 .pill-nav a.active {
