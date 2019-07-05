@@ -3,10 +3,14 @@
 function finish() {
 	echo "Killing server"
 	echo "Deactivating virtual environement"
+	deactivate
 	exit
 }
 
 trap finish SIGINT
+
+
+sudo killall gunicorn
 
 echo "Activating virtual environement"
 source venv/bin/activate

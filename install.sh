@@ -2,7 +2,6 @@
 #sudo apt-get update
 sudo apt-get -y install python3-pip python3-venv
 
-cd nephelae
 python3 -m venv venv
 source venv/bin/activate
 pip3 install wheel

@@ -49,6 +49,7 @@ A : You can reference any .nc file with your $MESO_NH environment variable, and 
 - simplify image encoding
 - display drones altitudes in map slider
 - max bound time value error
+- launch drones script ?
 
 ## Infos from users
 
