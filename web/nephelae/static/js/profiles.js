@@ -36,6 +36,7 @@ var refresh_rate = 2000; // ms
 
 $(document).ready(function(){
     updateData();
+    removeLoader();
 });
 
 function updateData(){
@@ -51,10 +52,11 @@ function updateData(){
         } else {
             if(data.length == 0){
                 //alert("No data received from the server, try refreshing the page");
+            } else {
+                initializeCharts(data);
+                isAlreadyDrawn = true;
+                setInterval(updateData, refresh_rate);
             }
-            initializeCharts(data);
-            isAlreadyDrawn = true;
-            setInterval(updateData, refresh_rate);
         }
     });
 }

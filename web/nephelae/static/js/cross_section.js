@@ -13,7 +13,6 @@ var y_display = document.getElementById('y_display');
 $(document).ready(function(){
     // set sliders min and max values to prevent value errors, display first image on ajax call return
     init();
-
 });
 
 function init(){
@@ -108,6 +107,8 @@ function displayImage(time_value, altitude_value, x_interval, y_interval){
     $.getJSON(url, function(response){
         $('#clouds_div').html('<img src="' + response.clouds + '">');
         $('#thermals_div').html('<img src="' + response.thermals + '">');
+        
+        removeLoader();
     });
 
 }

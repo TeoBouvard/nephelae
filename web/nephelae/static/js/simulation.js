@@ -4,6 +4,7 @@ var camera, scene, renderer, controls;
 
 init();
 animate();
+removeLoader();
 
 function init() {
 

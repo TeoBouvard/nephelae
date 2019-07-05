@@ -6,7 +6,7 @@ var length_slider = document.getElementById('length_slider');
 // Define graph settings
 var layout = {
     scene: {
-        xaxis:{title: 'Longitude'},
+        xaxis:{title: 'Longitude', zeroline: false},
         yaxis:{title: 'Latitude',},
         zaxis:{title: 'Altitude'},
         aspectratio: {x:1.3, y:1.3, z:0.9},
@@ -118,6 +118,7 @@ function displayDrones(){
                 Plotly.newPlot('chart', data, layout, config);
                 isAlreadyDrawn = true;
                 setInterval(displayDrones, refresh_rate);
+                removeLoader();
             }
         }
     });

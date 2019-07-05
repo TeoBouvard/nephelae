@@ -31,6 +31,8 @@ $(document).ready(function(){
 
     // Initialize document elements
     initializeMap();
+    
+    removeLoader();
 
     // Update elements every 'refresh_rate' ms
     displayDrones();

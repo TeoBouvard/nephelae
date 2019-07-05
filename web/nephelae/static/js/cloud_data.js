@@ -48,6 +48,7 @@ var refresh_rate = 2000; // ms
 
 $(document).ready(function(){
     updateData();
+    removeLoader();
 });
 
 function updateData(){
