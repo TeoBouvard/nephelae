@@ -6,8 +6,8 @@ var length_slider = document.getElementById('length_slider');
 // Define graph settings
 var layout = {
     scene: {
-        xaxis:{title: 'Longitude', zeroline: false},
-        yaxis:{title: 'Latitude',},
+        xaxis:{title: 'Longitude'},
+        yaxis:{title: 'Latitude'},
         zaxis:{title: 'Altitude'},
         aspectratio: {x:1.3, y:1.3, z:0.9},
         camera: {
@@ -58,18 +58,18 @@ function displayDrones(){
     $.getJSON('update/', function(response){
 
         // Initialize drone array with drone_id and position marker
-        for (var key in response){
+        for (var key in response.drones){
 
-            // Parse response data
+            // Parse drones data
             var drone_id = key;
             var drone_color = global_colors[key%global_colors.length];
-            var drone_position = response[key].position;
-            var drone_altitude = response[key].altitude;
-            var past_altitudes = response[key].past_altitudes;
-            var past_longitudes = response[key].past_longitudes;
-            var past_latitudes = response[key].past_latitudes;
+            var drone_position = response.drones[key].position;
+            var drone_altitude = response.drones[key].altitude;
+            var past_altitudes = response.drones[key].past_altitudes;
+            var past_longitudes = response.drones[key].past_longitudes;
+            var past_latitudes = response.drones[key].past_latitudes;
 
-            // Append current position to path
+            // Append current position to path to close gap
             past_longitudes.push(drone_position[1]);
             past_latitudes.push(drone_position[0]);
             past_altitudes.push(drone_altitude);
@@ -106,6 +106,8 @@ function displayDrones(){
             data.push(updatePath);
             data.push(updateMarker);
         }
+
+        //data.push(response.clouds)
 
         if(isAlreadyDrawn){
             // Update chart if it already exists

@@ -91,14 +91,14 @@ function displayDrones(){
         $.getJSON('update/', function(response){
 
         // Initialize drone array with drone_id and position marker
-        for (var key in response){
+        for (var key in response.drones){
 
             // Parse response data
             var drone_id = key;
-            var drone_position = response[key].position;
-            var drone_altitude = response[key].altitude;
-            var drone_heading = response[key].heading;
-            var drone_path = response[key].path.slice(-length_slider.value);
+            var drone_position = response.drones[key].position;
+            var drone_altitude = response.drones[key].altitude;
+            var drone_heading = response.drones[key].heading;
+            var drone_path = response.drones[key].path.slice(-length_slider.value);
 
             // Compute color and icon of markers, increment index_icon for next drone 
             var drone_color = global_colors[key%global_colors.length];
@@ -140,12 +140,12 @@ function updateDrones(){
     $.getJSON('update/', function(response){
 
         // Parse response
-        for (var key in response){
+        for (var key in response.drones){
             var drone_id = key;
-            var drone_position = response[key].position;
-            var drone_altitude = response[key].altitude;
-            var drone_heading = response[key].heading;
-            var drone_path = response[key].path.slice(-length_slider.value);
+            var drone_position = response.drones[key].position;
+            var drone_altitude = response.drones[key].altitude;
+            var drone_heading = response.drones[key].heading;
+            var drone_path = response.drones[key].path.slice(-length_slider.value);
 
             // Identify corresponding drone ...
             var drone_to_update = drones[drone_id];

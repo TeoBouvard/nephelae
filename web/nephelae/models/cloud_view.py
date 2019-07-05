@@ -35,7 +35,6 @@ def create_points_cloud(time_index):
     cloud_altitudes = list(set(cloud_altitudes))
 
     for altitude_index in cloud_altitudes:
-        altitude = int(dataset.variables[var_altitude][altitude_index,0,0])
 
         #Compute positions having clouds
         cloud_positions = np.where(dataset.variables[var_lwc][time_index,altitude_index,:,:] > cloud_threshold)

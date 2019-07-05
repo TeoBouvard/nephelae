@@ -12,7 +12,11 @@ pprz.start()
 
 # Get UAV fleet info
 def update_map(request):
-    return JsonResponse(pprz.uavs)
+    data = {
+        'drones' : pprz.uavs,
+        'clouds' : []
+    }
+    return JsonResponse(data)
 
 # Render icons for drones
 def plane_icon(request, index):
