@@ -1,7 +1,7 @@
 // Activate current menu in nav
 document.getElementById('nav_profiles').className = 'active';
 
-var chart_height = 600;
+var chart_height = 550;
 var max_alt = 5;
 var max_temp = 40;
 var lm = 60;

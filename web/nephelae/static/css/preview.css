@@ -6,18 +6,3 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 #chart {
     height: 80vh; 
 }
-
-/* Slider container style */
-.slider_container {
-    width: 50%;
-    position: relative;
-    top: 1em;
-    margin: 0 auto;
-}
-
-#length_display {
-    position: relative;
-    width: 100%;
-    text-align: center;
-    bottom: 1em;
-}

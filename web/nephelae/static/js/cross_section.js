@@ -8,13 +8,43 @@ var altitude_display = document.getElementById('altitude_display');
 
 
 $(document).ready(function(){
-    // Display first image
-    displayImage(altitude_slider.value, time_slider.value);
+    // set sliders min and max values to prevent value errors, display first image on ajax call return
+    initializeSliders();
 });
+
+function initializeSliders(){
+     $.getJSON('box/', function(response){
+
+        time_slider.min = Math.ceil(response[0].min);
+        time_slider.max = Math.floor(response[0].max);
+        time_slider.value = Math.ceil(response[0].min);
+
+        altitude_slider.min = Math.ceil(response[1].min);
+        altitude_slider.max = Math.floor(response[1].max);
+        altitude_slider.value = 1075;
+
+        // Display first image
+        updateInfo();
+        displayImage(time_slider.value, altitude_slider.value);
+    });
+
+}
+
+function displayImage(time_value, altitude_value){
+    
+    // Request the frame corresponding to selected time and altitude
+    var url = time_value + '/' + altitude_value;
+
+    $.getJSON(url, function(response){
+        $('#clouds_div').html('<img src="' + response.clouds + '">');
+        $('#thermals_div').html('<img src="' + response.thermals + '">');
+    });
+
+}
 
 // Update the current slider value and display image accordingly
 time_slider.oninput = function() {
-    time_display.innerHTML = '...';
+    updateInfo();
 }
 time_slider.onchange = function() {
     displayImage(this.value, altitude_slider.value);
@@ -22,22 +52,14 @@ time_slider.onchange = function() {
 
 // Update the current slider value and display image accordingly
 altitude_slider.oninput = function() {
-    altitude_display.innerHTML = '...';
+    updateInfo();
 }
 altitude_slider.onchange = function() {
     displayImage(time_slider.value,this.value);
 }
 
-function displayImage(time_percentage, altitude_percentage){
-    
-    // Request the frame corresponding to selected time and altitude
-    var url = time_percentage + '/' + altitude_percentage;
 
-    $.getJSON(url, function(response){
-        $('#clouds_div').html('<img src="' + response.clouds + '">');
-        $('#thermals_div').html('<img src="' + response.thermals + '">');
-        $('#time_display').html(response.date + "s")
-        $('#altitude_display').html(response.altitude + "m ASL")
-    });
-
+function updateInfo(){
+    altitude_display.innerHTML = altitude_slider.value + "m ASL";
+    time_display.innerHTML = time_slider.value + "s";
 }

@@ -25,18 +25,24 @@
 {% block page %}
 
     <!-- Display map -->
-    <div id="map_container"></div>
+    <div class="row">
+        <div id="map_container"></div>
+    </div>
 
     <!-- Display trail length slider -->
-    <div class="slider_container">
-        <div id="length">
-            <div id="length_display" class="info"></div>
-            <input id="length_slider" type="range" min="1" max="501" value="61" class="slider">
-        </div>
+    <div class="container">
+        <div class="row">
+            <div class="col s5">
+                <div id="length_display" class="info"></div>
+                <input id="length_slider" type="range" min="1" max="501" value="61">
+            </div>
 
-        <div id="altitude">
-            <div id="altitude_display" class="info"></div>
-            <input id="altitude_slider" type="range" min="0" max="159" value="42" class="slider">
+            <div class="col s1"></div>
+
+            <div class="col s5">
+                <div id="altitude_display" class="info"></div>
+                <input id="altitude_slider" type="range">
+            </div>
         </div>
     </div>
 

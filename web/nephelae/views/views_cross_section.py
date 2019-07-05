@@ -1,25 +1,25 @@
-import os
-from timeit import default_timer as timer
-
 from django.http import HttpResponseNotFound, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from ..models import hypercube
 
-def print_img(request, time_ratio, altitude_ratio):
+def mesonh_box(request):
+    bounds = hypercube.clouds.bounds
+    box = [
+        {'min':bounds[0].min, 'max':bounds[0].max}, 
+        {'min':bounds[1].min, 'max':bounds[1].max}, 
+        {'min':bounds[2].min, 'max':bounds[2].max}, 
+        {'min':bounds[3].min, 'max':bounds[3].max}]
+        
+    return JsonResponse(box, safe=False)
 
-    # Compute time of cross section with duration of acquisition
-    computed_time, computed_altitude = hypercube.dimensions_from_ratio(time_ratio, altitude_ratio)
+def print_img(request, time_value, altitude_value):
 
-    print(computed_time, computed_altitude)
-
-    raw_clouds_image = hypercube.encode_horizontal_clouds(time_ratio, altitude_ratio)
-    raw_thermals_image = hypercube.encode_horizontal_thermals(time_ratio, altitude_ratio)
+    raw_clouds_image = hypercube.encode_horizontal_clouds(time_value, altitude_value)
+    raw_thermals_image = hypercube.encode_horizontal_thermals(time_value, altitude_value)
 
 	#int64 have to be casted to int to be JSON serializable
     response = JsonResponse({
-		'date': int(computed_time),
-		'altitude': int(computed_altitude),
 		'clouds': raw_clouds_image,
 		'thermals': raw_thermals_image,
 	})

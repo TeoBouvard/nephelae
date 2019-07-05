@@ -10,13 +10,9 @@ from ..models import PprzGpsGrabber, hypercube
 pprz = PprzGpsGrabber()
 pprz.start()
 
-
+# Get UAV fleet info
 def update_map(request):
     return JsonResponse(pprz.uavs)
-
-# Render base page
-def map(request):
-    return render(request, 'map.html')
 
 # Render icons for drones
 def plane_icon(request, index):
@@ -38,6 +34,10 @@ def map_tiles(request, z, x, y):
         return HttpResponseNotFound()
 
 # Render clouds image
-def clouds_img(request, time, altitude):
-    buf = hypercube.print_horizontal_clouds(time, altitude)
+def clouds_img(request, time_value, altitude_value):
+    buf = hypercube.print_horizontal_clouds(time_value, altitude_value)
     return HttpResponse(buf.read(), content_type="image/png")
+
+# Render base page
+def map(request):
+    return render(request, 'map.html')

@@ -2,14 +2,13 @@
 document.getElementById('nav_preview').className = 'active';
 var length_display = document.getElementById('length_display');
 var length_slider = document.getElementById('length_slider');
-var init = new Powerange(length_slider, { min: 0, max: 500, start: 60});
 
 // Define graph settings
 var layout = {
     scene: {
         xaxis:{title: 'Longitude'},
-        yaxis:{title: 'Latitude'},
-        zaxis:{title: 'Altitude', showpikes: false},
+        yaxis:{title: 'Latitude',},
+        zaxis:{title: 'Altitude'},
         aspectratio: {x:1.3, y:1.3, z:0.9},
         camera: {
             center: { x: 0, y: 0, z: -0.2 }, 
@@ -35,28 +34,23 @@ var config = {
 // Parameters 
 var refresh_rate = 2000; //milliseconds
 var isAlreadyDrawn = false;
-var trail_length = 60;
+var trail_length = length_slider.value;
 
 // Update trail length, display 0 when slider is 1 to not slice(0)
-length_slider.onchange = function() {
-    if(this.value == 0){
-        length_display.innerHTML = "no trail";
-    } else if (this.value == 1){
-        length_display.innerHTML = "trail length : last second";
-    } else {
-        length_display.innerHTML = "trail length : last " + (this.value) + " seconds";
-    }
+length_slider.oninput = function() {
     trail_length = this.value;
+    updateInfo();
 }
 
 
 $(document).ready(function(){
     
     // Display original trail length
-    length_display.innerHTML = "trail length : last " + trail_length + " seconds";
+    updateInfo();
 
-    // Start by getting 3d evolution box of the drones
+    // Start by getting 3d evolution box of the drones, display drones on ajax call response
     getBox();
+
 });
 
 function displayDrones(){
@@ -138,4 +132,14 @@ function getBox(){
         // And then display the drones in the box
         displayDrones();
     })
+}
+
+function updateInfo(){
+    if(trail_length == 0){
+        length_display.innerHTML = "no trail";
+    } else if (trail_length == 1){
+        length_display.innerHTML = "trail length : last second";
+    } else {
+        length_display.innerHTML = "trail length : " + (trail_length) + " seconds";
+    }
 }

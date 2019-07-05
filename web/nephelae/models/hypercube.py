@@ -1,9 +1,9 @@
+import base64
 import io
 import logging
 import math
 import os
 import urllib
-import base64
 
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -11,10 +11,7 @@ import numpy as np
 from matplotlib.colors import ListedColormap
 from netCDF4 import MFDataset
 
-
-from nephelae_simulation.mesonh_interface import ScaledArray
-from nephelae_simulation.mesonh_interface import DimensionHelper
-from nephelae_simulation.mesonh_interface import MesoNHVariable
+from nephelae_simulation.mesonh_interface import *
 
 var_time = 'time'        # Time in seconds since 1995-1-1 00:00:00
 var_altitude = 'VLEV'    # Vertical levels in km ASL
@@ -41,17 +38,9 @@ def transparent_cmap(original_cmap):
 
     return ListedColormap(my_cmap)
 
-def horizontal_slice(variable, time_index=0, altitude_index=0, x1=None, x2=None, y1=None, y2=None):
-    try:
-        return hypercube.variables[variable][time_index, altitude_index, x1:x2, y1:y2]
-    except KeyError:
-        logging.error('Variable \'' + variable + '\' does not exist')
-    except ValueError:
-        logging.error('Indexes must be valid')
-
-def print_horizontal_clouds(time, altitude):
+def print_horizontal_clouds(u_time, u_altitude):
     # Get slice
-    h_slice = horizontal_slice(var_lwc, time, altitude)
+    h_slice = clouds[u_time, u_altitude, 12.5:6387.5, 12.5:6387.5].data
 
     # Write image to buffer
     buf = io.BytesIO()
@@ -61,11 +50,11 @@ def print_horizontal_clouds(time, altitude):
     return buf
 
 # Returns a base64 encoded string containing hcs cloud data
-def encode_horizontal_clouds(computed_time, computed_altitude):
+def encode_horizontal_clouds(u_time, u_altitude):
 
     # Get slice
     #h_slice = horizontal_slice(var_lwc, time_index, altitude_index)
-    h_slice = clouds[computed_time, computed_altitude, :, :].data
+    h_slice = clouds[u_time, u_altitude, 12.5:6387.5, 12.5:6387.5].data
 
     # Create pyplot image
     plt.imshow(h_slice, origin='lower',vmin=0, vmax=max_lwc())
@@ -88,10 +77,10 @@ def encode_horizontal_clouds(computed_time, computed_altitude):
     return encodedImage
 
 # Returns a base64 encoded string containing hcs upwind data
-def encode_horizontal_thermals(computed_time, computed_altitude):
+def encode_horizontal_thermals(u_time, u_altitude):
 
     #h_slice = horizontal_slice(var_upwind, time_index, altitude_index)
-    h_slice = thermals[computed_time, computed_altitude, :, :].data
+    h_slice = thermals[u_time, u_altitude, 12.5:6387.5, 12.5:6387.5].data
 
     # Create pyplot image
     plt.imshow(h_slice, origin='lower', vmin=min_upwind(), vmax=max_upwind())
@@ -115,25 +104,12 @@ def encode_horizontal_thermals(computed_time, computed_altitude):
 ########## UTILITY METHODS ##########
 
 def max_lwc():
-    return max(getattr(hypercube.variables[var_lwc], 'actual_range'))
-
-def max_time():
-    return hypercube.variables[var_time][-1] - hypercube.variables[var_time][0] 
-
-def max_altitude():
-    return 1000*hypercube.variables[var_altitude][-1, 0, 0]
+    return clouds.actual_range[1]
 
 # Compute max upwind to fix plot colorbar
 def max_upwind():
-    return max(getattr(hypercube.variables[var_upwind], 'actual_range'))
+    return thermals.actual_range[1]
 
 # Compute min upwind to fix plot colorbar
 def min_upwind():
-    return min(getattr(hypercube.variables[var_upwind], 'actual_range'))
-
-def dimensions_from_ratio(time_ratio, altitude_ratio):
-
-    computed_time = int(0.01*time_ratio*max_time())
-    computed_altitude = int(0.01*altitude_ratio*max_altitude())
-
-    return computed_time, computed_altitude
+    return thermals.actual_range[0]

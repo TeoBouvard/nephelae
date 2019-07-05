@@ -3,7 +3,7 @@ document.getElementById('nav_cloud_data').className = 'active';
 
 // Chart style and options
 
-var chart_height = 300;
+var chart_height = 280;
 var lm = 60;
 var rm = 30;
 var bm = 60;
@@ -11,26 +11,26 @@ var tm = 50;
 
 var layouts = {
     volume: {
-        xaxis:{title: 'Time'},
-        yaxis:{title: 'Cloud Volume (m³)'},
+        xaxis:{title: 'Time', rangemode: 'nonegative'},
+        yaxis:{title: 'Cloud Volume (m³)', rangemode: 'nonegative'},
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
     },
     height: {
-        xaxis:{title: 'Time'},
-        yaxis:{title: 'Cloud Height (m)'},
+        xaxis:{title: 'Time', rangemode: 'nonegative'},
+        yaxis:{title: 'Cloud Height (m)'}, rangemode: 'nonegative',
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
     },
     radius: {
-        xaxis:{title: 'Time'},
-        yaxis:{title: 'Cloud Radius (m)'},
+        xaxis:{title: 'Time', rangemode: 'nonegative'},
+        yaxis:{title: 'Cloud Radius (m)', rangemode: 'nonegative'},
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
     },
     zx: {
-        xaxis:{title: 'Time'},
-        yaxis:{title: 'Altitude (m)'},
+        xaxis:{title: 'Time', rangemode: 'nonegative'},
+        yaxis:{title: 'Altitude (m)', rangemode: 'nonegative'},
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
     },

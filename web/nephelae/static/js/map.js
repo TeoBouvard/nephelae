@@ -6,9 +6,8 @@ var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 
 // Data from MESO_NH, will come from mapping later
 var imageBounds = [[43.432883, 1.247409], [43.490199, 1.327060]];
-var max_time_index = 143;
-var time_index = 0;
-
+var max_time;
+function tick(){ return new Date().getSeconds() % max_time}
 /*
     drones     : { key           :   drone_id,   values : value_dict }
     value_dict : { color         :   global_colors[index_icon], 
@@ -23,22 +22,37 @@ var time_index = 0;
 var drones = {};
 
 // Parameters 
-var refresh_rate = 800; //milliseconds
-var trail_length = length_slider.value;
-var clouds_altitude = altitude_slider.value;
+var refresh_rate = 1000; //milliseconds
 
 $(document).ready(function(){
+
+    // Inititalize altitude slider and time with mesonh box
+    initializeSliders();
+
     // Initialize document elements
     initializeMap();
-
-    // Display initial info
-    updateInfo();
 
     // Update elements every 'refresh_rate' ms
     displayDrones();
 });
 
+function initializeSliders(){
+    $.getJSON('box/', function(response){
+
+        altitude_slider.min = response[1].min;
+        altitude_slider.max = response[1].max;
+        altitude_slider.value = 1075;
+
+        max_time = response[0].max;
+
+        // Display first image
+        updateInfo();
+    });
+}
+
+
 function initializeMap(){
+
     // Map
     flight_map = L.map('map_container', {zoomControl: false, maxZoom : 15});
 
@@ -50,9 +64,9 @@ function initializeMap(){
     tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
-    cloud_overlay = L.imageOverlay('clouds_img/' + time_index + '/' + clouds_altitude, imageBounds); 
+    cloud_overlay = L.imageOverlay('clouds_img/' + tick() + '/' + altitude_slider.value, imageBounds); 
 
-    // Set layers names
+    // Set layer dictionnary
     var base_layers = {
     };
 
@@ -71,24 +85,22 @@ function initializeMap(){
 }
 
 function displayDrones(){
-    var addedDrones = [];
-    var index_icon = 0;
 
-    $.getJSON('update/', function(response){
+        $.getJSON('update/', function(response){
 
         // Initialize drone array with drone_id and position marker
         for (var key in response){
-
-            // Compute color and icon of markers, increment index_icon for next drone 
-            var drone_color = global_colors[index_icon%global_colors.length];
-            var drone_icon = global_icons[index_icon++%global_colors.length];
 
             // Parse response data
             var drone_id = key;
             var drone_position = response[key].position;
             var drone_altitude = response[key].altitude;
             var drone_heading = response[key].heading;
-            var drone_path = response[key].path.slice(-trail_length);
+            var drone_path = response[key].path.slice(-length_slider.value);
+
+            // Compute color and icon of markers, increment index_icon for next drone 
+            var drone_color = global_colors[key%global_colors.length];
+            var drone_icon = global_icons[key%global_colors.length];
             
             // Create leaflet marker and polyline at drone position
             var marker = L.marker(drone_position, {icon: drone_icon});
@@ -107,14 +119,10 @@ function displayDrones(){
             drones[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
             drones[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading));
             drones[drone_id].path.addTo(path_overlay);
-            addedDrones.push(drone_id);
         }
 
-        // Log added drones 
-        console.debug('drones', addedDrones, 'added to overlays');
-
         // Center map on drone last drone added
-        if(addedDrones.length != 0){
+        if(drones.length != 0){
             flight_map.setView(drone_position, 15);
             zoomHome.addTo(flight_map);
             setInterval(updateDrones, refresh_rate);
@@ -135,7 +143,7 @@ function updateDrones(){
             var drone_position = response[key].position;
             var drone_altitude = response[key].altitude;
             var drone_heading = response[key].heading;
-            var drone_path = response[key].path.slice(-trail_length);
+            var drone_path = response[key].path.slice(-length_slider.value);
 
             // Identify corresponding drone ...
             var drone_to_update = drones[drone_id];
@@ -158,35 +166,24 @@ function updateDrones(){
         }
         // Update home button coordinates and cloud overlay
         zoomHome.setHomeCoordinates(drone_position);
-        time_index = time_index++%max_time_index;
-        cloud_overlay.setUrl('clouds_img/'+ time_index++ +'/'+ clouds_altitude);
+        cloud_overlay.setUrl('clouds_img/'+ tick() +'/'+ Math.ceil(altitude_slider.value));
     });
 
 }
 
 function updateInfo(){
-    if(trail_length == 1){
+
+    if(length_slider.value == 1){
         length_display.innerHTML = "no trail";
-    } else if (trail_length == 2){
+    } else if (length_slider.value == 2){
         length_display.innerHTML = "trail length : last second";
     } else {
-        length_display.innerHTML = "trail length : last " + (trail_length - 1) + " seconds";
+        length_display.innerHTML = "trail length : " + (length_slider.value - 1) + " seconds";
     }
 
-    altitude_display.innerHTML = "clouds altitude : " + clouds_altitude + " (MesoNH index)";
-    cloud_overlay.setUrl('clouds_img/'+ time_index +'/'+ clouds_altitude);
-}
+    altitude_display.innerHTML = "clouds altitude : " + altitude_slider.value + " m ASL";
 
-// Update trail length, display 0 when slider is 1 to not slice(0)
-length_slider.oninput = function() {
-    trail_length = this.value;
-    updateInfo();
-}
-
-// Update cross section altitude, display 0 when slider is 1 to not slice(0)
-altitude_slider.oninput = function() {
-    clouds_altitude = this.value;
-    updateInfo();
+    cloud_overlay.setUrl('clouds_img/'+ tick() +'/'+ Math.ceil(altitude_slider.value));
 }
 
 // Print HTML formatted string so that it can be added to marker popup
@@ -202,3 +199,14 @@ function infosToString(id, altitude, heading){
     return infos;
 }
 
+// Update trail length, display 0 when slider is 1 to not slice(0)
+length_slider.oninput = function() {
+    trail_length = this.value;
+    updateInfo();
+}
+
+// Update cross section altitude, display 0 when slider is 1 to not slice(0)
+altitude_slider.oninput = function() {
+    clouds_altitude = this.value;
+    updateInfo();
+}
