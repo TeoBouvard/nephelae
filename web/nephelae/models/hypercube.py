@@ -60,7 +60,7 @@ def encode_horizontal_clouds(u_time, u_altitude, x0, x1, y0, y1):
     plt.imshow(h_slice, origin='lower',vmin=0, vmax=max_lwc())
     title = 'Liquid Water Content in kg/kg'
     plt.title(title)
-    plt.set_cmap('viridis')
+    plt.set_cmap('Greys')
     plt.colorbar()
 
     # Write image to buffer
@@ -85,7 +85,7 @@ def encode_horizontal_thermals(u_time, u_altitude, x0, x1, y0, y1):
     # Create pyplot image
     plt.imshow(h_slice, origin='lower', vmin=min_upwind(), vmax=max_upwind())
     plt.title('Vertical air speed in m/s')
-    plt.set_cmap('viridis')
+    plt.set_cmap('seismic')
     plt.colorbar()
 
     # Write image to buffer

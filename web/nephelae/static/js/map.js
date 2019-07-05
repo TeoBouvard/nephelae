@@ -39,8 +39,8 @@ $(document).ready(function(){
 function initializeSliders(){
     $.getJSON('box/', function(response){
 
-        altitude_slider.min = response[1].min;
-        altitude_slider.max = response[1].max;
+        altitude_slider.min = Math.ceil(response[1].min);
+        altitude_slider.max = Math.floor(response[1].max);
         altitude_slider.value = 1075;
 
         max_time = response[0].max;
