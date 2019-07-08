@@ -1,6 +1,7 @@
 // Activate current menu in nav
 document.getElementById('nav_profiles').className = 'active';
 
+// Chart style and options
 var chart_height = 550;
 var max_alt = 5;
 var max_temp = 40;
@@ -9,7 +10,6 @@ var rm = 30;
 var bm = 60;
 var tm = 50;
 
-// Chart style and options
 var layouts = {
     temperature: {
         xaxis:{title: 'Temperature (°C)', range:[0,max_temp]},
@@ -27,7 +27,8 @@ var layouts = {
 var config = {
     responsive : true,
     displaylogo: false,
-    modeBarButtonsToRemove: ['toImage', 'pan2d', 'zoom2d'],
+    displayModeBar: false,
+    modeBarButtonsToRemove: ["zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
 };
 
 // Keep track of chart state

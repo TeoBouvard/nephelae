@@ -2,7 +2,6 @@
 document.getElementById('nav_cloud_data').className = 'active';
 
 // Chart style and options
-
 var chart_height = 280;
 var lm = 60;
 var rm = 30;

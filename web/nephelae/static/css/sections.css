@@ -1,0 +1,9 @@
+/* 
+Q : Why is this stylesheet in such a convoluted tree of files ?
+A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
+*/
+
+
+#charts {
+    min-height: 450px;
+}

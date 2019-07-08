@@ -18,8 +18,6 @@ $(document).ready(function(){
 function init(){
      $.getJSON('box/', function(response){
 
-        console.log(response);
-
         time_slider.min = Math.ceil(response[0].min);
         time_slider.max = Math.floor(response[0].max);
         time_slider.value = Math.ceil(response[0].min);

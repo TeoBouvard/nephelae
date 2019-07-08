@@ -18,7 +18,6 @@ def print_img(request, time_value, altitude_value, x0, x1, y0, y1):
     raw_clouds_image = hypercube.encode_horizontal_clouds(time_value, altitude_value, x0, x1, y0, y1)
     raw_thermals_image = hypercube.encode_horizontal_thermals(time_value, altitude_value, x0, x1, y0, y1)
 
-	#int64 have to be casted to int to be JSON serializable
     response = JsonResponse({
 		'clouds': raw_clouds_image,
 		'thermals': raw_thermals_image,
@@ -30,3 +29,18 @@ def print_img(request, time_value, altitude_value, x0, x1, y0, y1):
 # Render HTML template
 def cross_section(request):
     return render(request, 'cross_section.html')
+
+# Render HTML template
+def sections(request):
+    return render(request, 'sections.html')
+
+def update_section(request, time_value, altitude_value):
+
+    response = JsonResponse({
+        'time': time_value,
+        'altitude': altitude_value,
+		'clouds': hypercube.clouds[time_value, altitude_value, :, :].data.tolist(),
+		'thermals': hypercube.thermals[time_value, altitude_value, :, :].data.tolist()
+	}, safe=False)
+
+    return response

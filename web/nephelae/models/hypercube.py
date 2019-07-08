@@ -18,7 +18,7 @@ var_altitude = 'VLEV'    # Vertical levels in km ASL
 var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
-if 'MESO_NH' in os.environ :
+if 'MESO_NH' in os.environ:
     hypercube = MFDataset(os.environ['MESO_NH'])
     clouds = MesoNHVariable(hypercube, var_lwc, interpolation='linear')
     thermals = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
@@ -27,6 +27,7 @@ else :
     exit()
 
 def transparent_cmap(original_cmap):
+
     # Choose colormap
     cmap = cm.get_cmap(original_cmap)
 
@@ -39,6 +40,7 @@ def transparent_cmap(original_cmap):
     return ListedColormap(my_cmap)
 
 def print_horizontal_clouds(u_time, u_altitude):
+
     # Get slice
     h_slice = clouds[u_time, u_altitude, 12.5:6387.5, 12.5:6387.5].data
 
@@ -53,7 +55,6 @@ def print_horizontal_clouds(u_time, u_altitude):
 def encode_horizontal_clouds(u_time, u_altitude, x0, x1, y0, y1):
 
     # Get slice
-    #h_slice = horizontal_slice(var_lwc, time_index, altitude_index)
     h_slice = clouds[u_time, u_altitude, y0:y1, x0:x1].data
 
     # Create pyplot image
@@ -79,7 +80,6 @@ def encode_horizontal_clouds(u_time, u_altitude, x0, x1, y0, y1):
 # Returns a base64 encoded string containing hcs upwind data
 def encode_horizontal_thermals(u_time, u_altitude, x0, x1, y0, y1):
 
-    #h_slice = horizontal_slice(var_upwind, time_index, altitude_index)
     h_slice = thermals[u_time, u_altitude, y0:y1, x0:x1].data
 
     # Create pyplot image
