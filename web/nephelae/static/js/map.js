@@ -61,7 +61,7 @@ function initializeMap(){
 
     // Create layers (add/remove .grayscale() if you want a grey/colored map)
     //tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
-    tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
+    tiles_overlay = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
     cloud_overlay = L.imageOverlay('clouds_img/' + tick() + '/' + altitude_slider.value, imageBounds);

@@ -44,12 +44,19 @@ def print_horizontal_variable(variable_name, u_time, u_altitude):
     # Get slice
     if variable_name == 'clouds':
         h_slice = clouds[u_time, u_altitude, :, :].data
+        colormap = transparent_cmap('Purples')
+        min_slice = 0
+        max_slice = clouds.actual_range[1]
     elif variable_name == 'thermals':
         h_slice = thermals[u_time, u_altitude, :, :].data
+        h_slice[h_slice < 0] = 0
+        colormap = transparent_cmap('Reds')
+        min_slice = 0
+        max_slice = thermals.actual_range[1]
 
     # Write image to buffer
     buf = io.BytesIO()
-    plt.imsave(buf, h_slice, origin='lower', vmin=0, cmap=transparent_cmap('Purples'), format='png')
+    plt.imsave(buf, h_slice, origin='lower', cmap=colormap, format='png')
     plt.close()
     buf.seek(0)
     return buf
