@@ -13,3 +13,7 @@ function open_navbar(){
         x.className = "pill-nav";
     }
 }
+
+$(document).ready(function(){
+    M.AutoInit();
+});

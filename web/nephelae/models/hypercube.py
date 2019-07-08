@@ -42,7 +42,7 @@ def transparent_cmap(original_cmap):
 def print_horizontal_clouds(u_time, u_altitude):
 
     # Get slice
-    h_slice = clouds[u_time, u_altitude, 12.5:6387.5, 12.5:6387.5].data
+    h_slice = clouds[u_time, u_altitude, :, :].data
 
     # Write image to buffer
     buf = io.BytesIO()
