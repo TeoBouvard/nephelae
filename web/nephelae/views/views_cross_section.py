@@ -13,23 +13,6 @@ def mesonh_box(request):
         
     return JsonResponse(box, safe=False)
 
-def print_img(request, time_value, altitude_value, x0, x1, y0, y1):
-
-    raw_clouds_image = hypercube.encode_horizontal_clouds(time_value, altitude_value, x0, x1, y0, y1)
-    raw_thermals_image = hypercube.encode_horizontal_thermals(time_value, altitude_value, x0, x1, y0, y1)
-
-    response = JsonResponse({
-		'clouds': raw_clouds_image,
-		'thermals': raw_thermals_image,
-	})
-
-    return response
-
-
-# Render HTML template
-def cross_section(request):
-    return render(request, 'cross_section.html')
-
 # Render HTML template
 def sections(request):
     return render(request, 'sections.html')

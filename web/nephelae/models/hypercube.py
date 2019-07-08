@@ -39,10 +39,13 @@ def transparent_cmap(original_cmap):
 
     return ListedColormap(my_cmap)
 
-def print_horizontal_clouds(u_time, u_altitude):
+def print_horizontal_variable(variable_name, u_time, u_altitude):
 
     # Get slice
-    h_slice = clouds[u_time, u_altitude, :, :].data
+    if variable_name == 'clouds':
+        h_slice = clouds[u_time, u_altitude, :, :].data
+    elif variable_name == 'thermals':
+        h_slice = thermals[u_time, u_altitude, :, :].data
 
     # Write image to buffer
     buf = io.BytesIO()
@@ -51,68 +54,7 @@ def print_horizontal_clouds(u_time, u_altitude):
     buf.seek(0)
     return buf
 
-# Returns a base64 encoded string containing hcs cloud data
-def encode_horizontal_clouds(u_time, u_altitude, x0, x1, y0, y1):
-
-    # Get slice
-    h_slice = clouds[u_time, u_altitude, y0:y1, x0:x1].data
-
-    # Create pyplot image
-    plt.imshow(h_slice, origin='lower',vmin=0, vmax=max_lwc())
-    title = 'Liquid Water Content in kg/kg'
-    plt.title(title)
-    plt.set_cmap('Purples')
-    plt.colorbar()
-
-    # Write image to buffer
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-
-    # Encode buffer in base64 string
-    buf.seek(0)
-    data = base64.b64encode(buf.read())
-    buf.close()
-    encodedImage = 'data:image/jpg;base64,' + urllib.parse.quote(data)
-
-    return encodedImage
-
-# Returns a base64 encoded string containing hcs upwind data
-def encode_horizontal_thermals(u_time, u_altitude, x0, x1, y0, y1):
-
-    h_slice = thermals[u_time, u_altitude, y0:y1, x0:x1].data
-
-    # Create pyplot image
-    plt.imshow(h_slice, origin='lower', vmin=min_upwind(), vmax=max_upwind())
-    plt.title('Vertical air speed in m/s')
-    plt.set_cmap('seismic')
-    plt.colorbar()
-
-    # Write image to buffer
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    plt.close()
-
-    # Encode buffer in base64 string
-    buf.seek(0)
-    data = base64.b64encode(buf.read())
-    buf.close()
-    encodedImage = 'data:image/png;base64,' + urllib.parse.quote(data)
-
-    return encodedImage
-
 ########## UTILITY METHODS ##########
-
-def max_lwc():
-    return clouds.actual_range[1]
-
-# Compute max upwind to fix plot colorbar
-def max_upwind():
-    return thermals.actual_range[1]
-
-# Compute min upwind to fix plot colorbar
-def min_upwind():
-    return thermals.actual_range[0]
 
 # Compute where the value zero lies on the colorscale
 def colormap_zero(time_value, altitude_value):

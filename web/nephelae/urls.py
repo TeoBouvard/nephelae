@@ -18,12 +18,7 @@ urlpatterns = [
     path('map/update/', views.update_map, name='update_map'),
     path('map/tile/<int:z>/<int:x>/<int:y>', views.map_tiles, name='map_tiles'),
     path('map/plane_icon/<int:index>', views.plane_icon, name='plane_icon'),
-    path('map/clouds_img/<int:time_value>/<int:altitude_value>', views.clouds_img, name='plane_icon'),
-
-    # URL for cross_sections page
-    path('cross_sections/', views.cross_section, name='cross_sections'),
-    path('cross_sections/box/', views.mesonh_box, name='mesonh_box'),
-    path('cross_sections/<int:time_value>/<int:altitude_value>/<int:x0>,<int:x1>/<int:y0>,<int:y1>', views.print_img, name='cross_sections'),
+    path('map/<str:variable_name>_img/<int:time_value>/<int:altitude_value>', views.layer_img, name='layer_img'),
     
     # URL for simulation page
     path('simulation/', views.simulation, name='simulation'),

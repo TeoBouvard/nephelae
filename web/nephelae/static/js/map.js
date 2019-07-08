@@ -28,9 +28,6 @@ $(document).ready(function(){
 
     // Inititalize altitude slider and time with mesonh box
     initializeSliders();
-
-    // Initialize document elements
-    initializeMap();
     
     removeLoader();
 
@@ -47,7 +44,8 @@ function initializeSliders(){
 
         max_time = response[0].max;
 
-        // Display first image
+        // Once sliders are initialized, create map and display infos
+        initializeMap();
         updateInfo();
     });
 }
@@ -66,7 +64,8 @@ function initializeMap(){
     tiles_overlay = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
-    cloud_overlay = L.imageOverlay('clouds_img/' + tick() + '/' + altitude_slider.value, imageBounds); 
+    cloud_overlay = L.imageOverlay('clouds_img/' + tick() + '/' + altitude_slider.value, imageBounds);
+    thermals_overlay = L.imageOverlay('thermals_img/' + tick() + '/' + altitude_slider.value, imageBounds);
 
     // Set layer dictionnary
     var base_layers = {
@@ -77,6 +76,7 @@ function initializeMap(){
         "Trails": path_overlay,
         "Markers": markers_overlay,
         "Clouds": cloud_overlay,
+        "Thermals": thermals_overlay,
     };
 
     // Add layers to the map
@@ -168,7 +168,7 @@ function updateDrones(){
         }
         // Update home button coordinates and cloud overlay
         zoomHome.setHomeCoordinates(drone_position);
-        cloud_overlay.setUrl('clouds_img/'+ tick() +'/'+ Math.ceil(altitude_slider.value));
+        updateURL();
     });
 
 }
@@ -185,7 +185,11 @@ function updateInfo(){
 
     altitude_display.innerHTML = "clouds altitude : " + altitude_slider.value + " m ASL";
 
+}
+
+function updateURL(){
     cloud_overlay.setUrl('clouds_img/'+ tick() +'/'+ Math.ceil(altitude_slider.value));
+    thermals_overlay.setUrl('thermals_img/'+ tick() +'/'+ Math.ceil(altitude_slider.value));
 }
 
 // Print HTML formatted string so that it can be added to marker popup
