@@ -11,8 +11,8 @@ var lm = 30;
 var rm = 30;
 var bm = 30;
 var tm = 30;
-var chart_width = 600;
-var chart_height = 500;
+var chart_width = 650;
+var chart_height = 550;
 
 var layout = {
     margin: { l: lm, r: rm, b: bm, t: tm },
@@ -77,8 +77,8 @@ function updateData(){
         switch (selected_layer) {
             case "clouds":
                 data = [{
-                    z: response.clouds,
-                    colorscale: 'Reds',
+                    z: response.clouds.data,
+                    colorscale: clouds_colorscale,
                     type: 'heatmap'     
                 }];
 
@@ -87,8 +87,8 @@ function updateData(){
             
             case "thermals":
                 data = [{
-                    z: response.thermals,
-                    colorscale : 'RdBu',
+                    z: response.thermals.data,
+                    colorscale : thermals_colorscale(response.thermals.colormap_zero),
                     type: 'heatmap'    
                 }];
 

@@ -113,3 +113,10 @@ def max_upwind():
 # Compute min upwind to fix plot colorbar
 def min_upwind():
     return thermals.actual_range[0]
+
+# Compute where the value zero lies on the colorscale
+def colormap_zero(time_value, altitude_value):
+    matrix = thermals[time_value, altitude_value, :, :].data
+    minv = matrix.min()
+    maxv = matrix.max()
+    return abs(minv/(maxv-minv))

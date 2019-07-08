@@ -37,10 +37,11 @@ def sections(request):
 def update_section(request, time_value, altitude_value):
 
     response = JsonResponse({
-        'time': time_value,
-        'altitude': altitude_value,
-		'clouds': hypercube.clouds[time_value, altitude_value, :, :].data.tolist(),
-		'thermals': hypercube.thermals[time_value, altitude_value, :, :].data.tolist()
-	}, safe=False)
+		'clouds': { 'data' : hypercube.clouds[time_value, altitude_value, :, :].data.tolist() },
+		'thermals': { 
+            'data' : hypercube.thermals[time_value, altitude_value, :, :].data.tolist(),
+            'colormap_zero' : hypercube.colormap_zero(time_value,altitude_value)
+        },
+	})
 
     return response
