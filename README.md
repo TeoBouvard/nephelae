@@ -3,10 +3,10 @@
 ## Documentation  
 
 Q : What is this ?  
-A : This is a web application designed as an interface between a fleet of UAV frome the Nephelae project and Météo-France users. It comprises various tools to help them visualize the data being acquired from the drones.
+A : This is a web application designed as an interface between the fleet of UAV used by the Nephelae project and Météo-France users. It comprises various tools to help them visualize the data being acquired from the drones.
 
 Q : How do I install it ?  
-A : Just download install.sh, place it in an empty folder and run it. It creates a Python virutal environnement to install dependencies, so it wont mess up your packages. You shloud define three environment variables for this to work :  
+A : Clone the repo and run install.sh. It creates a Python virutal environnement to install dependencies, so it wont mess up with your packages. You should define three environment variables for this to work :  
 - $MAP_TILES referencing a map atlas. If you plan to use it with an internet connection, you can skip this step and change the tileLayer URL in web/nephelae/static/map.js
 - $MESO_NH referencing the Meso_NH.nc file.
 - $PAPARAZZI_HOME referencing the root folder of Paparazzi (see https://wiki.paparazziuav.org/wiki/Installation).
@@ -17,7 +17,7 @@ A : Once installed, you should run a paparazzi simulation (see paparazziuav wiki
 
 
 Q : How does it work ?  
-A : This webapp is based on a client-server architecture. When the client requests a web page, the requested URL is compared to every entry in the web/URL.py file. If it matches one entry, the corresponding view (web/nepeheale/views) is called. A view can call model methods (web/nephelae/models), where the logic is located. The view then returns a response containing the data requested. HTTP responses are sent back by the server to the client, where it is handled by scipts (web/nephelae/static/js) and displayed according to stylesheets (web/nephelae/static/css) and templates (web/nephelae/templates).
+A : This webapp is based on a client-server architecture. When the client requests a web page, the requested URL is compared to every entry in the web/URL.py file. If it matches one entry, the corresponding view (web/nepeheale/views) is called. A view can call model methods (web/nephelae/models), where the logic is located. The view then returns a response containing the data requested. HTTP responses are sent back by the server to the client, where it is handled by scripts (web/nephelae/static/js) and displayed according to stylesheets (web/nephelae/static/css) and templates (web/nephelae/templates).
 
 
 Q : How can I tune it ?  
@@ -36,7 +36,6 @@ A : You can reference any .nc file with your $MESO_NH environment variable, and 
 ## TODO
 
 - maps : https://leaflet-extras.github.io/leaflet-providers/preview/ / mobile atlas creator, create script ?
-- cross section dropdown
 - os.environ['MESO_NH'], os.environ['MAP_TILES'] -> define env variables in install script !
 - ngrok for fast global serving
 - leaflet/plotly fullscreen ? leaflet-velocity
@@ -45,38 +44,16 @@ A : You can reference any .nc file with your $MESO_NH environment variable, and 
 - requête box au mapping
 - map legend ?
 - drag problem in 3d -> three.js instead of plot ?
-- range sliders xy cross section
-- simplify image encoding
 - display drones altitudes in map slider
-- max bound time value error
 - launch drones script ?
 - bounds to json
-
-## Infos from users
-
--Infos (passé, présent, futur)
-    - Nuage ()
-    - Flotte
-    - Infos générales
-        - Wind (U)
-        - Temps (t)
-        - Gradients verticaux
-        - Lift condensation level
-
-- Destinataires
-    - Metéo
-    - Algos
-    - Dronistes
-
-- Instructions
-    - Meteo
-    - Algos
+- jquerize files
+- proper navbar ?
 
 
 ## Questions
 
--   authentication ?
--   approximate mesh from points cloud -> big points sufficient/convex hull
+-   k-means clustering, then convex hull ?
 
 ## Ideas
 
@@ -101,13 +78,3 @@ A : You can reference any .nc file with your $MESO_NH environment variable, and 
 
     -   emagrammes
     -   infos drones
-
-## 3D preview
-
--   Cesium (ok mais fort couplage maps)
--   I3S bof
--   Flyvast (\$\$)
--   three.js (pas mal, doc++)
--   Potree (open source, doc--, win--)
--   PPTK (simple à mettre en place, pas beaucoup de possibilités)
--   Chart.js

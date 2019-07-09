@@ -14,7 +14,6 @@ pprz.start()
 def update_map(request):
     data = {
         'drones' : pprz.uavs,
-        'clouds' : []
     }
     return JsonResponse(data)
 

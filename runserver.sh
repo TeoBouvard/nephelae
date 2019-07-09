@@ -9,8 +9,7 @@ function finish() {
 
 trap finish SIGINT
 
-
-sudo killall gunicorn
+#sudo killall gunicorn
 
 echo "Activating virtual environement"
 source venv/bin/activate

@@ -51,8 +51,7 @@ class PprzGpsGrabber:
         # New uav detected
         if uavId not in self.uavs.keys():
 
-            self.uavs[uavId] = {
-                "time" : m_time,        
+            self.uavs[uavId] = {       
                 "altitude" : altitude,      
                 "heading" :  heading,
                 "position" : position,
@@ -60,31 +59,29 @@ class PprzGpsGrabber:
                 "past_longitudes" : [position[1]],
                 "past_latitudes" : [position[0]],
                 "past_altitudes" : [altitude],
-                "log_times" : [m_time],
+                "last_log_time" : m_time,
             }
             
         else:
-            self.uavs[uavId].update({
-                "time" : m_time,        
+            self.uavs[uavId].update({       
                 "altitude" : altitude,  
                 "heading" : heading,
                 "position" : position,
             })
 
             # Add position to path only if it is far enough from last position
-            if m_time - self.uavs[uavId]['log_times'][-1] > close_enough :
+            if m_time - self.uavs[uavId]['last_log_time'] > close_enough :
                 self.uavs[uavId]['path'].append(position)
                 self.uavs[uavId]['past_altitudes'].append(altitude)
                 self.uavs[uavId]['past_longitudes'].append(position[1])
                 self.uavs[uavId]['past_latitudes'].append(position[0])
-                self.uavs[uavId]['log_times'].append(m_time)
+                self.uavs[uavId]['last_log_time'] = m_time
                 # Delete old positions
                 if(len(self.uavs[uavId]['path']) > log_size):
                     self.uavs[uavId]['path'].pop(0)
                     self.uavs[uavId]['past_altitudes'].pop(0)
                     self.uavs[uavId]['past_longitudes'].pop(0)
                     self.uavs[uavId]['past_latitudes'].pop(0)
-                    self.uavs[uavId]['log_times'].pop(0)
     
 def box():
     box = {

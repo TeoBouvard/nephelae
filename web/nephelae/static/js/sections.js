@@ -11,8 +11,8 @@ var lm = 30;
 var rm = 30;
 var bm = 30;
 var tm = 30;
-var chart_width = 650;
-var chart_height = 550;
+var chart_width = 500;
+var chart_height = 400;
 
 var layout = {
     margin: { l: lm, r: rm, b: bm, t: tm },
