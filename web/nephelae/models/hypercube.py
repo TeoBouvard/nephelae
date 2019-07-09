@@ -39,7 +39,7 @@ def transparent_cmap(original_cmap):
 
     return ListedColormap(my_cmap)
 
-def print_horizontal_variable(variable_name, u_time, u_altitude):
+def print_horizontal_slice(variable_name, u_time, u_altitude):
 
     # Get slice
     if variable_name == 'clouds':
@@ -64,8 +64,17 @@ def print_horizontal_variable(variable_name, u_time, u_altitude):
 ########## UTILITY METHODS ##########
 
 # Compute where the value zero lies on the colorscale
-def colormap_zero(time_value, altitude_value):
-    matrix = thermals[time_value, altitude_value, :, :].data
+def colormap_zero(variable_name, time_value, altitude_value):
+
+    if variable_name == 'clouds':
+        matrix = clouds[time_value, altitude_value, :, :].data
+    elif variable_name == 'thermals':
+        matrix = thermals[time_value, altitude_value, :, :].data
+    
     minv = matrix.min()
     maxv = matrix.max()
-    return abs(minv/(maxv-minv))
+    
+    if minv == maxv:
+        return 0.5
+    else:
+        return abs(minv/(maxv-minv))

@@ -38,7 +38,7 @@ def map_tiles(request, z, x, y):
 
 # Render layer image
 def layer_img(request, variable_name, time_value, altitude_value):
-    buf = hypercube.print_horizontal_variable(variable_name, time_value, altitude_value)
+    buf = hypercube.print_horizontal_slice(variable_name, time_value, altitude_value)
     return HttpResponse(buf.read(), content_type="image/png")
 
 # Render base page

@@ -23,7 +23,7 @@ urlpatterns = [
     # URL for simulation page
     path('simulation/', views.simulation, name='simulation'),
 
-        # URL for cross_sections page
+        # URL for sections page
     path('sections/', views.sections, name='sections'),
     path('sections/box/', views.mesonh_box, name='mesonh_box'),
     path('sections/update/<int:time_value>/<int:altitude_value>', views.update_section, name='update_section'),

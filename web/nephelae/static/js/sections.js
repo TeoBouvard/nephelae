@@ -68,7 +68,7 @@ function initializeSliders(){
 }
 
 function updateData(){
-    var data = {};
+    var data;
     var selected_layer = $('select').formSelect().val();
 
 
@@ -76,23 +76,25 @@ function updateData(){
 
         switch (selected_layer) {
             case "clouds":
+
                 data = [{
                     z: response.clouds.data,
-                    colorscale: clouds_colorscale,
+                    colorscale : clouds_colorscale(response.clouds.colormap_zero),
                     type: 'heatmap'     
                 }];
-
                 layout.title = 'Liquid Water Content in kg/kg';
+
                 break;
             
             case "thermals":
+
                 data = [{
                     z: response.thermals.data,
                     colorscale : thermals_colorscale(response.thermals.colormap_zero),
-                    type: 'heatmap'    
+                    type: 'heatmap'
                 }];
-
                 layout.title = 'Vertical air speed in m/s';
+
                 break;
         }
 

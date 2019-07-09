@@ -3,6 +3,7 @@ import pickle
 
 import numpy as np
 import pptk
+from scipy.spatial import ConvexHull
 from netCDF4 import MFDataset
 
 var_time = 'time'        # Time in seconds since 1995-1-1 00:00:00
@@ -35,13 +36,14 @@ def create_points_cloud(time_index):
     cloud_altitudes = list(set(cloud_altitudes))
 
     for altitude_index in cloud_altitudes:
-
+        print(altitude_index, ' / ', max(cloud_altitudes))
         #Compute positions having clouds
         cloud_positions = np.where(dataset.variables[var_lwc][time_index,altitude_index,:,:] > cloud_threshold)
         x_cloud_positions = cloud_positions[0] + cloud_altitudes[0]
         y_cloud_positions = cloud_positions[1] + cloud_altitudes[0]
 
         for i in range(len(x_cloud_positions)):
+            # print(i, ' / ', len(x_cloud_positions))
             points.append([x_cloud_positions[i],y_cloud_positions[i],altitude_index])
 
     return points
@@ -53,12 +55,14 @@ if __name__ == "__main__":
     #lwc = load_pickle()
 
     points = create_points_cloud(0)
+    print(len(points))
+    hull_indices = ConvexHull(points).vertices
+    points = [points[index] for index in hull_indices]
     height = [position[2] for position in points]
-
-
+    
     v = pptk.viewer(points, height)
     v.color_map('gray',scale=[10,65])
-    v.set(point_size=0.8)
+    v.set(point_size=0.1)
 
     poses = []
     poses.append([128, 128, 25, 0 * np.pi/2, np.pi/4, 500])

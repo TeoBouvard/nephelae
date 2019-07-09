@@ -11,7 +11,12 @@ function thermals_colorscale(zero_value){
     return cmap
 }
 
-clouds_colorscale = [
-    [0, 'rgb(255, 255, 255)'],
-    [1, 'rgb(128, 0, 128)']
-]
+// colormap has to be adjusted for the zero value to be white
+function clouds_colorscale(zero_value){
+    var cmap = [
+        [0, 'rgb(255, 255, 255)'],
+        [zero_value, 'rgb(255, 255, 255)'],
+        [1, 'rgb(128, 0, 128)']
+    ];
+    return cmap
+}
