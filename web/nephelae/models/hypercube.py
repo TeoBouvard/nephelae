@@ -78,3 +78,10 @@ def colormap_zero(variable_name, time_value, altitude_value):
         return 0.5
     else:
         return abs(minv/(maxv-minv))
+
+def axes():
+    min_x = clouds.bounds[2].min
+    max_x = clouds.bounds[2].max
+    nb_points = len(clouds[clouds.bounds[0].min, clouds.bounds[1].min, :, :].data)
+
+    return np.linspace(min_x, max_x, nb_points).tolist()

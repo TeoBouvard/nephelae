@@ -14,13 +14,13 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
          format("truetype");
 }
 
-body {
+body{
     font-family: 'Roboto';
 }
 
 #loader {
     position: absolute;
-    top :0;
+    top : 0;
     left: 0;
     right: 0;
     bottom: 0;
@@ -45,11 +45,8 @@ body {
     float: left;
     display: block;
     color: black;
-    text-align: center;
     padding: 14px 14px;
-    font-family: "Roboto";
     font-size: 17px;
-    text-decoration: none;
 }
 
 /* Change the color of links on mouse-over */
@@ -73,6 +70,12 @@ img {
     font-size: 17px;
     color: darkslategray;
     text-align: center;
+}
+
+#wrapper {
+    position: relative;
+    width: 100vw;
+    height: 90vh;
 }
 
 /* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */

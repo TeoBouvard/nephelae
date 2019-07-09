@@ -9,8 +9,10 @@ from pprint import pprint
 from geopy.distance import distance
 from ivy.std_api import IvyBindMsg, IvyInit, IvyStart, IvyStop, IvyUnBindMsg
 
+# Parameters
 close_enough = 1 # in seconds
 log_size = 500 # number of past_positions kept in memory
+origin = [43.46, 1.27]
 
 class PprzGpsGrabber:
 
@@ -46,7 +48,8 @@ class PprzGpsGrabber:
         northing = float(words[4])  / 1.0e2     # utmY (cm)
         
         position = utm.to_latlon(easting, northing, zone, northern=True)
-        #print(msg)
+        simulation_position = translate_position(position)
+        simulation_position.append(altitude)
 
         # New uav detected
         if uavId not in self.uavs.keys():
@@ -60,13 +63,16 @@ class PprzGpsGrabber:
                 "past_latitudes" : [position[0]],
                 "past_altitudes" : [altitude],
                 "last_log_time" : m_time,
+                "simulation_position": simulation_position
             }
             
         else:
+
             self.uavs[uavId].update({       
                 "altitude" : altitude,  
                 "heading" : heading,
                 "position" : position,
+                "simulation_position": simulation_position
             })
 
             # Add position to path only if it is far enough from last position
@@ -76,6 +82,7 @@ class PprzGpsGrabber:
                 self.uavs[uavId]['past_longitudes'].append(position[1])
                 self.uavs[uavId]['past_latitudes'].append(position[0])
                 self.uavs[uavId]['last_log_time'] = m_time
+
                 # Delete old positions
                 if(len(self.uavs[uavId]['path']) > log_size):
                     self.uavs[uavId]['path'].pop(0)
@@ -89,7 +96,14 @@ def box():
         'longitude_range': [1.27, 1.28],
         'altitude_range': [200, 300],
     }
+
     return box
+
+def translate_position(real_world):
+    x = distance(origin, [real_world[0], origin[1]]).meters
+    y = distance(origin, [origin[0], real_world[1]]).meters
+
+    return [x, y]
 
 if __name__ == '__main__':
     p = PprzGpsGrabber()

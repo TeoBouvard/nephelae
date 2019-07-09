@@ -14,24 +14,27 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<title>Nephelae</title>
 
 		<!-- Load static CSS -->
-		<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
-		<link rel="stylesheet" type="text/css" href="{% static 'css/libs/materialize.min.css' %}" />
-		<link rel="stylesheet" type="text/css" href="{% static 'css/libs/font_awesome.css' %}" />
-		<link rel="stylesheet" type="text/css" href="{% static 'css/libs/nouislider.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/base.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/libs/materialize.min.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/libs/font_awesome.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/libs/nouislider.css' %}" />
 
 		<!-- Load icons -->
 		<link rel="shortcut icon" href="#">
 		<!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
 
 		<!-- Load jquery -->
-		<script type="text/javascript" src="{% static 'js/libs/jquery.js' %}"></script>
+		<script src="{% static 'js/libs/jquery.js' %}"></script>
+
+		<!-- Load dat.gui -->
+		<script src="{% static 'js/libs/dat.gui.js' %}"></script>
 
 		<!-- Load materialize js -->
-		<script type="text/javascript" src="{% static 'js/libs/materialize.min.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/libs/nouislider.js' %}"></script>
+		<script src="{% static 'js/libs/materialize.min.js' %}"></script>
+		<script src="{% static 'js/libs/nouislider.js' %}"></script>
 
 		<!-- Load main js -->
-		<script type="text/javascript" src="{% static 'js/base.js' %}"></script>
+		<script src="{% static 'js/base.js' %}"></script>
 
 		{% block additional_head %}{% endblock %}
 	</head>

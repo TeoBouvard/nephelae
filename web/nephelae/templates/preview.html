@@ -3,17 +3,17 @@
 
 {% block additional_head%}
 	<!-- Load specific CSS -->
-	<link rel="stylesheet" type="text/css" href="{% static 'css/preview.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/preview.css' %}"/>
 {% endblock %}
 
 
 {% block additional_scripts %}
 	<!-- Load specific javascript -->
-	<script type="text/javascript" src="{% static 'js/preview.js' %}"></script>
+	<script src="{% static 'js/preview.js' %}"></script>
 	<!-- Load plotly js -->
-    <script type="text/javascript" src="{% static 'js/libs/plotly.min.js' %}"></script>
+    <script src="{% static 'js/libs/plotly.min.js' %}"></script>
 	<!-- Load global variables and specific javascript -->
-	<script type="text/javascript" src="{% static 'js/base_colors.js' %}"></script>
+	<script src="{% static 'js/base_colors.js' %}"></script>
 {% endblock %}
 
 {% block page %}

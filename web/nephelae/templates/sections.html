@@ -3,15 +3,15 @@
 
 {% block additional_head %}
     <!-- Load specific CSS -->
-	<link rel="stylesheet" type="text/css" href="{% static 'css/sections.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/sections.css' %}"/>
 {% endblock %}
 
 <!-- Load specific javascript -->
 {% block additional_scripts %}
-    <script type="text/javascript" src="{% static 'js/base_colors.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/sections.js' %}"></script>
+    <script src="{% static 'js/base_colors.js' %}"></script>
+    <script src="{% static 'js/sections.js' %}"></script>
     <!-- Load plotly js -->
-    <script type="text/javascript" src="{% static 'js/libs/plotly.min.js' %}"></script>
+    <script src="{% static 'js/libs/plotly.min.js' %}"></script>
 {% endblock %}
 
 

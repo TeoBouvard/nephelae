@@ -7,7 +7,7 @@ var time_display = document.getElementById('time_display');
 var altitude_display = document.getElementById('altitude_display');
 
 // Chart style and options
-var lm = 30;
+var lm = 50;
 var rm = 30;
 var bm = 30;
 var tm = 30;
@@ -78,6 +78,8 @@ function updateData(){
             case "clouds":
 
                 data = [{
+                    x: response.axes,
+                    y: response.axes,
                     z: response.clouds.data,
                     colorscale : clouds_colorscale(response.clouds.colormap_zero),
                     type: 'heatmap'     
@@ -89,6 +91,8 @@ function updateData(){
             case "thermals":
 
                 data = [{
+                    x: response.axes,
+                    y: response.axes,
                     z: response.thermals.data,
                     colorscale : thermals_colorscale(response.thermals.colormap_zero),
                     type: 'heatmap'

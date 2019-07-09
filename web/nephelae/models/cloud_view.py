@@ -56,13 +56,13 @@ if __name__ == "__main__":
 
     points = create_points_cloud(0)
     print(len(points))
-    hull_indices = ConvexHull(points).vertices
-    points = [points[index] for index in hull_indices]
+    #hull_indices = ConvexHull(points).vertices
+    #points = [points[index] for index in hull_indices]
     height = [position[2] for position in points]
     
     v = pptk.viewer(points, height)
     v.color_map('gray',scale=[10,65])
-    v.set(point_size=0.1)
+    v.set(point_size=1)
 
     poses = []
     poses.append([128, 128, 25, 0 * np.pi/2, np.pi/4, 500])

@@ -3,21 +3,21 @@
 
 {% block additional_head %}
     <!-- Load specific CSS -->
-	<link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/map.css' %}"/>
     <!-- Load leaflet CSS -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/libs/leaflet.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/libs/leaflet.css' %}"/>
 {% endblock %}
 
 
 {% block additional_scripts %}
     <!-- Load leaflet js + oriented marker (drone heading) -->
-    <script type="text/javascript" src="{% static 'js/libs/leaflet.js' %}"></script>
+    <script src="{% static 'js/libs/leaflet.js' %}"></script>
     <!-- Load plotly js -->
-    <script type="text/javascript" src="{% static 'js/libs/plotly.min.js' %}"></script>
+    <script src="{% static 'js/libs/plotly.min.js' %}"></script>
 	<!-- Load global variables and specific javascript -->
-	<script type="text/javascript" src="{% static 'js/base_colors.js' %}"></script>
-	<script type="text/javascript" src="{% static 'js/base_icons.js' %}"></script>
-	<script type="text/javascript" src="{% static 'js/map.js' %}"></script>
+	<script src="{% static 'js/base_colors.js' %}"></script>
+	<script src="{% static 'js/base_icons.js' %}"></script>
+	<script src="{% static 'js/map.js' %}"></script>
 {% endblock %}
 
 {% block page %}

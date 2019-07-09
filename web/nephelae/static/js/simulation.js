@@ -5,10 +5,11 @@ import Stats from './libs/Stats.js';
 
 // Simulation elements
 var camera, scene, renderer, controls, stats;
+var drones = {};
 
 // Parameters
-var refresh_rate = 1000;
-var then = new Date()
+var refresh_rate = 100;
+var then = new Date();
 
 $(document).ready(function(){
 	init();
@@ -18,60 +19,80 @@ $(document).ready(function(){
 function init() {
 
 	// Create a Web GL renderer
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	document.body.appendChild( renderer.domElement );
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+	renderer.setSize($("#wrapper").width(), $("#wrapper").height());
+	$("#wrapper").append(renderer.domElement);
 
 	// Create a Camera
-	var fov = 80;
-	var aspect = window.innerWidth / window.innerHeight;
+	var fov = 60;
+	var aspect = $("#wrapper").width() / $("#wrapper").height();
 	var near = 1;
-	var far = 500;
-	camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
-	camera.position.set(0, 10, 20);
+	var far = 5000;
+	camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+	camera.position.set(50, 0, 20);
 
 	// Create a scene
 	scene = new THREE.Scene();
-	scene.background = new THREE.Color(0x444444);
+	scene.background = new THREE.Color('white');
+	scene.fog = new THREE.Fog('white', near, far);
 
 	// Add controls
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 	// Create a floor mesh
-	var geometry = new THREE.PlaneBufferGeometry( 1000, 1000, 50, 50 );
-	var material = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true} );
-	var floor = new THREE.Mesh( geometry, material );
-	floor.rotation.x = Math.PI / 2;
-	scene.add( floor );
+	var geometry = new THREE.PlaneBufferGeometry(10000, 10000, 50, 50);
+	var material = new THREE.MeshStandardMaterial({ color: 'black', wireframe: true});
+	var floor = new THREE.Mesh(geometry, material);
+	scene.add(floor);
 
+	// Add performance stats
 	stats = new Stats();
-	//$('body').append( stats.dom );
-
-	// Axes helper, to be removed
-	var axesHelper = new THREE.AxesHelper( 500 );
-	scene.add( axesHelper );
+	$('#wrapper').append(stats.dom);
 
 	// Create a directional light
-	var light = new THREE.DirectionalLight( 0xffffff, 5.0 );
-	light.position.set( 0, 500, 0 );
-
-	// remember to add the light to the scene
-	scene.add( light );
-
-	// Create a drone
-	var geometry = new THREE.SphereBufferGeometry( 1, 32, 32 );
-	var material = new THREE.MeshStandardMaterial( {color: 0x156289} );
-	var sphere = new THREE.Mesh( geometry, material );
-	sphere.name = "drone"
-	scene.add( sphere );
+	var light = new THREE.DirectionalLight('grey', 3);
+	light.position.set(100, 100, 1000);
+	scene.add(light);
 
 
+	// Create drones objects
+	$.getJSON('update/', (response) => {
 
+		for(var key in response.drones){
 
+			// Parse response data
+            var drone_id = key;
+            var drone_position = response.drones[key].simulation_position;
+            var drone_altitude = response.drones[key].altitude;
+            //var drone_heading = response.drones[key].heading;
+            //var drone_path = response.drones[key].path.slice(-length_slider.value);
+
+            // Compute color and icon of markers, increment index_icon for next drone 
+            var drone_color = global_colors[key%global_colors.length];
+
+			// Create a drone
+			var geometry = new THREE.SphereBufferGeometry(5, 32, 32);
+			var material = new THREE.MeshStandardMaterial({color: drone_color});
+			var object = new THREE.Mesh(geometry, material);
+
+			object.name = key;
+			object.position.set(drone_position[0], drone_position[1], drone_position[2]);
+
+			scene.add(object);
+
+			// Update drones dictionnary with discovered drone
+            drones[drone_id] = {
+                object : object,
+            };
+		}
+
+		// Focus on drones
+		fitCameraToSelection(camera, controls, drones);
+	});
 
 
 	// start the animation loop
-  	renderer.setAnimationLoop( () => {
+  	renderer.setAnimationLoop(() => {
 		stats.update();
 		update();
 		render();
@@ -80,19 +101,68 @@ function init() {
 }
 
 function update(){
+
 	var now = new Date();
 	var elapsed_time = now - then;
+
 	if (elapsed_time >= refresh_rate){
 		then = now;
-		$.getJSON('update/', (response) => {
-			console.log(response);
-		});
 
-		console.log(scene.getObjectByName('drone').position.x);
-		scene.getObjectByName('drone').position.x++;
+		// Update drones objects
+		$.getJSON('update/', (response) => {
+
+			for(var key in response.drones){
+
+				// Parse response data
+				var drone_id = key;
+				var drone_position = response.drones[key].simulation_position;
+				var drone_altitude = response.drones[key].altitude;
+				//var drone_heading = response.drones[key].heading;
+				//var drone_path = response.drones[key].path.slice(-length_slider.value);
+
+				drones[key].object.position.set(drone_position[0], drone_position[1], drone_position[2]);
+			}
+
+		});
 	}
 }
 
 function render(){
-	renderer.render( scene, camera );
+	renderer.render(scene, camera);
+}
+
+function fitCameraToSelection(camera, controls, selection, fitOffset = 1.2) {
+  
+  var box = new THREE.Box3();
+  
+  for(const key in selection) box.expandByObject(selection[key].object);
+  
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  
+  const maxSize = Math.max(size.x, size.y, size.z);
+  const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+  const fitWidthDistance = fitHeightDistance / camera.aspect;
+  const distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
+  
+  const direction = controls.target.clone()
+    .sub(camera.position)
+    .normalize()
+    .multiplyScalar(distance);
+
+  controls.maxDistance = distance * 5;
+  controls.target.copy(center);
+  
+  //camera.near = distance / 100;
+  //camera.far = distance * 100;
+  //camera.updateProjectionMatrix();
+
+  camera.position.copy(controls.target).sub(direction);
+  
+  controls.update();
+  
+}
+
+function translatePosition(real_world){
+
 }
