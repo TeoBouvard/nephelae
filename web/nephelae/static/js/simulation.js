@@ -8,7 +8,7 @@ var camera, scene, renderer, controls, stats;
 var drones = {};
 
 // Parameters
-var refresh_rate = 100;
+var refresh_rate = 500;
 var then = new Date();
 
 $(document).ready(function(){
@@ -47,13 +47,12 @@ function init() {
 	// Create a floor mesh
 	var geometry = new THREE.PlaneBufferGeometry(10000, 10000, 1, 1);
 	var material = new THREE.MeshMatcapMaterial({ map: texture });
-	//var material = new THREE.MeshStandardMaterial({ color: 'black', wireframe: true});
 	var floor = new THREE.Mesh(geometry, material);
 	scene.add(floor);
 
 	// Add performance stats
 	stats = new Stats();
-	//$('#wrapper').append(stats.dom);
+	$('#stats').append(stats.dom);
 
 	// Create a directional light
 	var light = new THREE.DirectionalLight('white', 2);
