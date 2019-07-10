@@ -23,6 +23,7 @@ urlpatterns = [
     # URL for simulation page
     path('simulation/', views.simulation, name='simulation'),
     path('simulation/update/', views.update_map),
+    path('simulation/textures/<str:file_name>', views.texture),
 
         # URL for sections page
     path('sections/', views.sections, name='sections'),

@@ -23,7 +23,7 @@ function init() {
 	renderer.setSize($("#wrapper").width(), $("#wrapper").height());
 	$("#wrapper").append(renderer.domElement);
 
-	// Create a Camera
+	// Create a camera
 	var fov = 60;
 	var aspect = $("#wrapper").width() / $("#wrapper").height();
 	var near = 1;
@@ -39,9 +39,16 @@ function init() {
 	// Add controls
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+	// load floor texture, set wrap mode to repeat
+	var texture = new THREE.TextureLoader().load("textures/seamless_water.jpg" );
+	texture.wrapS = THREE.RepeatWrapping;
+	texture.wrapT = THREE.RepeatWrapping;
+	texture.repeat.set( 50, 60 );
+
 	// Create a floor mesh
-	var geometry = new THREE.PlaneBufferGeometry(10000, 10000, 50, 50);
-	var material = new THREE.MeshStandardMaterial({ color: 'black', wireframe: true});
+	var geometry = new THREE.PlaneBufferGeometry(10000, 10000, 1, 1);
+	var material = new THREE.MeshMatcapMaterial({ map: texture });
+	//var material = new THREE.MeshStandardMaterial({ color: 'black', wireframe: true});
 	var floor = new THREE.Mesh(geometry, material);
 	scene.add(floor);
 
@@ -50,7 +57,7 @@ function init() {
 	$('#wrapper').append(stats.dom);
 
 	// Create a directional light
-	var light = new THREE.DirectionalLight('grey', 3);
+	var light = new THREE.DirectionalLight('white', 2);
 	light.position.set(100, 100, 1000);
 	scene.add(light);
 
@@ -149,20 +156,17 @@ function fitCameraToSelection(camera, controls, selection, fitOffset = 1.2) {
     .sub(camera.position)
     .normalize()
     .multiplyScalar(distance);
+  
 
   controls.maxDistance = distance * 5;
   controls.target.copy(center);
+  controls.maxPolarAngle = Math.PI / 2; // -> compute floor angle
   
-  //camera.near = distance / 100;
-  //camera.far = distance * 100;
-  //camera.updateProjectionMatrix();
+  camera.near = distance / 100;
+  camera.far = distance * 100;
+  camera.updateProjectionMatrix();
 
   camera.position.copy(controls.target).sub(direction);
   
   controls.update();
-  
-}
-
-function translatePosition(real_world){
-
 }
