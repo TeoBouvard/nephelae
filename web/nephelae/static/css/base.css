@@ -51,3 +51,10 @@ nav ul li a {
     top: calc(64px + 10px);
     z-index: 400;
 }
+
+/* Fix conflict between materialize and dat.gui*/
+div .c div input[type=text] {
+    all: initial;
+    font-family: 'Roboto-Light';
+    font-size: 15px;
+}

@@ -6,6 +6,7 @@ import Stats from './libs/Stats.js';
 // Simulation elements
 var camera, scene, renderer, controls, stats;
 var drones = {};
+var gui;
 
 // Parameters
 var parameters = {
@@ -20,7 +21,7 @@ $(document).ready(function(){
 });
 
 function setupGUI(){
-    var gui = new dat.GUI({ autoplace: false });
+    gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
     gui.add(parameters, 'refresh_rate', 200, 3000);

@@ -25,7 +25,10 @@ urlpatterns = [
     path('simulation/update/', views.update_map),
     path('simulation/textures/<str:file_name>', views.texture),
 
-        # URL for sections page
+    # URL for simulation page
+    path('commands/', views.commands, name='commands'),
+
+    # URL for sections page
     path('sections/', views.sections, name='sections'),
     path('sections/box/', views.mesonh_box, name='mesonh_box'),
     path('sections/update/<int:time_value>/<int:altitude_value>', views.update_section, name='update_section'),

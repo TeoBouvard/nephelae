@@ -14,10 +14,10 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<title>Nephelae</title>
 
 		<!-- Load static CSS -->
-		<link rel="stylesheet" href="{% static 'css/base.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/libs/materialize.min.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/libs/material-icons.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/libs/nouislider.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/base.css' %}" />
 
 		<!-- Load favicon -->
 		<link rel="shortcut icon" href="#">
@@ -53,6 +53,7 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 					<li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li>
 					<li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
 					<li id='nav_simulation'><a href="{% url 'simulation' %}">Simulation</a></li>
+					<li id='nav_commands'><a href="{% url 'commands' %}">Commands</a></li>
 				</ul>
 			</div>
 		</nav>
