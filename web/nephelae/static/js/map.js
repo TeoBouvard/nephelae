@@ -44,9 +44,9 @@ function setupGUI(){
     var gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
-    gui.add(parameters, 'refresh_rate', 200, 3000).step(1);
-    gui.add(parameters, 'altitude', 0, 4000).step(1);
-    gui.add(parameters, 'trail_length', 1, 500).step(1);
+    gui.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
+    gui.add(parameters, 'altitude', 0, 4000).step(1).name('Altitude (m)');
+    gui.add(parameters, 'trail_length', 1, 500).step(1).name('Trail length (s)');
 
     initializeMap();
     updateInfo();

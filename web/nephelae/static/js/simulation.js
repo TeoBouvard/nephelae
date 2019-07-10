@@ -1,8 +1,6 @@
 // Activate current menu in nav
 document.getElementById('nav_simulation').className = 'active';
 
-//import Stats from './libs/Stats.js';
-
 // Simulation elements
 var camera, scene, renderer, controls, stats;
 var drones = {};
@@ -24,13 +22,12 @@ function setupGUI(){
     gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
-    gui.add(parameters, 'refresh_rate', 200, 3000).step(100);
-    //gui.add(parameters, 'altitude', 0, 4000);
+    gui.add(parameters, 'refresh_rate', 100, 3000).step(100).name('Delay (ms)');
     //gui.add(parameters, 'trail_length', 0, 500);
 }
 
 function init() {
-	
+
 	// Set default up vector to z axis
 	THREE.Object3D.DefaultUp.set( 0, 0, 1 );
 
@@ -65,10 +62,6 @@ function init() {
 	var material = new THREE.MeshMatcapMaterial({ map: texture });
 	var floor = new THREE.Mesh(geometry, material);
 	scene.add(floor);
-
-	// Add performance stats
-	//stats = new Stats();
-	//$('#stats').append(stats.dom);
 
 	// Create a directional light
 	var light = new THREE.DirectionalLight('white', 2);

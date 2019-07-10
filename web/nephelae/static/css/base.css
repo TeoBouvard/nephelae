@@ -58,3 +58,16 @@ div .c div input[type=text] {
     font-family: 'Roboto-Light';
     font-size: 15px;
 }
+
+.dg.main.a {
+    font-family: 'Roboto-Light';
+}
+
+.dg.main .close-button.close-bottom {
+    background-color: black;
+    font-size: 12px;
+}
+
+.dg ul {
+    font-size: 12px;
+}

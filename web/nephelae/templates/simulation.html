@@ -6,17 +6,19 @@
 {% endblock %}
 
 {% block additional_scripts %}
+
 	<!-- Load three js -->
 	<script src="{% static 'js/libs/three.js' %}"></script>
 	<script src="{% static 'js/libs/OrbitControls.js' %}"></script>
 
 	<!-- Load global variables and specific javascript -->
 	<script type="module" src="{% static 'js/simulation.js' %}"></script>
+
 {% endblock %}
 
 {% block page %}
 
-<div id="stats"></div>
+
 <div id="gui_container"></div>
 <canvas id="canvas_div" class="fullscreen"></canvas>
 
