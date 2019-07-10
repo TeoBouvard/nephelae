@@ -1,12 +1,5 @@
 # NEPHELAE : Network for studying Entrainment and microPHysics of cLouds using Adaptive Exploration
 
-## Prerequisites  
-
-- A running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). 
-- A Meso_NH file. 
-
-## Documentation
-
 **Q : What is this ?**  
 A : This is a web application designed as an interface between the fleet of UAV used by the Nephelae project and Météo-France users. It comprises various tools to help them visualize the data being acquired from the drones.
 
@@ -39,7 +32,13 @@ A : Because this web application is supposed to be used in remote places without
 
 **Q : I do not have a Meso_NH.nc file, what can I do ?**  
 A : You can reference any .nc file with your `$MESO_NH` environment variable, and it will *work*. The original file is 70GB so it did not fit in a commit, sorry.
-  
+   
+    
+## Prerequisites  
+
+- A running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). 
+- A Meso_NH file. 
+
 
 ## TODO
 
