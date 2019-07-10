@@ -54,7 +54,7 @@ function init() {
 
 	// Add performance stats
 	stats = new Stats();
-	$('#wrapper').append(stats.dom);
+	//$('#wrapper').append(stats.dom);
 
 	// Create a directional light
 	var light = new THREE.DirectionalLight('white', 2);
