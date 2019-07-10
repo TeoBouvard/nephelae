@@ -55,6 +55,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - jquerize files
 - 3d model of uavs ?
 - icons https://materializecss.com/icons.html
+- npm packages
 
 
 ## Questions

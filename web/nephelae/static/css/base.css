@@ -20,10 +20,6 @@ html, body{
     /*overflow: hidden; /* worst hack ever */
 }
 
-body {
-    font-family: 'Roboto-Light';
-}
-
 #loader {
     position: absolute;
     top : 0;
@@ -47,4 +43,11 @@ nav ul li a {
     top: 0px;
     width: 100%;
     height: calc(100vh - 64px);
+}
+
+#gui_container {
+    position: absolute;
+    right: 10px;
+    top: calc(64px + 10px);
+    z-index: 400;
 }

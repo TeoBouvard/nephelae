@@ -8,13 +8,25 @@ var camera, scene, renderer, controls, stats;
 var drones = {};
 
 // Parameters
-var refresh_rate = 500;
+var parameters = {
+	refresh_rate: 500
+}
 var then = new Date();
 
 $(document).ready(function(){
+	setupGUI();
 	init();
 	removeLoader();
 });
+
+function setupGUI(){
+    var gui = new dat.GUI({ autoplace: false });
+    $('#gui_container').append(gui.domElement);
+
+    gui.add(parameters, 'refresh_rate', 200, 3000);
+    //gui.add(parameters, 'altitude', 0, 4000);
+    //gui.add(parameters, 'trail_length', 0, 500);
+}
 
 function init() {
 
@@ -110,7 +122,7 @@ function update(){
 	var now = new Date();
 	var elapsed_time = now - then;
 
-	if (elapsed_time >= refresh_rate){
+	if (elapsed_time >= parameters.refresh_rate){
 		then = now;
 
 		// Update drones objects
