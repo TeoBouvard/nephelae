@@ -17,6 +17,7 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 
 html, body{
     height: 100%;
+    overflow: hidden; /* worst hack ever */
 }
 
 body {
@@ -40,6 +41,10 @@ body {
 
 nav ul li a {
     font-size: 18px;
+}
+
+canvas {
+    display: block;
 }
 
 .fullscreen {

@@ -6,18 +6,17 @@
 {% endblock %}
 
 {% block additional_scripts %}
-	<!-- Load three js -->
+	<!-- Load three js (default up direction has been set to z axis) -->
 	<script src="{% static 'js/libs/three.js' %}"></script>
 	<script src="{% static 'js/libs/OrbitControls.js' %}"></script>
 	<script type="module" src="{% static 'js/libs/Stats.js' %}"></script>
 
 	<!-- Load global variables and specific javascript -->
-	<script src="{% static 'js/base_colors.js' %}"></script>
 	<script type="module" src="{% static 'js/simulation.js' %}"></script>
 {% endblock %}
 
 {% block page %}
 
-<div id='wrapper' class='fullscreen'></div>
+<canvas id="canvas_div" class="fullscreen"></canvas>
 
 {% endblock %}

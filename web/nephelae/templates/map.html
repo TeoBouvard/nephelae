@@ -2,8 +2,6 @@
 {% load static %}
 
 {% block additional_head %}
-    <!-- Load specific CSS -->
-	<link rel="stylesheet" href="{% static 'css/map.css' %}"/>
     <!-- Load leaflet CSS -->
     <link rel="stylesheet" href="{% static 'css/libs/leaflet.css' %}"/>
 {% endblock %}
@@ -12,10 +10,7 @@
 {% block additional_scripts %}
     <!-- Load leaflet js + oriented marker (drone heading) -->
     <script src="{% static 'js/libs/leaflet.js' %}"></script>
-    <!-- Load plotly js -->
-    <script src="{% static 'js/libs/plotly.min.js' %}"></script>
-	<!-- Load global variables and specific javascript -->
-	<script src="{% static 'js/base_colors.js' %}"></script>
+	<!-- Load icons -->
 	<script src="{% static 'js/base_icons.js' %}"></script>
 	<script src="{% static 'js/map.js' %}"></script>
 {% endblock %}

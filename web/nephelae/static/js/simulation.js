@@ -19,13 +19,12 @@ $(document).ready(function(){
 function init() {
 
 	// Create a Web GL renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-	renderer.setSize($("#wrapper").width(), $("#wrapper").height());
-	$("#wrapper").append(renderer.domElement);
+    renderer = new THREE.WebGLRenderer({ canvas: canvas_div, antialias: true });
+	renderer.setSize($('#canvas_div').width(), $('#canvas_div').height());
 
 	// Create a camera
 	var fov = 60;
-	var aspect = $("#wrapper").width() / $("#wrapper").height();
+	var aspect = $('#canvas_div').width() / $('#canvas_div').height();
 	var near = 1;
 	var far = 5000;
 	camera = new THREE.PerspectiveCamera(fov, aspect, near, far);

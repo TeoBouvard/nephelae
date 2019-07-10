@@ -19,7 +19,7 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<link rel="stylesheet" href="{% static 'css/libs/material-icons.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/libs/nouislider.css' %}" />
 
-		<!-- Load icons -->
+		<!-- Load favicon -->
 		<link rel="shortcut icon" href="#">
 
 		<!-- Load jquery -->
@@ -34,6 +34,7 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 
 		<!-- Load main js -->
 		<script src="{% static 'js/base.js' %}"></script>
+		<script src="{% static 'js/base_colors.js' %}"></script>
 
 		{% block additional_head %}{% endblock %}
 	</head>
@@ -79,7 +80,7 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<!-- additional_scripts -->
 
 		{% block additional_scripts %}{% endblock %}
-		
+
 	</body>
 
 </html>

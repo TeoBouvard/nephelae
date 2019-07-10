@@ -1,4 +1,4 @@
-// DEFAULT UP HAS BEEN CHANGED TO ( 0, 0, 1 ) //
+// DEFAULT UP DIRECTION HAS BEEN CHANGED TO ( 0, 0, 1 ) //
 
 // threejs.org/license
 (function(l,na){"object"===typeof exports&&"undefined"!==typeof module?na(exports):"function"===typeof define&&define.amd?define(["exports"],na):(l=l||self,na(l.THREE={}))})(this,function(l){function na(){}function C(a,b){this.x=a||0;this.y=b||0}function ea(a,b,c,d){this._x=a||0;this._y=b||0;this._z=c||0;this._w=void 0!==d?d:1}function n(a,b,c){this.x=a||0;this.y=b||0;this.z=c||0}function ia(){this.elements=[1,0,0,0,1,0,0,0,1];0<arguments.length&&console.error("THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.")}
