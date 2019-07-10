@@ -11,5 +11,3 @@ sh
 gunicorn
 #useless in future
 ivy-python
-#3d testing
-pptk

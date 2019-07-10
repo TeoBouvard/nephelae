@@ -16,12 +16,11 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<!-- Load static CSS -->
 		<link rel="stylesheet" href="{% static 'css/base.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/libs/materialize.min.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/libs/font_awesome.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/libs/material-icons.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/libs/nouislider.css' %}" />
 
 		<!-- Load icons -->
 		<link rel="shortcut icon" href="#">
-		<!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
 
 		<!-- Load jquery -->
 		<script src="{% static 'js/libs/jquery.js' %}"></script>
@@ -40,38 +39,47 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 	</head>
 
 	<body>
-		<div id="nav" class="pill-nav">
-			<a id='nav_preview' href="{% url 'preview' %}">3D Preview</a>
-			<a id='nav_map' href="{% url 'map' %}">Map</a>
-			<a id='nav_profiles' href="{% url 'profiles' %}">Vertical Profiles</a>
-			<a id='nav_cloud_data' href="{% url 'cloud_data' %}">Cloud Data</a>
-			<a id='nav_sections' href="{% url 'sections' %}">Cross Sections</a>
-			<a id='nav_simulation' href="{% url 'simulation' %}">Simulation (soon)</a>
-			<a href="javascript:void(0);" class="icon" onclick="open_navbar()">
-				<i class="fa fa-bars"></i>
-			</a>
-		</div>
 
-		{% block loader %}
-			<div id="loader" class="preloader-wrapper big active">
-				<div class="spinner-layer">
-					<div class="circle-clipper left">
-						<div class="circle"></div>
-					</div>
-					<div class="gap-patch">
-						<div class="circle"></div>
-					</div>
-					<div class="circle-clipper right">
-						<div class="circle"></div>
-					</div>
+		<!-- navbar -->
+
+		<nav class="teal z-depth-0">
+			<div class="nav-wrapper">
+				<a href="https://github.com/teobouvard/nephelae_gui" class="brand-logo right"><i class="material-icons">cloud</i></a>
+				<ul id="nav-mobile" class="left">
+					<li id='nav_preview'><a href="{% url 'preview' %}">Preview</a></li>
+					<li id='nav_map'><a href="{% url 'map' %}">Map</a></li>
+					<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
+					<li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li>
+					<li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
+					<li id='nav_simulation'><a href="{% url 'simulation' %}">Simulation</a></li>
+				</ul>
+			</div>
+		</nav>
+
+		<!-- loader -->
+
+		<div id="loader" class="preloader-wrapper big active">
+			<div class="spinner-layer">
+				<div class="circle-clipper left">
+					<div class="circle"></div>
+				</div>
+				<div class="gap-patch">
+					<div class="circle"></div>
+				</div>
+				<div class="circle-clipper right">
+					<div class="circle"></div>
 				</div>
 			</div>
-		{% endblock %}
-		
+		</div>
+
+		<!-- rest of the page -->
+
 		{% block page %}{% endblock %}
-		
-		<!-- Load additional_scripts -->
+
+		<!-- additional_scripts -->
+
 		{% block additional_scripts %}{% endblock %}
+		
 	</body>
 
 </html>

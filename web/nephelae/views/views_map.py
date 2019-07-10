@@ -20,7 +20,7 @@ def update_map(request):
 # Render icons for drones
 def plane_icon(request, index):
     try:
-        path = 'nephelae/img/icons/plane_icon' + str(index) + '.png'
+        path = 'nephelae/img/plane_icons/plane_icon' + str(index) + '.png'
         with open(path, "rb") as f:
             return HttpResponse(f.read(), content_type="image/png")
     except IOError:

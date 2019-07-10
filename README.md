@@ -53,8 +53,8 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - launch drones script ?
 - bounds to json
 - jquerize files
-- proper navbar ?
 - 3d model of uavs ?
+- icons https://materializecss.com/icons.html
 
 
 ## Questions

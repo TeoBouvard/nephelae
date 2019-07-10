@@ -1,4 +1,4 @@
-// Add CSS colors (in order corresponding to icons folder) for more drones
+// Add CSS colors (in order corresponding to plane_icons folder) for more drones
 global_colors = ["red", "green", "blue", "purple", "teal", "orange", "lime", "yellow", "fuchsia", "gray"];
 
 // colormap has to be adjusted for the zero value to be white
