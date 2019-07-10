@@ -2,6 +2,8 @@
 .DS_Store
 __pycache__
 *.pyc
-js/libs/*
 db.sqlite3
-css/libs/images/
+web/nephelae/static/css/libs/images/*
+web/nephelae/static/css/libs/leaflet.css
+web/nephelae/static/css/libs/materialize.css
+web/nephelae/static/css/libs/*
