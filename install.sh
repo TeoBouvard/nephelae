@@ -1,8 +1,5 @@
 #!/bin/bash
 
-apt-get update
-apt-get -y install python3-pip
-
 # Download javascript files
 wget -O web/nephelae/static/js/libs/dat.gui.js https://raw.githubusercontent.com/dataarts/dat.gui/master/build/dat.gui.min.js
 wget -O web/nephelae/static/js/libs/jquery.js https://code.jquery.com/jquery-3.4.1.min.js
@@ -20,7 +17,7 @@ wget -O web/nephelae/static/css/libs/materialize.css https://cdnjs.cloudflare.co
 # Download images
 wget -O web/nephelae/static/css/libs/images/layers.png https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/images/layers.png
 
-# Download fonts
+apt-get -y install python3-pip
 
 pip3 install wheel
 pip3 install -r requirements.txt

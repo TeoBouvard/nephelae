@@ -6,6 +6,7 @@ netCDF4
 geopy
 utm
 scipy
+#MesoNH Probe -> to be packaged
 sh
 #Server
 gunicorn
