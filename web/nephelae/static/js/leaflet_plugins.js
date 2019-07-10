@@ -139,7 +139,6 @@
         },
 
         _zoomHome: function (e) {
-            //jshint unused:false
             this._map.setView(this.options.homeCoordinates, this.options.homeZoom);
         }
     });

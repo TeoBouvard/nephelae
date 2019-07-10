@@ -6,10 +6,9 @@
 {% endblock %}
 
 {% block additional_scripts %}
-	<!-- Load three js (default up direction has been set to z axis) -->
+	<!-- Load three js -->
 	<script src="{% static 'js/libs/three.js' %}"></script>
 	<script src="{% static 'js/libs/OrbitControls.js' %}"></script>
-	<script type="module" src="{% static 'js/libs/Stats.js' %}"></script>
 
 	<!-- Load global variables and specific javascript -->
 	<script type="module" src="{% static 'js/simulation.js' %}"></script>
