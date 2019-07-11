@@ -18,8 +18,8 @@ urlpatterns = [
     path('map/update/', views.update_map, name='update_map'),
     path('map/tile/<int:z>/<int:x>/<int:y>', views.map_tiles, name='map_tiles'),
     path('map/plane_icon/<int:index>', views.plane_icon, name='plane_icon'),
-    path('map/<str:variable_name>_img/<int:time_value>/<int:altitude_value>', views.layer_img, name='layer_img'),
-    
+    path('map/<str:variable_name>_img/', views.layer_img, name='layer_img'),
+
     # URL for simulation page
     path('simulation/', views.simulation, name='simulation'),
     path('simulation/update/', views.update_map),
@@ -32,7 +32,7 @@ urlpatterns = [
     path('sections/', views.sections, name='sections'),
     path('sections/box/', views.mesonh_box, name='mesonh_box'),
     path('sections/update/<int:time_value>/<int:altitude_value>', views.update_section, name='update_section'),
-    
+
 
     # URL for vertical profiles page
     path('profiles/', views.profiles, name='profiles'),
@@ -41,5 +41,5 @@ urlpatterns = [
     # URL for vertical profiles page
     path('cloud_data/', views.cloud_data, name='cloud_data'),
     path('cloud_data/update/', views.update_cloud_data, name='update_cloud_data'),
-    
+
 ]

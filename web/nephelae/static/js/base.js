@@ -8,3 +8,4 @@ function removeLoader(){
 $(document).ready(function(){
     M.AutoInit();
 });
+

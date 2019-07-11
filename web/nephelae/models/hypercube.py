@@ -1,9 +1,5 @@
-import base64
 import io
-import logging
-import math
 import os
-import urllib
 
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -22,9 +18,10 @@ if 'MESO_NH' in os.environ:
     hypercube = MFDataset(os.environ['MESO_NH'])
     clouds = MesoNHVariable(hypercube, var_lwc, interpolation='linear')
     thermals = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
-else :
+else:
     print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
     exit()
+
 
 def transparent_cmap(original_cmap):
 
@@ -35,24 +32,25 @@ def transparent_cmap(original_cmap):
     my_cmap = cmap(np.arange(cmap.N))
 
     # Set alpha
-    my_cmap[:,-1] = np.linspace(0, 1, cmap.N)
+    my_cmap[:, -1] = np.linspace(0, 1, cmap.N)
 
     return ListedColormap(my_cmap)
 
-def print_horizontal_slice(variable_name, u_time, u_altitude):
+
+def print_horizontal_slice(variable_name, u_time, u_altitude, x0, x1, y0, y1):
 
     # Get slice
     if variable_name == 'clouds':
-        h_slice = clouds[u_time, u_altitude, :, :].data
+        h_slice = clouds[u_time, u_altitude, y0:y1, x0:x1].data
         colormap = transparent_cmap('Purples')
-        min_slice = 0
-        max_slice = clouds.actual_range[1]
+        # min_slice = 0
+        # max_slice = clouds.actual_range[1]
     elif variable_name == 'thermals':
-        h_slice = thermals[u_time, u_altitude, :, :].data
+        h_slice = thermals[u_time, u_altitude, y0:y1, x0:x1].data
         h_slice[h_slice < 0] = 0
         colormap = transparent_cmap('Reds')
-        min_slice = 0
-        max_slice = thermals.actual_range[1]
+        # min_slice = 0
+        # max_slice = thermals.actual_range[1]
 
     # Write image to buffer
     buf = io.BytesIO()
@@ -63,6 +61,7 @@ def print_horizontal_slice(variable_name, u_time, u_altitude):
 
 ########## UTILITY METHODS ##########
 
+
 # Compute where the value zero lies on the colorscale
 def colormap_zero(variable_name, time_value, altitude_value):
 
@@ -70,14 +69,15 @@ def colormap_zero(variable_name, time_value, altitude_value):
         matrix = clouds[time_value, altitude_value, :, :].data
     elif variable_name == 'thermals':
         matrix = thermals[time_value, altitude_value, :, :].data
-    
+
     minv = matrix.min()
     maxv = matrix.max()
-    
+
     if minv == maxv:
         return 0.5
     else:
-        return abs(minv/(maxv-minv))
+        return abs(minv / (maxv - minv))
+
 
 def axes():
     min_x = clouds.bounds[2].min

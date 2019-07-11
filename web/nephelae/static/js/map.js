@@ -5,11 +5,10 @@ var flight_map, zoom_home;
 var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 
 // Data from MESO_NH, will come from mapping later
-var imageBounds = [[43.432883, 1.247409], [43.490199, 1.327060]];
 var max_time;
-function tick(){ return new Date().getSeconds() % max_time}
+function tick(){ return Math.floor(new Date() / 1000) % max_time}
 /*
-    drones     : { key           :   drone_id,   values : value_dict }
+    fleet     : { key           :   drone_id,   values : value_dict }
     value_dict : { color         :   global_colors[index_icon], 
                    position      :   marker, 
                    altitude      :   float, 
@@ -19,13 +18,15 @@ function tick(){ return new Date().getSeconds() % max_time}
                    last_position :   LatLng
                  }
 */
-var drones = {};
+var fleet = {};
 
 // Parameters
 var parameters = {
     refresh_rate: 1000, // milliseconds
     altitude: 1075,     // meters
-    trail_length: 60    // seconds
+    trail_length: 60,    // seconds
+
+    origin: [43.432883, 1.247409] // used to compute layer images
 }
 
 $(document).ready(function(){
@@ -46,7 +47,7 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     // Get sliders range
-    $.getJSON('box/', function(response){
+    $.getJSON('box/', (response) => {
         
         // Parse response
         var min_altitude = Math.ceil(response[1].min);
@@ -54,14 +55,12 @@ function setupGUI(){
 
         max_time = response[0].max;
 
-
         gui.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
         gui.add(parameters, 'altitude', min_altitude, max_altitude).step(1).name('Altitude (m)');
         gui.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
 
         // Once sliders are initialized, create map and display infos
         setupMap();
-        updateInfo();
     });
 }
 
@@ -69,7 +68,8 @@ function setupGUI(){
 function setupMap(){
 
     // Map
-    flight_map = L.map('map_container', {zoomControl: false, maxZoom : 15});
+    flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 15, minZoom: 12});
+    flight_map.on('moveend', updateLayerBounds);
 
     // Home button
     zoomHome = L.Control.zoomHome();
@@ -79,8 +79,8 @@ function setupMap(){
     tiles_overlay = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
-    cloud_overlay = L.imageOverlay('clouds_img/' + tick() + '/' + parameters.altitude, imageBounds);
-    thermals_overlay = L.imageOverlay('thermals_img/' + tick() + '/' + parameters.altitude, imageBounds);
+    cloud_overlay = L.imageOverlay('clouds_img/?' + computeURL(), flight_map.getBounds());
+    thermals_overlay = L.imageOverlay('thermals_img/?' + computeURL(), flight_map.getBounds());
 
     // Set layer dictionnary
     var base_layers = {
@@ -103,7 +103,7 @@ function setupMap(){
 
 function displayDrones(){
 
-        $.getJSON('update/', function(response){
+        $.getJSON('update/', (response) => {
 
         // Initialize drone array with drone_id and position marker
         for (var key in response.drones){
@@ -123,8 +123,8 @@ function displayDrones(){
             var marker = L.marker(drone_position, {icon: drone_icon});
             var polyline = L.polyline([drone_path], {color : drone_color, weight : '2', dashArray : '5,7'});
             
-            // Update drones dictionnary with discovered drone
-            drones[drone_id] = ({
+            // Update fleet dictionnary with discovered drone
+            fleet[drone_id] = ({
                 color : drone_color, 
                 position : marker, 
                 altitude : drone_altitude, 
@@ -133,13 +133,13 @@ function displayDrones(){
             });
 
             // Add drone marker to layer group
-            drones[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
-            drones[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading));
-            drones[drone_id].path.addTo(path_overlay);
+            fleet[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
+            fleet[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading));
+            fleet[drone_id].path.addTo(path_overlay);
         }
         
         // Center map on drone last drone added
-        if(Object.keys(drones).length != 0){
+        if(Object.keys(fleet).length != 0){
             flight_map.setView(drone_position, 15);
             zoomHome.addTo(flight_map);
             updateDrones();
@@ -152,7 +152,7 @@ function displayDrones(){
 function updateDrones(){
 
     // Request updated data from the server
-    $.getJSON('update/', function(response){
+    $.getJSON('update/', (response) => {
 
         // Parse response
         for (var key in response.drones){
@@ -163,7 +163,7 @@ function updateDrones(){
             var drone_path = response.drones[key].path.slice(-parameters.trail_length-1);
 
             // Identify corresponding drone ...
-            var drone_to_update = drones[drone_id];
+            var drone_to_update = fleet[drone_id];
 
             // ... and update it
             if(drone_to_update){
@@ -175,42 +175,52 @@ function updateDrones(){
                 // Update polyline
                 drone_to_update.path.setLatLngs(drone_path);
             } 
-            // ... or display error message if drone id does not match -> update drones dictionnary and start tracking it
+            // ... or display error message if drone id does not match -> update fleet dictionnary and start tracking it
             else {
                 console.error("no drone with id ", drone_id, " found !");
                 initializeDrones(); // NOT SURE IF THIS IS WORKING, CAN'T TEST ?
             }
         }
-        // Update home button coordinates and cloud overlay
-        zoomHome.setHomeCoordinates(drone_position);
+        // Update home button coordinates and layers URL
+        zoomHome.setHomeCoordinates(drone_position); // compute center of mass/getBoundsZoom later ?
         updateURL();
         setTimeout(updateDrones, parameters.refresh_rate);
     });
 
 }
 
-function updateInfo(){
-
-    if(parameters.trail_length == 1){
-        length_display.innerHTML = "no trail";
-    } else if (parameters.trail_length == 2){
-        length_display.innerHTML = "trail length : last second";
-    } else {
-        length_display.innerHTML = "trail length : " + (parameters.trail_length - 1) + " seconds";
-    }
-
-    altitude_display.innerHTML = "clouds altitude : " + parameters.altitude + " m ASL";
-
+function updateURL(){
+    cloud_overlay.setUrl('clouds_img/?'+ computeURL());
+    thermals_overlay.setUrl('thermals_img/?'+ computeURL());
 }
 
-function updateURL(){
-    cloud_overlay.setUrl('clouds_img/'+ tick() +'/'+ parameters.altitude);
-    thermals_overlay.setUrl('thermals_img/'+ tick() +'/'+ parameters.altitude);
+function updateLayerBounds(){
+    cloud_overlay.setBounds(flight_map.getBounds());
+    thermals_overlay.setBounds(flight_map.getBounds());
+}
+
+function computeURL(){
+
+    var bounds = flight_map.getBounds();
+
+    var query = $.param({
+        altitude: parameters.altitude,
+        time: tick(),
+        map_bounds: {
+            west: bounds.getWest(), 
+            east: bounds.getEast(),
+            south: bounds.getSouth(),
+            north: bounds.getNorth()
+        },
+        origin: parameters.origin,
+    });
+
+    return query;
 }
 
 // Print HTML formatted string so that it can be added to marker popup
 function infosToString(id, altitude, heading){
-    var infos = '<p style=text-align:center>';
+    var infos = '<p style="text-align:center;font-family:Roboto-Light;font-size:15px">';
 
     infos += 'Drone ';
     infos += id + ' <br> ' ;
@@ -219,16 +229,4 @@ function infosToString(id, altitude, heading){
     infos += '</p>'
 
     return infos;
-}
-
-// Update trail length, display 0 when slider is 1 to not slice(0)
-length_slider.oninput = function() {
-    trail_length = this.value;
-    updateInfo();
-}
-
-// Update cross section altitude, display 0 when slider is 1 to not slice(0)
-altitude_slider.oninput = function() {
-    clouds_altitude = this.value;
-    updateInfo();
 }
