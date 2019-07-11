@@ -44,7 +44,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 
 - maps : https://leaflet-extras.github.io/leaflet-providers/preview/ / mobile atlas creator, create script ?
 - os.environ['MESO_NH'], os.environ['MAP_TILES'] -> define env variables in install script !
-- leaflet/plotly fullscreen ? leaflet-velocity
+- leaflet-velocity
 - plotly update button
 - requête repère mobile au mapping
 - requête box au mapping
@@ -55,7 +55,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - jquerize files
 - 3d model of uavs ?
 - icons https://materializecss.com/icons.html
-- npm packages
+- reduce array size in image overlay (memory problems?)
 
 
 ## Questions
