@@ -52,11 +52,17 @@ nav ul li a {
     z-index: 400;
 }
 
+
 /* Fix conflict between materialize and dat.gui*/
-div .c div input[type=text] {
-    all: initial;
+#gui_container [type=text] {
+    height: initial !important;
     font-family: 'Roboto-Light';
     font-size: 15px;
+}
+
+#gui_container [type=checkbox] {
+    position: initial !important;
+    opacity: initial !important;
 }
 
 .dg.main.a {

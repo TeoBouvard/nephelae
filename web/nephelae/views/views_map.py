@@ -77,8 +77,6 @@ def layer_img(request, variable_name):
     y0 = distance_y0 if origin['lat'] < map_bounds['south'] else -distance_y0
     y1 = distance_y1 if origin['lat'] < map_bounds['north'] else -distance_y1
 
-    print(x0, x1, y0, y1)
-
     buf = hypercube.print_horizontal_slice(variable_name, time_value, altitude_value, x0, x1, y0, y1)
     return HttpResponse(buf.read(), content_type="image/png")
 

@@ -92,7 +92,7 @@
 
             this._zoomInButton = this._createButton(options.zoomInText, options.zoomInTitle,
                 controlName + '-in', container, this._zoomIn.bind(this));
-            var zoomHomeText = '<i class="material-icons" style="line-height:1.3">' + options.zoomHomeText + '</i>';
+            var zoomHomeText = '<i class="material-icons" style="text-align:center;line-height:1.8;font-size:17px">' + options.zoomHomeText + '</i>';
             this._zoomHomeButton = this._createButton(zoomHomeText, options.zoomHomeTitle,
                 controlName + '-home', container, this._zoomHome.bind(this));
             this._zoomOutButton = this._createButton(options.zoomOutText, options.zoomOutTitle,

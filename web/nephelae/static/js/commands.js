@@ -1,5 +1,5 @@
 // Activate current menu in nav
-document.getElementById('nav_commands').className = 'active';
+$('#nav_commands').addClass('active');
 
 var parameters = {
 	text: 'hello'
@@ -7,7 +7,7 @@ var parameters = {
 
 
 $(document).ready(function(){
-	setupGUI();
+	//setupGUI();
 	removeLoader();
 });
 

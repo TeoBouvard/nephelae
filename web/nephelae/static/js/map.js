@@ -99,6 +99,9 @@ function setupMap(){
 
     // Display everything on initialization
     for(key in overlays) overlays[key].addTo(flight_map);
+
+    // Change checkbox style dynamically (fucking materialize framework)
+    $(':checkbox').addClass('filled-in');
 }
 
 function displayDrones(){
@@ -145,6 +148,7 @@ function displayDrones(){
             updateDrones();
         } else {
             alert("No drones detected, try launching the simulation and restart the server");
+            updateDrones();
         }
     });
 }
@@ -182,7 +186,7 @@ function updateDrones(){
             }
         }
         // Update home button coordinates and layers URL
-        zoomHome.setHomeCoordinates(drone_position); // compute center of mass/getBoundsZoom later ?
+        zoomHome.setHomeCoordinates(parameters.origin); // compute center of mass/getBoundsZoom later ?
         updateURL();
         setTimeout(updateDrones, parameters.refresh_rate);
     });
@@ -197,6 +201,7 @@ function updateURL(){
 function updateLayerBounds(){
     cloud_overlay.setBounds(flight_map.getBounds());
     thermals_overlay.setBounds(flight_map.getBounds());
+    updateURL();
 }
 
 function computeURL(){

@@ -44,17 +44,28 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 		<nav class="teal z-depth-0">
 			<div class="nav-wrapper">
 				<a href="https://github.com/teobouvard/nephelae_gui" class="brand-logo right"><i class="material-icons">cloud</i></a>
-				<ul id="nav-mobile" class="left">
+				<a href="#" data-target="small_nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+				<ul id="large_nav" class="left hide-on-med-and-down">
 					<li id='nav_preview'><a href="{% url 'preview' %}">Preview</a></li>
 					<li id='nav_map'><a href="{% url 'map' %}">Map</a></li>
 					<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
 					<li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li>
 					<li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
 					<li id='nav_simulation'><a href="{% url 'simulation' %}">Simulation</a></li>
-					<li id='nav_commands'><a href="{% url 'commands' %}">Commands</a></li>
+					<li id='nav_commands'><a href="{% url 'commands' %}">Commands (soon)</a></li>
 				</ul>
 			</div>
 		</nav>
+
+		<ul class="sidenav" id="small_nav" style="z-index:2000;">
+			<li id='nav_preview'><a href="{% url 'preview' %}">Preview</a></li>
+			<li id='nav_map'><a href="{% url 'map' %}">Map</a></li>
+			<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
+			<li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li>
+			<li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
+			<li id='nav_simulation'><a href="{% url 'simulation' %}">Simulation</a></li>
+			<li id='nav_commands'><a href="{% url 'commands' %}">Commands (soon)</a></li>
+		</ul>
 
 		<!-- loader -->
 

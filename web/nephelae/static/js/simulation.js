@@ -1,16 +1,18 @@
 // Activate current menu in nav
-document.getElementById('nav_simulation').className = 'active';
+$('#nav_simulation').addClass('active');
 
 // Simulation elements
-var camera, scene, renderer, controls, stats;
-var drones = {};
+var camera, near, far, scene, renderer, controls, stats;
+var fleet = {};
 var gui;
+var then = new Date();
 
 // Parameters
 var parameters = {
-	refresh_rate: 500
+	refresh_rate: 500,
+	trail_length: 60,
+	drone_visibility: true,
 }
-var then = new Date();
 
 $(document).ready(function(){
 	setupGUI();
@@ -22,8 +24,17 @@ function setupGUI(){
     gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
-    gui.add(parameters, 'refresh_rate', 100, 3000).step(100).name('Delay (ms)');
-    //gui.add(parameters, 'trail_length', 0, 500);
+	var f1 = gui.addFolder('Parameters');
+	var f2 = gui.addFolder('Layers');
+
+    f1.add(parameters, 'refresh_rate', 100, 3000).step(100).name('Delay (ms)');
+    f1.add(parameters, 'trail_length', 0, 500).name('Trail');
+
+	var fleet_toggle = f2.add(parameters, 'drone_visibility').name('Fleet');
+
+	fleet_toggle.onChange(toggleFleetVisibility);
+
+	f2.open();
 }
 
 function init() {
@@ -31,26 +42,58 @@ function init() {
 	// Set default up vector to z axis
 	THREE.Object3D.DefaultUp.set( 0, 0, 1 );
 
-	// Create a Web GL renderer
-    renderer = new THREE.WebGLRenderer({ canvas: canvas_div, antialias: true });
-	renderer.setSize($('#canvas_div').width(), $('#canvas_div').height());
+	createRenderer();
 
-	// Create a camera
+	createCamera();
+
+	createScene();
+
+	createControls();
+
+	window.addEventListener( 'resize', onWindowResize, false );
+
+	createFloor();
+
+	createLights();
+
+	createDrones();
+
+
+	// start the animation loop
+  	renderer.setAnimationLoop(() => {
+		update();
+		render();
+  	});
+
+}
+
+function createRenderer() {
+	// why is canvas size bigger than container ?
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+	renderer.setSize($('#canvas_container').width() - 15, $('#canvas_container').height());
+	$('#canvas_container').append( renderer.domElement );
+}
+
+function createCamera() {
 	var fov = 60;
-	var aspect = $('#canvas_div').width() / $('#canvas_div').height();
-	var near = 1;
-	var far = 5000;
+	var aspect = $('#canvas_container').width() / $('#canvas_container').height();
+	near = 1;
+	far = 5000;
 	camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 	camera.position.set(50, 0, 20);
+}
 
-	// Create a scene
+function createScene() {
 	scene = new THREE.Scene();
-	scene.background = new THREE.Color('white');
-	scene.fog = new THREE.Fog('white', near, far);
+	scene.background = new THREE.Color('rgb(32,32,32)');
+	scene.fog = new THREE.Fog('rgb(32,32,32)', near, far);
+}
 
-	// Add controls
+function createControls() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
+}
 
+function createFloor() {
 	// load floor texture, set wrap mode to repeat
 	var texture = new THREE.TextureLoader().load("textures/seamless_water.jpg" );
 	texture.wrapS = THREE.RepeatWrapping;
@@ -62,14 +105,17 @@ function init() {
 	var material = new THREE.MeshMatcapMaterial({ map: texture });
 	var floor = new THREE.Mesh(geometry, material);
 	scene.add(floor);
+}
 
+function createLights() {
 	// Create a directional light
 	var light = new THREE.DirectionalLight('white', 2);
 	light.position.set(100, 100, 1000);
 	scene.add(light);
+}
 
+function createDrones() {
 
-	// Create drones objects
 	$.getJSON('update/', (response) => {
 
 		for(var key in response.drones){
@@ -79,7 +125,7 @@ function init() {
             var drone_position = response.drones[key].simulation_position;
             var drone_altitude = response.drones[key].altitude;
             //var drone_heading = response.drones[key].heading;
-            //var drone_path = response.drones[key].path.slice(-length_slider.value);
+        	var drone_path = response.drones[key].path.slice(-parameters.trail_length-1);
 
             // Compute color and icon of markers, increment index_icon for next drone 
             var drone_color = global_colors[key%global_colors.length];
@@ -87,31 +133,23 @@ function init() {
 			// Create a drone
 			var geometry = new THREE.SphereBufferGeometry(5, 32, 32);
 			var material = new THREE.MeshStandardMaterial({color: drone_color});
-			var object = new THREE.Mesh(geometry, material);
+			var drone_object = new THREE.Mesh(geometry, material);
 
-			object.name = key;
-			object.position.set(drone_position[0], drone_position[1], drone_position[2]);
+			drone_object.name = key;
+			drone_object.position.set(drone_position[0], drone_position[1], drone_position[2]);
 
-			scene.add(object);
+			scene.add(drone_object);
 
-			// Update drones dictionnary with discovered drone
-            drones[drone_id] = {
-                object : object,
+			// Update fleet dictionnary with discovered drone
+            fleet[drone_id] = {
+                drone : drone_object,
+
             };
 		}
 
-		// Focus on drones
-		fitCameraToSelection(camera, controls, drones);
+		// Focus on fleet
+		fitCameraToSelection(camera, controls, fleet);
 	});
-
-
-	// start the animation loop
-  	renderer.setAnimationLoop(() => {
-		//stats.update();
-		update();
-		render();
-  	});
-
 }
 
 function update(){
@@ -134,9 +172,8 @@ function update(){
 				//var drone_heading = response.drones[key].heading;
 				//var drone_path = response.drones[key].path.slice(-length_slider.value);
 
-				drones[key].object.position.set(drone_position[0], drone_position[1], drone_position[2]);
+				fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
 			}
-
 		});
 	}
 }
@@ -145,35 +182,49 @@ function render(){
 	renderer.render(scene, camera);
 }
 
+function toggleFleetVisibility(){
+	for(var key in fleet){
+		fleet[key].drone.visible = !fleet[key].drone.visible;
+	}
+}
+
 function fitCameraToSelection(camera, controls, selection, fitOffset = 1.2) {
-  
-  var box = new THREE.Box3();
-  
-  for(const key in selection) box.expandByObject(selection[key].object);
-  
-  const size = box.getSize(new THREE.Vector3());
-  const center = box.getCenter(new THREE.Vector3());
-  
-  const maxSize = Math.max(size.x, size.y, size.z);
-  const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
-  const fitWidthDistance = fitHeightDistance / camera.aspect;
-  const distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
-  
-  const direction = controls.target.clone()
-    .sub(camera.position)
-    .normalize()
-    .multiplyScalar(distance);
-  
 
-  controls.maxDistance = distance * 5;
-  controls.target.copy(center);
-  controls.maxPolarAngle = Math.PI / 2; // -> compute floor angle
-  
-  camera.near = distance / 100;
-  camera.far = distance * 100;
-  camera.updateProjectionMatrix();
+	var box = new THREE.Box3();
 
-  camera.position.copy(controls.target).sub(direction);
-  
-  controls.update();
+	for(const key in selection) box.expandByObject(selection[key].drone);
+
+	const size = box.getSize(new THREE.Vector3());
+	const center = box.getCenter(new THREE.Vector3());
+
+	const maxSize = Math.max(size.x, size.y, size.z);
+	const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+	const fitWidthDistance = fitHeightDistance / camera.aspect;
+	const distance = fitOffset * Math.max(fitHeightDistance, fitWidthDistance);
+
+	const direction = controls.target.clone()
+		.sub(camera.position)
+		.normalize()
+		.multiplyScalar(distance);
+
+	controls.maxDistance = distance * 5;
+	controls.target.copy(center);
+	//controls.maxPolarAngle = Math.PI / 2; // -> compute floor angle
+
+	camera.near = distance / 100;
+	camera.far = distance * 100;
+	camera.updateProjectionMatrix();
+
+	camera.position.copy(controls.target).sub(direction);
+
+	controls.update();
+}
+
+function onWindowResize(){
+
+    camera.aspect = $('#canvas_container').width() / $('#canvas_container').height();
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( $('#canvas_container').width(), $('#canvas_container').height() );
+
 }
