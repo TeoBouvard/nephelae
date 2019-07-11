@@ -134,7 +134,6 @@ function createDrones() {
 			var geometry = new THREE.SphereBufferGeometry(5, 32, 32);
 			var material = new THREE.MeshStandardMaterial({color: drone_color});
 			var drone_object = new THREE.Mesh(geometry, material);
-			drone_object.name = key + '_drone'
 ;
 			drone_object.position.set(drone_position[0], drone_position[1], drone_position[2]);
 			scene.add(drone_object);
@@ -148,13 +147,12 @@ function createDrones() {
 
 			var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
 			var path_object = new THREE.Line( geometry, material );
-			path_object.name = key + '_path'
 			scene.add(path_object);
 
 			// Update fleet dictionnary with discovered drone
             fleet[drone_id] = {
-                drone: drone_object.name,
-				path: path_object.name
+                drone: drone_object,
+				path: path_object
             };
 
 		}
@@ -187,25 +185,25 @@ function update(){
             	var drone_color = global_colors[key%global_colors.length];
 
 				// Update drone position
-				var drone_to_update = scene.getObjectByName(key + "_drone");
-				drone_to_update.position.set(drone_position[0], drone_position[1], drone_position[2]);
+				fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
 
 				// Recreate trail vertices (updating did not work properly)
-				var path_to_update = scene.getObjectByName(key + "_path");
-				scene.remove(path_to_update);
+				scene.remove(fleet[key].path);
+
 				var geometry = new THREE.Geometry();
 				for(var position in drone_path){
 					var point = drone_path[position];
 					geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
 				}
+
 				var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
+	
 				var path_object = new THREE.Line( geometry, material );
-				path_object.name = key + '_path'
+
 				scene.add(path_object);
+				fleet[key].path = path_object;
 
 			}
-			console.log(fleet);
-			console.log(scene);
 		});
 	}
 }
@@ -224,7 +222,7 @@ function fitCameraToSelection(camera, controls, selection, fitOffset = 1.2) {
 
 	var box = new THREE.Box3();
 
-	for(const key in selection) box.expandByObject(scene.getObjectByName(selection[key].drone));
+	for(const key in selection) box.expandByObject(selection[key].drone);
 
 	const size = box.getSize(new THREE.Vector3());
 	const center = box.getCenter(new THREE.Vector3());
