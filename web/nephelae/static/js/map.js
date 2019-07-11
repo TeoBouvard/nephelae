@@ -1,12 +1,12 @@
 // Activate current menu in nav
-document.getElementById('nav_map').className = 'active';
+$("#nav_map").addClass('active');
 
 var flight_map, zoom_home;
 var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 
 // Data from MESO_NH, will come from mapping later
 var imageBounds = [[43.432883, 1.247409], [43.490199, 1.327060]];
-var max_time = 200;
+var max_time;
 function tick(){ return new Date().getSeconds() % max_time}
 /*
     drones     : { key           :   drone_id,   values : value_dict }
@@ -30,9 +30,8 @@ var parameters = {
 
 $(document).ready(function(){
 
+    // Inititalize parameters with mesonh bounds
     setupGUI();
-    // Inititalize altitude slider and time with mesonh box
-    //initializeSliders();
     
     removeLoader();
 
@@ -41,34 +40,33 @@ $(document).ready(function(){
 });
 
 function setupGUI(){
+
+    // Construct dat.gui
     var gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
-    gui.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
-    gui.add(parameters, 'altitude', 0, 4000).step(1).name('Altitude (m)');
-    gui.add(parameters, 'trail_length', 1, 500).step(1).name('Trail length (s)');
-
-    initializeMap();
-    updateInfo();
-}
-
-function initializeSliders(){
+    // Get sliders range
     $.getJSON('box/', function(response){
-
-        altitude_slider.min = Math.ceil(response[1].min);
-        altitude_slider.max = Math.floor(response[1].max);
-        parameters.altitude = 1075;
+        
+        // Parse response
+        var min_altitude = Math.ceil(response[1].min);
+        var max_altitude = Math.floor(response[1].max);
 
         max_time = response[0].max;
 
+
+        gui.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
+        gui.add(parameters, 'altitude', min_altitude, max_altitude).step(1).name('Altitude (m)');
+        gui.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
+
         // Once sliders are initialized, create map and display infos
-        initializeMap();
+        setupMap();
         updateInfo();
     });
 }
 
 
-function initializeMap(){
+function setupMap(){
 
     // Map
     flight_map = L.map('map_container', {zoomControl: false, maxZoom : 15});
@@ -100,7 +98,7 @@ function initializeMap(){
     L.control.layers(base_layers, overlays, {position: 'bottomleft'}).addTo(flight_map);
 
     // Display everything on initialization
-    for(key in overlays) { overlays[key].addTo(flight_map); }
+    for(key in overlays) overlays[key].addTo(flight_map);
 }
 
 function displayDrones(){
@@ -115,7 +113,7 @@ function displayDrones(){
             var drone_position = response.drones[key].position;
             var drone_altitude = response.drones[key].altitude;
             var drone_heading = response.drones[key].heading;
-            var drone_path = response.drones[key].path.slice(-parameters.trail_length);
+            var drone_path = response.drones[key].path.slice(-parameters.trail_length-1);
 
             // Compute color and icon of markers, increment index_icon for next drone 
             var drone_color = global_colors[key%global_colors.length];
@@ -144,7 +142,7 @@ function displayDrones(){
         if(Object.keys(drones).length != 0){
             flight_map.setView(drone_position, 15);
             zoomHome.addTo(flight_map);
-            setInterval(updateDrones, parameters.refresh_rate);
+            updateDrones();
         } else {
             alert("No drones detected, try launching the simulation and restart the server");
         }
@@ -162,7 +160,7 @@ function updateDrones(){
             var drone_position = response.drones[key].position;
             var drone_altitude = response.drones[key].altitude;
             var drone_heading = response.drones[key].heading;
-            var drone_path = response.drones[key].path.slice(-parameters.trail_length);
+            var drone_path = response.drones[key].path.slice(-parameters.trail_length-1);
 
             // Identify corresponding drone ...
             var drone_to_update = drones[drone_id];
@@ -186,6 +184,7 @@ function updateDrones(){
         // Update home button coordinates and cloud overlay
         zoomHome.setHomeCoordinates(drone_position);
         updateURL();
+        setTimeout(updateDrones, parameters.refresh_rate);
     });
 
 }
