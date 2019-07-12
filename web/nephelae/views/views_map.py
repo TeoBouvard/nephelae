@@ -2,6 +2,7 @@ import os
 
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import render
+from django.utils.cache import add_never_cache_headers
 import numpy as np
 from geopy.distance import distance
 
@@ -16,7 +17,9 @@ def update_map(request):
     data = {
         'drones': pprz.uavs,
     }
-    return JsonResponse(data)
+    response = JsonResponse(data)
+    add_never_cache_headers(response)
+    return response
 
 
 # Render icons for drones

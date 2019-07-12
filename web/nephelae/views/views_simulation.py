@@ -10,7 +10,8 @@ def texture(request, file_name):
     try:
         path = 'nephelae/img/textures/' + str(file_name)
         with open(path, "rb") as f:
-            return HttpResponse(f.read(), content_type="image/jpg")
+            response = HttpResponse(f.read(), content_type="image/jpg")
+            return response
     except IOError:
         return HttpResponseNotFound()
 
