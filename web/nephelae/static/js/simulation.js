@@ -215,6 +215,7 @@ function render(){
 function toggleFleetVisibility(){
 	for(var key in fleet){
 		fleet[key].drone.visible = !fleet[key].drone.visible;
+		fleet[key].path.visible = !fleet[key].path.visible;
 	}
 }
 
