@@ -15,6 +15,7 @@ var parameters = {
 	refresh_rate: 500,
 	trail_length: 60,
 	fleet_visibility: true,
+	fleet_focus: fitCameraToFleet,
 }
 
 $(document).ready(function(){
@@ -27,17 +28,16 @@ function setupGUI(){
     gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
-	var f1 = gui.addFolder('Parameters');
+	var f1 = gui.addFolder('Controls');
 	var f2 = gui.addFolder('Layers');
 
     f1.add(parameters, 'refresh_rate', 100, 3000).step(100).name('Delay (ms)');
     f1.add(parameters, 'trail_length', 0, 500).name('Trail');
+	f1.add(parameters, 'fleet_focus').name('Focus on fleet');
 
 	var fleet_toggle = f2.add(parameters, 'fleet_visibility').name('Fleet');
-
 	fleet_toggle.onChange(toggleFleetVisibility);
 
-	f2.open();
 }
 
 function init() {
@@ -140,7 +140,7 @@ function createDrones() {
 			var geometry = new THREE.SphereBufferGeometry(5, 32, 32);
 			var material = new THREE.MeshStandardMaterial({color: drone_color});
 			var drone_object = new THREE.Mesh(geometry, material);
-;
+
 			drone_object.position.set(drone_position[0], drone_position[1], drone_position[2]);
 			scene.add(drone_object);
 
@@ -163,7 +163,7 @@ function createDrones() {
 
 		}
 		// Focus on fleet
-		fitCameraToFleet(camera, controls);
+		fitCameraToFleet();
 	});
 }
 
@@ -225,7 +225,7 @@ function toggleFleetVisibility(){
 	}
 }
 
-function fitCameraToFleet(camera, controls, fitOffset = 1.2) {
+function fitCameraToFleet(fitOffset = 1.5) {
 
 	var box = new THREE.Box3();
 
@@ -292,7 +292,6 @@ function onClick( event ) {
 
 	// Raycast !
     var intersects = raycaster.intersectObjects( objects, true );
-	console.log(intersects)
 
     if ( intersects.length > 0 ) {
 		console.log(intersects[0].object)
