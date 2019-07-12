@@ -39,31 +39,39 @@ A : https://docs.djangoproject.com/en/2.2/intro/tutorial06/
 
 	<body>
 
-		<!-- navbar -->
+		<!-- horizontal navbar for large screens-->
 
 		<nav class="teal z-depth-0">
 			<div class="nav-wrapper">
 				<a href="https://github.com/teobouvard/nephelae_gui" class="brand-logo right"><i class="material-icons">cloud</i></a>
 				<a href="#" data-target="small_nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
 				<ul id="large_nav" class="left hide-on-med-and-down">
-					<li id='nav_preview'><a href="{% url 'preview' %}">Preview</a></li>
-					<li id='nav_map'><a href="{% url 'map' %}">Map</a></li>
+					<li id='nav_preview'><a href="{% url 'preview' %}">Trails</a></li>
+					<li><a class="dropdown-trigger" href="#!" data-target="tracking_dropdown">Tracking<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
 					<li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li>
 					<li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
-					<li id='nav_simulation'><a href="{% url 'simulation' %}">Simulation</a></li>
 					<li id='nav_commands'><a href="{% url 'commands' %}">Commands (soon)</a></li>
 				</ul>
 			</div>
 		</nav>
 
+		<!-- tracking dropdown -->
+
+		<ul id="tracking_dropdown" class="dropdown-content">
+			<li><a href="{% url 'map' %}">Map</a></li>
+			<li><a href="{% url 'simulation' %}">3D</a></li>
+		</ul>
+
+		<!-- vertical navbar for small screens-->
+		
 		<ul class="sidenav" id="small_nav" style="z-index:2000;">
-			<li id='nav_preview'><a href="{% url 'preview' %}">Preview</a></li>
+			<li id='nav_preview'><a href="{% url 'preview' %}">Trails</a></li>
 			<li id='nav_map'><a href="{% url 'map' %}">Map</a></li>
+			<li id='nav_simulation'><a href="{% url 'simulation' %}">Simulation</a></li>
 			<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
 			<li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li>
 			<li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
-			<li id='nav_simulation'><a href="{% url 'simulation' %}">Simulation</a></li>
 			<li id='nav_commands'><a href="{% url 'commands' %}">Commands (soon)</a></li>
 		</ul>
 

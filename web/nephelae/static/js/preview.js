@@ -1,8 +1,6 @@
 // Activate current menu in nav
 $('#nav_preview').addClass('active');
 
-var chart_size = 800;
-
 // Plot settings
 var layout = {
     scene: {
@@ -16,7 +14,7 @@ var layout = {
             up: { x: 0, y: 0, z: 1 }
         },
     },
-    showlegend: true,
+    showlegend: false,
 };
 
 var config = { 
@@ -29,12 +27,14 @@ var config = {
 var parameters = {
     trail_length: 50,
     update: drawPlot,
+    line_color: 'Altitude',
+    color_mapping: {LWC: ['past_altitudes', 'Greys'], Altitude: ['past_altitudes', 'Reds']},
 }
 
 
 $(document).ready(function(){
 
-    // // Inititalize parameters
+    // // Inititalize parameters before drawing plot
     setupGUI();
 
 });
@@ -46,6 +46,8 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Controls');
     f1.add(parameters, 'trail_length', 2, 500).step(1).name("Trail length (s)").onChange(drawPlot);
+    f1.add(parameters, 'line_color', ['Altitude', 'LWC']).name("Trail color").onChange(drawPlot);
+    f1.add(parameters, 'update').name('Update plot');
 
     var f2 = gui.addFolder('Trails');
 
@@ -56,7 +58,7 @@ function setupGUI(){
             f2.add(parameters, key).name('Drone ' + key).onChange(drawPlot);
         }
 
-        // And then display the drones in the box
+        // And then display the drones
         drawPlot();
     })
 }
@@ -68,11 +70,14 @@ function drawPlot(){
     $.getJSON('update/', (response) => {
 
         for (var key in response.drones){
+
+            // Check if trail has to be displayed
             if (parameters[key]){
+
                 // Parse drones data
                 var drone_id = key;
                 var drone_color = global_colors[key%global_colors.length];
-                var drone_path = response.drones[key].path
+                var drone_path = response.drones[key].path;
                 var past_latitudes = [];
                 var past_longitudes = [];
                 var past_altitudes = [];
@@ -85,6 +90,7 @@ function drawPlot(){
                 }
 
                 // Update chart data with new dataset and line color corresponding to the icon
+                var displayColorBar = onlyOneTrail();
                 var updatePath = {
                     type: 'scatter3d',
                     x: past_longitudes,
@@ -92,21 +98,35 @@ function drawPlot(){
                     z: past_altitudes,
                     name: drone_id,
                     mode: 'lines',
-                    line:{
-                        color: drone_color,
+                    line: {
+                        width: 5,
                         shape: 'spline',
-                        dash: 'solid',
+                        color: eval(parameters.color_mapping[parameters.line_color][0]),
+                        colorscale: parameters.color_mapping[parameters.line_color][1],
+                        showscale: displayColorBar,
+                        colorbar: {
+                            x: -0.2,
+                            xpad: 30,
+                        }
                     },
-                    hoverinfo: 'none'
                 };
-            
                 data.push(updatePath);
             }
-
         }
 
         // Create or update plot with new data
         Plotly.react('chart', data, layout, config);
         removeLoader();
     });
+}
+
+function onlyOneTrail() {
+
+    var numberOfTrails = 0;
+
+    for(key in parameters){
+        if (typeof parameters[key] == 'boolean' && parameters[key] == true) numberOfTrails++;
+    }
+
+    return numberOfTrails == 1;
 }
