@@ -1,7 +1,7 @@
 // Activate current menu in nav
 $("#nav_map").addClass('active');
 
-var flight_map, zoom_home;
+var flight_map, zoom_home, overlays;
 var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 
 // Data from MESO_NH, will come from mapping later
@@ -22,7 +22,7 @@ var fleet = {};
 
 // Parameters
 var parameters = {
-    refresh_rate: 100000, // milliseconds
+    refresh_rate: 1000, // milliseconds
     altitude: 1075,     // meters
     trail_length: 60,    // seconds
 
@@ -70,6 +70,8 @@ function setupMap(){
     // Map
     flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 15, minZoom: 12});
     flight_map.on('moveend', updateLayerBounds);
+    //flight_map.on('movestart', removeImageLayers); //-> uncomment to solve drag glitch (but disappearing images)
+
 
     // Home button
     zoomHome = L.Control.zoomHome();
@@ -86,7 +88,7 @@ function setupMap(){
     var base_layers = {
     };
 
-    var overlays = {
+    overlays = {
         "Map": tiles_overlay,
         "Trails": path_overlay,
         "Markers": markers_overlay,
@@ -201,6 +203,10 @@ function updateURL(){
 function updateLayerBounds(){
     cloud_overlay.setBounds(flight_map.getBounds());
     thermals_overlay.setBounds(flight_map.getBounds());
+
+    // add layers in case they were removed on movestart event (drag glitch)
+    for(key in overlays) flight_map.addLayer(overlays[key]);
+    
     updateURL();
 }
 
@@ -234,4 +240,9 @@ function infosToString(id, altitude, heading){
     infos += '</p>'
 
     return infos;
+}
+
+function removeImageLayers(){
+    flight_map.removeLayer(cloud_overlay);
+    flight_map.removeLayer(thermals_overlay);
 }
