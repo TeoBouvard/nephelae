@@ -26,7 +26,7 @@ var parameters = {
     altitude: 1075,     // meters
     trail_length: 60,    // seconds
 
-    origin: [43.432883, 1.247409] // used to compute layer images
+    origin: [43.46, 1.27] // used to compute layer images
 }
 
 $(document).ready(function(){
@@ -73,7 +73,6 @@ function setupMap(){
     flight_map.on('moveend', updateLayerBounds);
     //flight_map.on('movestart', removeImageLayers); //-> uncomment to solve drag glitch (but disappearing images)
 
-
     // Home button
     zoomHome = L.Control.zoomHome();
 
@@ -86,8 +85,7 @@ function setupMap(){
     thermals_overlay = L.imageOverlay('thermals_img/?' + computeURL(), flight_map.getBounds());
 
     // Set layer dictionnary
-    var base_layers = {
-    };
+    var base_layers = {};
 
     overlays = {
         "Map": tiles_overlay,
@@ -121,7 +119,7 @@ function displayDrones(){
             var drone_heading = response.drones[key].heading;
             var drone_path = response.drones[key].path.slice(-parameters.trail_length-1);
 
-            // Compute color and icon of markers, increment index_icon for next drone 
+            // Compute color and icon of markers based on drone ID
             var drone_color = global_colors[key%global_colors.length];
             var drone_icon = global_icons[key%global_colors.length];
             
@@ -185,9 +183,10 @@ function updateDrones(){
             // ... or display error message if drone id does not match -> update fleet dictionnary and start tracking it
             else {
                 console.error("no drone with id ", drone_id, " found !");
-                initializeDrones(); // NOT SURE IF THIS IS WORKING, CAN'T TEST ?
+                initializeDrones();
             }
         }
+
         // Update home button coordinates and layers URL
         zoomHome.setHomeCoordinates(parameters.origin); // compute center of mass/getBoundsZoom later ?
         updateURL();

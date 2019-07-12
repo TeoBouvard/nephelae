@@ -109,23 +109,7 @@ function updateData(){
                 break;
         }
 
-        if(isAlreadyDrawn){
-            updateCharts(data);
-        } else {
-            if(data.length == 0){
-                alert("No data received from the server");
-            }
-            initializeCharts(data);
-            isAlreadyDrawn = true;
-            removeLoader();
-        }
+        Plotly.react('chart', data, layout, config);
+        removeLoader();
     });
-}
-
-function initializeCharts(data, select){
-    Plotly.newPlot('chart', data, layout, config);
-}
-
-function updateCharts(data){
-    Plotly.react('chart', data, layout, config);
 }

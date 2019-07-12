@@ -130,8 +130,7 @@ function createDrones() {
             var drone_id = key;
             var drone_position = response.drones[key].simulation_position;
             var drone_altitude = response.drones[key].altitude;
-        	var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length-1);
-			drone_path.push(drone_position);
+        	var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length);
 
             // Compute color of marker
             var drone_color = global_colors[key%global_colors.length];
@@ -186,7 +185,7 @@ function update(){
 					var drone_id = key;
 					var drone_position = response.drones[key].simulation_position;
 					var drone_altitude = response.drones[key].altitude;
-					var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length-1);
+					var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length);
 					drone_path.push(drone_position);
 
 					// Compute color of marker
@@ -198,16 +197,18 @@ function update(){
 
 					// Recreate trail vertices (updating did not work properly)
 					scene.remove(fleet[key].path);
-					var geometry = new THREE.Geometry();
-					for(var position in drone_path){
-						var point = drone_path[position];
-						geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
-					}
-					var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
-					var path_object = new THREE.Line( geometry, material );
+					if(parameters.trail_length > 0){
+						var geometry = new THREE.Geometry();
+						for(var position in drone_path){
+							var point = drone_path[position];
+							geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
+						}
+						var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
+						var path_object = new THREE.Line( geometry, material );
 
-					scene.add(path_object);
-					fleet[key].path = path_object;
+						scene.add(path_object);
+						fleet[key].path = path_object;
+					}
 				}
 			}
 		});
