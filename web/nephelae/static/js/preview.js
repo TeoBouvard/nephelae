@@ -1,9 +1,9 @@
 // Activate current menu in nav
-document.getElementById('nav_preview').className = 'active';
-var length_display = document.getElementById('length_display');
-var length_slider = document.getElementById('length_slider');
+$('#nav_preview').addClass('active');
 
-// Define graph settings
+var chart_size = 800;
+
+// Plot settings
 var layout = {
     scene: {
         xaxis:{title: 'Longitude'},
@@ -17,12 +17,6 @@ var layout = {
         },
     },
     showlegend: false,
-    margin: {
-        t: 0, //top margin
-        l: 0, //left margin
-        r: 0, //right margin
-        b: 0, //bottom margin
-    },
 };
 
 var config = { 
@@ -32,30 +26,36 @@ var config = {
 };
 
 // Parameters 
-var refresh_rate = 2000; //milliseconds
-var isAlreadyDrawn = false;
-var trail_length = length_slider.value;
-
-// Update trail length, display 0 when slider is 1 to not slice(0)
-length_slider.oninput = function() {
-    trail_length = this.value;
-    updateInfo();
+var parameters = {
+    trail_length: 50,
+    update: displayDrones,
 }
 
 
 $(document).ready(function(){
 
-    // Start by getting 3d evolution box of the drones, display drones on ajax call response
-    getBox();
-
-    // Display original trail length
-    updateInfo();
+    // // Inititalize parameters
+    setupGUI();
 
 });
 
+function setupGUI(){
+
+    gui = new dat.GUI({ autoplace: false });
+    $('#gui_container').append(gui.domElement);
+
+    $.getJSON('update/', (response) => {
+
+        // And then display the drones in the box
+        displayDrones();
+    })
+}
+
 function displayDrones(){
+
     var data = [];
-    $.getJSON('update/', function(response){
+
+    $.getJSON('update/', (response) => {
 
         // Initialize drone array with drone_id and position marker
         for (var key in response.drones){
@@ -66,20 +66,23 @@ function displayDrones(){
             var drone_position = response.drones[key].position;
             var drone_altitude = response.drones[key].altitude;
             var past_altitudes = response.drones[key].past_altitudes;
-            var past_longitudes = response.drones[key].past_longitudes;
-            var past_latitudes = response.drones[key].past_latitudes;
+            var drone_path = response.drones[key].path
+            var past_latitudes = [];
+            var past_longitudes = [];
 
-            // Append current position to path to close gap
-            past_longitudes.push(drone_position[1]);
-            past_latitudes.push(drone_position[0]);
-            past_altitudes.push(drone_altitude);
+            // Compute coordinates from path
+            for(var i = 0; i < parameters.trail_length; i++){
+                past_latitudes.push(drone_path[i][0]);
+                past_longitudes.push(drone_path[i][1]);
+            }
+            
 
             // Update chart data with new dataset and line color corresponding to the icon
             var updatePath = {
                 type: 'scatter3d',
-                x: past_longitudes.slice(-trail_length-1),
-                y: past_latitudes.slice(-trail_length-1),
-                z: past_altitudes.slice(-trail_length-1),
+                x: past_longitudes,
+                y: past_latitudes,
+                z: past_altitudes.slice(-parameters.trail_length-1),
                 name: drone_id,
                 mode: 'lines',
                 line:{
@@ -89,8 +92,9 @@ function displayDrones(){
                 },
                 hoverinfo: 'none'
             };
+
             
-            var updateMarker = {
+            /*var updateMarker = {
                 type: 'scatter3d',
                 x: [drone_position[1]],
                 y: [drone_position[0]],
@@ -103,46 +107,13 @@ function displayDrones(){
                 }
             };
 
+            data.push(updateMarker);*/
+
             data.push(updatePath);
-            data.push(updateMarker);
         }
 
-        //data.push(response.clouds)
-
-        if(isAlreadyDrawn){
-            // Update chart if it already exists
-            Plotly.react('chart', data, layout, config)
-        } else {
-            // Launch livetracking if response contains data
-            if(data.length == 0){
-                alert("No drones detected, try launching the simulation and restart the server");
-            } else {
-                Plotly.newPlot('chart', data, layout, config);
-                isAlreadyDrawn = true;
-                setInterval(displayDrones, refresh_rate);
-                removeLoader();
-            }
-        }
+        // Create or update plot with new data
+        Plotly.react('chart', data, layout, config);
+        removeLoader();
     });
-}
-
-function getBox(){
-    $.getJSON('box', function(response){
-        layout.scene.xaxis.range = response.longitude_range;
-        layout.scene.yaxis.range = response.latitude_range;
-        layout.scene.zaxis.range = response.altitude_range;
-
-        // And then display the drones in the box
-        displayDrones();
-    })
-}
-
-function updateInfo(){
-    if(trail_length == 0){
-        length_display.innerHTML = "no trail";
-    } else if (trail_length == 1){
-        length_display.innerHTML = "trail length : last second";
-    } else {
-        length_display.innerHTML = "trail length : " + (trail_length) + " seconds";
-    }
 }

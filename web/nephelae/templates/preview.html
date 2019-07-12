@@ -3,26 +3,20 @@
 
 
 {% block additional_scripts %}
+
 	<!-- Load specific javascript -->
 	<script src="{% static 'js/preview.js' %}"></script>
 	<!-- Load plotly js -->
     <script src="{% static 'js/libs/plotly.js' %}"></script>
+	
 {% endblock %}
 
 {% block page %}
 
- <!-- Display 3d plot -->
-<div id='chart' class="fullscreen"></div>
+	<!-- Display 3d plot -->
+	<div id='chart' class="fullscreen"></div>
 
- <!-- Display trail length slider -->
-
-<div class="container">
-	<div class="row">
-		<div class="col s6 offset-s3">
-			<div id="length_display" class="info"></div>
-			<input id="length_slider" type="range" min="0" max="500", value="60">
-		</div>
-	</div>
-</div>
+	<!-- Display controller -->
+    <div id="gui_container"></div>
 
 {% endblock %}

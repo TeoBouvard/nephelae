@@ -1,7 +1,7 @@
 // Activate current menu in nav
 $('#nav_simulation').addClass('active');
 
-var WIDTH = $('#canvas_container').width() -15;
+var WIDTH = $('#canvas_container').width() -15; // don't know why canvas is larger than container
 var HEIGHT = $('#canvas_container').height();
 
 // Simulation elements
@@ -25,6 +25,7 @@ $(document).ready(function(){
 });
 
 function setupGUI(){
+	
     gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
@@ -35,8 +36,7 @@ function setupGUI(){
     f1.add(parameters, 'trail_length', 0, 500).name('Trail');
 	f1.add(parameters, 'fleet_focus').name('Focus on fleet');
 
-	var fleet_toggle = f2.add(parameters, 'fleet_visibility').name('Fleet');
-	fleet_toggle.onChange(toggleFleetVisibility);
+	f2.add(parameters, 'fleet_visibility').onChange(toggleFleetVisibility).name('Fleet');
 
 }
 

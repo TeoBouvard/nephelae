@@ -2,24 +2,17 @@
 $('#nav_sections').addClass('active');
 
 // Chart style and options
-var lm = 50;
-var rm = 30;
-var bm = 30;
-var tm = 30;
-var chart_width = 600;
-var chart_height = 600;
+var chart_size = 600;
 
 var layout = {
-    //margin: { l: lm, r: rm, b: bm, t: tm },
-    width: chart_width,
-    height: chart_height,
+    width: chart_size,
+    height: chart_size,
     uirevision: true,
 };
 
 var config = {
     responsive : true,
     displaylogo: false,
-    displayModeBar: false,
 };
 
 // Keep track of chart state
@@ -33,7 +26,7 @@ var parameters = {
 
 
 $(document).ready(function(){
-    // set sliders range and display initial values
+    // set sliders range and display initial image
     setupGUI();
 });
 
@@ -88,6 +81,7 @@ function updateData(){
     $.getJSON('update/' + parameters.time + '/' + parameters.altitude, (response) => {
 
         switch (parameters.selected_layer) {
+            
             case "clouds":
 
                 data = [{

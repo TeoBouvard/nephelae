@@ -63,8 +63,6 @@ class PprzGpsGrabber:
                 "heading": heading,
                 "position": position,
                 "path": [position],
-                "past_longitudes": [position[1]],
-                "past_latitudes": [position[0]],
                 "past_altitudes": [altitude],
                 "last_log_time": m_time,
                 "simulation_position": simulation_position,
@@ -84,16 +82,12 @@ class PprzGpsGrabber:
             if m_time - self.uavs[uavId]['last_log_time'] > close_enough:
                 self.uavs[uavId]['path'].append(position)
                 self.uavs[uavId]['past_altitudes'].append(altitude)
-                self.uavs[uavId]['past_longitudes'].append(position[1])
-                self.uavs[uavId]['past_latitudes'].append(position[0])
                 self.uavs[uavId]['simulation_path'].append(simulation_position)
                 self.uavs[uavId]['last_log_time'] = m_time
 
                 # Delete old positions
                 if len(self.uavs[uavId]['path']) > log_size:
                     self.uavs[uavId]['path'].pop(0)
-                    self.uavs[uavId]['past_altitudes'].pop(0)
-                    self.uavs[uavId]['past_longitudes'].pop(0)
                     self.uavs[uavId]['past_latitudes'].pop(0)
                     self.uavs[uavId]['simulation_path'].pop(0)
 
