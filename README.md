@@ -56,6 +56,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - icons https://materializecss.com/icons.html
 - reduce array size in image overlay (memory problems?)
 - drag glitch on map
+- simulation path update does not work, have to redraw it entirely
 
 
 ## Questions

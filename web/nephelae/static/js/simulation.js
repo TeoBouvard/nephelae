@@ -1,8 +1,11 @@
 // Activate current menu in nav
 $('#nav_simulation').addClass('active');
 
+var WIDTH = $('#canvas_container').width() -15;
+var HEIGHT = $('#canvas_container').height();
+
 // Simulation elements
-var camera, near, far, scene, renderer, controls, stats;
+var camera, near, far, scene, renderer, controls, raycaster, mouse;
 var fleet = {};
 var gui;
 var then = new Date();
@@ -51,6 +54,7 @@ function init() {
 	createControls();
 
 	window.addEventListener( 'resize', onWindowResize, false );
+	window.addEventListener( 'click', onClick, false );
 
 	createFloor();
 
@@ -70,13 +74,13 @@ function init() {
 function createRenderer() {
 	// why is canvas size bigger than container ?
     renderer = new THREE.WebGLRenderer({ antialias: true });
-	renderer.setSize($('#canvas_container').width() - 15, $('#canvas_container').height());
+	renderer.setSize(WIDTH, HEIGHT);
 	$('#canvas_container').append( renderer.domElement );
 }
 
 function createCamera() {
 	var fov = 60;
-	var aspect = $('#canvas_container').width() / $('#canvas_container').height();
+	var aspect = WIDTH / HEIGHT;
 	near = 1;
 	far = 5000;
 	camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
@@ -91,6 +95,8 @@ function createScene() {
 
 function createControls() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
+	raycaster = new THREE.Raycaster();
+	mouse = new THREE.Vector2;
 }
 
 function createFloor() {
@@ -240,7 +246,6 @@ function fitCameraToFleet(camera, controls, fitOffset = 1.2) {
 
 	controls.maxDistance = distance * 5;
 	controls.target.copy(center);
-	//controls.maxPolarAngle = Math.PI / 2; // -> compute floor angle
 
 	camera.near = distance / 100;
 	camera.far = distance * 100;
@@ -251,11 +256,46 @@ function fitCameraToFleet(camera, controls, fitOffset = 1.2) {
 	controls.update();
 }
 
+/* EVENT LISTENERS */
+
 function onWindowResize(){
 
-    camera.aspect = $('#canvas_container').width() / $('#canvas_container').height();
+	WIDTH = $('#canvas_container').width();
+	HEIGHT = $('#canvas_container').height();
+	
+    camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( $('#canvas_container').width(), $('#canvas_container').height() );
+    renderer.setSize( WIDTH, HEIGHT );
 
+}
+
+function onClick( event ) {
+
+	// event.preventDefault(); not sure if useless
+	
+	// Compute mouse position in the canvas
+    var rect = $('canvas')[0].getBoundingClientRect();
+    var x = event.clientX - rect.left;
+    var y = event.clientY - rect.top;
+	mouse.x = ( x / WIDTH ) * 2 - 1;
+	mouse.y = - ( y / HEIGHT ) * 2 + 1;
+
+	// Create a list of intersectable objects
+	var objects = [];
+	for (var key in fleet){
+		objects.push(fleet[key].drone);
+	}
+
+	// Update raycaster direction
+    raycaster.setFromCamera( mouse, camera );
+
+	// Raycast !
+    var intersects = raycaster.intersectObjects( objects, true );
+	console.log(intersects)
+
+    if ( intersects.length > 0 ) {
+		console.log(intersects[0].object)
+        //intersects[0].object.callback();
+    }
 }
