@@ -15,9 +15,6 @@ var config = {
     displaylogo: false,
 };
 
-// Keep track of chart state
-var isAlreadyDrawn = false;
-
 var parameters = {
     time: 0,
     altitude: 0,
@@ -36,7 +33,7 @@ function setupGUI(){
     var gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
-    $.getJSON('box/', function(response){
+    $.getJSON('box/', (response) => {
 
         // Parse response
         var min_time = Math.ceil(response[0].min);
@@ -76,6 +73,7 @@ function setupGUI(){
 }
 
 function updateData(){
+    
     var data;
 
     $.getJSON('update/' + parameters.time + '/' + parameters.altitude, (response) => {

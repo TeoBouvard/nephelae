@@ -62,7 +62,6 @@ function init() {
 
 	createDrones();
 
-
 	// start the animation loop
   	renderer.setAnimationLoop(() => {
 		update();
@@ -159,8 +158,8 @@ function createDrones() {
                 drone: drone_object,
 				path: path_object
             };
-
 		}
+		
 		// Focus on fleet
 		fitCameraToFleet();
 	});
@@ -191,12 +190,16 @@ function update(){
 					// Compute color of marker
 					var drone_color = global_colors[key%global_colors.length];
 
-
-					// Update drone position
+					// Update drone object
 					fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
+					fleet[key].drone.userData = {
+						id: key,
+						altitude: drone_altitude, 
+					}
 
 					// Recreate trail vertices (updating did not work properly)
 					scene.remove(fleet[key].path);
+
 					if(parameters.trail_length > 0){
 						var geometry = new THREE.Geometry();
 						for(var position in drone_path){
@@ -268,12 +271,11 @@ function onWindowResize(){
     camera.updateProjectionMatrix();
 
     renderer.setSize( WIDTH, HEIGHT );
-
 }
 
 function onClick( event ) {
 
-	// event.preventDefault(); not sure if useless
+	event.preventDefault(); // not sure if useless
 	
 	// Compute mouse position in the canvas
     var rect = $('canvas')[0].getBoundingClientRect();
@@ -295,7 +297,10 @@ function onClick( event ) {
     var intersects = raycaster.intersectObjects( objects, true );
 
     if ( intersects.length > 0 ) {
-		console.log(intersects[0].object)
-        //intersects[0].object.callback();
+        displayInfo(intersects[0].object.userData);
     }
+}
+
+function displayInfo(data){
+	console.log(data)
 }

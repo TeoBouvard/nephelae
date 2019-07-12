@@ -11,7 +11,7 @@ A : Clone the repo and run `install.sh`. You should define two environment varia
   
 
 **Q : How do I run it ?**  
-A : Once installed, you can launch the server by running `runserver.sh`. You should then open a web browser (chrome or chromium preferably) and go to `localhost:8000`. As the server broadcasts on the whole network, you can use this interface from every computer on the network, by changing "localhost" to the server's IP address in the URL.
+A : Once installed (make sure to check the prerequisites), you can launch the server by running `runserver.sh`. You can then open a web browser (chrome or chromium preferably) and go to `localhost:8000`. As the server broadcasts on the whole network, you can use this interface from every computer on the network, by changing "localhost" to the server's IP address in the URL.
   
 
 **Q : How does it work ?**  
@@ -45,7 +45,6 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - maps : https://leaflet-extras.github.io/leaflet-providers/preview/ / mobile atlas creator, create script ?
 - os.environ['MESO_NH'], os.environ['MAP_TILES'] -> define env variables in install script !
 - leaflet-velocity
-- plotly update button
 - requête repère mobile au mapping
 - requête box au mapping
 - display drones altitudes in map slider
@@ -55,7 +54,6 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - 3d model of uavs ?
 - icons https://materializecss.com/icons.html
 - reduce array size in image overlay (memory problems?)
-- drag glitch on map
 - simulation path update does not work, have to redraw it entirely
 
 
