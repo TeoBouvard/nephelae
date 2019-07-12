@@ -2,8 +2,7 @@
 {% load static %}
 
 {% block additional_head %}
-    <!-- Load specific CSS -->
-	<link rel="stylesheet" href="{% static 'css/sections.css' %}"/>
+
 {% endblock %}
 
 <!-- Load specific javascript -->
@@ -17,32 +16,10 @@
 
 {% block page %}
 
-    <!-- Display altitude and time slider -->
-    <div class="settings">
-        <div class="row">
-            <div class="col s8 offset-s2">
-                <div id="altitude_display" class="info"></div>
-                <input id="altitude_slider" type="range">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col s8 offset-s2">
-                <div id="time_display" class="info"></div>
-                <input id="time_slider" type="range">
-            </div>
-        </div>
-        <div class="row">
-            <div id="select" class="input-field col s8 offset-s2">
-                <select>
-                    <option value="clouds">Clouds</option>
-                    <option value="thermals" selected>Thermals</option>
-                </select>
-                <label>Variable</label>
-            </div>
-        </div>
-    </div>
-
     <!-- Display cross sections heatmaps -->
     <div id='chart'></div>
+
+    <!-- Display controller -->
+    <div id="gui_container"></div>
 
 {% endblock %}

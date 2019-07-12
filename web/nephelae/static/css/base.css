@@ -53,7 +53,7 @@ nav ul li a {
 }
 
 
-/* Fix conflict between materialize and dat.gui*/
+/* Fix conflicts between materialize and dat.gui*/
 #gui_container [type=text] {
     height: initial !important;
     font-family: 'Roboto-Light';
@@ -63,6 +63,17 @@ nav ul li a {
 #gui_container [type=checkbox] {
     position: initial !important;
     opacity: initial !important;
+}
+
+#gui_container select{
+    display: initial;
+    background-color: #f2f2f2;
+    width: initial;
+    padding: initial;
+    border-radius: initial;
+    height: initial;
+    padding: initial;
+    font-family: 'Roboto-Light';
 }
 
 .dg.main.a {

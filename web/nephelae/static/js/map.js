@@ -31,7 +31,7 @@ var parameters = {
 
 $(document).ready(function(){
 
-    // Inititalize parameters with mesonh bounds
+    // Inititalize parameters
     setupGUI();
     
     removeLoader();
@@ -55,6 +55,7 @@ function setupGUI(){
 
         max_time = response[0].max;
 
+        // Setup GUI
         gui.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
         gui.add(parameters, 'altitude', min_altitude, max_altitude).step(1).name('Altitude (m)');
         gui.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
