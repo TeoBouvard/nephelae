@@ -22,7 +22,7 @@ var fleet = {};
 
 // Parameters
 var parameters = {
-    refresh_rate: 1000, // milliseconds
+    refresh_rate: 100000, // milliseconds
     altitude: 1075,     // meters
     trail_length: 60,    // seconds
 

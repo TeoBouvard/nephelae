@@ -11,7 +11,7 @@ var then = new Date();
 var parameters = {
 	refresh_rate: 500,
 	trail_length: 60,
-	drone_visibility: true,
+	fleet_visibility: true,
 }
 
 $(document).ready(function(){
@@ -30,7 +30,7 @@ function setupGUI(){
     f1.add(parameters, 'refresh_rate', 100, 3000).step(100).name('Delay (ms)');
     f1.add(parameters, 'trail_length', 0, 500).name('Trail');
 
-	var fleet_toggle = f2.add(parameters, 'drone_visibility').name('Fleet');
+	var fleet_toggle = f2.add(parameters, 'fleet_visibility').name('Fleet');
 
 	fleet_toggle.onChange(toggleFleetVisibility);
 
@@ -157,7 +157,7 @@ function createDrones() {
 
 		}
 		// Focus on fleet
-		fitCameraToSelection(camera, controls, fleet);
+		fitCameraToFleet(camera, controls);
 	});
 }
 
@@ -172,37 +172,37 @@ function update(){
 		// Update drones objects
 		$.getJSON('update/', (response) => {
 
-			for(var key in response.drones){
+			if (parameters.fleet_visibility){
+				
+				for(var key in response.drones){
 
-				// Parse response data
-				var drone_id = key;
-				var drone_position = response.drones[key].simulation_position;
-				var drone_altitude = response.drones[key].altitude;
-				var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length-1);
-				drone_path.push(drone_position);
+					// Parse response data
+					var drone_id = key;
+					var drone_position = response.drones[key].simulation_position;
+					var drone_altitude = response.drones[key].altitude;
+					var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length-1);
+					drone_path.push(drone_position);
 
-				// Compute color of marker
-            	var drone_color = global_colors[key%global_colors.length];
+					// Compute color of marker
+					var drone_color = global_colors[key%global_colors.length];
 
-				// Update drone position
-				fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
 
-				// Recreate trail vertices (updating did not work properly)
-				scene.remove(fleet[key].path);
+					// Update drone position
+					fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
 
-				var geometry = new THREE.Geometry();
-				for(var position in drone_path){
-					var point = drone_path[position];
-					geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
+					// Recreate trail vertices (updating did not work properly)
+					scene.remove(fleet[key].path);
+					var geometry = new THREE.Geometry();
+					for(var position in drone_path){
+						var point = drone_path[position];
+						geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
+					}
+					var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
+					var path_object = new THREE.Line( geometry, material );
+
+					scene.add(path_object);
+					fleet[key].path = path_object;
 				}
-
-				var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
-	
-				var path_object = new THREE.Line( geometry, material );
-
-				scene.add(path_object);
-				fleet[key].path = path_object;
-
 			}
 		});
 	}
@@ -219,11 +219,11 @@ function toggleFleetVisibility(){
 	}
 }
 
-function fitCameraToSelection(camera, controls, selection, fitOffset = 1.2) {
+function fitCameraToFleet(camera, controls, fitOffset = 1.2) {
 
 	var box = new THREE.Box3();
 
-	for(const key in selection) box.expandByObject(selection[key].drone);
+	for(const key in fleet) box.expandByObject(fleet[key].drone);
 
 	const size = box.getSize(new THREE.Vector3());
 	const center = box.getCenter(new THREE.Vector3());

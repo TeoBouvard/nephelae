@@ -37,7 +37,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 ## Prerequisites  
 
 - A running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). 
-- A Meso_NH file. 
+- A Meso_NH file referenced by `$MESO_NH`. 
 
 
 ## TODO
@@ -48,7 +48,6 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - plotly update button
 - requête repère mobile au mapping
 - requête box au mapping
-- drag problem in 3d -> three.js instead of plot ?
 - display drones altitudes in map slider
 - launch drones script ?
 - bounds to json
@@ -56,6 +55,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - 3d model of uavs ?
 - icons https://materializecss.com/icons.html
 - reduce array size in image overlay (memory problems?)
+- drag glitch on map
 
 
 ## Questions
