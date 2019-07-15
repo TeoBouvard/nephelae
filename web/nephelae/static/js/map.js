@@ -89,9 +89,8 @@ function setupMap(){
     wind_overlay = L.velocityLayer({
         displayValues: true,
         displayOptions: {
-        velocityType: "Wind",
-        displayPosition: "bottomleft",
-        displayEmptyString: "No wind data"
+            velocityType: "Wind",
+            displayEmptyString: "No wind data"
         },
         maxVelocity: 15
     });
@@ -129,66 +128,76 @@ function setupMap(){
 
 function displayDrones(){
 
-        $.getJSON('update/', (response) => {
+    $.getJSON('discover/', (response) => {
 
-        // Initialize drone array with drone_id and position marker
-        for (var key in response.drones){
+        var query = $.param({uav_id: response, trail_length: parameters.trail_length});
 
-            // Parse response data
-            var drone_id = key;
-            var drone_position = response.drones[key].position;
-            var drone_altitude = response.drones[key].altitude;
-            var drone_heading = response.drones[key].heading;
-            var drone_path = response.drones[key].path.slice(-parameters.trail_length-1);
+        $.getJSON('update/?' + query, (response) => {
 
-            // Compute color and icon of markers based on drone ID
-            var drone_color = global_colors[key%global_colors.length];
-            var drone_icon = global_icons[key%global_colors.length];
+            // Initialize drone array with drone_id and position marker
+            for (var key in response.drones){
+
+                // Parse response data
+                var drone_id = key;
+                var drone_path = response.drones[key].path;
+                var drone_position = drone_path.slice(-1)[0];
+                var drone_altitude = drone_path.slice(-1)[0][2];
+                var drone_heading = response.drones[key].heading;
+                
+
+                // Compute color and icon of markers based on drone ID
+                var drone_color = global_colors[key%global_colors.length];
+                var drone_icon = global_icons[key%global_colors.length];
+                
+                // Create leaflet marker and polyline at drone position
+                var marker = L.marker(drone_position, {icon: drone_icon}).bindTooltip("Drone " + key);
+                var polyline = L.polyline([drone_path], {color : drone_color, weight : '2', dashArray : '5,7'});
+                
+                // Update fleet dictionnary with discovered drone
+                fleet[drone_id] = ({
+                    color : drone_color, 
+                    position : marker, 
+                    altitude : drone_altitude, 
+                    heading: drone_heading,
+                    path : polyline,
+                });
+
+                // Add drone marker to layer group
+                fleet[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
+                fleet[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading), {autoClose: false});
+                fleet[drone_id].path.addTo(path_overlay);
+            }
             
-            // Create leaflet marker and polyline at drone position
-            var marker = L.marker(drone_position, {icon: drone_icon}).bindTooltip("Drone " + key);
-            var polyline = L.polyline([drone_path], {color : drone_color, weight : '2', dashArray : '5,7'});
-            
-            // Update fleet dictionnary with discovered drone
-            fleet[drone_id] = ({
-                color : drone_color, 
-                position : marker, 
-                altitude : drone_altitude, 
-                heading: drone_heading,
-                path : polyline,
-            });
-
-            // Add drone marker to layer group
-            fleet[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
-            fleet[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading), {autoClose: false});
-            fleet[drone_id].path.addTo(path_overlay);
-        }
-        
-        // Center map on drone last drone added
-        if(Object.keys(fleet).length != 0){
-            flight_map.setView(drone_position, 15);
-            zoomHome.addTo(flight_map);
-            updateDrones();
+            // Center map on drone last drone added
+            if(Object.keys(fleet).length != 0){
+                flight_map.setView(drone_position, 15);
+                zoomHome.addTo(flight_map);
+                updateDrones();
+            } else {
+                alert("No drones detected, try launching the simulation and restart the server");
+                updateDrones();
+            }
             removeLoader();
-        } else {
-            alert("No drones detected, try launching the simulation and restart the server");
-            updateDrones();
-        }
+
+        });
     });
 }
 
 function updateDrones(){
 
+    var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length});
+
     // Request updated data from the server
-    $.getJSON('update/', (response) => {
+    $.getJSON('update/?' + query, (response) => {
 
         // Parse response
         for (var key in response.drones){
+            // Parse response data
             var drone_id = key;
-            var drone_position = response.drones[key].position;
-            var drone_altitude = response.drones[key].altitude;
+            var drone_path = response.drones[key].path;
+            var drone_position = drone_path.slice(-1)[0];
+            var drone_altitude = drone_path.slice(-1)[0][2];
             var drone_heading = response.drones[key].heading;
-            var drone_path = response.drones[key].path.slice(-parameters.trail_length-1);
 
             // Identify corresponding drone ...
             var drone_to_update = fleet[drone_id];

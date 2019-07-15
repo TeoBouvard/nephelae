@@ -60,7 +60,7 @@ function setupGUI(){
 
         // And then display the drones
         drawPlot();
-    })
+    });
 }
 
 function drawPlot(){

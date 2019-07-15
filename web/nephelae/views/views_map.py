@@ -6,21 +6,7 @@ from django.utils.cache import add_never_cache_headers
 import numpy as np
 from geopy.distance import distance
 
-from ..models import tracker, PprzGpsGrabber, hypercube
-
-
-#pprz = PprzGpsGrabber()
-#pprz.start()
-
-
-# Get UAV fleet info
-def update_map(request):
-    data = {
-        # 'drones': pprz.uavs,
-    }
-    response = JsonResponse(data)
-    add_never_cache_headers(response)
-    return response
+from ..models import tracker, hypercube
 
 
 # Returns a list of discovered UAVs
@@ -28,15 +14,17 @@ def discover_UAVs(request):
     return JsonResponse(tracker.discover(), safe=False)
 
 
+# Get UAV fleet info
 def update_UAVs(request):
 
+    print(request)
     # Parse request parameters
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = request.GET.getlist('uav_id[]')
 
     uav_ids = [int(item) for item in uav_ids]
 
-    return JsonResponse({'drones':tracker.track(uav_ids, trail_length)})
+    return JsonResponse({'drones': tracker.track(uav_ids, trail_length)})
 
 
 def get_json(request):
