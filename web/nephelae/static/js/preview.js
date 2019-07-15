@@ -25,7 +25,7 @@ var config = {
 
 // Parameters 
 var parameters = {
-    trail_length: 50,
+    trail_length: 60,
     update: drawPlot,
     line_color: 'Altitude',
     color_mapping: {Altitude: ['past_altitudes', 'Reds'], LWC: ['past_altitudes', 'Greys'] },
@@ -51,9 +51,9 @@ function setupGUI(){
 
     var f2 = gui.addFolder('Trails');
 
-    $.getJSON('update/', (response) => {
+    $.getJSON('discover/', (response) => {
 
-        for (var key in response.drones){
+        for (var key of response){
             parameters[key] = true;
             f2.add(parameters, key).name('Drone ' + key).onChange(drawPlot);
         }
@@ -66,68 +66,68 @@ function setupGUI(){
 function drawPlot(){
 
     var data = [];
+    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length});
 
-    $.getJSON('update/', (response) => {
+    $.getJSON('update/?' + query, (response) => {
+
+        console.log(response)
 
         for (var key in response.drones){
 
-            // Check if trail has to be displayed
-            if (parameters[key]){
+            // Parse drones data
+            var drone_id = key;
+            var drone_color = global_colors[key%global_colors.length];
+            var drone_path = response.drones[key].path;
+            var past_latitudes = [];
+            var past_longitudes = [];
+            var past_altitudes = [];
 
-                // Parse drones data
-                var drone_id = key;
-                var drone_color = global_colors[key%global_colors.length];
-                var drone_path = response.drones[key].path;
-                var past_latitudes = [];
-                var past_longitudes = [];
-                var past_altitudes = [];
-
-                // Compute coordinates from path
-                for(var i = 0; i < Math.min(parameters.trail_length, drone_path.length); i++){
-                    past_latitudes.push(drone_path[drone_path.length-1-i][0]);
-                    past_longitudes.push(drone_path[drone_path.length-1-i][1]);
-                    past_altitudes.push(drone_path[drone_path.length-1-i][2]);
-                }
-
-                // Update chart data with new dataset and line color corresponding to the icon
-                var displayColorBar = onlyOneTrail();
-                var updatePath = {
-                    type: 'scatter3d',
-                    x: past_longitudes,
-                    y: past_latitudes,
-                    z: past_altitudes,
-                    name: drone_id,
-                    mode: 'lines',
-                    line: {
-                        width: 5,
-                        shape: 'spline',
-                        color: eval(parameters.color_mapping[parameters.line_color][0]),
-                        colorscale: parameters.color_mapping[parameters.line_color][1],
-                        showscale: displayColorBar,
-                        colorbar: {
-                            x: -0.2,
-                            xpad: 30,
-                        }
-                    },
-                };
-                data.push(updatePath);
+            // Compute coordinates from path
+            for(var i = 0; i < Math.min(parameters.trail_length, drone_path.length); i++){
+                past_latitudes.push(drone_path[drone_path.length-1-i][0]);
+                past_longitudes.push(drone_path[drone_path.length-1-i][1]);
+                past_altitudes.push(drone_path[drone_path.length-1-i][2]);
             }
+
+            // Display colorbar if only one UAV is selected
+            var displayColorBar = getSelectedUAVs().length == 1;
+
+            // Update chart data with new dataset and line color corresponding to the icon
+            var updatePath = {
+                type: 'scatter3d',
+                x: past_longitudes,
+                y: past_latitudes,
+                z: past_altitudes,
+                name: drone_id,
+                mode: 'lines',
+                line: {
+                    width: 5,
+                    shape: 'spline',
+                    color: eval(parameters.color_mapping[parameters.line_color][0]),
+                    colorscale: parameters.color_mapping[parameters.line_color][1],
+                    showscale: displayColorBar,
+                    colorbar: {
+                        x: -0.2,
+                        xpad: 30,
+                    }
+                },
+            };
+            data.push(updatePath);
         }
 
         // Create or update plot with new data
         Plotly.react('chart', data, layout, config);
-        console.log("called")
         removeLoader();
     });
 }
 
-function onlyOneTrail() {
+function getSelectedUAVs() {
 
-    var numberOfTrails = 0;
+    var selectedUAVs = [];
 
     for(key in parameters){
-        if (typeof parameters[key] == 'boolean' && parameters[key] == true) numberOfTrails++;
+        if (typeof parameters[key] == 'boolean' && parameters[key] == true) selectedUAVs.push(key);
     }
 
-    return numberOfTrails == 1;
+    return selectedUAVs;
 }
