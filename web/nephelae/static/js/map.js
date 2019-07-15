@@ -35,9 +35,6 @@ $(document).ready(function(){
     setupGUI();
     
     removeLoader();
-
-    // Update elements every 'refresh_rate' ms
-    displayDrones();
 });
 
 function setupGUI(){
@@ -103,6 +100,9 @@ function setupMap(){
 
     // Change checkbox style dynamically (fucking materialize framework)
     $(':checkbox').addClass('filled-in');
+
+    // Prevent async conflicts by displaying drones once map is initialized
+    displayDrones();
 }
 
 function displayDrones(){
@@ -124,7 +124,7 @@ function displayDrones(){
             var drone_icon = global_icons[key%global_colors.length];
             
             // Create leaflet marker and polyline at drone position
-            var marker = L.marker(drone_position, {icon: drone_icon});
+            var marker = L.marker(drone_position, {icon: drone_icon}).bindTooltip("Drone " + key);
             var polyline = L.polyline([drone_path], {color : drone_color, weight : '2', dashArray : '5,7'});
             
             // Update fleet dictionnary with discovered drone
@@ -138,7 +138,7 @@ function displayDrones(){
 
             // Add drone marker to layer group
             fleet[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
-            fleet[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading));
+            fleet[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading), {autoClose: false});
             fleet[drone_id].path.addTo(path_overlay);
         }
         

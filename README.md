@@ -50,11 +50,11 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - display drones altitudes in map slider
 - launch drones script ?
 - bounds to json
-- jquerize files
 - 3d model of uavs ?
 - icons https://materializecss.com/icons.html
 - reduce array size in image overlay (memory problems?)
 - simulation path update does not work, have to redraw it entirely
+- rethink views architecture
 
 
 ## Questions
