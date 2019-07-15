@@ -6,7 +6,7 @@ A : This is a web application designed as an interface between the fleet of UAV 
 
 **Q : How do I install it ?**  
 A : Clone the repo and run `install.sh`. You should define two environment variables for this to work :  
-- `$MAP_TILES` referencing a map atlas. If you plan to use it with an internet connection, you can skip this step and change the tileLayer URL in web/nephelae/static/map.js
+- `$MAP_TILES` referencing a map atlas. If you don't plan on using it offline, this is not necessary.
 - `$MESO_NH` referencing the Meso_NH.nc file.
   
 
