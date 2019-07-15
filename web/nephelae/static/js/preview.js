@@ -116,6 +116,7 @@ function drawPlot(){
 
         // Create or update plot with new data
         Plotly.react('chart', data, layout, config);
+        console.log("called")
         removeLoader();
     });
 }
