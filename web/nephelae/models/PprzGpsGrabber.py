@@ -81,14 +81,14 @@ class PprzGpsGrabber:
 
             # Add position to path only if it is far enough from last position
             if m_time - self.uavs[uavId]['last_log_time'] > close_enough:
-                self.uavs[uavId]['path'].insert(0, position)
-                self.uavs[uavId]['simulation_path'].insert(0, simulation_position)
+                self.uavs[uavId]['path'].append(position)
+                self.uavs[uavId]['simulation_path'].append(simulation_position)
                 self.uavs[uavId]['last_log_time'] = m_time
 
                 # Delete old positions
                 if len(self.uavs[uavId]['path']) > log_size:
-                    self.uavs[uavId]['path'].pop(-1)
-                    self.uavs[uavId]['simulation_path'].pop(-1)
+                    self.uavs[uavId]['path'].pop(0)
+                    self.uavs[uavId]['simulation_path'].pop(0)
 
 
 def translate_position(real_world):

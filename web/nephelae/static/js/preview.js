@@ -84,9 +84,9 @@ function drawPlot(){
 
                 // Compute coordinates from path
                 for(var i = 0; i < Math.min(parameters.trail_length, drone_path.length); i++){
-                    past_latitudes.push(drone_path[i][0]);
-                    past_longitudes.push(drone_path[i][1]);
-                    past_altitudes.push(drone_path[i][2]);
+                    past_latitudes.push(drone_path[drone_path.length-1-i][0]);
+                    past_longitudes.push(drone_path[drone_path.length-1-i][1]);
+                    past_altitudes.push(drone_path[drone_path.length-1-i][2]);
                 }
 
                 // Update chart data with new dataset and line color corresponding to the icon
