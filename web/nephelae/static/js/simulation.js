@@ -1,5 +1,6 @@
 // Activate current menu in nav
 $('#nav_simulation').addClass('active');
+$('.sidenav').sidenav();
 
 var WIDTH = $('#canvas_container').width() -15; // don't know why canvas is larger than container
 var HEIGHT = $('#canvas_container').height();
@@ -274,8 +275,6 @@ function onWindowResize(){
 }
 
 function onClick( event ) {
-
-	event.preventDefault(); // not sure if useless
 	
 	// Compute mouse position in the canvas
     var rect = $('canvas')[0].getBoundingClientRect();
