@@ -28,7 +28,7 @@ var parameters = {
     trail_length: 50,
     update: drawPlot,
     line_color: 'Altitude',
-    color_mapping: {LWC: ['past_altitudes', 'Greys'], Altitude: ['past_altitudes', 'Reds']},
+    color_mapping: {Altitude: ['past_altitudes', 'Reds'], LWC: ['past_altitudes', 'Greys'] },
 }
 
 

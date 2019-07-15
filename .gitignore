@@ -8,3 +8,4 @@ web/nephelae/static/css/libs/leaflet.css
 web/nephelae/static/css/libs/materialize.css
 web/nephelae/static/js/libs/*
 
+web/nephelae/static/wind.json

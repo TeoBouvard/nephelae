@@ -7,23 +7,24 @@ var tiles_overlay, path_overlay, markers_overlay, cloud_overlay;
 // Data from MESO_NH, will come from mapping later
 var max_time;
 function tick(){ return Math.floor(new Date() / 1000) % max_time}
+
 /*
-    fleet     : { key           :   drone_id,   values : value_dict }
-    value_dict : { color         :   global_colors[index_icon], 
-                   position      :   marker, 
-                   altitude      :   float, 
-                   heading       :   float,
-                   polyline      :   L.Polyline,
-                   past_positions:   [positions]
-                   last_position :   LatLng
-                 }
+    fleet     : { drone_id : value_dict }
+    value_dict : { 
+        color         :   global_colors[index_icon], 
+        position      :   marker, 
+        altitude      :   float, 
+        heading       :   float,
+        path          :   L.Polyline,
+    }
 */
+
 var fleet = {};
 
 // Parameters
 var parameters = {
     refresh_rate: 1000, // milliseconds
-    altitude: 1075,     // meters
+    altitude: 600,     // meters
     trail_length: 60,    // seconds
 
     origin: [43.46, 1.27] // used to compute layer images
@@ -53,9 +54,15 @@ function setupGUI(){
         max_time = response[0].max;
 
         // Setup GUI
-        gui.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
-        gui.add(parameters, 'altitude', min_altitude, max_altitude).step(1).name('Altitude (m)');
-        gui.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
+        gui.add(parameters, 'refresh_rate', 200, 3000)
+            .step(100)
+            .name('Delay (ms)');
+        gui.add(parameters, 'altitude', min_altitude, max_altitude)
+            .step(1)
+            .name('Altitude (m)');
+        gui.add(parameters, 'trail_length', 0, 500)
+            .step(1)
+            .name('Trail length (s)');
 
         // Once sliders are initialized, create map and display infos
         setupMap();
@@ -66,26 +73,33 @@ function setupGUI(){
 function setupMap(){
 
     // Map
-    flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 15, minZoom: 12});
+    flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 18, minZoom: 12});
     flight_map.on('moveend', updateLayerBounds);
     //flight_map.on('movestart', removeImageLayers); //-> uncomment to solve drag glitch (but disappearing images)
 
     // Home button
     zoomHome = L.Control.zoomHome();
 
-    // Create layers (add/remove .grayscale() if you want a grey/colored map)
-    //tiles_overlay = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
-    tiles_overlay = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
+    // Create layers
+    tiles_overlay0 = L.tileLayer('');
+    tiles_overlay1 = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
+    tiles_overlay2 = L.tileLayer("http://{s}.sm.mapstack.stamen.com/" + "(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/" + "{z}/{x}/{y}.png", {maxZoom: 18});
+    tiles_overlay3 = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
+
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
     cloud_overlay = L.imageOverlay('clouds_img/?' + computeURL(), flight_map.getBounds());
     thermals_overlay = L.imageOverlay('thermals_img/?' + computeURL(), flight_map.getBounds());
 
     // Set layer dictionnary
-    var base_layers = {};
+    var base_layers = {
+        "None": tiles_overlay0,
+        "Dark, Online": tiles_overlay2,
+        "Clear, Offline": tiles_overlay3,
+        "Color, Online": tiles_overlay1,
+    };
 
     overlays = {
-        "Map": tiles_overlay,
         "Trails": path_overlay,
         "Markers": markers_overlay,
         "Clouds": cloud_overlay,
@@ -100,6 +114,7 @@ function setupMap(){
 
     // Change checkbox style dynamically (fucking materialize framework)
     $(':checkbox').addClass('filled-in');
+    $(':radio').prop('checked');
 
     // Prevent async conflicts by displaying drones once map is initialized
     displayDrones();
