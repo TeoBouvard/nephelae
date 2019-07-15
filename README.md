@@ -55,6 +55,8 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - reduce array size in image overlay (memory problems?)
 - simulation path update does not work, have to redraw it entirely
 - rethink views architecture
+- NCO-JSON for wind layer
+- organize base css 
 
 
 ## Questions
