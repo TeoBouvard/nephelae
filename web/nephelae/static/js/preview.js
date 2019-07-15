@@ -83,10 +83,10 @@ function drawPlot(){
             var past_altitudes = [];
 
             // Compute coordinates from path
-            for(var i = 0; i < Math.min(parameters.trail_length, drone_path.length); i++){
-                past_latitudes.push(drone_path[drone_path.length-1-i][0]);
-                past_longitudes.push(drone_path[drone_path.length-1-i][1]);
-                past_altitudes.push(drone_path[drone_path.length-1-i][2]);
+            for(var i = 0; i < drone_path.length; i++){
+                past_latitudes.push(drone_path[i][0]);
+                past_longitudes.push(drone_path[i][1]);
+                past_altitudes.push(drone_path[i][2]);
             }
 
             // Display colorbar if only one UAV is selected

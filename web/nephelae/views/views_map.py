@@ -17,7 +17,6 @@ def discover_UAVs(request):
 # Get UAV fleet info
 def update_UAVs(request):
 
-    print(request)
     # Parse request parameters
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = request.GET.getlist('uav_id[]')
