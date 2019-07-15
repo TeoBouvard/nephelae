@@ -111,10 +111,10 @@ function setupMap(){
 
     // Display everything on initialization
     for(key in overlays) overlays[key].addTo(flight_map);
+    tiles_overlay2.addTo(flight_map);
 
     // Change checkbox style dynamically (fucking materialize framework)
     $(':checkbox').addClass('filled-in');
-    $(':radio').prop('checked');
 
     // Prevent async conflicts by displaying drones once map is initialized
     displayDrones();
