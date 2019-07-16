@@ -135,9 +135,9 @@ function createDrones() {
 
 				// Parse response data
 				var drone_id = key;
-				var drone_position = response.drones[key].simulation_position;
-				var drone_altitude = response.drones[key].altitude;
-				var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length);
+				var drone_path = response.drones[key].frame_path;
+				var drone_position = drone_path.slice(-1)[0];
+                var drone_altitude = drone_path.slice(-1)[0][2];
 
 				// Compute color of marker
 				var drone_color = global_colors[key%global_colors.length];
@@ -182,9 +182,10 @@ function update(){
 
 	if (elapsed_time >= parameters.refresh_rate){
 		then = now;
+		var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length});
 
 		// Update drones objects
-		$.getJSON('update/', (response) => {
+		$.getJSON('update/?' + query, (response) => {
 
 			if (parameters.fleet_visibility){
 				
@@ -192,10 +193,9 @@ function update(){
 
 					// Parse response data
 					var drone_id = key;
-					var drone_position = response.drones[key].simulation_position;
-					var drone_altitude = response.drones[key].altitude;
-					var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length);
-					drone_path.push(drone_position);
+					var drone_path = response.drones[key].frame_path;
+					var drone_position = drone_path.slice(-1)[0];
+                	var drone_altitude = drone_path.slice(-1)[0][2]
 
 					// Compute color of marker
 					var drone_color = global_colors[key%global_colors.length];

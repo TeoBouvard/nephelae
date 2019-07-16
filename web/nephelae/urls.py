@@ -24,6 +24,7 @@ urlpatterns = [
 
     # URL for simulation page
     path('simulation/', views.simulation, name='simulation'),
+    path('simulation/discover/', views.discover_UAVs),
     path('simulation/update/', views.update_UAVs),
     path('simulation/textures/<str:file_name>', views.texture),
 
