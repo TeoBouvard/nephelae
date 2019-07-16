@@ -45,7 +45,7 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
-    f1.add(parameters, 'trail_length', 2, 500).step(1).name("Trail length (s)").onChange(drawPlot);
+    f1.add(parameters, 'trail_length', 30, 1000).step(10).name("Trail length (s)").onChange(drawPlot);
     f1.add(parameters, 'line_color', ['Altitude', 'LWC']).name("Trail color").onChange(drawPlot);
     f1.add(parameters, 'update').name('Update plot');
 
@@ -53,7 +53,7 @@ function setupGUI(){
 
     $.getJSON('discover/', (response) => {
 
-        for (var key of response){
+        for (var key of response.uavs){
             parameters[key] = true;
             f2.add(parameters, key).name('Drone ' + key).onChange(drawPlot);
         }
@@ -83,7 +83,7 @@ function drawPlot(){
             var past_altitudes = [];
 
             // Compute coordinates from path
-            for(var i = 0; i < drone_path.length; i++){
+            for(var i = 0; i < drone_path.length ; i++){
                 past_latitudes.push(drone_path[i][0]);
                 past_longitudes.push(drone_path[i][1]);
                 past_altitudes.push(drone_path[i][2]);

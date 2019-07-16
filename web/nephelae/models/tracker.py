@@ -6,7 +6,8 @@ db = NephelaeDataServer.load('/home/arthurdent/Documents/dev/nephelae/nephelae_m
 
 
 def discover():
-    return db.uavIds
+    origin = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
+    return dict(origin=origin, uavs=db.uavIds)
 
 
 def track(uav_ids, trail_length):

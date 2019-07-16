@@ -19,9 +19,7 @@ def update_UAVs(request):
 
     # Parse request parameters
     trail_length = int(request.GET.get('trail_length'))
-    uav_ids = request.GET.getlist('uav_id[]')
-
-    uav_ids = [int(item) for item in uav_ids]
+    uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
 
     return JsonResponse({'drones': tracker.track(uav_ids, trail_length)})
 

@@ -75,10 +75,10 @@ function setupMap(){
     zoomHome = L.Control.zoomHome();
 
     // Create layers
-    tiles_overlay0 = L.tileLayer('');
-    tiles_overlay1 = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
-    tiles_overlay2 =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
-    tiles_overlay3 = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
+    tiles_overlay_none = L.tileLayer('');
+    tiles_overlay_hydda = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
+    tiles_overlay_dark =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
+    tiles_overlay_offline = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
 
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
@@ -92,7 +92,7 @@ function setupMap(){
             velocityType: "Wind",
             displayEmptyString: "No wind data"
         },
-        maxVelocity: 15
+        velocityScale: 0.003
     });
 
     $.getJSON('wind.json', (data) => {
@@ -101,10 +101,10 @@ function setupMap(){
 
     // Set layer dictionnary for control initialization
     var base_layers = {
-        "None": tiles_overlay0,
-        "Dark, Online": tiles_overlay2,
-        "Clear, Offline": tiles_overlay3,
-        "Color, Online": tiles_overlay1,
+        "None": tiles_overlay_none,
+        "Dark, Online": tiles_overlay_dark,
+        "Clear, Offline": tiles_overlay_offline,
+        "Color, Online": tiles_overlay_hydda,
     };
 
     overlays = {
@@ -120,7 +120,7 @@ function setupMap(){
 
     // Display everything on initialization
     for(key in overlays) overlays[key].addTo(flight_map);
-    tiles_overlay2.addTo(flight_map);
+    tiles_overlay_dark.addTo(flight_map);
 
     // Prevent async conflicts by displaying drones once map is initialized
     displayDrones();
@@ -129,8 +129,11 @@ function setupMap(){
 function displayDrones(){
 
     $.getJSON('discover/', (response) => {
+        
+        parameters.origin = response.origin;
+        console.log(parameters.origin);
 
-        var query = $.param({uav_id: response, trail_length: parameters.trail_length});
+        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length});
 
         $.getJSON('update/?' + query, (response) => {
 
@@ -143,6 +146,7 @@ function displayDrones(){
                 var drone_position = drone_path.slice(-1)[0];
                 var drone_altitude = drone_path.slice(-1)[0][2];
                 var drone_heading = response.drones[key].heading;
+                var drone_speed = response.drones[key].speed;
                 
 
                 // Compute color and icon of markers based on drone ID
@@ -198,6 +202,7 @@ function updateDrones(){
             var drone_position = drone_path.slice(-1)[0];
             var drone_altitude = drone_path.slice(-1)[0][2];
             var drone_heading = response.drones[key].heading;
+            var drone_speed = response.drones[key].speed;
 
             // Identify corresponding drone ...
             var drone_to_update = fleet[drone_id];
@@ -207,7 +212,7 @@ function updateDrones(){
 
                 // Update markers
                 drone_to_update.position.setLatLng(drone_position).setRotationAngle(drone_heading);
-                drone_to_update.position.setPopupContent(infosToString(drone_id, drone_altitude, drone_heading));
+                drone_to_update.position.setPopupContent(infosToString(drone_id, drone_altitude, drone_heading, drone_speed));
 
                 // Update polyline
                 drone_to_update.path.setLatLngs(drone_path);
@@ -263,13 +268,14 @@ function computeURL(){
 }
 
 // Print HTML formatted string so that it can be added to marker popup
-function infosToString(id, altitude, heading){
+function infosToString(id, altitude, heading, speed){
     var infos = '<p style="text-align:center;font-family:Roboto-Light;font-size:15px">';
 
     infos += 'Drone ';
     infos += id + ' <br> ' ;
     infos += altitude + 'm <br> ';
     infos += heading + '° <br> ';
+    infos += speed + 'm/s <br> ';
     infos += '</p>'
 
     return infos;
