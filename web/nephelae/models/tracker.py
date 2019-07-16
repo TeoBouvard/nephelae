@@ -51,20 +51,24 @@ def get_data(uav_ids, trail_length):
 
     for uav_id in uav_ids:
 
-        data[uav_id] = {}
-
         messages = [entry.data for entry in db.find_entries(['SAMPLE', str(uav_id)], (slice(-trail_length, None), ))]
         
         for message in messages:
 
-            if message.variableName not in data[uav_id].keys():
-                data[uav_id][message.variableName] = {
+            if message.variableName not in data.keys():
+                data[message.variableName] = {
+                    'uav_id': uav_id,
+                    'x': [message.timeStamp],
+                    'y': message.data
+                }
+            elif uav_id not in data[message.variableName].keys():
+                data[message.variableName][uav_id] = {
                     'x': [message.timeStamp],
                     'y': message.data
                 }
             else:
-                data[uav_id][message.variableName]['x'].append(message.timeStamp)
-                data[uav_id][message.variableName]['y'].append(message.data[0])
+                data[message.variableName][uav_id]['x'].append(message.timeStamp)
+                data[message.variableName][uav_id]['y'].append(message.data[0])
                 
     return data
 
