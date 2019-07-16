@@ -17,16 +17,10 @@ def update_UAVs(request):
 
     return JsonResponse({'drones': tracker.track(uav_ids, trail_length)})
 
+
 # Get sections/map sliders bounds, bad design for now ..
 def mesonh_box(request):
-    bounds = hypercube.clouds.bounds
-    box = [
-        {'min': bounds[0].min, 'max':bounds[0].max},
-        {'min': bounds[1].min, 'max':bounds[1].max},
-        {'min': bounds[2].min, 'max':bounds[2].max},
-        {'min': bounds[3].min, 'max':bounds[3].max}]
-
-    return JsonResponse(box, safe=False)
+    return JsonResponse(hypercube.box(), safe=False)
 
 
 # Update MesoNH hyperslabs

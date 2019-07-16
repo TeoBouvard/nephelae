@@ -23,6 +23,35 @@ else:
     exit()
 
 
+def print_horizontal_slice(variable_name, u_time, u_altitude, x0, x1, y0, y1, thermals_cmap, clouds_cmap, transparent):
+
+    # Get slice
+    if variable_name == 'clouds':
+        h_slice = clouds[u_time, u_altitude, y0:y1, x0:x1].data
+        colormap = transparent_cmap(
+            clouds_cmap) if transparent else clouds_cmap
+        min_slice = 0
+        max_slice = clouds.actual_range[1]
+    elif variable_name == 'thermals':
+        h_slice = thermals[u_time, u_altitude, y0:y1, x0:x1].data
+        h_slice[h_slice < 0] = 0
+        colormap = transparent_cmap(
+            thermals_cmap) if transparent else thermals_cmap
+        min_slice = 0
+        max_slice = thermals.actual_range[1]
+
+    # Write image to buffer
+    buf = io.BytesIO()
+    plt.imsave(buf, h_slice, origin='lower', vmin=min_slice,
+               vmax=max_slice, cmap=colormap, format='png')
+    plt.close()
+    buf.seek(0)
+    return buf
+
+
+########## UTILITY METHODS ##########
+
+
 def transparent_cmap(original_cmap):
 
     # Choose colormap
@@ -35,32 +64,6 @@ def transparent_cmap(original_cmap):
     my_cmap[:, -1] = np.linspace(0, 1, cmap.N)
 
     return ListedColormap(my_cmap)
-
-
-def print_horizontal_slice(variable_name, u_time, u_altitude, x0, x1, y0, y1, thermals_cmap, clouds_cmap, transparent):
-
-    # Get slice
-    if variable_name == 'clouds':
-        h_slice = clouds[u_time, u_altitude, y0:y1, x0:x1].data
-        colormap = transparent_cmap(clouds_cmap) if transparent else clouds_cmap
-        min_slice = 0
-        max_slice = clouds.actual_range[1]
-    elif variable_name == 'thermals':
-        h_slice = thermals[u_time, u_altitude, y0:y1, x0:x1].data
-        h_slice[h_slice < 0] = 0
-        colormap = transparent_cmap(thermals_cmap) if transparent else thermals_cmap
-        min_slice = 0
-        max_slice = thermals.actual_range[1]
-
-
-    # Write image to buffer
-    buf = io.BytesIO()
-    plt.imsave(buf, h_slice, origin='lower', vmin=min_slice, vmax=max_slice, cmap=colormap, format='png')
-    plt.close()
-    buf.seek(0)
-    return buf
-
-########## UTILITY METHODS ##########
 
 
 # Compute where the value zero lies on the colorscale
@@ -86,3 +89,13 @@ def axes():
     nb_points = len(clouds[clouds.bounds[0].min, clouds.bounds[1].min, :, :].data)
 
     return np.linspace(min_x, max_x, nb_points).tolist()
+
+
+def box():
+    bounds = clouds.bounds
+    box = [
+        {'min': bounds[0].min, 'max':bounds[0].max},
+        {'min': bounds[1].min, 'max':bounds[1].max},
+        {'min': bounds[2].min, 'max':bounds[2].max},
+        {'min': bounds[3].min, 'max':bounds[3].max}]
+    return box

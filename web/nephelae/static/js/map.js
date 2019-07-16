@@ -24,7 +24,7 @@ var parameters = {
     trail_length: 60,    // seconds
     thermals_cmap: 'viridis',
     clouds_cmap: 'viridis',
-    transparent: false,
+    transparent: true,
 
     origin: [43.46, 1.27] // used to compute layer images
 }
