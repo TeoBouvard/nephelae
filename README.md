@@ -48,7 +48,6 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - requête repère mobile au mapping
 - requête box au mapping
 - display drones altitudes in map slider
-- launch drones script ?
 - bounds to json
 - 3d model of uavs ?
 - icons https://materializecss.com/icons.html
@@ -56,7 +55,8 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - simulation path update does not work, have to redraw it entirely
 - rethink views architecture
 - NCO-JSON for wind layer
-- organize base css 
+- organize base css
+- southern hemisphere utm zones ?
 
 
 ## Questions

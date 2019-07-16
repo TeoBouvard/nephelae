@@ -4,10 +4,6 @@ $("#nav_map").addClass('active');
 var flight_map, zoom_home, overlays;
 var tiles_overlay, path_overlay, markers_overlay, cloud_overlay, wind_overlay;
 
-// Data from MESO_NH, will come from mapping later
-var max_time;
-function tick(){ return Math.floor(new Date() / 1000) % max_time}
-
 /*
     fleet     : { drone_id : value_dict }
     value_dict : { 
@@ -152,6 +148,7 @@ function displayDrones(){
                 var drone_altitude = drone_path.slice(-1)[0][2];
                 var drone_heading = response.drones[key].heading;
                 var drone_speed = response.drones[key].speed;
+                var drone_time = response.drones[key].time;
                 
 
                 // Compute color and icon of markers based on drone ID
@@ -169,6 +166,7 @@ function displayDrones(){
                     altitude : drone_altitude, 
                     heading: drone_heading,
                     path : polyline,
+                    time : drone_time
                 });
 
                 // Add drone marker to layer group
@@ -208,6 +206,7 @@ function updateDrones(){
             var drone_altitude = drone_path.slice(-1)[0][2];
             var drone_heading = response.drones[key].heading;
             var drone_speed = response.drones[key].speed;
+            var drone_time = response.drones[key].time;
 
             // Identify corresponding drone ...
             var drone_to_update = fleet[drone_id];
@@ -221,6 +220,10 @@ function updateDrones(){
 
                 // Update polyline
                 drone_to_update.path.setLatLngs(drone_path);
+
+                // Update time
+                drone_to_update.time = drone_time;
+
             } 
             // ... or display error message if drone id does not match -> update fleet dictionnary and start tracking it
             else {
@@ -259,7 +262,7 @@ function computeURL(){
 
     var query = $.param({
         altitude: parameters.altitude,
-        time: tick(),
+        time: compute_time(),
         map_bounds: {
             west: bounds.getWest(), 
             east: bounds.getEast(),
@@ -287,4 +290,12 @@ function infosToString(id, altitude, heading, speed){
     infos += '</p>'
 
     return infos;
+}
+
+function compute_time(){
+    if (Object.keys(fleet).length > 0){
+        return fleet[Object.keys(fleet)[0]].time;
+    } else {
+        return 0;
+    }
 }

@@ -4,7 +4,7 @@ from geopy.distance import distance
 from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
 
 db = DatabasePlayer('/home/arthurdent/Documents/dev/nephelae/nephelae_mapping/tests/output/database01.neph')
-db.play()
+db.play(looped=True)
 
 nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
 
@@ -23,7 +23,8 @@ def track(uav_ids, trail_length):
 
         data[uav_id] = {
             'heading': messages[-1]['course'],
-            'speed': messages[-1]['speed']
+            'speed': messages[-1]['speed'],
+            'time': int(messages[-1]['stamp'] - db.navFrame['stamp'])
         }
 
         for message in messages:
