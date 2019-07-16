@@ -35,7 +35,9 @@ var config = {
 
 // Parameters
 var parameters = {
+    refresh_rate: 1000,   // ms
     trail_length: 60,    // seconds
+    auto_update: true,
     update: updateData,
 }
 
@@ -50,16 +52,20 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Controls');
 
-    f1.add(parameters, 'trail_length', 30, 3000).step(10).name("Log length (s)").onChange(updateData);
+    f1.add(parameters, 'trail_length', 30, 3000).step(10).name("Log length (s)");
+    f1.add(parameters, 'refresh_rate', 500, 5000).step(100).name("Refresh rate (ms)");
+    f1.add(parameters, 'auto_update').name("Auto Update").onChange(updateData);
     f1.add(parameters, 'update').name('Update plot');
 
     var f2 = gui.addFolder('Trails');
 
     $.getJSON('discover/', (response) => {
 
+        parameters['uavs'] = {};
+
         for (var key of response.uavs){
-            parameters[key] = true;
-            f2.add(parameters, key).name('Drone ' + key).onChange(updateData);
+            parameters['uavs'][key] = true;
+            f2.add(parameters['uavs'], key).name('Drone ' + key);
         }
 
         // Draw charts once GUI is initialized
@@ -73,8 +79,6 @@ function updateData(){
     var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length});
 
     $.getJSON('update/?' + query, function(response){
-
-        console.log(response)
         
         // Parse server response
         for (var variable_name in response){
@@ -94,19 +98,17 @@ function updateData(){
                         shape: 'spline',
                         color: global_colors[uav_id%global_colors.length],
                     }
-                }
+                };
 
                 data[variable_name].push(new_data);
             }
         }
 
         // Update charts
-        if(Object.keys(data).length == 0){
-            alert("No data received from the server, try refreshing the page");
-        } else {
-            updateCharts(data);
+        updateCharts(data);
+        if (parameters.auto_update){
+            setTimeout(updateData, parameters.refresh_rate);
         }
-
         removeLoader();
 
     });
@@ -121,8 +123,8 @@ function getSelectedUAVs() {
 
     var selectedUAVs = [];
 
-    for(key in parameters){
-        if (typeof parameters[key] == 'boolean' && parameters[key] == true) selectedUAVs.push(key);
+    for(key in parameters.uavs){
+        if (parameters.uavs[key] == true) selectedUAVs.push(key);
     }
 
     return selectedUAVs;
