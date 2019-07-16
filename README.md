@@ -58,6 +58,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - 1D time data !
 - map downloader -> asynchronous requests to speed up script
 - move image layer calculations inside model
+- sort positions
 
 - rethink views architecture :
     - template views
