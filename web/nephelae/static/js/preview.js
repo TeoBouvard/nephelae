@@ -45,7 +45,7 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
-    f1.add(parameters, 'trail_length', 30, 1000).step(10).name("Trail length (s)").onChange(drawPlot);
+    f1.add(parameters, 'trail_length', 30, 3000).step(10).name("Trail length (s)").onChange(drawPlot);
     f1.add(parameters, 'line_color', ['Altitude', 'LWC']).name("Trail color").onChange(drawPlot);
     f1.add(parameters, 'update').name('Update plot');
 

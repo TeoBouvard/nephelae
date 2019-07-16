@@ -17,6 +17,7 @@ var parameters = {
 	trail_length: 60,
 	fleet_visibility: true,
 	fleet_focus: fitCameraToFleet,
+	origin: [],
 }
 
 $(document).ready(function(){
@@ -122,47 +123,55 @@ function createLights() {
 
 function createDrones() {
 
-	$.getJSON('update/', (response) => {
+	$.getJSON('discover/', (response) => {
+        
+        parameters.origin = response.origin;
 
-		for(var key in response.drones){
+        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length});
 
-			// Parse response data
-            var drone_id = key;
-            var drone_position = response.drones[key].simulation_position;
-            var drone_altitude = response.drones[key].altitude;
-        	var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length);
+        $.getJSON('update/?' + query, (response) => {
 
-            // Compute color of marker
-            var drone_color = global_colors[key%global_colors.length];
+			for (var key in response.drones){
 
-			// Create a drone
-			var geometry = new THREE.SphereBufferGeometry(5, 32, 32);
-			var material = new THREE.MeshStandardMaterial({color: drone_color});
-			var drone_object = new THREE.Mesh(geometry, material);
+				// Parse response data
+				var drone_id = key;
+				var drone_position = response.drones[key].simulation_position;
+				var drone_altitude = response.drones[key].altitude;
+				var drone_path = response.drones[key].simulation_path.slice(-parameters.trail_length);
 
-			drone_object.position.set(drone_position[0], drone_position[1], drone_position[2]);
-			scene.add(drone_object);
+				// Compute color of marker
+				var drone_color = global_colors[key%global_colors.length];
 
-			// Create a line
-			var geometry = new THREE.Geometry();
-			for(var position in drone_path){
-				var point = drone_path[position];
-				geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
+				// Create a drone
+				var geometry = new THREE.SphereBufferGeometry(5, 32, 32);
+				var material = new THREE.MeshStandardMaterial({color: drone_color});
+				var drone_object = new THREE.Mesh(geometry, material);
+
+				drone_object.position.set(drone_position[0], drone_position[1], drone_position[2]);
+				scene.add(drone_object);
+
+				// Create a line
+				var geometry = new THREE.Geometry();
+				for(var position in drone_path){
+					var point = drone_path[position];
+					geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
+				}
+
+				var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
+				var path_object = new THREE.Line( geometry, material );
+				scene.add(path_object);
+
+				// Update fleet dictionnary with discovered drone
+				fleet[drone_id] = {
+					drone: drone_object,
+					path: path_object
+				};
 			}
-
-			var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
-			var path_object = new THREE.Line( geometry, material );
-			scene.add(path_object);
-
-			// Update fleet dictionnary with discovered drone
-            fleet[drone_id] = {
-                drone: drone_object,
-				path: path_object
-            };
-		}
 		
 		// Focus on fleet
 		fitCameraToFleet();
+
+		});
 	});
 }
 

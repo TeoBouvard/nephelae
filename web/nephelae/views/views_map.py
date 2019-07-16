@@ -59,6 +59,10 @@ def layer_img(request, variable_name):
     time_value = int(query.get('time'))
     altitude_value = int(query.get('altitude'))
 
+    thermals_cmap = query.get('thermals_cmap')
+    clouds_cmap = query.get('clouds_cmap')
+    transparent = True if (query.get('transparent')) == 'true' else False
+
     map_bounds = {
         'east': float(query.get('map_bounds[east]')),
         'west': float(query.get('map_bounds[west]')),
@@ -87,7 +91,7 @@ def layer_img(request, variable_name):
     y0 = distance_y0 if origin['lat'] < map_bounds['south'] else -distance_y0
     y1 = distance_y1 if origin['lat'] < map_bounds['north'] else -distance_y1
 
-    buf = hypercube.print_horizontal_slice(variable_name, time_value, altitude_value, x0, x1, y0, y1)
+    buf = hypercube.print_horizontal_slice(variable_name, time_value, altitude_value, x0, x1, y0, y1, thermals_cmap, clouds_cmap, transparent)
     return HttpResponse(buf.read(), content_type="image/png")
 
 

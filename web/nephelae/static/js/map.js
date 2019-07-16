@@ -26,6 +26,9 @@ var parameters = {
     refresh_rate: 1000, // milliseconds
     altitude: 600,     // meters
     trail_length: 60,    // seconds
+    thermals_cmap: 'viridis',
+    clouds_cmap: 'viridis',
+    transparent: false,
 
     origin: [43.46, 1.27] // used to compute layer images
 }
@@ -58,6 +61,9 @@ function setupGUI(){
         gui.add(parameters, 'trail_length', 0, 500)
             .step(1)
             .name('Trail length (s)');
+        gui.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
+        gui.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
+        gui.add(parameters, 'transparent').name('Transparent');
 
         // Once sliders are initialized, create map and display infos
         setupMap();
@@ -92,7 +98,7 @@ function setupMap(){
             velocityType: "Wind",
             displayEmptyString: "No wind data"
         },
-        velocityScale: 0.003
+        maxVelocity: 10
     });
 
     $.getJSON('wind.json', (data) => {
@@ -131,7 +137,6 @@ function displayDrones(){
     $.getJSON('discover/', (response) => {
         
         parameters.origin = response.origin;
-        console.log(parameters.origin);
 
         var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length});
 
@@ -262,6 +267,9 @@ function computeURL(){
             north: bounds.getNorth()
         },
         origin: parameters.origin,
+        thermals_cmap: parameters.thermals_cmap,
+        clouds_cmap: parameters.clouds_cmap,
+        transparent: parameters.transparent,
     });
 
     return query;

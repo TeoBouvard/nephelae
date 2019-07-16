@@ -37,18 +37,18 @@ def transparent_cmap(original_cmap):
     return ListedColormap(my_cmap)
 
 
-def print_horizontal_slice(variable_name, u_time, u_altitude, x0, x1, y0, y1):
+def print_horizontal_slice(variable_name, u_time, u_altitude, x0, x1, y0, y1, thermals_cmap, clouds_cmap, transparent):
 
     # Get slice
     if variable_name == 'clouds':
         h_slice = clouds[u_time, u_altitude, y0:y1, x0:x1].data
-        colormap = transparent_cmap('Purples')
+        colormap = transparent_cmap(clouds_cmap) if transparent else clouds_cmap
         min_slice = 0
         max_slice = clouds.actual_range[1]
     elif variable_name == 'thermals':
         h_slice = thermals[u_time, u_altitude, y0:y1, x0:x1].data
         h_slice[h_slice < 0] = 0
-        colormap = transparent_cmap('Reds')
+        colormap = transparent_cmap(thermals_cmap) if transparent else thermals_cmap
         min_slice = 0
         max_slice = thermals.actual_range[1]
 

@@ -17,7 +17,7 @@ wget -O web/nephelae/static/css/libs/materialize.css https://cdnjs.cloudflare.co
 # Download images
 wget -O web/nephelae/static/css/libs/images/layers.png https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/images/layers.png
 
-apt-get -y install python3-pip
+apt-get -y install python3-pip  nco
 
 pip3 install wheel
 pip3 install -r requirements.txt

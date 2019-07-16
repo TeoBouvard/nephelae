@@ -2,7 +2,8 @@ import utm
 
 from nephelae_mapping.database import NephelaeDataServer, DatabasePlayer
 
-db = NephelaeDataServer.load('/home/arthurdent/Documents/dev/nephelae/nephelae_mapping/tests/output/database01.neph')
+db = DatabasePlayer('/home/arthurdent/Documents/dev/nephelae/nephelae_mapping/tests/output/database01.neph')
+db.play()
 
 
 def discover():
