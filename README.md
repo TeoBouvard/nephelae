@@ -46,7 +46,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - leaflet-velocity -> NCO 
 - requête repère mobile au mapping
 - requête box au mapping
-- display drones altitudes in map slider
+- display drones altitudes in map slider -> goto drone altitude in marker popup
 - bounds to json
 - 3d model of uavs ?
 - icons https://materializecss.com/icons.html
@@ -55,16 +55,10 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - NCO-JSON for wind layer
 - organize base css
 - southern hemisphere utm zones ?
-- 1D time data !
 - map downloader -> asynchronous requests to speed up script
 - move image layer calculations inside model
 - sort positions
 
-- rethink views architecture :
-    - template views
-    - data views
-    - tracking views ?
-    - static files views
 
 ## Questions
 

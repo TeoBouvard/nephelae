@@ -45,7 +45,7 @@ def track(uav_ids, trail_length):
     return data
 
 
-def get_data(uav_ids, trail_length):
+def data(uav_ids, trail_length):
 
     data = {}
 
