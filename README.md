@@ -42,9 +42,8 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 
 ## TODO
 
-- maps : https://leaflet-extras.github.io/leaflet-providers/preview/ / mobile atlas creator, create script ?
 - os.environ['MESO_NH'], os.environ['MAP_TILES'] -> define env variables in install script !
-- leaflet-velocity
+- leaflet-velocity -> NCO 
 - requête repère mobile au mapping
 - requête box au mapping
 - display drones altitudes in map slider
@@ -53,15 +52,23 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - icons https://materializecss.com/icons.html
 - reduce array size in image overlay (memory problems?)
 - simulation path update does not work, have to redraw it entirely
-- rethink views architecture
 - NCO-JSON for wind layer
 - organize base css
 - southern hemisphere utm zones ?
+- 1D time data !
+- map downloader -> asynchronous requests to speed up script
+- move image layer calculations inside model
 
+- rethink views architecture :
+    - template views
+    - data views
+    - tracking views ?
+    - static files views
 
 ## Questions
 
 -   k-means clustering, then convex hull ?
+-   why is message.data an array ? (3d data ?)
 
 ##
 

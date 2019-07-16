@@ -45,8 +45,6 @@ function setupGUI(){
         var min_altitude = Math.ceil(response[1].min);
         var max_altitude = Math.floor(response[1].max);
 
-        max_time = response[0].max;
-
         // Setup GUI
         gui.add(parameters, 'refresh_rate', 200, 3000)
             .step(100)
@@ -78,9 +76,8 @@ function setupMap(){
 
     // Create layers
     tiles_overlay_none = L.tileLayer('');
-    tiles_overlay_hydda = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {maxZoom: 18});
     tiles_overlay_dark =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
-    tiles_overlay_offline = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
+    tiles_overlay_IGN = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
 
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
@@ -105,8 +102,7 @@ function setupMap(){
     var base_layers = {
         "None": tiles_overlay_none,
         "Dark, Online": tiles_overlay_dark,
-        "Clear, Offline": tiles_overlay_offline,
-        "Color, Online": tiles_overlay_hydda,
+        "IGN": tiles_overlay_IGN,
     };
 
     overlays = {

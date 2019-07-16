@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block additional_head%}
+{% endblock %}
+
+
+{% block additional_scripts %}
+	<!-- Load specific javascript -->
+	<script src="{% static 'js/raw_data.js' %}"></script>
+	<!-- Load plotly js -->
+    <script src="{% static 'js/libs/plotly.js' %}"></script>
+	<!-- Load global variables and specific javascript -->
+	<script src="{% static 'js/base_colors.js' %}"></script>
+{% endblock %}
+
+
+{% block page %}
+
+    <!-- Display controller -->
+    <div id="gui_container"></div>
+
+	<!-- Display charts -->
+	<div class="row">
+		<div class="col s6">
+			<div id='lwc_chart'></div>	
+		</div>
+		
+		<div class="col s6">
+			<div id='upwind_chart'></div>
+		</div>
+	</div>
+
+{% endblock %}
