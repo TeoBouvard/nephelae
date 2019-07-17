@@ -26,6 +26,7 @@ var parameters = {
     clouds_cmap: 'viridis',
     transparent: true,
     tracked_drone: undefined,
+    time: undefined,
 
     origin: [43.46, 1.27] // used to compute layer images
 }
@@ -270,9 +271,17 @@ function computeURL(){
 
     var bounds = flight_map.getBounds();
 
+    // Check if a drone is being tracked with MesoNH
+    if (parameters.tracked_drone != undefined){
+        parameters.altitude = parameters.tracked_drone.altitude;
+        parameters.time = parameters.tracked_drone.time;
+    } else {
+        parameters.time = compute_time();
+    }
+
     var query = $.param({
         altitude: parameters.altitude,
-        time: compute_time(),
+        time: parameters.time,
         map_bounds: {
             west: bounds.getWest(), 
             east: bounds.getEast(),

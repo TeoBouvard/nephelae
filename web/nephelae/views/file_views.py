@@ -43,8 +43,8 @@ def layer_img(request, variable_name):
     # Parse request parameters
     query = request.GET
 
-    time_value = int(query.get('time'))
-    altitude_value = int(query.get('altitude'))
+    time_value = float(query.get('time'))
+    altitude_value = float(query.get('altitude'))
 
     thermals_cmap = query.get('thermals_cmap')
     clouds_cmap = query.get('clouds_cmap')
