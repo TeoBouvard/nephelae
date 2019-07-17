@@ -19,7 +19,7 @@ def track(uav_ids, trail_length):
 
     for uav_id in uav_ids:
 
-        messages = [entry.data for entry in db.find_entries(['GPS', str(uav_id)], (slice(-trail_length, None), ))]
+        messages = [entry.data for entry in db.find_entries(['GPS', str(uav_id)], (slice(-trail_length, None), ), lambda entry: entry.data.stamp)]
 
         data[uav_id] = {
             'heading': messages[-1]['course'],
@@ -51,7 +51,7 @@ def data(uav_ids, trail_length):
 
     for uav_id in uav_ids:
 
-        messages = [entry.data for entry in db.find_entries(['SAMPLE', str(uav_id)], (slice(-trail_length, None), ))]
+        messages = [entry.data for entry in db.find_entries(['SAMPLE', str(uav_id)], (slice(-trail_length, None), ), lambda entry: entry.data.stamp)]
         
         for message in messages:
 
