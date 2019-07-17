@@ -1,3 +1,5 @@
+import os
+
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from geopy.distance import distance
 
@@ -17,10 +19,10 @@ def plane_icon(request, index):
 # Render map tiles
 def map_tiles(request, z, x, y):
     try:
-        path = os.environ.get('MAP_TILES') + '/' + str(z) + \
-            '/' + str(x) + '/' + str(y) + '.png'
+        path = os.environ.get('MAP_TILES') + str(z) + '_' + str(x) + '_' + str(y) + '.jpg'
+        print(path)
         with open(path, "rb") as f:
-            return HttpResponse(f.read(), content_type="image/png")
+            return HttpResponse(f.read(), content_type="image/jpg")
     except IOError:
         return HttpResponseNotFound()
 

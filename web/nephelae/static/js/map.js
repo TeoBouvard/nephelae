@@ -2,7 +2,7 @@
 $("#nav_map").addClass('active');
 
 var flight_map, zoom_home, overlays;
-var tiles_overlay, path_overlay, markers_overlay, cloud_overlay, wind_overlay;
+var tiles_overlay_IGN, tiles_overlay_dark, path_overlay, markers_overlay, cloud_overlay, wind_overlay;
 
 /*
     fleet     : { drone_id : value_dict }
@@ -57,7 +57,7 @@ function setupGUI(){
             .name('Trail length (s)');
         gui.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
         gui.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
-        gui.add(parameters, 'transparent').name('Transparent');
+        gui.add(parameters, 'transparent').name('Transparent').onChange(toggle_map);
 
         // Once sliders are initialized, create map and display infos
         setupMap();
@@ -77,7 +77,7 @@ function setupMap(){
     // Create layers
     tiles_overlay_none = L.tileLayer('');
     tiles_overlay_dark =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
-    tiles_overlay_IGN = L.tileLayer.grayscale('tile/{z}/{x}/{y}', {maxZoom : 15});
+    tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
 
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
@@ -282,7 +282,7 @@ function infosToString(id, altitude, heading, speed){
     infos += id + ' <br> ' ;
     infos += altitude + 'm <br> ';
     infos += heading + '° <br> ';
-    infos += speed + 'm/s <br> ';
+    infos += speed + ' m/s <br> ';
     infos += '</p>'
 
     return infos;
@@ -293,5 +293,15 @@ function compute_time(){
         return fleet[Object.keys(fleet)[0]].time;
     } else {
         return 0;
+    }
+}
+
+function toggle_map(){
+    if(parameters.transparent){
+        flight_map.addLayer(tiles_overlay_IGN);
+        flight_map.addLayer(tiles_overlay_dark);
+    } else {
+        flight_map.removeLayer(tiles_overlay_IGN);
+        flight_map.removeLayer(tiles_overlay_dark);
     }
 }

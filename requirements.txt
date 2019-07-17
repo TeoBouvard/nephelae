@@ -12,3 +12,5 @@ sh
 gunicorn
 #useless in future
 ivy-python
+#Map tile downloader
+aiohttp
