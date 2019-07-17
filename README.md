@@ -49,7 +49,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - display drones altitudes in map slider -> goto drone altitude in marker popup
 - bounds to json
 - 3d model of uavs ?
-- icons https://materializecss.com/icons.html
+- [icons](https://materializecss.com/icons.html)
 - reduce array size in image overlay (memory problems?)
 - simulation path update does not work, have to redraw it entirely
 - NCO-JSON for wind layer
@@ -57,7 +57,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - southern hemisphere utm zones ?
 - map downloader -> asynchronous requests to speed up script
 - move image layer calculations inside model
-- sort positions
+- [dat.gui](https://github.com/dataarts/dat.gui) -> [paper-gui](https://github.com/google/paper-gui)
 
 
 ## Questions

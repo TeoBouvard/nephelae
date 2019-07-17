@@ -14,3 +14,5 @@ gunicorn
 ivy-python
 #Map tile downloader
 aiohttp
+# Loading bar
+tqdm
