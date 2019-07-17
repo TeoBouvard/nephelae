@@ -46,7 +46,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - leaflet-velocity -> NCO 
 - requête repère mobile au mapping
 - requête box au mapping
-- display drones altitudes in map slider -> goto drone altitude in marker popup
+- display drones altitudes in map slider -> goto drone altitude in marker popup/gui
 - bounds to json
 - 3d model of uavs ?
 - [icons](https://materializecss.com/icons.html)

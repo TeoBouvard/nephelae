@@ -51,7 +51,7 @@ def data(uav_ids, trail_length):
 
     for uav_id in uav_ids:
 
-        messages = [entry.data for entry in db.find_entries(['SAMPLE', str(uav_id)], (slice(-trail_length, None), ), lambda entry: entry.data.stamp)]
+        messages = [entry.data for entry in db.find_entries(['SAMPLE', str(uav_id)], (slice(-trail_length, None), ), lambda entry: entry.data.timeStamp)]
         
         for message in messages:
 

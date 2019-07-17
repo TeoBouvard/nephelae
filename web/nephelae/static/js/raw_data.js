@@ -28,7 +28,7 @@ var layouts = {
 };
 
 var config = {
-    responsive : true,
+    responsive: true,
     displaylogo: false,
     displayModeBar: false,
 };
@@ -36,9 +36,10 @@ var config = {
 // Parameters
 var parameters = {
     refresh_rate: 1000,   // ms
-    trail_length: 60,    // seconds
+    trail_length: 600,    // seconds
     auto_update: true,
     update: updateData,
+    already_drawn: false,
 }
 
 $(document).ready(function(){
@@ -52,7 +53,7 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Controls');
 
-    f1.add(parameters, 'trail_length', 30, 3000).step(10).name("Log length (s)");
+    f1.add(parameters, 'trail_length', 10, 2000).step(1).name("Log length (s)").listen();
     f1.add(parameters, 'refresh_rate', 500, 5000).step(100).name("Refresh rate (ms)");
     f1.add(parameters, 'auto_update').name("Auto Update").onChange(updateData);
     f1.add(parameters, 'update').name('Update plot');
@@ -77,8 +78,9 @@ function updateData(){
 
     var data = {};
     var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length});
+    console.log(query)
 
-    $.getJSON('update/?' + query, function(response){
+    $.getJSON('update/?' + query, (response) => {
         
         // Parse server response
         for (var variable_name in response){
@@ -105,7 +107,11 @@ function updateData(){
         }
 
         // Update charts
-        updateCharts(data);
+        if (parameters.already_drawn){
+            updateCharts(data);
+        } else {
+            createCharts(data);
+        }
         if (parameters.auto_update){
             setTimeout(updateData, parameters.refresh_rate);
         }
@@ -115,8 +121,17 @@ function updateData(){
 }
 
 function updateCharts(data){
-    Plotly.react('lwc_chart', data.RCT, layouts.lwc, config);
-    Plotly.react('upwind_chart', data.WT, layouts.upwind, config);
+    //$('lwc_chart').empty();
+    //$('upwind_chart').empty();
+    Plotly.restyle('lwc_chart', data.RCT, layouts.lwc, config);
+    Plotly.restyle('upwind_chart', data.WT, layouts.upwind, config);
+}
+
+function createCharts(data){
+    //$('lwc_chart').empty();
+    //$('upwind_chart').empty();
+    Plotly.newPlot('lwc_chart', data.RCT, layouts.lwc, config);
+    Plotly.newPlot('upwind_chart', data.WT, layouts.upwind, config);
 }
 
 function getSelectedUAVs() {
