@@ -2,7 +2,7 @@
 $("#nav_map").addClass('active');
 
 var flight_map, zoom_home, overlays;
-var path_overlay, markers_overlay, cloud_overlay, wind_overlay;
+var markers_overlay, cloud_overlay, wind_overlay;
 
 /*
     fleet     : { drone_id : value_dict }
@@ -113,8 +113,7 @@ function setupMap(){
     };
 
     overlays = {
-        "Trails": path_overlay,
-        "Markers": markers_overlay,
+        "UAVs": markers_overlay,
         "Clouds": cloud_overlay,
         "Thermals": thermals_overlay,
         "Wind": wind_overlay,
@@ -176,7 +175,7 @@ function displayDrones(){
                 // Add drone marker to layer group
                 fleet[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
                 fleet[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading), {autoClose: false});
-                fleet[drone_id].path.addTo(path_overlay);
+                fleet[drone_id].path.addTo(markers_overlay);
             }
             
             // Center map on drone last drone added
@@ -197,7 +196,6 @@ function displayDrones(){
 function updateDrones(){
 
     var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length});
-    console.log(parameters.tracked_drone);
 
     // Request updated data from the server
     $.getJSON('update/?' + query, (response) => {
@@ -310,6 +308,7 @@ function infosToString(uav){
     return infos;
 }
 
+// Attach or remove tracked uav in parameters
 function track(id){
     if (id == -1){
         parameters.tracked_drone = undefined;
@@ -318,10 +317,7 @@ function track(id){
     }
 }
 
+
 function compute_time(){
-    if (Object.keys(fleet).length > 0){
-        return fleet[Object.keys(fleet)[0]].time;
-    } else {
-        return 0;
-    }
+    return Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : 0;
 }

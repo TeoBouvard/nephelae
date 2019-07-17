@@ -9,8 +9,6 @@ from netCDF4 import MFDataset
 
 from nephelae_simulation.mesonh_interface import *
 
-var_time = 'time'        # Time in seconds since 1995-1-1 00:00:00
-var_altitude = 'VLEV'    # Vertical levels in km ASL
 var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 
