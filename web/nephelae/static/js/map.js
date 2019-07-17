@@ -45,19 +45,22 @@ function setupGUI(){
         var min_altitude = Math.ceil(response[1].min);
         var max_altitude = Math.floor(response[1].max);
 
+        var f1 = gui.addFolder('Options');
+        var f2 = gui.addFolder('Layer colors');
+
         // Setup GUI
-        gui.add(parameters, 'refresh_rate', 200, 3000)
+        f1.add(parameters, 'refresh_rate', 200, 3000)
             .step(100)
             .name('Delay (ms)');
-        gui.add(parameters, 'altitude', min_altitude, max_altitude)
+        f1.add(parameters, 'altitude', min_altitude, max_altitude)
             .step(1)
             .name('Altitude (m)');
-        gui.add(parameters, 'trail_length', 0, 500)
+        f1.add(parameters, 'trail_length', 0, 500)
             .step(1)
             .name('Trail length (s)');
-        gui.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
-        gui.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
-        gui.add(parameters, 'transparent').name('Transparent').onChange(toggle_map);
+        f2.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
+        f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
+        f2.add(parameters, 'transparent').name('Transparent').onChange(toggle_map);
 
         // Once sliders are initialized, create map and display infos
         setupMap();
@@ -283,6 +286,7 @@ function infosToString(id, altitude, heading, speed){
     infos += altitude + 'm <br> ';
     infos += heading + '° <br> ';
     infos += speed + ' m/s <br> ';
+    //infos += '<a href="#"> Follow with </a>'
     infos += '</p>'
 
     return infos;

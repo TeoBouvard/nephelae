@@ -14,3 +14,4 @@ web/nephelae/static/js/libs/leafletRotatedMarker.js
 web/nephelae/static/js/libs/materialize.js
 web/nephelae/static/js/libs/plotly.js
 web/nephelae/static/js/libs/three.js
+web/nephelae/static/map_tiles/*

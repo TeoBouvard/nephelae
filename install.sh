@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create static folders
-mkdir web/nephelae/static/js/libs web/nephelae/static/css/libs/images -p
+mkdir web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles -p
 
 # Download javascript libraries
 wget -O web/nephelae/static/js/libs/jquery.js https://code.jquery.com/jquery-3.4.1.min.js

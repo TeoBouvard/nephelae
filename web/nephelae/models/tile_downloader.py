@@ -1,6 +1,7 @@
 import asyncio
 import math
 import os
+import pathlib
 
 import aiohttp
 from tqdm import tqdm
@@ -31,7 +32,7 @@ def latlon2xy(z, lat, lon):
 
 async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east):
 
-    connector = aiohttp.TCPConnector(limit=30)
+    connector = aiohttp.TCPConnector(limit=40)
     total_images = 0
     already_exists = 0
 
@@ -55,8 +56,9 @@ async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east)
 
             for x in range(start_x, stop_x):
                 for y in range(start_y, stop_y):
-
-                    filename = "output_p/%d_%d_%d.jpg" % (z, x, y)
+                    
+                    fn = "static/map_tiles/%d_%d_%d.jpg" % (z, x, y)
+                    filename = pathlib.Path(__file__).parent.parent / fn
                     total_images += 1
 
                     if not os.path.exists(filename):
@@ -104,14 +106,12 @@ async def fetch(client, filename, z, x, y):
         if r.status == 200:
             image = await r.read()
             return dict(image=image, filename=filename)
-        else:
-            pass
 
 
 # Main
 if __name__ == "__main__":
 
-    zoom_min, zoom_max = 11, 16
+    zoom_min, zoom_max = 11, 12
     lat_north, lon_east = 44, 4
     lat_south, lon_west = 42, 0
 
