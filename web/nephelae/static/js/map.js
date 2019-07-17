@@ -2,7 +2,7 @@
 $("#nav_map").addClass('active');
 
 var flight_map, zoom_home, overlays;
-var tiles_overlay_IGN, tiles_overlay_dark, path_overlay, markers_overlay, cloud_overlay, wind_overlay;
+var path_overlay, markers_overlay, cloud_overlay, wind_overlay;
 
 /*
     fleet     : { drone_id : value_dict }
@@ -25,6 +25,7 @@ var parameters = {
     thermals_cmap: 'viridis',
     clouds_cmap: 'viridis',
     transparent: true,
+    tracked_drone: undefined,
 
     origin: [43.46, 1.27] // used to compute layer images
 }
@@ -54,13 +55,15 @@ function setupGUI(){
             .name('Delay (ms)');
         f1.add(parameters, 'altitude', min_altitude, max_altitude)
             .step(1)
-            .name('Altitude (m)');
-        f1.add(parameters, 'trail_length', 0, 500)
+            .name('Altitude (m)')
+            .onChange(() => {track(-1);})
+            .listen();
+        f1.add(parameters, 'trail_length', 1, 500)
             .step(1)
             .name('Trail length (s)');
         f2.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
         f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
-        f2.add(parameters, 'transparent').name('Transparent').onChange(toggle_map);
+        f2.add(parameters, 'transparent').name('Transparent');
 
         // Once sliders are initialized, create map and display infos
         setupMap();
@@ -78,9 +81,9 @@ function setupMap(){
     zoomHome = L.Control.zoomHome();
 
     // Create layers
-    tiles_overlay_none = L.tileLayer('');
-    tiles_overlay_dark =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
-    tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
+    var tiles_overlay_none = L.tileLayer('');
+    var tiles_overlay_dark =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
+    var tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
 
     path_overlay = L.layerGroup();
     markers_overlay = L.layerGroup();
@@ -155,11 +158,12 @@ function displayDrones(){
                 var drone_icon = global_icons[key%global_colors.length];
                 
                 // Create leaflet marker and polyline at drone position
-                var marker = L.marker(drone_position, {icon: drone_icon}).bindTooltip("Drone " + key);
+                var marker = L.marker(drone_position, {icon: drone_icon}).bindTooltip("UAV " + key);
                 var polyline = L.polyline([drone_path], {color : drone_color, weight : '2', dashArray : '5,7'});
                 
                 // Update fleet dictionnary with discovered drone
                 fleet[drone_id] = ({
+                    id: drone_id,
                     color : drone_color, 
                     position : marker, 
                     altitude : drone_altitude, 
@@ -192,6 +196,7 @@ function displayDrones(){
 function updateDrones(){
 
     var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length});
+    console.log(parameters.tracked_drone);
 
     // Request updated data from the server
     $.getJSON('update/?' + query, (response) => {
@@ -213,9 +218,15 @@ function updateDrones(){
             // ... and update it
             if(drone_to_update){
 
+                // Update infos
+                drone_to_update.heading = drone_heading;
+                drone_to_update.speed = drone_speed;
+                drone_to_update.altitude = drone_altitude;
+                drone_to_update.time = drone_time;
+
                 // Update markers
                 drone_to_update.position.setLatLng(drone_position).setRotationAngle(drone_heading);
-                drone_to_update.position.setPopupContent(infosToString(drone_id, drone_altitude, drone_heading, drone_speed));
+                drone_to_update.position.setPopupContent(infosToString(drone_to_update));
 
                 // Update polyline
                 drone_to_update.path.setLatLngs(drone_path);
@@ -278,18 +289,24 @@ function computeURL(){
 }
 
 // Print HTML formatted string so that it can be added to marker popup
-function infosToString(id, altitude, heading, speed){
-    var infos = '<p style="text-align:center;font-family:Roboto-Light;font-size:15px">';
+function infosToString(uav){
+    var infos = '<p style="text-align:center;font-family:Roboto-Light;font-size:14px">';
 
-    infos += 'Drone ';
-    infos += id + ' <br> ' ;
-    infos += altitude + 'm <br> ';
-    infos += heading + '° <br> ';
-    infos += speed + ' m/s <br> ';
-    //infos += '<a href="#"> Follow with </a>'
-    infos += '</p>'
+    infos += '<b>UAV ' + uav.id + ' </b><br> ' ;
+    infos += uav.altitude + 'm <br> ';
+    infos += uav.heading + '° <br> ';
+    infos += uav.speed + ' m/s <br>';
+    infos += '<a onClick="track(' + uav.id + ');" class="white btn">Follow with MesoNH</a></p>'
 
     return infos;
+}
+
+function track(id){
+    if (id == -1){
+        parameters.tracked_drone = undefined;
+    } else {
+        parameters.tracked_drone = fleet[id];
+    }
 }
 
 function compute_time(){
@@ -297,15 +314,5 @@ function compute_time(){
         return fleet[Object.keys(fleet)[0]].time;
     } else {
         return 0;
-    }
-}
-
-function toggle_map(){
-    if(parameters.transparent){
-        flight_map.addLayer(tiles_overlay_IGN);
-        flight_map.addLayer(tiles_overlay_dark);
-    } else {
-        flight_map.removeLayer(tiles_overlay_IGN);
-        flight_map.removeLayer(tiles_overlay_dark);
     }
 }
