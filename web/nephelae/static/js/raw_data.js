@@ -36,7 +36,7 @@ var config = {
 // Parameters
 var parameters = {
     refresh_rate: 1000,   // ms
-    trail_length: 600,    // seconds
+    trail_length: 60,    // seconds
     auto_update: true,
     update: updateData,
     already_drawn: false,
@@ -53,7 +53,7 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Controls');
 
-    f1.add(parameters, 'trail_length', 10, 2000).step(1).name("Log length (s)").listen();
+    f1.add(parameters, 'trail_length', 10, 2000).step(1).name("Log length (s)");
     f1.add(parameters, 'refresh_rate', 500, 5000).step(100).name("Refresh rate (ms)");
     f1.add(parameters, 'auto_update').name("Auto Update").onChange(updateData);
     f1.add(parameters, 'update').name('Update plot');
@@ -78,21 +78,18 @@ function updateData(){
 
     var data = {};
     var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length});
-    console.log(query)
 
     $.getJSON('update/?' + query, (response) => {
         
         // Parse server response
-        for (var variable_name in response){
+        for (var uav_id in response){
 
-            data[variable_name] = [];
-
-            for (var uav_id in response[variable_name]){
+            for (var variable_name in response[uav_id]){
 
                 var new_data = {
                     type: 'scatter',
-                    x: response[variable_name][uav_id]['x'],
-                    y: response[variable_name][uav_id]['y'],
+                    x: response[uav_id][variable_name]['x'],
+                    y: response[uav_id][variable_name]['y'],
                     name: "UAV " + uav_id,
                     mode: 'lines',
                     line: {
@@ -102,16 +99,16 @@ function updateData(){
                     }
                 };
 
-                data[variable_name].push(new_data);
+                if (variable_name in data){
+                    data[variable_name].push(new_data);
+                } else {
+                    data[variable_name] = [new_data];
+                }  
             }
         }
 
         // Update charts
-        if (parameters.already_drawn){
-            updateCharts(data);
-        } else {
-            createCharts(data);
-        }
+        updateCharts(data);
         if (parameters.auto_update){
             setTimeout(updateData, parameters.refresh_rate);
         }
@@ -121,18 +118,10 @@ function updateData(){
 }
 
 function updateCharts(data){
-    //$('lwc_chart').empty();
-    //$('upwind_chart').empty();
-    Plotly.restyle('lwc_chart', data.RCT, layouts.lwc, config);
-    Plotly.restyle('upwind_chart', data.WT, layouts.upwind, config);
+    Plotly.react('lwc_chart', data.RCT, layouts.lwc, config);
+    Plotly.react('upwind_chart', data.WT, layouts.upwind, config);
 }
 
-function createCharts(data){
-    //$('lwc_chart').empty();
-    //$('upwind_chart').empty();
-    Plotly.newPlot('lwc_chart', data.RCT, layouts.lwc, config);
-    Plotly.newPlot('upwind_chart', data.WT, layouts.upwind, config);
-}
 
 function getSelectedUAVs() {
 

@@ -47,7 +47,7 @@ def track(uav_ids, trail_length):
 
 def data(uav_ids, trail_length):
 
-    data = {}
+    data = dict()
 
     for uav_id in uav_ids:
 
@@ -55,20 +55,16 @@ def data(uav_ids, trail_length):
         
         for message in messages:
 
-            if message.variableName not in data.keys():
-                data[message.variableName] = {
-                    'uav_id': uav_id,
-                    'x': [message.timeStamp],
-                    'y': message.data
-                }
-            elif uav_id not in data[message.variableName].keys():
-                data[message.variableName][uav_id] = {
-                    'x': [message.timeStamp],
-                    'y': message.data
-                }
+            if uav_id not in data.keys():
+                data[uav_id] = dict()
+            elif message.variableName not in data[uav_id].keys():
+                data[uav_id][message.variableName] = dict(
+                    x=[message.timeStamp],
+                    y=[message.data[0]],
+                )
             else:
-                data[message.variableName][uav_id]['x'].append(message.timeStamp)
-                data[message.variableName][uav_id]['y'].append(message.data[0])
+                data[uav_id][message.variableName]['x'].append(message.timeStamp)
+                data[uav_id][message.variableName]['y'].append(message.data[0])
                 
     return data
 
