@@ -7,14 +7,15 @@ var parameters = {
 
 
 $(document).ready(function(){
-	//setupGUI();
+	setupGUI();
 	removeLoader();
 });
 
 function setupGUI(){
     var gui = new dat.GUI();
+    customizeGUI();
 
-    gui.add(parameters, 'hello');
+    gui.add(parameters, 'text');
     //gui.add(parameters, 'altitude', 0, 4000);
     //gui.add(parameters, 'trail_length', 0, 500);
 }
