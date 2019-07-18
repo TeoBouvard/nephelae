@@ -56,7 +56,7 @@ function setupGUI(){
         f1.add(parameters, 'altitude', min_altitude, max_altitude)
             .step(1)
             .name('Altitude (m)')
-            .onChange(() => {track(-1);})
+            .onChange(() => {track(-1); updateWindData();})
             .listen();
         f1.add(parameters, 'trail_length', 1, 500).step(1).name('Trail length (s)');
         f1.add(parameters, 'update_wind').name('Update wind');
@@ -97,7 +97,7 @@ function setupMap(){
             velocityType: "Wind",
             displayEmptyString: "No wind data"
         },
-        maxVelocity: 10
+        maxVelocity: 15
     });
 
     // Set layer dictionnary for control initialization
@@ -119,7 +119,7 @@ function setupMap(){
 
     // Display everything on initialization
     for(key in overlays) overlays[key].addTo(flight_map);
-    tiles_overlay_dark.addTo(flight_map);
+    tiles_overlay_none.addTo(flight_map);
 
     // Prevent async conflicts by displaying drones once map is initialized
     displayDrones();
@@ -247,6 +247,7 @@ function updateDrones(){
 function updateURL(){
     cloud_overlay.setUrl('clouds_img/?'+ computeURL());
     thermals_overlay.setUrl('thermals_img/?'+ computeURL());
+
 }
 
 function updateLayerBounds(){
@@ -254,6 +255,7 @@ function updateLayerBounds(){
     thermals_overlay.setBounds(flight_map.getBounds());
     
     updateURL();
+    updateWindData();
 
     // Change checkbox style dynamically (fucking materialize framework)
     $(':checkbox').addClass('filled-in');
@@ -315,7 +317,6 @@ function updateWindData() {
 
     // Request updated data from the server
     $.getJSON('wind/?' + computeURL(), (response) => {
-        console.log(response)
         wind_overlay.setData(response);
     });
 }

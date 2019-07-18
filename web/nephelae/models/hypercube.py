@@ -20,8 +20,8 @@ if 'MESO_NH' in os.environ:
     hypercube = MFDataset(os.environ['MESO_NH'])
     clouds = MesoNHVariable(hypercube, var_lwc, interpolation='linear')
     thermals = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
-    wind_u = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
-    wind_v = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
+    wind_u = MesoNHVariable(hypercube, var_wind_u, interpolation='linear')
+    wind_v = MesoNHVariable(hypercube, var_wind_v, interpolation='linear')
 else:
     print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
     exit()
@@ -77,11 +77,10 @@ def get_wind(u_time, u_altitude, bounds, origin):
         'lo2': bounds['east'],
         'nx': np.size(u, 0),
         'ny': np.size(u, 1),
-        'refTime': '2016-04-30T06:00:00.000Z',
+
     }
-    
+
     s1 = json.dumps({'header': header, 'data': u_data.tolist()})
-    #s1 = s1[1:-1]
 
     header['parameterNumber'] = 3
     header['parameterNumberName'] = 'northward_wind'
@@ -89,7 +88,6 @@ def get_wind(u_time, u_altitude, bounds, origin):
     header['ny'] = np.size(v, 1)
 
     s2 = json.dumps({'header': header, 'data': v_data.tolist()})
-    #s2 = s2[1:-1]
 
     return [eval(s1), eval(s2)]
 
