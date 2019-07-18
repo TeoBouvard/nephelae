@@ -27,8 +27,8 @@ var config = {
 var parameters = {
     trail_length: 60,
     update: drawPlot,
-    line_color: 'Altitude',
-    color_mapping: {Altitude: ['past_altitudes', 'Reds'], LWC: ['past_altitudes', 'Greys'] },
+    variable: 'WT',
+    color_mapping: {WT: ['samples', 'viridis'], RCT: ['samples', 'viridis'] },
 }
 
 
@@ -46,7 +46,7 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Controls');
     f1.add(parameters, 'trail_length', 30, 3000).step(10).name("Trail length (s)").onChange(drawPlot);
-    f1.add(parameters, 'line_color', ['Altitude', 'LWC']).name("Trail color").onChange(drawPlot);
+    f1.add(parameters, 'variable', ['WT', 'RCT']).name("Trail color").onChange(drawPlot);
     f1.add(parameters, 'update').name('Update plot');
 
     var f2 = gui.addFolder('Trails');
@@ -66,11 +66,11 @@ function setupGUI(){
 function drawPlot(){
 
     var data = [];
-    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length});
+    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length, variable: parameters.variable});
 
     $.getJSON('update/?' + query, (response) => {
 
-        console.log(response)
+        //console.log(response)
 
         for (var key in response.drones){
 
@@ -81,6 +81,8 @@ function drawPlot(){
             var past_latitudes = [];
             var past_longitudes = [];
             var past_altitudes = [];
+            var samples = response.samples[drone_id][parameters.variable]['y'];
+            console.log(samples)
 
             // Compute coordinates from path
             for(var i = 0; i < drone_path.length ; i++){
@@ -103,8 +105,8 @@ function drawPlot(){
                 line: {
                     width: 5,
                     shape: 'spline',
-                    color: eval(parameters.color_mapping[parameters.line_color][0]),
-                    colorscale: parameters.color_mapping[parameters.line_color][1],
+                    color: samples,
+                    //colorscale: 'Electric',
                     showscale: displayColorBar,
                     colorbar: {
                         x: -0.2,

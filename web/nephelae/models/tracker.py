@@ -18,7 +18,6 @@ def discover():
 def track(uav_ids, trail_length):
     data = dict()
 
-
     for uav_id in uav_ids:
 
         messages = [entry.data for entry in db.find_entries(['GPS', str(uav_id)], (slice(-trail_length, None), ), lambda entry: entry.data.stamp)]

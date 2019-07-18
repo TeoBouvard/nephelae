@@ -14,8 +14,9 @@ def update_UAVs(request):
     # Parse request parameters
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
+    variable = request.GET.get('variable')
 
-    return JsonResponse({'drones': tracker.track(uav_ids, trail_length)})
+    return JsonResponse({'drones': tracker.track(uav_ids, trail_length), 'samples': tracker.data(uav_ids, trail_length)})
 
 
 # Get sections/map sliders bounds, bad design for now ..

@@ -1,7 +1,9 @@
 .vscode
 .DS_Store
+.vscode
 __pycache__
 *.pyc
+*.swp
 db.sqlite3
 web/nephelae/static/css/libs/images/*
 web/nephelae/static/css/libs/leaflet.css
@@ -15,4 +17,3 @@ web/nephelae/static/js/libs/materialize.js
 web/nephelae/static/js/libs/plotly.js
 web/nephelae/static/js/libs/three.js
 web/nephelae/static/map_tiles/*
-.swp

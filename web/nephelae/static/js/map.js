@@ -119,7 +119,7 @@ function setupMap(){
 
     // Display everything on initialization
     for(key in overlays) overlays[key].addTo(flight_map);
-    tiles_overlay_none.addTo(flight_map);
+    tiles_overlay_dark.addTo(flight_map);
 
     // Prevent async conflicts by displaying drones once map is initialized
     displayDrones();

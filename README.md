@@ -46,14 +46,14 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - requête repère mobile au mapping
 - requête box au mapping
 - bounds to json
-- 3d model of uavs ?
 - reduce array size in image overlay (memory problems?)
-- simulation path update does not work, have to redraw it entirely
-- NCO-JSON for wind layer
 - organize base css
 - move image layer calculations inside model
-- 3D tracking broken
+- 3d model of uavs ?
+- simulation path update does not work, have to redraw it entirely
+- 3D tracking broken -> path translation error
 - simplify bounds management
+- synchronize gps to samples by getting both at the same time
 
 
 ## Links  
