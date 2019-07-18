@@ -1,7 +1,6 @@
 import os
 
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
-from geopy.distance import distance
 
 from ..models import hypercube
 
@@ -62,21 +61,5 @@ def layer_img(request, variable_name):
         'lng': float(query.getlist('origin[]')[1])
     }
 
-    # Compute projected origin coordinates
-    x_projected_origin = [map_bounds['south'], origin['lng']]
-    y_projected_origin = [origin['lat'], map_bounds['west']]
-
-    # Compute distances to map corners
-    distance_x0 = distance(x_projected_origin, [map_bounds['south'], map_bounds['west']]).meters
-    distance_x1 = distance(x_projected_origin, [map_bounds['south'], map_bounds['east']]).meters
-    distance_y0 = distance(y_projected_origin, [map_bounds['south'], map_bounds['west']]).meters
-    distance_y1 = distance(y_projected_origin, [map_bounds['north'], map_bounds['west']]).meters
-
-    # Adjust for negative indices
-    x0 = distance_x0 if origin['lng'] < map_bounds['west'] else -distance_x0
-    x1 = distance_x1 if origin['lng'] < map_bounds['east'] else -distance_x1
-    y0 = distance_y0 if origin['lat'] < map_bounds['south'] else -distance_y0
-    y1 = distance_y1 if origin['lat'] < map_bounds['north'] else -distance_y1
-
-    buf = hypercube.print_horizontal_slice(variable_name, time_value, altitude_value, x0, x1, y0, y1, thermals_cmap, clouds_cmap, transparent)
+    buf = hypercube.print_horizontal_slice(variable_name, time_value, altitude_value, map_bounds, origin, thermals_cmap, clouds_cmap, transparent)
     return HttpResponse(buf.read(), content_type="image/png")

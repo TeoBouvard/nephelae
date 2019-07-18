@@ -43,53 +43,28 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 ## TODO
 
 - os.environ['MESO_NH'], os.environ['MAP_TILES'] -> define env variables in install script !
-- leaflet-velocity -> NCO 
 - requête repère mobile au mapping
 - requête box au mapping
-- display drones altitudes in map slider -> goto drone altitude in marker popup/gui
 - bounds to json
 - 3d model of uavs ?
-- [icons](https://materializecss.com/icons.html)
 - reduce array size in image overlay (memory problems?)
 - simulation path update does not work, have to redraw it entirely
 - NCO-JSON for wind layer
 - organize base css
-- southern hemisphere utm zones ?
-- map downloader -> asynchronous requests to speed up script
 - move image layer calculations inside model
+- 3D tracking broken
+- simplify bounds management
+
+
+## Links  
+
+- [Grib parameters table](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/GRIB2_parmeter_conversion_table.html)
 - [dat.gui](https://github.com/dataarts/dat.gui) -> [paper-gui](https://github.com/google/paper-gui)
+- [icons](https://materializecss.com/icons.html)
 
 
 ## Questions
 
 -   k-means clustering, then convex hull ?
 -   why is message.data an array ? (3d data ?)
-
-##
-
-- "High level command"
-- "Future trajectories"
-
-## Ideas
-
--   3D global view :
-
-    -   axes (cardinal + height + time)
-    -   drones + trails + infos?
-    -   clouds (lwc > 0)
-    -   sélection plan de coupe
-
--   Vues en coupe :
-
-    -   horizontale (altitude)
-    -   verticale (vecteur normal)
-
--   Tracking drones :
-
-    -   map with drones + trails + intentions
-    -   altitude/time graph
-
--   Mesures
-
-    -   emagrammes
-    -   infos drones
+-   can I have a way to ask all sample tags (not all tags)

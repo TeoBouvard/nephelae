@@ -2,7 +2,6 @@ Django
 matplotlib
 mpld3
 Jinja2
-netCDF4
 geopy
 utm
 scipy
@@ -16,3 +15,5 @@ ivy-python
 aiohttp
 # Loading bar
 tqdm
+# NetCDF and operators
+netCDF4

@@ -2,7 +2,7 @@
 $("#nav_map").addClass('active');
 
 var flight_map, zoom_home, overlays;
-var markers_overlay, cloud_overlay, wind_overlay;
+var uavs_overlay, cloud_overlay, wind_overlay;
 
 /*
     fleet     : { drone_id : value_dict }
@@ -19,14 +19,15 @@ var fleet = {};
 
 // Parameters
 var parameters = {
-    refresh_rate: 1000, // milliseconds
-    altitude: 600,     // meters
-    trail_length: 60,    // seconds
+    refresh_rate: 1000,     // milliseconds
+    altitude: 600,          // meters
+    trail_length: 60,       // seconds
     thermals_cmap: 'viridis',
     clouds_cmap: 'viridis',
     transparent: true,
     tracked_drone: undefined,
     time: undefined,
+    update_wind: updateWindData,
 
     origin: [43.46, 1.27] // used to compute layer images
 }
@@ -47,26 +48,24 @@ function setupGUI(){
         var min_altitude = Math.ceil(response[1].min);
         var max_altitude = Math.floor(response[1].max);
 
+        // Setup GUI
         var f1 = gui.addFolder('Options');
         var f2 = gui.addFolder('Layer colors');
 
-        // Setup GUI
-        f1.add(parameters, 'refresh_rate', 200, 3000)
-            .step(100)
-            .name('Delay (ms)');
+        f1.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
         f1.add(parameters, 'altitude', min_altitude, max_altitude)
             .step(1)
             .name('Altitude (m)')
             .onChange(() => {track(-1);})
             .listen();
-        f1.add(parameters, 'trail_length', 1, 500)
-            .step(1)
-            .name('Trail length (s)');
+        f1.add(parameters, 'trail_length', 1, 500).step(1).name('Trail length (s)');
+        f1.add(parameters, 'update_wind').name('Update wind');
+
         f2.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
         f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
         f2.add(parameters, 'transparent').name('Transparent');
 
-        // Once sliders are initialized, create map and display infos
+        // Once sliders are initialized -> create map
         setupMap();
     });
 }
@@ -87,7 +86,7 @@ function setupMap(){
     var tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
 
     path_overlay = L.layerGroup();
-    markers_overlay = L.layerGroup();
+    uavs_overlay = L.layerGroup();
 
     cloud_overlay = L.imageOverlay('clouds_img/?' + computeURL(), flight_map.getBounds());
     thermals_overlay = L.imageOverlay('thermals_img/?' + computeURL(), flight_map.getBounds());
@@ -101,10 +100,6 @@ function setupMap(){
         maxVelocity: 10
     });
 
-    $.getJSON('wind.json', (data) => {
-        wind_overlay.setData(data);
-    });
-
     // Set layer dictionnary for control initialization
     var base_layers = {
         "None": tiles_overlay_none,
@@ -113,7 +108,7 @@ function setupMap(){
     };
 
     overlays = {
-        "UAVs": markers_overlay,
+        "UAVs": uavs_overlay,
         "Clouds": cloud_overlay,
         "Thermals": thermals_overlay,
         "Wind": wind_overlay,
@@ -152,7 +147,6 @@ function displayDrones(){
                 var drone_speed = response.drones[key].speed;
                 var drone_time = response.drones[key].time;
                 
-
                 // Compute color and icon of markers based on drone ID
                 var drone_color = global_colors[key%global_colors.length];
                 var drone_icon = global_icons[key%global_colors.length];
@@ -173,9 +167,9 @@ function displayDrones(){
                 });
 
                 // Add drone marker to layer group
-                fleet[drone_id].position.setRotationAngle(drone_heading).addTo(markers_overlay);
+                fleet[drone_id].position.setRotationAngle(drone_heading).addTo(uavs_overlay);
                 fleet[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading), {autoClose: false});
-                fleet[drone_id].path.addTo(markers_overlay);
+                fleet[drone_id].path.addTo(uavs_overlay);
             }
             
             // Center map on drone last drone added
@@ -315,4 +309,13 @@ function track(id){
     } else {
         parameters.tracked_drone = fleet[id];
     }
+}
+
+function updateWindData() {
+
+    // Request updated data from the server
+    $.getJSON('wind/?' + computeURL(), (response) => {
+        console.log(response)
+        wind_overlay.setData(response);
+    });
 }

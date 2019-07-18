@@ -17,7 +17,7 @@ urlpatterns = [
     path('map/discover/', views.discover_UAVs),
     path('map/update/', views.update_UAVs),
     path('map/box/', views.mesonh_box),
-    path('map/wind.json/', views.get_json),
+    path('map/wind/', views.wind_data),
     path('map/tile/<int:z>/<int:x>/<int:y>', views.map_tiles, name='map_tiles'),
     path('map/plane_icon/<int:index>', views.plane_icon, name='plane_icon'),
     path('map/<str:variable_name>_img/', views.layer_img, name='layer_img'),

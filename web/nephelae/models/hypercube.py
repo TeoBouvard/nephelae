@@ -1,9 +1,11 @@
 import io
+import json
 import os
 
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
+from geopy.distance import distance
 from matplotlib.colors import ListedColormap
 from netCDF4 import MFDataset
 
@@ -11,17 +13,23 @@ from nephelae_simulation.mesonh_interface import *
 
 var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
+var_wind_u = 'UT'          # Liquid water content in KG/KG ?
+var_wind_v = 'VT'          # Liquid water content in KG/KG ?
 
 if 'MESO_NH' in os.environ:
     hypercube = MFDataset(os.environ['MESO_NH'])
     clouds = MesoNHVariable(hypercube, var_lwc, interpolation='linear')
     thermals = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
+    wind_u = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
+    wind_v = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
 else:
     print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
     exit()
 
 
-def print_horizontal_slice(variable_name, u_time, u_altitude, x0, x1, y0, y1, thermals_cmap, clouds_cmap, transparent):
+def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
+
+    x0, x1, y0, y1 = bounds2indices(bounds, origin)
 
     # Get slice
     if variable_name == 'clouds':
@@ -47,7 +55,46 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, x0, x1, y0, y1, th
     return buf
 
 
-########## UTILITY METHODS ##########
+def get_wind(u_time, u_altitude, bounds, origin):
+
+    x0, x1, y0, y1 = bounds2indices(bounds, origin)
+    u = wind_u[u_time, u_altitude, y0:y1, x0:x1].data
+    v = wind_v[u_time, u_altitude, y0:y1, x0:x1].data
+    u_data = u.flatten()
+    v_data = v.flatten()
+
+    # header template
+    header = {
+        'parameterUnit': 'm.s-1',
+        'parameterCategory': 2,
+        'parameterNumber': 2,
+        'parameterNumberName': 'eastward_wind',
+        'dx': 25.0,
+        'dy': 25.0,
+        'la1': bounds['north'],
+        'la2': bounds['south'],
+        'lo1': bounds['west'],
+        'lo2': bounds['east'],
+        'nx': np.size(u, 0),
+        'ny': np.size(u, 1),
+        'refTime': '2016-04-30T06:00:00.000Z',
+    }
+    
+    s1 = json.dumps({'header': header, 'data': u_data.tolist()})
+    #s1 = s1[1:-1]
+
+    header['parameterNumber'] = 3
+    header['parameterNumberName'] = 'northward_wind'
+    header['nx'] = np.size(v, 0)
+    header['ny'] = np.size(v, 1)
+
+    s2 = json.dumps({'header': header, 'data': v_data.tolist()})
+    #s2 = s2[1:-1]
+
+    return [eval(s1), eval(s2)]
+
+
+# ######### UTILITY METHODS ######### #
 
 
 def transparent_cmap(original_cmap):
@@ -97,3 +144,24 @@ def box():
         {'min': bounds[2].min, 'max':bounds[2].max},
         {'min': bounds[3].min, 'max':bounds[3].max}]
     return box
+
+
+def bounds2indices(bounds, origin):
+
+    # Compute projected origin coordinates
+    x_projected_origin = [bounds['south'], origin['lng']]
+    y_projected_origin = [origin['lat'], bounds['west']]
+
+    # Compute distances to map corners
+    distance_x0 = distance(x_projected_origin, [bounds['south'], bounds['west']]).meters
+    distance_x1 = distance(x_projected_origin, [bounds['south'], bounds['east']]).meters
+    distance_y0 = distance(y_projected_origin, [bounds['south'], bounds['west']]).meters
+    distance_y1 = distance(y_projected_origin, [bounds['north'], bounds['west']]).meters
+
+    # Adjust for negative indices
+    x0 = distance_x0 if origin['lng'] < bounds['west'] else -distance_x0
+    x1 = distance_x1 if origin['lng'] < bounds['east'] else -distance_x1
+    y0 = distance_y0 if origin['lat'] < bounds['south'] else -distance_y0
+    y1 = distance_y1 if origin['lat'] < bounds['north'] else -distance_y1
+
+    return x0, x1, y0, y1
