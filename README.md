@@ -54,6 +54,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - 3D tracking broken -> path translation error
 - simplify bounds management
 - synchronize gps to samples by getting both at the same time
+- WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 
 
 ## Links  

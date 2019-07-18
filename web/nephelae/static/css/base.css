@@ -55,8 +55,8 @@ nav ul li a {
 #draggable i {
     cursor: pointer;
     position: relative;
-    left: -30px;
-    top: 26px;
+    left: 218px;
+    top: 30px;
 }
 
 /* Fix conflicts between materialize and dat.gui*/

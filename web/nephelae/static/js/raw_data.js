@@ -40,6 +40,7 @@ var parameters = {
     auto_update: true,
     update: updateData,
     already_drawn: false,
+    variables: ['WT', 'RCT']
 }
 
 $(document).ready(function(){
@@ -77,19 +78,19 @@ function setupGUI(){
 function updateData(){
 
     var data = {};
-    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length});
+    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length, variables:parameters.variables});
 
     $.getJSON('update/?' + query, (response) => {
         
         // Parse server response
-        for (var uav_id in response){
+        for (var uav_id in response.data){
 
-            for (var variable_name in response[uav_id]){
+            for (var variable_name in response.data[uav_id]){
 
                 var new_data = {
                     type: 'scatter',
-                    x: response[uav_id][variable_name]['x'],
-                    y: response[uav_id][variable_name]['y'],
+                    x: response.data[uav_id][variable_name]['t'],
+                    y: response.data[uav_id][variable_name]['values'],
                     name: "UAV " + uav_id,
                     mode: 'line',
                     line: {
@@ -103,7 +104,7 @@ function updateData(){
                     data[variable_name].push(new_data);
                 } else {
                     data[variable_name] = [new_data];
-                }  
+                }
             }
         }
 

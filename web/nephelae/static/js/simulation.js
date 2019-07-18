@@ -131,11 +131,11 @@ function createDrones() {
 
         $.getJSON('update/?' + query, (response) => {
 
-			for (var key in response.drones){
+			for (var key in response.positions){
 
 				// Parse response data
 				var drone_id = key;
-				var drone_path = response.drones[key].frame_path;
+				var drone_path = response.positions[key].frame_path;
 				var drone_position = drone_path.slice(-1)[0];
                 var drone_altitude = drone_path.slice(-1)[0][2];
 
@@ -189,11 +189,11 @@ function update(){
 
 			if (parameters.fleet_visibility){
 				
-				for(var key in response.drones){
+				for(var key in response.positions){
 
 					// Parse response data
 					var drone_id = key;
-					var drone_path = response.drones[key].frame_path;
+					var drone_path = response.positions[key].frame_path;
 					var drone_position = drone_path.slice(-1)[0];
                 	var drone_altitude = drone_path.slice(-1)[0][2]
 

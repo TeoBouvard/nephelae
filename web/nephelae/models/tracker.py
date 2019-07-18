@@ -1,4 +1,5 @@
 import utm
+import os
 from geopy.distance import distance
 
 from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
@@ -6,15 +7,15 @@ from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
 import sys
 import nephelae_paparazzi.pprzinterface as ppint
 
-mesonhFiles = '/home/pnarvor/work/nephelae/data/MesoNH-2019-02/REFHR.1.ARMCu.4D.nc'
 db = NephelaeDataServer()
 
 def build_uav(uavId, navRef):
-    uav = ppint.PprzMesoNHUav(uavId, navRef, mesonhFiles, ['RCT', 'WT'])
+    uav = ppint.PprzMesoNHUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
     uav.add_sensor_observer(db)
     uav.add_gps_observer(db)
     return uav
-interface = ppint.PprzSimulation(mesonhFiles,
+
+interface = ppint.PprzSimulation(os.environ['MESO_NH'],
                                  ['RCT', 'WT'],
                                  build_uav_callback=build_uav)
 interface.start()
@@ -37,14 +38,15 @@ def discover():
 
 
 # GPS time is *absolute*, but SAMPLE time is relative to navFrame
-def track(uav_ids, trail_length):
-    data = dict()
+def get_positions(uav_ids, trail_length):
+    positions = dict()
 
     for uav_id in uav_ids:
 
-        messages = [entry.data for entry in db.find_entries(['GPS', str(uav_id)], (slice(-trail_length, None), ), lambda entry: entry.data.stamp)]
+        messages = [entry.data for entry in db.find_entries(['GPS', str(uav_id)], (slice(-trail_length, None, -1), ), lambda entry: entry.data.stamp)]
 
-        data[uav_id] = {
+        # Gather most recent information for display
+        positions[uav_id] = {
             'heading': messages[-1]['course'],
             'speed': messages[-1]['speed'],
             'time': int(messages[-1]['stamp'] - db.navFrame['stamp'])
@@ -58,39 +60,42 @@ def track(uav_ids, trail_length):
             frame_position = translate_position(position, nav_frame)
             frame_position.append(message['alt'])
 
-            if 'path' not in data[uav_id]:
-                data[uav_id]['path'] = [position]
-                data[uav_id]['frame_path'] = [frame_position]
+            if 'path' not in positions[uav_id]:
+                positions[uav_id]['path'] = [position]
+                positions[uav_id]['frame_path'] = [frame_position]
             else:
-                data[uav_id]['path'].append(position)
-                data[uav_id]['frame_path'].append(frame_position)
+                positions[uav_id]['path'].append(position)
+                positions[uav_id]['frame_path'].append(frame_position)
     
-    return data
+    return dict(positions=positions)
 
 
-def data(uav_ids, trail_length):
+def get_data(uav_ids, trail_length, variables):
 
     data = dict()
 
-    for uav_id in uav_ids:
+    for variable in variables:
 
-        messages = [entry.data for entry in db.find_entries(['SAMPLE', str(uav_id)], (slice(-trail_length, None), ), lambda entry: entry.data.timeStamp)]
-        
-        for message in messages:
+        for uav_id in uav_ids:
 
-            if uav_id not in data.keys():
-                data[uav_id] = dict()
-            elif message.variableName not in data[uav_id].keys():
-                data[uav_id][message.variableName] = dict(
-                    x=[message.timeStamp],
-                    y=[message.data[0]],
-                )
-            else:
-                data[uav_id][message.variableName]['x'].append(message.timeStamp)
-                data[uav_id][message.variableName]['y'].append(message.data[0])
-                
-    return data
+            messages = [entry.data for entry in db.find_entries([variable, str(uav_id)], (slice(-trail_length, None, -1), ), lambda entry: entry.data.timeStamp)]
 
+            for message in messages:
+
+                if uav_id not in data.keys():
+                    data[uav_id] = dict()
+                elif message.variableName not in data[uav_id].keys():
+                    data[uav_id][message.variableName] = dict(
+                        positions=[message.position.data.tolist()],
+                        values=[message.data[0]],
+                    )
+                else:
+                    data[uav_id][message.variableName]['positions'].append(message.position.data.tolist())
+                    data[uav_id][message.variableName]['values'].append(message.data[0])
+    
+    return dict(data=data)
+
+# TODO add sign check
 
 def translate_position(real_world, origin):
     x = distance(origin, [real_world[0], origin[1]]).meters

@@ -6,11 +6,11 @@ geopy
 utm
 scipy
 #MesoNH Probe -> to be packaged
+sklearn
 sh
+ivy-python
 #Server
 gunicorn
-#useless in future
-ivy-python
 #Map tile downloader
 aiohttp
 # Loading bar

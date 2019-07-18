@@ -4,19 +4,28 @@ from ..models import hypercube, tracker
 
 
 # Returns discovered UAVs and navigation frame info
-def discover_UAVs(request):
+def discover(request):
     return JsonResponse(tracker.discover(), safe=False)
 
 
 # Update UAV fleet positions
-def update_UAVs(request):
+def get_positions(request):
 
     # Parse request parameters
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
-    variable = request.GET.get('variable')
 
-    return JsonResponse({'drones': tracker.track(uav_ids, trail_length), 'samples': tracker.data(uav_ids, trail_length)})
+    return JsonResponse(tracker.get_positions(uav_ids, trail_length))
+
+
+def get_data(request):
+
+    # Parse request parameters
+    trail_length = int(request.GET.get('trail_length'))
+    uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
+    variables = request.GET.getlist('variables[]')
+
+    return JsonResponse(tracker.get_data(uav_ids, trail_length, variables))
 
 
 # Get sections/map sliders bounds, bad design for now ..

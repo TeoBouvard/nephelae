@@ -136,16 +136,16 @@ function displayDrones(){
         $.getJSON('update/?' + query, (response) => {
 
             // Initialize drone array with drone_id and position marker
-            for (var key in response.drones){
+            for (var key in response.positions){
 
                 // Parse response data
                 var drone_id = key;
-                var drone_path = response.drones[key].path;
+                var drone_path = response.positions[key].path;
                 var drone_position = drone_path.slice(-1)[0];
                 var drone_altitude = drone_path.slice(-1)[0][2];
-                var drone_heading = response.drones[key].heading;
-                var drone_speed = response.drones[key].speed;
-                var drone_time = response.drones[key].time;
+                var drone_heading = response.positions[key].heading;
+                var drone_speed = response.positions[key].speed;
+                var drone_time = response.positions[key].time;
                 
                 // Compute color and icon of markers based on drone ID
                 var drone_color = global_colors[key%global_colors.length];
@@ -195,15 +195,16 @@ function updateDrones(){
     $.getJSON('update/?' + query, (response) => {
 
         // Parse response
-        for (var key in response.drones){
+        for (var key in response.positions){
+
             // Parse response data
             var drone_id = key;
-            var drone_path = response.drones[key].path;
+            var drone_path = response.positions[key].path;
             var drone_position = drone_path.slice(-1)[0];
             var drone_altitude = drone_path.slice(-1)[0][2];
-            var drone_heading = response.drones[key].heading;
-            var drone_speed = response.drones[key].speed;
-            var drone_time = response.drones[key].time;
+            var drone_heading = response.positions[key].heading;
+            var drone_speed = response.positions[key].speed;
+            var drone_time = response.positions[key].time;
 
             // Identify corresponding drone ...
             var drone_to_update = fleet[drone_id];
@@ -275,7 +276,7 @@ function computeURL(){
     // Build query with parameters
     var query = $.param({
         altitude: parameters.altitude,
-        time: parameters.time,
+        time: parameters.time%715,
         map_bounds: {
             west: bounds.getWest(), 
             east: bounds.getEast(),
