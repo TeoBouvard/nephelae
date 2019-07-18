@@ -274,7 +274,7 @@ function computeURL(){
         parameters.altitude = parameters.tracked_drone.altitude;
         parameters.time = parameters.tracked_drone.time;
     } else {
-        parameters.time = compute_time();
+        parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : 0;;
     }
 
     var query = $.param({
@@ -303,7 +303,7 @@ function infosToString(uav){
     infos += uav.altitude + 'm <br> ';
     infos += uav.heading + '° <br> ';
     infos += uav.speed + ' m/s <br>';
-    infos += '<a onClick="track(' + uav.id + ');" class="white btn">Follow with MesoNH</a></p>'
+    infos += '<a onClick="track(' + uav.id + ');" class="btn"><span class="white-text"><b>Follow with MesoNH</b></span></a></p>'
 
     return infos;
 }
@@ -315,9 +315,4 @@ function track(id){
     } else {
         parameters.tracked_drone = fleet[id];
     }
-}
-
-
-function compute_time(){
-    return Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : 0;
 }

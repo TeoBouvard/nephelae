@@ -10,12 +10,14 @@ nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north']
 
 
 def discover():
-    return dict(origin=nav_frame, uavs=db.uavIds)
+    tags = [a for a in db.orderedTags if a not in ["GPS","SAMPLE","ALL"] + db.uavIds]
+    return dict(origin=nav_frame, uavs=db.uavIds, sample_tags=tags)
 
 
+# GPS time is *absolute*, but SAMPLE time is relative to navFrame
 def track(uav_ids, trail_length):
+    data = dict()
 
-    data = {}
 
     for uav_id in uav_ids:
 
