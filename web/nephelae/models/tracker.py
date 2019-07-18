@@ -10,8 +10,7 @@ nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north']
 
 
 def discover():
-    tags = [tag for tag in db.orderedTags if tag not in ["GPS", "SAMPLE", "ALL"] + db.uavIds]
-    return dict(origin=nav_frame, uavs=db.uavIds, sample_tags=tags)
+    return dict(origin=nav_frame, uavs=db.uavIds, sample_tags=db.variableNames)
 
 
 # GPS time is *absolute*, but SAMPLE time is relative to navFrame

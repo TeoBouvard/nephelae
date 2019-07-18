@@ -235,7 +235,6 @@ function updateDrones(){
             }
         }
 
-
         // Update home button coordinates and layers URL
         zoomHome.setHomeCoordinates(parameters.origin); // compute center of mass/getBoundsZoom later ?
         updateURL();
@@ -273,6 +272,7 @@ function computeURL(){
         parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : 0;;
     }
 
+    // Build query with parameters
     var query = $.param({
         altitude: parameters.altitude,
         time: parameters.time,

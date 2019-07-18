@@ -91,10 +91,10 @@ function updateData(){
                     x: response[uav_id][variable_name]['x'],
                     y: response[uav_id][variable_name]['y'],
                     name: "UAV " + uav_id,
-                    mode: 'lines',
+                    mode: 'line',
                     line: {
-                        width: 2,
-                        shape: 'spline',
+                        width: 1,
+                        shape: 'linear',
                         color: global_colors[uav_id%global_colors.length],
                     }
                 };

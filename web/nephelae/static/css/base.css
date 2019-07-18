@@ -45,13 +45,19 @@ nav ul li a {
     height: calc(100vh - 64px);
 }
 
-#gui_container {
+.small-container {
     position: absolute;
     right: 10px;
     top: calc(64px + 10px);
     z-index: 400;
 }
 
+#draggable i {
+    cursor: pointer;
+    position: relative;
+    left: -30px;
+    top: 26px;
+}
 
 /* Fix conflicts between materialize and dat.gui*/
 #gui_container [type=text] {

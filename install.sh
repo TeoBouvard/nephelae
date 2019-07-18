@@ -5,6 +5,7 @@ mkdir web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephel
 
 # Download javascript libraries
 wget -O web/nephelae/static/js/libs/jquery.js https://code.jquery.com/jquery-3.4.1.min.js
+wget -O web/nephelae/static/js/libs/jqueryUI.js https://code.jquery.com/ui/1.12.1/jquery-ui.js
 wget -O web/nephelae/static/js/libs/leaflet.js https://unpkg.com/leaflet@1.5.1/dist/leaflet.js
 wget -O web/nephelae/static/js/libs/leafletRotatedMarker.js https://raw.githubusercontent.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js
 wget -O web/nephelae/static/js/libs/materialize.js https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js
