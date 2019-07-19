@@ -3,14 +3,14 @@ document.getElementById('nav_raw_data').className = 'active';
 
 // Chart style and options
 var chart_height = 250;
-var lm = 50;
-var rm = 50;
-var bm = 50;
+var lm = 70;
+var rm = 20;
+var bm = 20;
 var tm = 10;
 
 var layouts = {
     lwc: {
-        xaxis:{title: 'Time', rangemode: 'nonegative'},
+        //xaxis:{title: 'Time', rangemode: 'nonegative'},
         yaxis:{title: 'Liquid Water Content (kg/kg)', rangemode: 'nonegative'},
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
@@ -18,7 +18,7 @@ var layouts = {
         showlegend: false,
     },
     upwind: {
-        xaxis:{title: 'Time', rangemode: 'nonegative'},
+        //xaxis:{title: 'Time', rangemode: 'nonegative'},
         yaxis:{title: 'Upwind (m/s)'},
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
@@ -30,7 +30,7 @@ var layouts = {
 var config = {
     responsive: true,
     displaylogo: false,
-    //displayModeBar: false,
+    displayModeBar: false,
 };
 
 // Parameters
@@ -39,6 +39,7 @@ var parameters = {
     trail_length: 60,    // seconds
     auto_update: true,
     update: updateData,
+    last_request: 0,
 }
 
 $(document).ready(function(){
@@ -61,7 +62,6 @@ function setupGUI(){
     var f3 = gui.addFolder('Variables');
 
     $.getJSON('discover/', (response) => {
-        console.log(response)
 
         parameters['uavs'] = {};
         parameters['variables'] = {};
@@ -81,47 +81,56 @@ function setupGUI(){
     });
 }
 
+// to make sure updateData is not called multiple times at once because of redraws, check parameters.last_query timestamp
 function updateData(){
 
     var data = {};
     var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length, variables:getSelectedVariables()});
 
-    $.getJSON('update/?' + query, (response) => {
-        
-        // Parse server response
-        for (var uav_id in response.data){
+    if (new Date() - parameters.last_request > parameters.refresh_rate){
+        parameters.last_request = undefined;
 
-            for (var variable_name in response.data[uav_id]){
+        $.getJSON('update/?' + query, (response) => {
+            
+            // Parse server response
+            for (var uav_id in response.data){
 
-                var new_data = {
-                    type: 'scatter',
-                    x: response.data[uav_id][variable_name]['t'],
-                    y: response.data[uav_id][variable_name]['values'],
-                    name: "UAV " + uav_id,
-                    mode: 'line',
-                    line: {
-                        width: 1,
-                        shape: 'linear',
-                        color: global_colors[uav_id%global_colors.length],
+                for (var variable_name in response.data[uav_id]){
+
+                    var new_data = {
+                        type: 'scatter',
+                        x: response.data[uav_id][variable_name]['t'],
+                        y: response.data[uav_id][variable_name]['values'],
+                        name: "UAV " + uav_id,
+                        mode: 'line',
+                        line: {
+                            width: 1,
+                            shape: 'linear',
+                            color: global_colors[uav_id%global_colors.length],
+                        }
+                    };
+
+                    if (variable_name in data){
+                        data[variable_name].push(new_data);
+                    } else {
+                        data[variable_name] = [new_data];
                     }
-                };
-
-                if (variable_name in data){
-                    data[variable_name].push(new_data);
-                } else {
-                    data[variable_name] = [new_data];
                 }
             }
-        }
 
-        // Update charts
-        updateCharts(data);
-        if (parameters.auto_update){
-            //setTimeout(updateData, parameters.refresh_rate);
-        }
-        removeLoader();
+            // Update charts
+            updateCharts(data);
 
-    });
+            if (parameters.auto_update){
+                setTimeout(updateData, parameters.refresh_rate);
+            }
+            removeLoader();
+            parameters.last_request = new Date();
+        });
+    }
+    else{
+        setTimeout(updateData, 20);
+    }
 }
 
 function updateCharts(data){
