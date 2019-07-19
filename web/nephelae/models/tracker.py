@@ -1,8 +1,8 @@
 import utm
 import os
-from geopy.distance import distance
 
 from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
+from . import utils
 
 import sys
 import nephelae_paparazzi.pprzinterface as ppint
@@ -57,7 +57,7 @@ def get_positions(uav_ids, trail_length):
             position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
             position.append(message['alt'])
 
-            frame_position = translate_position(position, nav_frame)
+            frame_position = utils.translate_position(position, nav_frame)
             frame_position.append(message['alt'])
 
             if 'path' not in positions[uav_id]:
@@ -94,15 +94,3 @@ def get_data(uav_ids, trail_length, variables):
                     data[uav_id][message.variableName]['values'].append(message.data[0])
     
     return dict(data=data)
-
-# TODO add sign check
-
-def translate_position(real_world, origin):
-
-    dx = distance(origin, [origin[0], real_world[1]]).meters
-    dy = distance(origin, [real_world[0], origin[1]]).meters
-    
-    x = dx if real_world[1] > origin[1] else -dx
-    y = dy if real_world[0] < origin[0] else -dy
-
-    return [x, y]

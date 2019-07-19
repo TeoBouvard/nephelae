@@ -39,7 +39,6 @@ var parameters = {
     trail_length: 60,    // seconds
     auto_update: true,
     update: updateData,
-    already_drawn: false,
     variables: ['WT', 'RCT']
 }
 
@@ -111,7 +110,7 @@ function updateData(){
         // Update charts
         updateCharts(data);
         if (parameters.auto_update){
-            setTimeout(updateData, parameters.refresh_rate);
+            //setTimeout(updateData, parameters.refresh_rate);
         }
         removeLoader();
 

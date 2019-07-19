@@ -2,14 +2,14 @@ import io
 import json
 import os
 
-import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
 from geopy.distance import distance
-from matplotlib.colors import ListedColormap
 from netCDF4 import MFDataset
 
 from nephelae_simulation.mesonh_interface import *
+
+from . import utils
 
 var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
@@ -30,27 +30,24 @@ else:
 
 def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
 
-    x0, x1, y0, y1 = bounds2indices(bounds, origin)
+    x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)
 
     # Get slice
     if variable_name == 'clouds':
         h_slice = get_horizontal_slice(var_lwc, u_time, u_altitude, x0, x1, y0, y1)
-        colormap = transparent_cmap(
-            clouds_cmap) if transparent else clouds_cmap
+        colormap = utils.transparent_cmap(clouds_cmap) if transparent else clouds_cmap
         min_slice = 0
         max_slice = clouds.actual_range[1]
     elif variable_name == 'thermals':
         h_slice = get_horizontal_slice(var_upwind, u_time, u_altitude, x0, x1, y0, y1)
         h_slice[h_slice < 0] = 0
-        colormap = transparent_cmap(
-            thermals_cmap) if transparent else thermals_cmap
+        colormap = utils.transparent_cmap(thermals_cmap) if transparent else thermals_cmap
         min_slice = 0
         max_slice = thermals.actual_range[1]
 
     # Write image to buffer
     buf = io.BytesIO()
-    plt.imsave(buf, h_slice, origin='lower', vmin=min_slice,
-               vmax=max_slice, cmap=colormap, format='png')
+    plt.imsave(buf, h_slice, origin='lower', vmin=min_slice, vmax=max_slice, cmap=colormap, format='png')
     plt.close()
     buf.seek(0)
 
@@ -64,15 +61,17 @@ def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None,
 
     elif variable == var_upwind:
         return thermals[time_value, altitude_value, y0:y1, x0:x1].data
+
     elif variable == var_wind_u:
         return wind_u[time_value, altitude_value, y0:y1, x0:x1].data
+
     elif variable == var_wind_v:
         return wind_v[time_value, altitude_value, y0:y1, x0:x1].data
 
 
 def get_wind(u_time, u_altitude, bounds, origin):
 
-    x0, x1, y0, y1 = bounds2indices(bounds, origin)
+    x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)
     u = get_horizontal_slice(var_wind_u, u_time, u_altitude, x0, x1, y0, y1)
     v = get_horizontal_slice(var_wind_v, u_time, u_altitude, x0, x1, y0, y1)
     u_data = u.flatten()
@@ -107,23 +106,6 @@ def get_wind(u_time, u_altitude, bounds, origin):
     return [eval(s1), eval(s2)]
 
 
-# ######### UTILITY METHODS ######### #
-
-
-def transparent_cmap(original_cmap):
-
-    # Choose colormap
-    cmap = cm.get_cmap(original_cmap)
-
-    # Get the colormap colors
-    my_cmap = cmap(np.arange(cmap.N))
-
-    # Set alpha
-    my_cmap[:, -1] = np.linspace(0, 1, cmap.N)
-
-    return ListedColormap(my_cmap)
-
-
 def axes():
     min_x = clouds.bounds[2].min
     max_x = clouds.bounds[2].max
@@ -141,23 +123,3 @@ def box():
         {'min': bounds[3].min, 'max':bounds[3].max}]
     return box
 
-
-def bounds2indices(bounds, origin):
-
-    # Compute projected origin coordinates
-    x_projected_origin = [bounds['south'], origin['lng']]
-    y_projected_origin = [origin['lat'], bounds['west']]
-
-    # Compute distances to map corners
-    distance_x0 = distance(x_projected_origin, [bounds['south'], bounds['west']]).meters
-    distance_x1 = distance(x_projected_origin, [bounds['south'], bounds['east']]).meters
-    distance_y0 = distance(y_projected_origin, [bounds['south'], bounds['west']]).meters
-    distance_y1 = distance(y_projected_origin, [bounds['north'], bounds['west']]).meters
-
-    # Adjust for negative indices
-    x0 = distance_x0 if origin['lng'] < bounds['west'] else -distance_x0
-    x1 = distance_x1 if origin['lng'] < bounds['east'] else -distance_x1
-    y0 = distance_y0 if origin['lat'] < bounds['south'] else -distance_y0
-    y1 = distance_y1 if origin['lat'] < bounds['north'] else -distance_y1
-
-    return x0, x1, y0, y1

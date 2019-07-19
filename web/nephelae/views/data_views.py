@@ -76,10 +76,11 @@ def wind_data(request):
         'north': float(query.get('map_bounds[north]'))
     }
 
-    origin = {
-        'lat': float(query.getlist('origin[]')[0]),
-        'lng': float(query.getlist('origin[]')[1])
-    }
+    origin = [
+        float(query.getlist('origin[]')[0]),
+        float(query.getlist('origin[]')[1])
+    ]
+
 
     data = hypercube.get_wind(time_value, altitude_value, map_bounds, origin)
     return JsonResponse(data, safe=False)

@@ -56,10 +56,10 @@ def layer_img(request, variable_name):
         'north': float(query.get('map_bounds[north]'))
     }
 
-    origin = {
-        'lat': float(query.getlist('origin[]')[0]),
-        'lng': float(query.getlist('origin[]')[1])
-    }
+    origin = [
+        float(query.getlist('origin[]')[0]),
+        float(query.getlist('origin[]')[1])
+    ]
 
     buf = hypercube.print_horizontal_slice(variable_name, time_value, altitude_value, map_bounds, origin, thermals_cmap, clouds_cmap, transparent)
     return HttpResponse(buf.read(), content_type="image/png")

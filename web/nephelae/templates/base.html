@@ -12,6 +12,7 @@
 		<link rel="stylesheet" href="{% static 'css/base.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/libs/materialize.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/libs/material-icons.css' %}" />
+    	<link rel="stylesheet" href="{% static 'css/libs/leaflet.css' %}"/>
 
 		<!-- Load favicon -->
 		<link rel="shortcut icon" href="#">
@@ -25,13 +26,14 @@
 
 		<!-- Load materialize js -->
 		<script src="{% static 'js/libs/materialize.js' %}"></script>
+		
+		<!-- Load main js -->
+		<script src="{% static 'js/libs/leaflet.js' %}"></script>
+		<script src="{% static 'js/base.js' %}"></script>
+		<script src="{% static 'js/utils.js' %}"></script>
 
 		{% block additional_head %}{% endblock %}
 		
-		<!-- Load main js -->
-		<script src="{% static 'js/utils.js' %}"></script>
-		<script src="{% static 'js/base.js' %}"></script>
-
 	</head>
 
 	<body>

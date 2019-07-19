@@ -1,13 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block additional_head %}
-
-    <!-- Load leaflet CSS + js as it must be loaded BEFORE utils.js -->
-    <link rel="stylesheet" href="{% static 'css/libs/leaflet.css' %}"/>
-    <script src="{% static 'js/libs/leaflet.js' %}"></script>
-
-{% endblock %}
 
 
 {% block additional_scripts %}

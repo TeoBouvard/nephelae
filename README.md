@@ -50,10 +50,9 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - organize base css
 - 3d model of uavs ?
 - simulation path update does not work, have to redraw it entirely
-- simplify bounds management ?
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - replace dat gui and materialize style in install script
-- add utils model
+- are messages unique ?
 
 ## Links  
 
