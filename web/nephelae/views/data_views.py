@@ -18,7 +18,7 @@ def get_positions(request):
     return JsonResponse(tracker.get_positions(uav_ids, trail_length))
 
 
-def get_data(request):
+def get_sensor_data(request):
 
     # Parse request parameters
     trail_length = int(request.GET.get('trail_length'))
@@ -66,16 +66,8 @@ def update_cloud_data(request):
     return JsonResponse(data)
 
 
-def update_raw_data(request):
-
-    # Parse request parameters
-    trail_length = int(request.GET.get('trail_length'))
-    uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
-
-    return JsonResponse(tracker.data(uav_ids, trail_length))
-
-
 def wind_data(request):
+
     # Parse request parameters
     query = request.GET
 

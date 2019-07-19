@@ -98,7 +98,11 @@ def get_data(uav_ids, trail_length, variables):
 # TODO add sign check
 
 def translate_position(real_world, origin):
-    x = distance(origin, [real_world[0], origin[1]]).meters
-    y = distance(origin, [origin[0], real_world[1]]).meters
+
+    dx = distance(origin, [origin[0], real_world[1]]).meters
+    dy = distance(origin, [real_world[0], origin[1]]).meters
+    
+    x = dx if real_world[1] > origin[1] else -dx
+    y = dy if real_world[0] < origin[0] else -dy
 
     return [x, y]

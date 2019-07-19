@@ -17,7 +17,6 @@ var parameters = {
 	trail_length: 60,
 	fleet_visibility: true,
 	fleet_focus: fitCameraToFleet,
-	origin: [],
 }
 
 $(document).ready(function(){
@@ -35,7 +34,7 @@ function setupGUI(){
 	var f2 = gui.addFolder('Layers');
 
     f1.add(parameters, 'refresh_rate', 100, 3000).step(100).name('Delay (ms)');
-    f1.add(parameters, 'trail_length', 0, 500).name('Trail');
+    f1.add(parameters, 'trail_length', 0, 500).step(5).name('Trail');
 	f1.add(parameters, 'fleet_focus').name('Focus on fleet');
 
 	f2.add(parameters, 'fleet_visibility').onChange(toggleFleetVisibility).name('Fleet');
@@ -125,8 +124,6 @@ function createDrones() {
 
 	$.getJSON('discover/', (response) => {
         
-        parameters.origin = response.origin;
-
         var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length});
 
         $.getJSON('update/?' + query, (response) => {

@@ -53,9 +53,8 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - simulation path update does not work, have to redraw it entirely
 - 3D tracking broken -> path translation error
 - simplify bounds management
-- synchronize gps to samples by getting both at the same time
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
-
+- replace dat gui and materialize style in install script
 
 ## Links  
 
