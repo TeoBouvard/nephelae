@@ -1,33 +1,13 @@
 // Activate current menu in nav
 $('#nav_preview').addClass('active');
 
-// Plot settings
-var layout = {
-    scene: {
-        xaxis:{title: 'x'},
-        yaxis:{title: 'y'},
-        zaxis:{title: 'Altitude'},
-        aspectratio: {x:1.3, y:1.3, z:0.9},
-        camera: {
-            center: { x: 0, y: 0, z: -0.2 }, 
-            eye: { x: 1.6, y: 1.6, z: 0.2 }, 
-            up: { x: 0, y: 0, z: 1 }
-        },
-    },
-    showlegend: false,
-};
-
-var config = { 
-    responsive : true,
-    displaylogo: false,
-    displayModeBar: false,
-};
-
 // Parameters 
 var parameters = {
     trail_length: 60,
     update: drawPlot,
     variable: [],
+    bgcolor: 'rgb(32,32,32)',
+    axcolor: 'rgb(192,192,192)'
 }
 
 
@@ -113,9 +93,9 @@ function drawPlot(){
                     'time : %{text}' +
                     '<extra>UAV %{meta[0]}</extra>',
                 hoverlabel: {
-                    bgcolor: 'white',
-                    bordercolor: global_colors[uav_id%global_colors.length],
-                    font: {family: 'Roboto', size: '15', color: global_colors[uav_id%global_colors.length]},
+                    bgcolor: 'black',
+                    bordercolor: 'black',
+                    font: {family: 'Roboto', size: '15', color: 'white'},
                     align: 'left',
                 },
                 mode: 'lines',
@@ -126,8 +106,11 @@ function drawPlot(){
                     colorscale: lay['cmap'],
                     showscale: displayColorBar,
                     colorbar: {
-                        x: -0.2,
+                        x: 0,
                         xpad: 30,
+                        bgcolor: parameters.bgcolor,
+                        tickfont: {color: parameters.axcolor},
+                        margin: layout.margin,
                     }
                 },
             };
@@ -136,6 +119,7 @@ function drawPlot(){
 
         // Create or update plot with new data
         Plotly.react('chart', data, layout, config);
+
         removeLoader();
     });
 }
@@ -150,3 +134,28 @@ function getSelectedUAVs() {
 
     return selectedUAVs;
 }
+
+
+// Plot settings
+var layout = {
+    scene: {
+        xaxis:{title: 'x', color: parameters.axcolor},
+        yaxis:{title: 'y', color: parameters.axcolor},
+        zaxis:{title: 'Altitude', color: parameters.axcolor},
+        aspectratio: {x:1.3, y:1.3, z:0.9},
+        camera: {
+            center: { x: 0, y: 0, z: -0.2 }, 
+            eye: { x: 1.6, y: 1.6, z: 0.2 }, 
+            up: { x: 0, y: 0, z: 1 }
+        },
+        bgcolor: parameters.bgcolor,
+    },
+    margin: {t: 0,l: 0,r: 0,b: 0},
+    showlegend: false,
+};
+
+var config = { 
+    responsive : true,
+    displaylogo: false,
+    displayModeBar: false,
+};
