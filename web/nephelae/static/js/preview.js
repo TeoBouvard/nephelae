@@ -27,7 +27,7 @@ var config = {
 var parameters = {
     trail_length: 60,
     update: drawPlot,
-    variable: ['WT'],
+    variable: [],
     color_mapping: {WT: ['samples', 'viridis'], RCT: ['samples', 'viridis'] },
 }
 
@@ -46,14 +46,16 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Controls');
     f1.add(parameters, 'trail_length', 10, 1000).step(10).name("Log length (s)").onChange(drawPlot);
-    f1.add(parameters, 'variable', ['WT', 'RCT']).name("Sensor variable").onChange(drawPlot);
     f1.add(parameters, 'update').name('Update plot');
 
     var f2 = gui.addFolder('Trails');
 
     $.getJSON('discover/', (response) => {
 
-        console.log(response)
+        f1.add(parameters, 'variable', response.sample_tags)
+        .setValue(response.sample_tags[0])
+        .name("Sensor variable")
+        .onChange(drawPlot);
 
         for (var key of response.uavs){
             parameters[key] = true;
@@ -73,8 +75,6 @@ function drawPlot(){
     var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length, variables: parameters.variable});
 
     $.getJSON('update/?' + query, (response) => {
-
-        console.log(response)
 
         for (var uav_id in response.data){
 

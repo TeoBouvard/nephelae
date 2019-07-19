@@ -20,10 +20,11 @@ def get_positions(request):
 
 def get_sensor_data(request):
 
-    # Parse request parameters
+    # Parse request parameters, get variables as array and as single values
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
     variables = request.GET.getlist('variables[]')
+    variables.append(request.GET.get('variables'))
 
     return JsonResponse(tracker.get_data(uav_ids, trail_length, variables))
 
@@ -34,7 +35,7 @@ def mesonh_box(request):
 
 
 # Update MesoNH hyperslabs
-def update_section(request, time_value, altitude_value):
+def get_section(request, time_value, altitude_value):
 
     response = JsonResponse({
 

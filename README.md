@@ -48,13 +48,12 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - bounds to json
 - reduce array size in image overlay (memory problems?)
 - organize base css
-- move image layer calculations inside model
 - 3d model of uavs ?
 - simulation path update does not work, have to redraw it entirely
-- 3D tracking broken -> path translation error
-- simplify bounds management
+- simplify bounds management ?
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - replace dat gui and materialize style in install script
+- add utils model
 
 ## Links  
 
