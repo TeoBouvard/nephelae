@@ -82,12 +82,15 @@ function drawPlot(){
             var x = [];
             var y = [];
             var z = [];
+            var text = [];
 
             // Compute coordinates from path
             for(var i = 0; i < positions.length ; i++){
                 x.push(positions[i][1]);
                 y.push(positions[i][2]);
                 z.push(positions[i][3]);
+                // hack to pass multiple data to plotly %text variable
+                text.push(positions[i][0].toFixed(2) + 's<br>sensor value : ' + sensor_values[i].toFixed(3));
             }
 
             // Display colorbar if only one UAV is selected
@@ -97,10 +100,24 @@ function drawPlot(){
             // Update chart data with new dataset and line color corresponding to the icon
             var updatePath = {
                 type: 'scatter3d',
+                name: uav_id,
                 x: x,
                 y: y,
                 z: z,
-                name: uav_id,
+                text: text,
+                meta: [uav_id],
+                hovertemplate:
+                    'x : %{x:.1f}m <br>' +
+                    'y : %{y:.1f}m <br>' + 
+                    'altitude : %{z:.1f}m <br>' +
+                    'time : %{text}' +
+                    '<extra>UAV %{meta[0]}</extra>',
+                hoverlabel: {
+                    bgcolor: 'white',
+                    bordercolor: global_colors[uav_id%global_colors.length],
+                    font: {family: 'Roboto', size: '15', color: global_colors[uav_id%global_colors.length]},
+                    align: 'left',
+                },
                 mode: 'lines',
                 line: {
                     width: 5,

@@ -1,11 +1,13 @@
-import utm
 import os
+import sys
 
+import utm
+
+import nephelae_paparazzi.pprzinterface as ppint
 from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
+
 from . import utils
 
-import sys
-import nephelae_paparazzi.pprzinterface as ppint
 
 #db = NephelaeDataServer()
 #
