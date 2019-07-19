@@ -18,9 +18,10 @@ def get_positions(request):
     return JsonResponse(tracker.get_positions(uav_ids, trail_length))
 
 
+# Get sensor data with sample positions
 def get_sensor_data(request):
 
-    # Parse request parameters, get variables as array and as single values
+    # Parse request parameters, get variables as array and as single value to factor code
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
     variables = request.GET.getlist('variables[]')
@@ -52,7 +53,6 @@ def get_section(request):
 # Data updates
 def update_profiles(request):
     data = {}
-
     return JsonResponse(data)
 
 

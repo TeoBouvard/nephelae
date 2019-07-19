@@ -53,6 +53,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - replace dat gui and materialize style in install script
 - are messages unique ?
+- preview uav toggle not update data
 
 ## Links  
 

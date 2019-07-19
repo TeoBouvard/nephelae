@@ -2,11 +2,11 @@
 document.getElementById('nav_raw_data').className = 'active';
 
 // Chart style and options
-var chart_height = 300;
-var lm = 60;
-var rm = 30;
-var bm = 60;
-var tm = 50;
+var chart_height = 250;
+var lm = 50;
+var rm = 50;
+var bm = 50;
+var tm = 10;
 
 var layouts = {
     lwc: {
@@ -30,7 +30,7 @@ var layouts = {
 var config = {
     responsive: true,
     displaylogo: false,
-    displayModeBar: false,
+    //displayModeBar: false,
 };
 
 // Parameters
@@ -39,7 +39,6 @@ var parameters = {
     trail_length: 60,    // seconds
     auto_update: true,
     update: updateData,
-    variables: ['WT', 'RCT']
 }
 
 $(document).ready(function(){
@@ -59,14 +58,22 @@ function setupGUI(){
     f1.add(parameters, 'update').name('Update plot');
 
     var f2 = gui.addFolder('Trails');
+    var f3 = gui.addFolder('Variables');
 
     $.getJSON('discover/', (response) => {
+        console.log(response)
 
         parameters['uavs'] = {};
+        parameters['variables'] = {};
 
-        for (var key of response.uavs){
-            parameters['uavs'][key] = true;
-            f2.add(parameters['uavs'], key).name('Drone ' + key);
+        for (var uav_id of response.uavs){
+            parameters['uavs'][uav_id] = true;
+            f2.add(parameters['uavs'], uav_id).name('Drone ' + uav_id);
+        }
+
+        for (var tag of response.sample_tags){
+            parameters['variables'][tag] = true;
+            f3.add(parameters['variables'], tag).name(tag);
         }
 
         // Draw charts once GUI is initialized
@@ -77,7 +84,7 @@ function setupGUI(){
 function updateData(){
 
     var data = {};
-    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length, variables:parameters.variables});
+    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length, variables:getSelectedVariables()});
 
     $.getJSON('update/?' + query, (response) => {
         
@@ -127,9 +134,20 @@ function getSelectedUAVs() {
 
     var selectedUAVs = [];
 
-    for(key in parameters.uavs){
-        if (parameters.uavs[key] == true) selectedUAVs.push(key);
+    for(uav_id in parameters.uavs){
+        if (parameters.uavs[uav_id] == true) selectedUAVs.push(uav_id);
     }
 
     return selectedUAVs;
+}
+
+function getSelectedVariables() {
+
+    var selectedVariables = [];
+
+    for(tag in parameters.variables){
+        if (parameters.variables[tag] == true) selectedVariables.push(tag);
+    }
+
+    return selectedVariables;
 }

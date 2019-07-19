@@ -42,7 +42,6 @@ function setupGUI(){
         }
 
 
-
         // And then display the drones
         drawPlot();
     });
@@ -69,7 +68,7 @@ function drawPlot(){
                 x.push(positions[i][1]);
                 y.push(positions[i][2]);
                 z.push(positions[i][3]);
-                // hack to pass multiple data to plotly %text variable
+                // hack to send multiple data to plotly %text variable
                 text.push(positions[i][0].toFixed(2) + 's<br>sensor value : ' + sensor_values[i].toFixed(3));
             }
 
@@ -80,7 +79,6 @@ function drawPlot(){
             // Update chart data with new dataset and line color corresponding to the icon
             var updatePath = {
                 type: 'scatter3d',
-                name: uav_id,
                 x: x,
                 y: y,
                 z: z,
@@ -107,7 +105,6 @@ function drawPlot(){
                     showscale: displayColorBar,
                     colorbar: {
                         x: 0,
-                        xpad: 30,
                         bgcolor: parameters.bgcolor,
                         tickfont: {color: parameters.axcolor},
                         margin: layout.margin,
@@ -119,7 +116,6 @@ function drawPlot(){
 
         // Create or update plot with new data
         Plotly.react('chart', data, layout, config);
-
         removeLoader();
     });
 }
@@ -139,9 +135,9 @@ function getSelectedUAVs() {
 // Plot settings
 var layout = {
     scene: {
-        xaxis:{title: 'x', color: parameters.axcolor},
-        yaxis:{title: 'y', color: parameters.axcolor},
-        zaxis:{title: 'Altitude', color: parameters.axcolor},
+        xaxis:{title: 'x', color: parameters.axcolor, showspikes: true},
+        yaxis:{title: 'y', color: parameters.axcolor, showspikes: true},
+        zaxis:{title: 'Altitude', color: parameters.axcolor, showspikes: true},
         aspectratio: {x:1.3, y:1.3, z:0.9},
         camera: {
             center: { x: 0, y: 0, z: -0.2 }, 
