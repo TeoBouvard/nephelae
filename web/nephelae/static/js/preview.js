@@ -28,7 +28,6 @@ var parameters = {
     trail_length: 60,
     update: drawPlot,
     variable: [],
-    color_mapping: {WT: ['samples', 'viridis'], RCT: ['samples', 'viridis'] },
 }
 
 
@@ -93,6 +92,7 @@ function drawPlot(){
 
             // Display colorbar if only one UAV is selected
             var displayColorBar = getSelectedUAVs().length == 1;
+            var lay = createLayout(parameters.variable, sensor_values);
 
             // Update chart data with new dataset and line color corresponding to the icon
             var updatePath = {
@@ -106,7 +106,7 @@ function drawPlot(){
                     width: 5,
                     shape: 'linear',
                     color: sensor_values,
-                    //colorscale: 'Electric',
+                    colorscale: lay['cmap'],
                     showscale: displayColorBar,
                     colorbar: {
                         x: -0.2,

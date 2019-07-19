@@ -35,21 +35,15 @@ def mesonh_box(request):
 
 
 # Update MesoNH hyperslabs
-def get_section(request, time_value, altitude_value):
+def get_section(request):
+
+    time_value = int(request.GET.get('time'))
+    altitude_value = int(request.GET.get('altitude'))
+    variable = request.GET.get('variable')
 
     response = JsonResponse({
-
         'axes': hypercube.axes(),
-
-        'clouds': {
-            'data': hypercube.clouds[time_value, altitude_value, :, :].data.tolist(),
-            'colormap_zero': hypercube.colormap_zero('clouds', time_value, altitude_value)
-        },
-
-        'thermals': {
-            'data': hypercube.thermals[time_value, altitude_value, :, :].data.tolist(),
-            'colormap_zero': hypercube.colormap_zero('thermals', time_value, altitude_value)
-        },
+        'data': hypercube.get_horizontal_slice(variable, time_value, altitude_value).tolist(),
     })
 
     return response

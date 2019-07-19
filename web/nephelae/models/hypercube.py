@@ -16,6 +16,7 @@ var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 var_wind_u = 'UT'          # Liquid water content in KG/KG ?
 var_wind_v = 'VT'          # Liquid water content in KG/KG ?
 
+# Precheck and variable assignment
 if 'MESO_NH' in os.environ:
     hypercube = MFDataset(os.environ['MESO_NH'])
     clouds = MesoNHVariable(hypercube, var_lwc, interpolation='linear')
@@ -33,13 +34,13 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
     # Get slice
     if variable_name == 'clouds':
-        h_slice = clouds[u_time, u_altitude, y0:y1, x0:x1].data
+        h_slice = get_horizontal_slice(var_lwc, u_time, u_altitude, x0, x1, y0, y1)
         colormap = transparent_cmap(
             clouds_cmap) if transparent else clouds_cmap
         min_slice = 0
         max_slice = clouds.actual_range[1]
     elif variable_name == 'thermals':
-        h_slice = thermals[u_time, u_altitude, y0:y1, x0:x1].data
+        h_slice = get_horizontal_slice(var_upwind, u_time, u_altitude, x0, x1, y0, y1)
         h_slice[h_slice < 0] = 0
         colormap = transparent_cmap(
             thermals_cmap) if transparent else thermals_cmap
@@ -52,14 +53,28 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
                vmax=max_slice, cmap=colormap, format='png')
     plt.close()
     buf.seek(0)
+
     return buf
+
+
+def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
+
+    if variable == var_lwc:
+        return clouds[time_value, altitude_value, y0:y1, x0:x1].data
+
+    elif variable == var_upwind:
+        return thermals[time_value, altitude_value, y0:y1, x0:x1].data
+    elif variable == var_wind_u:
+        return wind_u[time_value, altitude_value, y0:y1, x0:x1].data
+    elif variable == var_wind_v:
+        return wind_v[time_value, altitude_value, y0:y1, x0:x1].data
 
 
 def get_wind(u_time, u_altitude, bounds, origin):
 
     x0, x1, y0, y1 = bounds2indices(bounds, origin)
-    u = wind_u[u_time, u_altitude, y0:y1, x0:x1].data
-    v = wind_v[u_time, u_altitude, y0:y1, x0:x1].data
+    u = get_horizontal_slice(var_wind_u, u_time, u_altitude, x0, x1, y0, y1)
+    v = get_horizontal_slice(var_wind_v, u_time, u_altitude, x0, x1, y0, y1)
     u_data = u.flatten()
     v_data = v.flatten()
 
@@ -107,23 +122,6 @@ def transparent_cmap(original_cmap):
     my_cmap[:, -1] = np.linspace(0, 1, cmap.N)
 
     return ListedColormap(my_cmap)
-
-
-# Compute where the value zero lies on the colorscale
-def colormap_zero(variable_name, time_value, altitude_value):
-
-    if variable_name == 'clouds':
-        matrix = clouds[time_value, altitude_value, :, :].data
-    elif variable_name == 'thermals':
-        matrix = thermals[time_value, altitude_value, :, :].data
-
-    minv = matrix.min()
-    maxv = matrix.max()
-
-    if minv == maxv:
-        return 0.5
-    else:
-        return abs(minv / (maxv - minv))
 
 
 def axes():

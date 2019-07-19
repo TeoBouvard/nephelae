@@ -3,8 +3,9 @@
 
 {% block additional_head %}
 
-    <!-- Load leaflet CSS -->
+    <!-- Load leaflet CSS + js as it must be loaded BEFORE utils.js -->
     <link rel="stylesheet" href="{% static 'css/libs/leaflet.css' %}"/>
+    <script src="{% static 'js/libs/leaflet.js' %}"></script>
 
 {% endblock %}
 
@@ -12,11 +13,9 @@
 {% block additional_scripts %}
 
     <!-- Load leaflet js + oriented marker (drone heading) -->
-    <script src="{% static 'js/libs/leaflet.js' %}"></script>
     <script src="{% static 'js/leaflet_plugins.js' %}"></script>
 
 	<!-- Load icons -->
-	<script src="{% static 'js/base_icons.js' %}"></script>
 	<script src="{% static 'js/map.js' %}"></script>
 
 {% endblock %}

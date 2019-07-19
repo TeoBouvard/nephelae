@@ -33,8 +33,9 @@ urlpatterns = [
 
     # URL for sections page
     path('sections/', views.sections, name='sections'),
+    path('sections/discover/', views.discover),
     path('sections/box/', views.mesonh_box),
-    path('sections/update/<int:time_value>/<int:altitude_value>', views.get_section),
+    path('sections/update/', views.get_section),
 
     # URL for vertical profiles page
     path('profiles/', views.profiles, name='profiles'),
