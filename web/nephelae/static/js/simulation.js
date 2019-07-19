@@ -178,7 +178,8 @@ function update(){
 	var elapsed_time = now - then;
 
 	if (elapsed_time >= parameters.refresh_rate){
-		then = now;
+		then = undefined;
+
 		var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length});
 
 		// Update drones objects
@@ -221,6 +222,8 @@ function update(){
 					}
 				}
 			}
+			// To ensure next request will not be launched before this one finishes
+			then = new Date();
 		});
 	}
 }
