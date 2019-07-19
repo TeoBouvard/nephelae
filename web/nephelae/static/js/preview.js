@@ -45,7 +45,7 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
-    f1.add(parameters, 'trail_length', 30, 1000).step(10).name("Log length (s)").onChange(drawPlot);
+    f1.add(parameters, 'trail_length', 10, 1000).step(10).name("Log length (s)").onChange(drawPlot);
     f1.add(parameters, 'variable', ['WT', 'RCT']).name("Sensor variable").onChange(drawPlot);
     f1.add(parameters, 'update').name('Update plot');
 
@@ -53,10 +53,14 @@ function setupGUI(){
 
     $.getJSON('discover/', (response) => {
 
+        console.log(response)
+
         for (var key of response.uavs){
             parameters[key] = true;
             f2.add(parameters, key).name('Drone ' + key).onChange(drawPlot);
         }
+
+
 
         // And then display the drones
         drawPlot();

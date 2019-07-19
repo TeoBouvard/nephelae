@@ -58,7 +58,7 @@ function setupGUI(){
             .name('Altitude (m)')
             .onChange(() => {track(-1); updateWindData();})
             .listen();
-        f1.add(parameters, 'trail_length', 1, 500).step(1).name('Trail length (s)');
+        f1.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
         f1.add(parameters, 'update_wind').name('Update wind');
 
         f2.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
@@ -130,8 +130,9 @@ function displayDrones(){
     $.getJSON('discover/', (response) => {
         
         parameters.origin = response.origin;
-
-        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length});
+        
+        // add +1 to trail_length so that zero performs a valid slice
+        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length+1});
 
         $.getJSON('update/?' + query, (response) => {
 
@@ -189,7 +190,8 @@ function displayDrones(){
 
 function updateDrones(){
 
-    var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length});
+    // add +1 to trail_length so that zero performs a valid slice
+    var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1});
 
     // Request updated data from the server
     $.getJSON('update/?' + query, (response) => {

@@ -123,8 +123,9 @@ function createLights() {
 function createDrones() {
 
 	$.getJSON('discover/', (response) => {
-        
-        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length});
+
+		// add +1 to trail_length so that zero performs a valid slice
+        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length+1});
 
         $.getJSON('update/?' + query, (response) => {
 
@@ -178,9 +179,12 @@ function update(){
 	var elapsed_time = now - then;
 
 	if (elapsed_time >= parameters.refresh_rate){
+
+		// stop sending request while this one is processed
 		then = undefined;
 
-		var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length});
+		// add +1 to trail_length so that zero performs a valid slice
+		var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1});
 
 		// Update drones objects
 		$.getJSON('update/?' + query, (response) => {
@@ -222,7 +226,7 @@ function update(){
 					}
 				}
 			}
-			// To ensure next request will not be launched before this one finishes
+			// restart sensing requests
 			then = new Date();
 		});
 	}

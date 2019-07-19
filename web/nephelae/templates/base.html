@@ -55,27 +55,27 @@
 		<!-- tracking dropdown -->
 
 		<ul id="tracking_dropdown" class="dropdown-content">
-			<li><a href="{% url 'map' %}">Map</a></li>
-			<li><a href="{% url 'simulation' %}">3D</a></li>
+			<li><a href="{% url 'map' %}">2D Tracking</a></li>
+			<li><a href="{% url 'simulation' %}">3D Tracking</a></li>
 		</ul>
 
 		<!-- sensor data dropdown -->
 
 		<ul id="sensor_data_dropdown" class="dropdown-content">
-			<li><a href="{% url 'raw_data' %}">Time</a></li>
-			<li><a href="{% url 'preview' %}">Space</a></li>
+			<li><a href="{% url 'raw_data' %}">Temporal Data</a></li>
+			<li><a href="{% url 'preview' %}">Spatial Data</a></li>
 		</ul>
 
 		<!-- vertical navbar for small screens-->
 		
 		<ul class="sidenav" id="small_nav" style="z-index:2000;">
-			<li id='nav_preview'><a href="{% url 'preview' %}">Trails</a></li>
-			<li id='nav_map'><a href="{% url 'map' %}">Map</a></li>
-			<li id='nav_simulation'><a href="{% url 'simulation' %}">Simulation</a></li>
+			<li id='nav_map'><a href="{% url 'map' %}">2D Tracking</a></li>
+			<li id='nav_simulation'><a href="{% url 'simulation' %}">3D Tracking</a></li>
+			<li id='nav_raw_data'><a href="{% url 'raw_data' %}">Temporal Sensor Data</a></li>
+			<li id='nav_preview'><a href="{% url 'preview' %}">Spatial Sensor Data</a></li>
 			<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
 			<li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li>
 			<li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
-			<li id='nav_raw_data'><a href="{% url 'raw_data' %}">Raw Data</a></li>
 			<li id='nav_commands'><a href="{% url 'commands' %}">Commands (soon)</a></li>
 		</ul>
 
