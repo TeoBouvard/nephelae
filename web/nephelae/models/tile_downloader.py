@@ -111,10 +111,10 @@ def dl(map_bounds):
     lon_west = map_bounds['west']
     lon_east = map_bounds['east']
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     loop.run_until_complete(download_tiles(zoom_min, zoom_max, lat_north, lat_south, lon_west, lon_east))
-    #loop.close()
-    print('end of download')
+    loop.close()
 
 
 if __name__ == "__main__":

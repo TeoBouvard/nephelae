@@ -1,4 +1,5 @@
 import pathlib
+import threading
 
 from django.http import HttpResponse, HttpResponseNotFound
 
@@ -17,7 +18,9 @@ def download_map(request):
         'north': float(query.get('map_bounds[north]'))
     }
 
-    tile_downloader.dl(map_bounds)
+    t = threading.Thread(target=tile_downloader.dl, args=[map_bounds])
+    t.setDaemon(True)
+    t.start()
     return HttpResponse()
 
 
