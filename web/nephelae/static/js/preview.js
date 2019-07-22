@@ -30,14 +30,16 @@ function setupGUI(){
 
     $.getJSON('discover/', (response) => {
 
+        parameters['uavs'] = {};
+
         f1.add(parameters, 'variable', response.sample_tags)
         .setValue(response.sample_tags[0])
         .name("Sensor variable")
         .onChange(drawPlot);
 
-        for (var key of response.uavs){
-            parameters[key] = true;
-            f2.add(parameters, key).name('UAV ' + key).onChange(drawPlot);
+        for (var uav_id of response.uavs){
+            parameters['uavs'][uav_id] = true;
+            f2.add(parameters['uavs'], uav_id).name('UAV ' + uav_id).onChange(drawPlot);
         }
 
         // And then display UAVs
@@ -48,7 +50,7 @@ function setupGUI(){
 function drawPlot(){
 
     var data = [];
-    var query = $.param({uav_id: getSelectedElements(parameters.uavs), trail_length: parameters.trail_length, variables: parameters.variable});
+    var query = $.param({uav_id: getSelectedElements(parameters.uavs), trail_length: parameters.trail_length, variable: parameters.variable});
 
     $.getJSON('update/?' + query, (response) => {
 
@@ -71,7 +73,7 @@ function drawPlot(){
             }
 
             // Display colorbar if only one UAV is selected, create zero-centered colorbars
-            var displayColorBar = getSelectedUAVs().length == 1;
+            var displayColorBar = getSelectedElements(parameters.uavs).length == 1;
             var lay = createLayout(parameters.variable, sensor_values);
 
             // Update chart data with new dataset and line color corresponding to the icon

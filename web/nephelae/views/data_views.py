@@ -25,7 +25,7 @@ def get_sensor_data(request):
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
     variables = request.GET.getlist('variables[]')
-    variables.append(request.GET.get('variables'))
+    variables.append(request.GET.get('variable'))
 
     return JsonResponse(tracker.get_data(uav_ids, trail_length, variables))
 
