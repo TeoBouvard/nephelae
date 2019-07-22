@@ -8,25 +8,6 @@ var rm = 20;
 var bm = 20;
 var tm = 10;
 
-var layouts = {
-    RCT: {
-        //xaxis:{title: 'Time', rangemode: 'nonegative'},
-        yaxis:{title: 'Liquid Water Content (kg/kg)', rangemode: 'nonegative'},
-        height: chart_height,
-        margin: { l: lm, r: rm, b: bm, t: tm },
-        hovermode: 'closest',
-        showlegend: false,
-    },
-    WT: {
-        //xaxis:{title: 'Time', rangemode: 'nonegative'},
-        yaxis:{title: 'Vertical wind (m/s)'},
-        height: chart_height,
-        margin: { l: lm, r: rm, b: bm, t: tm },
-        hovermode: 'closest',
-        showlegend: false,
-    },
-};
-
 var config = {
     responsive: true,
     displaylogo: false,
@@ -37,7 +18,7 @@ var config = {
 var parameters = {
     refresh_rate: 1000,   // ms
     trail_length: 60,     // seconds
-    auto_update: true,
+    streaming: true,
     update: updateData,
     last_request: 0,
     timeout: null,
@@ -56,10 +37,10 @@ function setupGUI(){
 
     f1.add(parameters, 'trail_length', 10, 2000).step(1).name("Log length (s)");
     f1.add(parameters, 'refresh_rate', 500, 5000).step(100).name("Refresh rate (ms)");
-    f1.add(parameters, 'auto_update').name("Streaming").onChange(toggleStreaming);
+    f1.add(parameters, 'streaming').name("Streaming").onChange(toggleStreaming);
     f1.add(parameters, 'update').name('Update plot');
 
-    var f2 = gui.addFolder('Trails');
+    var f2 = gui.addFolder('UAVs');
     var f3 = gui.addFolder('Variables');
 
     $.getJSON('discover/', (response) => {
@@ -74,10 +55,11 @@ function setupGUI(){
 
         for (var tag of response.sample_tags){
             parameters['variables'][tag] = true;
-            f3.add(parameters['variables'], tag).name(tag);
+            f3.add(parameters['variables'], tag).name(tag).onChange((state) => toggleChart(state));
         }
 
         // Draw charts once GUI is initialized
+        toggleChart(true);
         updateData();
     });
 }
@@ -137,7 +119,7 @@ function updateData(){
             // Update charts
             updateCharts(data);
 
-            if (parameters.auto_update){
+            if (parameters.streaming){
                 parameters.timeout = setTimeout(updateData, parameters.refresh_rate);
             }
             removeLoader();
@@ -151,8 +133,9 @@ function updateData(){
 }
 
 function updateCharts(data){
-    Plotly.react('lwc_chart', data.RCT, layouts.RCT, config);
-    Plotly.react('upwind_chart', data.WT, layouts.WT, config);
+    for (variable of getSelectedElements(parameters.variables)){
+        Plotly.react(variable, data[variable], printLayout(variable), config);
+    }
 }
 
 function toggleStreaming(){
@@ -162,4 +145,33 @@ function toggleStreaming(){
     } else {
         updateData();
     }
+}
+
+function toggleChart(state){
+    // not 100% sure why this works
+    for (variable in parameters.variables){
+        if(state == parameters.variables[variable]){
+            if (state){
+                $('#charts').append(
+                    '<div id="container_'+ variable + '" class="row">' +
+                        '<div class="col s12">' +
+                            '<div id=' + variable + '></div>' +
+                        '</div>' +
+                    '</div>'
+                );
+            } else {
+                $('#container_' + variable).find('*').addBack().remove();
+            }
+        }
+    }
+}
+
+function printLayout(variable){
+    return layout = {
+        yaxis:{title: createLayout(variable)['title']},
+        height: chart_height,
+        margin: { l: lm, r: rm, b: bm, t: tm },
+        hovermode: 'closest',
+        showlegend: false,
+    };
 }

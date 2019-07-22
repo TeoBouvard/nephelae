@@ -56,7 +56,7 @@ function setupGUI(){
         f1.add(parameters, 'altitude', min_altitude, max_altitude)
             .step(1)
             .name('Altitude (m)')
-            .onChange(() => {track(-1); updateWindData();})
+            .onFinishChange(() => {track(-1); updateWindData();})
             .listen();
         f1.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
         f1.add(parameters, 'update_wind').name('Update wind');

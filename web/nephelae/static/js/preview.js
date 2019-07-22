@@ -23,7 +23,7 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
-    f1.add(parameters, 'trail_length', 10, 1000).step(10).name("Log length (s)").onChange(drawPlot);
+    f1.add(parameters, 'trail_length', 10, 1000).step(10).name("Log length (s)").onFinishChange(drawPlot);
     f1.add(parameters, 'update').name('Update plot');
 
     var f2 = gui.addFolder('UAVs');

@@ -56,13 +56,13 @@ function setupGUI(){
                 .setValue(initial_time)
                 .step(1)
                 .name('Time (s)')
-                .onChange(updateData);
+                .onFinishChange(updateData);
 
             gui.add(parameters, 'altitude', min_altitude, max_altitude)
                 .setValue(initial_altitude)
                 .step(1)
                 .name('Altitude (m)')
-                .onChange(updateData);
+                .onFinishChange(updateData);
         }),
 
         $.getJSON('discover/', (response) => {

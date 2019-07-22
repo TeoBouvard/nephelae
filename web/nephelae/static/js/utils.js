@@ -18,7 +18,7 @@ for(var i = 0; i < global_colors.length; i++){
 }
 
 
-function createLayout(variable, values){
+function createLayout(variable, values=[]){
 
     var min_value = getMin(values);
     var max_value = getMax(values);
