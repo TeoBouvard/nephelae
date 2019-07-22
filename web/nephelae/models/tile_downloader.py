@@ -48,8 +48,8 @@ async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east)
             #print("x range for zoom ", z, " : ", start_x, stop_x)
             #print("y range for 1000zoom ", z, " : ", start_y, stop_y)
 
-            for x in range(start_x-10, stop_x+10):
-                for y in range(start_y-10, stop_y+10):
+            for x in range(start_x, stop_x):
+                for y in range(start_y, stop_y):
                     
                     dir_path = pathlib.Path(__file__).parent.parent / pathlib.Path("static/map_tiles/%d/%d" % (z, x))
                     filename = pathlib.Path(dir_path, str(y) + ".jpg")
@@ -69,7 +69,7 @@ async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east)
 
             print("Writing images to disk ...")
 
-            for response in tqdm(found_responses):
+            for response in found_responses:
                 f = open(response['filename'], 'wb')
                 f.write(response['image'])
                 saved_images += 1

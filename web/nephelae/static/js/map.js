@@ -123,8 +123,8 @@ function setupMap(){
     L.control.layers(base_layers, overlays, {position: 'bottomright'}).addTo(flight_map);
 
     // Display everything on initialization
-    for(key in overlays) overlays[key].addTo(flight_map);
-    tiles_overlay_dark.addTo(flight_map);
+    for(key in overlays) if(key != "Wind") overlays[key].addTo(flight_map);
+    tiles_overlay_IGN.addTo(flight_map);
 
     // Prevent async conflicts by displaying drones once map is initialized
     displayDrones();

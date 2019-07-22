@@ -5,8 +5,6 @@ __pycache__
 *.pyc
 *.swp
 db.sqlite3
-web/nephelae/static/css/libs/images/*
-web/nephelae/static/css/libs/leaflet.css
-web/nephelae/static/css/libs/materialize.css
+web/nephelae/static/css/libs/*
 web/nephelae/static/js/libs/*
 web/nephelae/static/map_tiles/*
