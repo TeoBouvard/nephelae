@@ -2,7 +2,7 @@
 $('#nav_simulation').addClass('active');
 $('.sidenav').sidenav();
 
-var WIDTH = $('#canvas_container').width() -15; // don't know why canvas is larger than container
+var WIDTH = $('#canvas_container').width();
 var HEIGHT = $('#canvas_container').height();
 
 // Simulation elements
