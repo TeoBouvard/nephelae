@@ -8,7 +8,6 @@ from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
 
 from . import utils
 
-
 #db = NephelaeDataServer()
 #
 #def build_uav(uavId, navRef):

@@ -55,6 +55,7 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - preview uav toggle not update data
 - onChange -> onFinishChange
 - empty plot not white screen ?
+- background task on new thread ?
 
 ## Links  
 

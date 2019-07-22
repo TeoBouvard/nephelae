@@ -1,3 +1,5 @@
+import pathlib
+
 from django.http import HttpResponse, HttpResponseNotFound
 
 from ..models import hypercube, tile_downloader
@@ -5,9 +7,8 @@ from ..models import hypercube, tile_downloader
 
 def download_map(request):
 
-     # Parse request parameters
+    # Parse request parameters
     query = request.GET
-    print("coucou")
 
     map_bounds = {
         'east': float(query.get('map_bounds[east]')),
@@ -23,7 +24,7 @@ def download_map(request):
 # Render icons for UAVs
 def plane_icon(request, index):
     try:
-        path = 'nephelae/img/plane_icons/plane_icon' + str(index) + '.png'
+        path = pathlib.Path('nephelae/img/plane_icons/', 'plane_icon' + str(index) + '.png')
         with open(path, "rb") as f:
             return HttpResponse(f.read(), content_type="image/png")
     except IOError:
@@ -33,7 +34,7 @@ def plane_icon(request, index):
 # Render map tiles
 def map_tiles(request, z, x, y):
     try:
-        path = 'nephelae/static/map_tiles/' + str(z) + '_' + str(x) + '_' + str(y) + '.jpg'
+        path = 'nephelae/static/map_tiles/' + str(z) + '/' + str(x) + '/' + str(y) + '.jpg'
         with open(path, "rb") as f:
             return HttpResponse(f.read(), content_type="image/jpg")
     except IOError:

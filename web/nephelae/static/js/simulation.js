@@ -33,7 +33,7 @@ function setupGUI(){
 	var f1 = gui.addFolder('Controls');
 	var f2 = gui.addFolder('Layers');
 
-    f1.add(parameters, 'refresh_rate', 100, 3000).step(100).name('Delay (ms)');
+    f1.add(parameters, 'refresh_rate', 500, 3000).step(100).name('Delay (ms)');
     f1.add(parameters, 'trail_length', 0, 500).step(5).name('Trail');
 	f1.add(parameters, 'fleet_focus').name('Focus on fleet');
 

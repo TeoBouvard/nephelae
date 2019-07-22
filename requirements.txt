@@ -1,4 +1,5 @@
 Django
+django-background-tasks
 matplotlib
 mpld3
 Jinja2

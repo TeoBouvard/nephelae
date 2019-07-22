@@ -25,8 +25,8 @@ var parameters = {
     thermals_cmap: 'viridis',
     clouds_cmap: 'viridis',
     transparent: true,
-    tracked_drone: undefined,
-    time: undefined,
+    tracked_drone: null,
+    time: null,
     update_wind: updateWindData,
     dl_map: downloadMap,
 
@@ -54,7 +54,7 @@ function setupGUI(){
         var f2 = gui.addFolder('Layer colors');
         var f3 = gui.addFolder('Tools');
 
-        f1.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
+        f1.add(parameters, 'refresh_rate', 500, 3000).step(100).name('Delay (ms)');
         f1.add(parameters, 'altitude', min_altitude, max_altitude)
             .step(1)
             .name('Altitude (m)')
@@ -88,7 +88,7 @@ function setupMap(){
     // Create layers
     var tiles_overlay_none = L.tileLayer('');
     var tiles_overlay_dark =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
-    var tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 15});
+    var tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 18});
 
     path_overlay = L.layerGroup();
     uavs_overlay = L.layerGroup();
@@ -239,7 +239,7 @@ function updateDrones(){
             // ... or display error message if drone id does not match -> update fleet dictionnary and start tracking it
             else {
                 console.error("no drone with id ", drone_id, " found !");
-                initializeDrones();
+                displayDrones();
             }
         }
 
@@ -254,7 +254,6 @@ function updateDrones(){
 function updateURL(){
     cloud_overlay.setUrl('clouds_img/?'+ computeURL());
     thermals_overlay.setUrl('thermals_img/?'+ computeURL());
-
 }
 
 function updateLayerBounds(){
@@ -273,11 +272,11 @@ function computeURL(){
     var bounds = flight_map.getBounds();
 
     // Check if a drone is being tracked with MesoNH
-    if (parameters.tracked_drone != undefined){
+    if (parameters.tracked_drone != null){
         parameters.altitude = parameters.tracked_drone.altitude;
         parameters.time = parameters.tracked_drone.time;
     } else {
-        parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : 0;;
+        parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : 0;
     }
 
     // Build query with parameters
@@ -315,7 +314,7 @@ function infosToString(uav){
 // Attach or remove tracked uav in parameters
 function track(id){
     if (id == -1){
-        parameters.tracked_drone = undefined;
+        parameters.tracked_drone = null;
     } else {
         parameters.tracked_drone = fleet[id];
     }
@@ -330,7 +329,5 @@ function updateWindData() {
 }
 
 function downloadMap(){
-    $.get('dl_map/?' + computeURL(), (response => {
-      console.log(response)  
-    }));
+    $.get('dl_map/?' + computeURL());
 }
