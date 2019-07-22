@@ -41,6 +41,7 @@ def discover():
 
 # GPS time is *absolute*, but SAMPLE time is relative to navFrame
 def get_positions(uav_ids, trail_length):
+    
     positions = dict()
 
     for uav_id in uav_ids:

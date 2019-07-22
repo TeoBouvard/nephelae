@@ -179,7 +179,7 @@ function displayDrones(){
                 zoomHome.addTo(flight_map);
                 updateDrones();
             } else {
-                alert("No drones detected, try launching the simulation and restart the server");
+                alert("No UAVs detected, try launching the simulation and restart the server");
                 updateDrones();
             }
             removeLoader();

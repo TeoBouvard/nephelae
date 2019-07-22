@@ -9,7 +9,7 @@ var bm = 20;
 var tm = 10;
 
 var layouts = {
-    lwc: {
+    RCT: {
         //xaxis:{title: 'Time', rangemode: 'nonegative'},
         yaxis:{title: 'Liquid Water Content (kg/kg)', rangemode: 'nonegative'},
         height: chart_height,
@@ -17,9 +17,9 @@ var layouts = {
         hovermode: 'closest',
         showlegend: false,
     },
-    upwind: {
+    WT: {
         //xaxis:{title: 'Time', rangemode: 'nonegative'},
-        yaxis:{title: 'Upwind (m/s)'},
+        yaxis:{title: 'Vertical wind (m/s)'},
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
         hovermode: 'closest',
@@ -36,10 +36,11 @@ var config = {
 // Parameters
 var parameters = {
     refresh_rate: 1000,   // ms
-    trail_length: 60,    // seconds
+    trail_length: 60,     // seconds
     auto_update: true,
     update: updateData,
     last_request: 0,
+    timeout: null,
 }
 
 $(document).ready(function(){
@@ -55,7 +56,7 @@ function setupGUI(){
 
     f1.add(parameters, 'trail_length', 10, 2000).step(1).name("Log length (s)");
     f1.add(parameters, 'refresh_rate', 500, 5000).step(100).name("Refresh rate (ms)");
-    f1.add(parameters, 'auto_update').name("Auto Update").onChange(updateData);
+    f1.add(parameters, 'auto_update').name("Streaming").onChange(toggleStreaming);
     f1.add(parameters, 'update').name('Update plot');
 
     var f2 = gui.addFolder('Trails');
@@ -68,7 +69,7 @@ function setupGUI(){
 
         for (var uav_id of response.uavs){
             parameters['uavs'][uav_id] = true;
-            f2.add(parameters['uavs'], uav_id).name('Drone ' + uav_id);
+            f2.add(parameters['uavs'], uav_id).name('UAV ' + uav_id);
         }
 
         for (var tag of response.sample_tags){
@@ -85,7 +86,7 @@ function setupGUI(){
 function updateData(){
 
     var data = {};
-    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length, variables:getSelectedVariables()});
+    var query = $.param({uav_id: getSelectedElements(parameters.uavs), trail_length: parameters.trail_length, variables:getSelectedElements(parameters.variables)});
 
     if (new Date() - parameters.last_request > parameters.refresh_rate){
         parameters.last_request = undefined;
@@ -97,24 +98,39 @@ function updateData(){
 
                 for (var variable_name in response.data[uav_id]){
 
+                    var positions = response.data[uav_id][variable_name]['positions'];
+                    var timestamps = [];
+
+                     // Compute coordinates from path
+                    for(var i = 0; i < positions.length ; i++){
+                        timestamps.push(positions[i][0]);
+                    }
+
                     var new_data = {
                         type: 'scatter',
-                        x: response.data[uav_id][variable_name]['t'],
+                        x: timestamps,
                         y: response.data[uav_id][variable_name]['values'],
-                        name: "UAV " + uav_id,
                         mode: 'line',
                         line: {
                             width: 1,
                             shape: 'linear',
                             color: global_colors[uav_id%global_colors.length],
+                        },
+                        meta: [uav_id],
+                        hovertemplate:
+                            'timestamp : %{x:.1f}s <br>' +
+                            'sensor value : %{y:.3f} <br>' +
+                            '<extra>UAV %{meta[0]}</extra>',
+                        hoverlabel: {
+                            bgcolor: 'black',
+                            bordercolor: 'black',
+                            font: {family: 'Roboto', size: '15', color: 'white'},
+                            align: 'left',
                         }
                     };
 
-                    if (variable_name in data){
-                        data[variable_name].push(new_data);
-                    } else {
-                        data[variable_name] = [new_data];
-                    }
+                    variable_name in data ? data[variable_name].push(new_data) : data[variable_name] = [new_data];
+
                 }
             }
 
@@ -122,41 +138,28 @@ function updateData(){
             updateCharts(data);
 
             if (parameters.auto_update){
-                setTimeout(updateData, parameters.refresh_rate);
+                parameters.timeout = setTimeout(updateData, parameters.refresh_rate);
             }
             removeLoader();
             parameters.last_request = new Date();
         });
     }
+    // too early, try again in a short time
     else{
         setTimeout(updateData, 20);
     }
 }
 
 function updateCharts(data){
-    Plotly.react('lwc_chart', data.RCT, layouts.lwc, config);
-    Plotly.react('upwind_chart', data.WT, layouts.upwind, config);
+    Plotly.react('lwc_chart', data.RCT, layouts.RCT, config);
+    Plotly.react('upwind_chart', data.WT, layouts.WT, config);
 }
 
-
-function getSelectedUAVs() {
-
-    var selectedUAVs = [];
-
-    for(uav_id in parameters.uavs){
-        if (parameters.uavs[uav_id] == true) selectedUAVs.push(uav_id);
+function toggleStreaming(){
+    if (parameters.timeout != null){
+        clearTimeout(parameters.timeout);
+        parameters.timeout = null;
+    } else {
+        updateData();
     }
-
-    return selectedUAVs;
-}
-
-function getSelectedVariables() {
-
-    var selectedVariables = [];
-
-    for(tag in parameters.variables){
-        if (parameters.variables[tag] == true) selectedVariables.push(tag);
-    }
-
-    return selectedVariables;
 }

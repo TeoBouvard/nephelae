@@ -12,8 +12,7 @@ var parameters = {
 
 
 $(document).ready(function(){
-
-    // // Inititalize parameters before drawing plot
+    // Inititalize parameters before drawing plot
     setupGUI();
 
 });
@@ -27,7 +26,7 @@ function setupGUI(){
     f1.add(parameters, 'trail_length', 10, 1000).step(10).name("Log length (s)").onChange(drawPlot);
     f1.add(parameters, 'update').name('Update plot');
 
-    var f2 = gui.addFolder('Trails');
+    var f2 = gui.addFolder('UAVs');
 
     $.getJSON('discover/', (response) => {
 
@@ -38,11 +37,10 @@ function setupGUI(){
 
         for (var key of response.uavs){
             parameters[key] = true;
-            f2.add(parameters, key).name('Drone ' + key).onChange(drawPlot);
+            f2.add(parameters, key).name('UAV ' + key).onChange(drawPlot);
         }
 
-
-        // And then display the drones
+        // And then display UAVs
         drawPlot();
     });
 }
@@ -50,14 +48,14 @@ function setupGUI(){
 function drawPlot(){
 
     var data = [];
-    var query = $.param({uav_id: getSelectedUAVs(), trail_length: parameters.trail_length, variables: parameters.variable});
+    var query = $.param({uav_id: getSelectedElements(parameters.uavs), trail_length: parameters.trail_length, variables: parameters.variable});
 
     $.getJSON('update/?' + query, (response) => {
 
         for (var uav_id in response.data){
 
-            var positions = response.data[uav_id][parameters.variable].positions;
-            var sensor_values = response.data[uav_id][parameters.variable].values;
+            var positions = response.data[uav_id][parameters.variable]['positions'];
+            var sensor_values = response.data[uav_id][parameters.variable]['values'];
             var x = [];
             var y = [];
             var z = [];
@@ -72,7 +70,7 @@ function drawPlot(){
                 text.push(positions[i][0].toFixed(2) + 's<br>sensor value : ' + sensor_values[i].toFixed(3));
             }
 
-            // Display colorbar if only one UAV is selected
+            // Display colorbar if only one UAV is selected, create zero-centered colorbars
             var displayColorBar = getSelectedUAVs().length == 1;
             var lay = createLayout(parameters.variable, sensor_values);
 
@@ -119,18 +117,6 @@ function drawPlot(){
         removeLoader();
     });
 }
-
-function getSelectedUAVs() {
-
-    var selectedUAVs = [];
-
-    for(key in parameters){
-        if (typeof parameters[key] == 'boolean' && parameters[key] == true) selectedUAVs.push(key);
-    }
-
-    return selectedUAVs;
-}
-
 
 // Plot settings
 var layout = {

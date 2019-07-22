@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from ..models import hypercube
 
 
-# Render icons for drones
+# Render icons for UAVs
 def plane_icon(request, index):
     try:
         path = 'nephelae/img/plane_icons/plane_icon' + str(index) + '.png'

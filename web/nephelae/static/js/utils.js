@@ -1,4 +1,4 @@
-// Add CSS colors (in order corresponding to plane_icons folder) for more drones
+// Add CSS colors (in order corresponding to plane_icons folder) for more UAVs
 global_colors = ["red", "green", "blue", "purple", "teal", "orange", "lime", "yellow", "fuchsia", "gray"];
 global_icons = [];
 
@@ -72,3 +72,14 @@ function getMin(a){
     return Math.min(...a.map(e => Array.isArray(e) ? getMin(e) : e));
 }
 
+// Helper function to get all 'true' checkboxes of a container
+function getSelectedElements(container) {
+
+    var selectedElements = [];
+
+    for(element in container){
+        if (container[element] == true) selectedElements.push(element);
+    }
+
+    return selectedElements;
+}
