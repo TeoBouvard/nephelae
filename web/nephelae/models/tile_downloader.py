@@ -18,8 +18,7 @@ headers = {
 # Utility methods
 def latlon2px(z, lat, lon):
     x = 2 ** z * (lon + 180) / 360 * 256
-    y = -(0.5 * math.log((1 + math.sin(math.radians(lat))) /
-                         (1 - math.sin(math.radians(lat)))) / math.pi - 1) * 256 * 2 ** (z - 1)
+    y = -(0.5 * math.log((1 + math.sin(math.radians(lat))) / (1 - math.sin(math.radians(lat)))) / math.pi - 1) * 256 * 2 ** (z - 1)
     return x, y
 
 
@@ -35,6 +34,7 @@ async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east)
     connector = aiohttp.TCPConnector(limit=40)
     total_images = 0
     already_exists = 0
+    saved_images = 0
 
     async with aiohttp.ClientSession(connector=connector, headers=headers) as client:
 
@@ -57,11 +57,13 @@ async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east)
             for x in range(start_x, stop_x):
                 for y in range(start_y, stop_y):
                     
-                    fn = "static/map_tiles/%d_%d_%d.jpg" % (z, x, y)
+                    dir_path = pathlib.Path("static/map_tiles/%d/%d/" % (z, x))
+                    fn = pathlib.Path(dir_path, str(y) + ".jpg")
                     filename = pathlib.Path(__file__).parent.parent / fn
                     total_images += 1
 
                     if not os.path.exists(filename):
+                        pathlib.Path.mkdir(dir_path, parents=True, exist_ok=True)
                         task = asyncio.ensure_future(fetch(client, filename, z, x, y))
                         tasks.append(task)
                     else:
@@ -78,12 +80,13 @@ async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east)
             for response in tqdm(found_responses):
                 f = open(response['filename'], 'wb')
                 f.write(response['image'])
+                saved_images += 1
                 f.close()
             
-            print(total_images, "images in this area")
-            print(already_exists, "images already exist")
-            print(len(responses) - len(found_responses), "images were not found (probably normal)")
-            print(len(found_responses), "images will be saved")
+            #print(total_images, "images in this area")
+            #print(already_exists, "images already exist")
+            #print(len(responses) - len(found_responses), "images were not found (probably normal)")
+    print(saved_images, "images saved")
 
 
 async def fetch(client, filename, z, x, y):
@@ -108,10 +111,23 @@ async def fetch(client, filename, z, x, y):
             return dict(image=image, filename=filename)
 
 
-# Main
+def dl(map_bounds):
+
+    zoom_min, zoom_max = 6, 18
+    lat_north = map_bounds['north']
+    lat_south = map_bounds['south']
+    lon_west = map_bounds['west']
+    lon_east = map_bounds['east']
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(download_tiles(zoom_min, zoom_max, lat_north, lat_south, lon_west, lon_east))
+    #loop.close()
+    print('end of download')
+
+
 if __name__ == "__main__":
 
-    zoom_min, zoom_max = 11, 12
+    zoom_min, zoom_max = 5, 16
     lat_north, lon_east = 44, 4
     lat_south, lon_west = 42, 0
 

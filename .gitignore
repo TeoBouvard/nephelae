@@ -8,13 +8,5 @@ db.sqlite3
 web/nephelae/static/css/libs/images/*
 web/nephelae/static/css/libs/leaflet.css
 web/nephelae/static/css/libs/materialize.css
-web/nephelae/static/wind.json
-web/nephelae/static/js/libs/jquery.js
-web/nephelae/static/js/libs/jqueryUI.js
-web/nephelae/static/js/libs/three.js
-web/nephelae/static/js/libs/OrbitControls.js
-web/nephelae/static/js/libs/leaflet.js
-web/nephelae/static/js/libs/leafletRotatedMarker.js
-web/nephelae/static/js/libs/materialize.js
-web/nephelae/static/js/libs/plotly.js
+web/nephelae/static/js/libs/*
 web/nephelae/static/map_tiles/*

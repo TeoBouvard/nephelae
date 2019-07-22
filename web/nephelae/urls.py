@@ -16,6 +16,7 @@ urlpatterns = [
     path('map/', views.map, name='map'),
     path('map/discover/', views.discover),
     path('map/update/', views.get_positions),
+    path('map/dl_map/', views.download_map),
     path('map/box/', views.mesonh_box),
     path('map/wind/', views.wind_data),
     path('map/tile/<int:z>/<int:x>/<int:y>', views.map_tiles, name='map_tiles'),

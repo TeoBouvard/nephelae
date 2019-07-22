@@ -28,6 +28,7 @@ var parameters = {
     tracked_drone: undefined,
     time: undefined,
     update_wind: updateWindData,
+    dl_map: downloadMap,
 
     origin: [43.46, 1.27] // used to compute layer images
 }
@@ -51,6 +52,7 @@ function setupGUI(){
         // Setup GUI
         var f1 = gui.addFolder('Options');
         var f2 = gui.addFolder('Layer colors');
+        var f3 = gui.addFolder('Tools');
 
         f1.add(parameters, 'refresh_rate', 200, 3000).step(100).name('Delay (ms)');
         f1.add(parameters, 'altitude', min_altitude, max_altitude)
@@ -64,6 +66,9 @@ function setupGUI(){
         f2.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
         f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
         f2.add(parameters, 'transparent').name('Transparent');
+
+        f3.add(parameters, 'dl_map').name('Download IGN map');
+
 
         // Once sliders are initialized -> create map
         setupMap();
@@ -322,4 +327,10 @@ function updateWindData() {
     $.getJSON('wind/?' + computeURL(), (response) => {
         wind_overlay.setData(response);
     });
+}
+
+function downloadMap(){
+    $.get('dl_map/?' + computeURL(), (response => {
+      console.log(response)  
+    }));
 }
