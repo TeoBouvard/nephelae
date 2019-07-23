@@ -23,7 +23,6 @@ This is a web application designed as an interface between the fleet of UAV used
 
 **How do I install it ?**  
 Clone the repo and run [`install.sh`](install.sh). You should define `$MESO_NH` environment variable for this to work, referencing the Meso_NH.nc file.
-  
 
 **How do I run it ?**  
 Once installed (make sure to check the prerequisites), you can launch the server by running [`runserver.sh`](runserver.sh). You can then open a web browser (chrome or chromium preferably) and go to [localhost:8000](http://localhost:8000). As the server broadcasts on the whole network, you can use this interface from every computer on the network, by changing `localhost` to the server's IP address in the URL.
@@ -55,15 +54,16 @@ You can download a copy from [their website](http://mesonh.aero.obs-mip.fr/meson
 ### User Guide
 
 **General**
+
 Every tool in this webapp has a controller located at the top right of the page. You can move it along the vertical axis by dragging the handle, and extend it along the horizontal axis by dragging its left side. You can toggle its visibility by pressing the H key on your keyboard.
 
 **2D tracking**
 
-You can choose which layers to display by hovering the layers icon at the bottom right of the map. 
-You can tune the appearance of the clouds and thermals layers in the controller. 
-You can download IGN map tiles of the visible map by clicking `Download IGN` in the `Tools` folder of the controller. This will download all map tiles for offline use of the current map. This might take a few seconds (minutes?) depending on your internet connection. Keep in mind that a 10km * 10km map is at least 150MB (10k tiles).
-You can get live infos about a UAV by clicking on it.
-You can set MesoNH cross-section altitude in the controller. If you want the cross-section to follow one of the UAVs, you can do so by clicking on a UAV and then on `SYNC MESONH`. It will synchronize time and altitude of the cross-section with the position of the UAV. Click anywhere on the altitude slider to stop syncing.
+* You can choose which layers to display by hovering the layers icon at the bottom right of the map. 
+* You can tune the appearance of the clouds and thermals layers in the controller. 
+* You can download IGN map tiles of the visible map by clicking `Download IGN` in the `Tools` folder of the controller. This will download all map tiles for offline use of the current map. This might take a few seconds (minutes?) depending on your internet connection. Keep in mind that a 10km * 10km map is at least 150MB (10k tiles).
+* You can get live infos about a UAV by clicking on it.
+* You can set MesoNH cross-section altitude in the controller. If you want the cross-section to follow one of the UAVs, you can do so by clicking on a UAV and then on `SYNC MESONH`. It will synchronize time and altitude of the cross-section with the position of the UAV. Click anywhere on the altitude slider to stop syncing.
 If you are lost, click the home icon at the top left of the map to get back to base.
 
 **3D tracking**
@@ -72,14 +72,15 @@ In the controller, `Focus on fleet` will place the camera so that every UAV is v
 
 **Temporal Sensor Data**
 
-Choose the UAVs from which you want to display data by selecting them in the `UAVs` folder of the controller. 
-Choose the sensor data you want to display in the `Variables` folder of the controller. 
-Choose the length of the data you want to display in `Controls`. Select `Streaming` if you want incoming data to be displayed automatically. 
-You can zoom on the charts by selecting a desired area. Zoom back out by double-clicking on the chart.
+* Choose the UAVs from which you want to display data by selecting them in the `UAVs` folder of the controller. 
+* Choose the sensor data you want to display in the `Variables` folder of the controller. 
+* Choose the length of the data you want to display in `Controls`. 
+* Select `Streaming` if you want incoming data to be displayed automatically. 
+* You can zoom on the charts by selecting a desired area. Zoom back out by double-clicking on the chart.
 
 **Spatial Sensor Data**
 
-Same tool as the previous one but data is displayed as a function of space rather than time. Hover a line to get details. A colorbar is displayed if only one UAV is selected. This visualization does not support streaming without consequent drawbacks, so you will have to click `Update Plot` if you want to fetch the latest data.
+Same tool as the previous one, but data is displayed as a function of space rather than time. Hover a line to get details. A colorbar is displayed if only one UAV is selected. This visualization does not support streaming without consequent drawbacks, so you will have to click `Update Plot` if you want to fetch the latest data.
 
 **Sections**
 
@@ -139,3 +140,5 @@ Not yet implemented. Will be used to give high-level orders to the fleet.
 
 - A running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). 
 - A Meso_NH file referenced by `$MESO_NH`. 
+
+</p>
