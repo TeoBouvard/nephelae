@@ -4,11 +4,10 @@
 ### Table of contents
 
 * [Q/A](#qa)  
-* [Prerequisites](#prerequisites)  
 * [User Guide](#user-guide)  
 * [Miscellaneous](#miscellaneous)  
 * [Todo](#todo) 
-* [Open Questions](#open-questions) 
+* [Prerequisites](#prerequisites)  
 
 ---
 
@@ -100,7 +99,6 @@ Not yet implemented. Will be used to give high-level orders to the fleet.
 
 ### Todo
 
-- os.environ['MESO_NH'] -> define env variables in install script
 - requête repère mobile au mapping
 - requête box au mapping
 - bounds to json
@@ -108,6 +106,9 @@ Not yet implemented. Will be used to give high-level orders to the fleet.
 - simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - roll estimate by heading change
+
+- k-means clustering, then convex hull ?
+- why is message.data an array ? (3d data ?)
 
 ---
 
@@ -118,15 +119,6 @@ Not yet implemented. Will be used to give high-level orders to the fleet.
 - [Grib parameters table](https://www.nco.ncep.noaa.gov/pmb/docs/grib2/GRIB2_parmeter_conversion_table.html)
 - [dat.gui](https://github.com/dataarts/dat.gui) -> [paper-gui](https://github.com/google/paper-gui)
 - [icons](https://material.io/tools/icons/?style=baseline)
-
----
-
-<a name="open-questions"></a>
-
-### Open Questions
-
--   k-means clustering, then convex hull ?
--   why is message.data an array ? (3d data ?)
 
 ---
 

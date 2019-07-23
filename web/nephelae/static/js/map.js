@@ -22,8 +22,8 @@ var parameters = {
     refresh_rate: 1000,     // milliseconds
     altitude: 600,          // meters
     trail_length: 60,       // seconds
-    thermals_cmap: 'viridis',
-    clouds_cmap: 'viridis',
+    thermals_cmap: 'Reds',
+    clouds_cmap: 'Purples',
     transparent: true,
     tracked_drone: null,
     time: null,
