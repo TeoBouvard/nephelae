@@ -21,10 +21,11 @@ This is a web application designed as an interface between the fleet of UAV used
 
 
 **How do I install it ?**  
-Clone the repo and run [`install.sh`](install.sh). You should define `$MESO_NH` environment variable for this to work, referencing the Meso_NH.nc file.
+Clone the repo, cd into it and `make install`. You can get all the `make` targets by simply running `make help`.
+
 
 **How do I run it ?**  
-Once installed (make sure to check the prerequisites), you can launch the server by running [`runserver.sh`](runserver.sh). You can then open a web browser (chrome or chromium preferably) and go to [localhost:8000](http://localhost:8000). As the server broadcasts on the whole network, you can use this interface from every computer on the network, by changing `localhost` to the server's IP address in the URL.
+Once installed (make sure to check the prerequisites), you can launch the server by running [`make runserver`]. You can then open a web browser (chrome or chromium preferably) and go to [localhost:8000](http://localhost:8000). As the server broadcasts on the whole network, you can use this interface from every computer on the network, by changing `localhost` to the server's IP address in the URL.
   
 
 **How does it work ?**  
@@ -36,7 +37,7 @@ Most of the display tuning is located in the javascript files. You can modify th
   
 
 **I updated the views/models but nothing changes, what is happening ?**  
-For updates concerning server-side files to take place, you have to restart the server. You can ctrl-c twice, and re-run [`runserver.sh`](runserver.sh). Note that this is not necessary when updating client-side programming files (js, css, html files), as long as browser caching is disabled.
+For updates concerning server-side files to take place, you have to restart the server. You can ctrl-c twice, and re-run `make runserver`. Note that this is not necessary when updating client-side programming files (js, css, html files), as long as browser caching is disabled.
   
 
 **Why are all the javascript librairies locally downloaded and not taken from Content Delivery Networks ?**  
