@@ -65,7 +65,7 @@ purge-maps :
 
 runserver: check-meso
 	$(ECHO) "Starting server on 0.0.0.0:8000"
-	@cd ./web && gunicorn --threads=$(NTHREADS) --timeout=200 --bind 0.0.0.0:8000 IHM.wsgi
+	-@cd ./web && gunicorn --threads=$(NTHREADS) --timeout=200 --bind 0.0.0.0:8000 IHM.wsgi
 
 simulation: check-pprz
 	@$(PAPARAZZI_HOME)/sw/simulator/pprzsim-launch -b 127.255.255.255 -a Microjet_neph_0 -t sim --boot --norc &

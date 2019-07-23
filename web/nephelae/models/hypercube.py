@@ -4,10 +4,9 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from geopy.distance import distance
 from netCDF4 import MFDataset
 
-from nephelae_simulation.mesonh_interface import *
+from nephelae_simulation.mesonh_interface import MesoNHVariable
 
 from . import utils
 
@@ -44,6 +43,11 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
         colormap = utils.transparent_cmap(thermals_cmap) if transparent else thermals_cmap
         min_slice = 0
         max_slice = thermals.actual_range[1]
+
+    # Reduce array density
+    #while max(np.shape(h_slice)) > 256:
+    
+    #print(np.shape(h_slice))
 
     # Write image to buffer
     buf = io.BytesIO()

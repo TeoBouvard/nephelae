@@ -212,6 +212,7 @@ function update(){
 					var drone_position = drone_path.slice(-1)[0];
                 	var drone_altitude = drone_path.slice(-1)[0][2];
 					var drone_heading = response.positions[key].heading;
+					var course_change = drone_heading.toRad() - fleet[key].drone.rotation.y;
 
 					// Compute color of marker
 					var drone_color = global_colors[key%global_colors.length];
@@ -219,6 +220,7 @@ function update(){
 					// Update drone object
 					fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
 					fleet[key].drone.rotation.y = Math.PI - drone_heading.toRad();
+					fleet[key].drone.rotation.z = 0.1*course_change;
 					fleet[key].drone.userData = {
 						id: key,
 						altitude: drone_altitude, 

@@ -106,6 +106,7 @@ Not yet implemented. Will be used to give high-level orders to the fleet.
 - simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - roll estimate by heading change
+- limit display radius in map ?
 
 - k-means clustering, then convex hull ?
 - why is message.data an array ? (3d data ?)
