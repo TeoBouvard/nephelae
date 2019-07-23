@@ -1,7 +1,7 @@
 // Activate current menu in nav
 document.getElementById('nav_raw_data').className = 'active';
 
-// Chart style and options
+// Chart style
 var chart_height = 250;
 var lm = 70;
 var rm = 20;
@@ -38,7 +38,7 @@ function setupGUI(){
     f1.add(parameters, 'trail_length', 10, 2000).step(1).name("Log length (s)");
     f1.add(parameters, 'refresh_rate', 500, 5000).step(100).name("Refresh rate (ms)");
     f1.add(parameters, 'streaming').name("Streaming").onChange(toggleStreaming);
-    f1.add(parameters, 'update').name('Update plot');
+    f1.add(parameters, 'update').name('Update charts');
 
     var f2 = gui.addFolder('UAVs');
     var f3 = gui.addFolder('Variables');
@@ -168,10 +168,11 @@ function toggleChart(state){
 
 function printLayout(variable){
     return layout = {
-        yaxis:{title: createLayout(variable)['title']},
+        yaxis: { title: createLayout(variable)['title'] },
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
         hovermode: 'closest',
         showlegend: false,
+        uirevision: true,
     };
 }

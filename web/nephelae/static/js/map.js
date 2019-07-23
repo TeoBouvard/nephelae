@@ -108,7 +108,7 @@ function setupMap(){
     // Set layer dictionnary for control initialization
     var base_layers = {
         "None": tiles_overlay_none,
-        "Dark, Online": tiles_overlay_dark,
+        "Dark (online)": tiles_overlay_dark,
         "IGN": tiles_overlay_IGN,
     };
 
@@ -300,13 +300,13 @@ function computeURL(){
 
 // Print HTML formatted string so that it can be added to marker popup
 function infosToString(uav){
-    var infos = '<p style="text-align:center;font-family:Roboto-Light;font-size:14px">';
+    var infos = '<p style="font-family:Roboto-Light;font-size:14px">';
 
-    infos += '<b>UAV ' + uav.id + ' </b><br> ' ;
-    infos += uav.altitude + 'm <br> ';
-    infos += uav.heading + '° <br> ';
-    infos += uav.speed + ' m/s <br>';
-    infos += '<a onClick="track(' + uav.id + ');" class="btn"><span class="white-text"><b>Follow with MesoNH</b></span></a></p>'
+    infos += '<b> UAV ' + uav.id + ' </b><br><br>' ;
+    infos += 'Altitude : ' + uav.altitude + 'm<br> ';
+    infos += 'Heading : ' + uav.heading + '° <br> ';
+    infos += 'Speed : ' + uav.speed + ' m/s <br><br>';
+    infos += '<a onClick="track(' + uav.id + ');" class="btn"><span class="white-text"><b>Sync MesoNH</b></span></a></p>'
 
     return infos;
 }
