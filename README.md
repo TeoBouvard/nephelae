@@ -36,7 +36,7 @@ Most of the display tuning is located in the javascript files. You can modify th
   
 
 **I updated the views/models but nothing changes, what is happening ?**  
-For updates concerning server-side files to take place, you have to restart the server. You can ctrl-c twice, and re-run `make runserver`. Note that this is not necessary when updating client-side programming files (js, css, html files), as long as browser caching is disabled.
+For updates concerning server-side files to take place, you have to restart the server. You can `ctrl-C` to stop it, and re-run `make runserver`. Note that this is not necessary when updating client-side files (js, css, html files), as long as browser caching is disabled.
   
 
 **Why are all the javascript librairies locally downloaded and not taken from Content Delivery Networks ?**  
@@ -105,8 +105,9 @@ Not yet implemented. Will be used to give high-level orders to the fleet.
 - reduce array size in image overlay (memory problems?)
 - simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
-- roll estimate by heading change
-- limit display radius in map ?
+- limit display radius in map or sparse matrix ? can't find a way 
+- get_positions parameters (real | simulation)
+- commands + scheduling
 
 - k-means clustering, then convex hull ?
 - why is message.data an array ? (3d data ?)
