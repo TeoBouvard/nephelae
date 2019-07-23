@@ -34,7 +34,7 @@ function setupGUI(){
 	var f2 = gui.addFolder('Layers');
 
     f1.add(parameters, 'refresh_rate', 500, 3000).step(100).name('Delay (ms)');
-    f1.add(parameters, 'trail_length', 0, 500).step(5).name('Trail');
+    f1.add(parameters, 'trail_length', 0, 120).step(5).name('Trail');
 	f1.add(parameters, 'fleet_focus').name('Focus on fleet');
 
 	f2.add(parameters, 'fleet_visibility').onChange(toggleFleetVisibility).name('Fleet');
@@ -116,7 +116,7 @@ function createFloor() {
 function createLights() {
 	// Create a directional light
 	var light = new THREE.DirectionalLight('white', 2);
-	light.position.set(100, 100, 1000);
+	light.position.set(100, 100, 10000);
 	scene.add(light);
 }
 
@@ -124,7 +124,11 @@ function createDrones() {
 
 	var loader = new THREE.GLTFLoader();
 
-	$.when(loader.load('models/glider.gltf', (gltf) => {plane_model = gltf.scene; console.log(gltf)}))
+	$.when(loader.load('models/glider.gltf', (gltf) => {
+		plane_model = gltf.scene;
+		plane_model.rotateX(Math.PI / 2)
+		//plane_model.scale.set(0.5, 0.5, 0.5);
+	}))
 	.done( () => {
 
 		$.getJSON('discover/', (response) => {
@@ -141,6 +145,7 @@ function createDrones() {
 					var drone_path = response.positions[key].frame_path;
 					var drone_position = drone_path.slice(-1)[0];
 					var drone_altitude = drone_path.slice(-1)[0][2];
+					var drone_heading = response.positions[key].heading;
 
 					// Compute color of marker
 					var drone_color = global_colors[key%global_colors.length];
@@ -148,9 +153,11 @@ function createDrones() {
 					// Create a drone
 					//var geometry = new THREE.SphereBufferGeometry(5, 32, 32);
 					//var material = new THREE.MeshStandardMaterial({color: drone_color});
-					var drone_object = plane_model;//new THREE.Mesh(geometry, material);
+					var drone_object = plane_model.clone();//new THREE.Mesh(geometry, material);
 
 					drone_object.position.set(drone_position[0], drone_position[1], drone_position[2]);
+					drone_object.rotation.y = Math.PI - drone_heading.toRad();
+
 					scene.add(drone_object);
 
 					// Create a line
@@ -184,10 +191,10 @@ function update(){
 	var now = new Date();
 	var elapsed_time = now - then;
 
-	if (elapsed_time >= parameters.refresh_rate){
+	if (elapsed_time >= parameters.refresh_rate && then != null){
 
 		// stop sending request while this one is processed
-		then = undefined;
+		then = null;
 
 		// add +1 to trail_length so that zero performs a valid slice
 		var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1});
@@ -203,13 +210,15 @@ function update(){
 					var drone_id = key;
 					var drone_path = response.positions[key].frame_path;
 					var drone_position = drone_path.slice(-1)[0];
-                	var drone_altitude = drone_path.slice(-1)[0][2]
+                	var drone_altitude = drone_path.slice(-1)[0][2];
+					var drone_heading = response.positions[key].heading;
 
 					// Compute color of marker
 					var drone_color = global_colors[key%global_colors.length];
 
 					// Update drone object
 					fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
+					fleet[key].drone.rotation.y = Math.PI - drone_heading.toRad();
 					fleet[key].drone.userData = {
 						id: key,
 						altitude: drone_altitude, 
@@ -315,7 +324,7 @@ function onClick( event ) {
     var intersects = raycaster.intersectObjects( objects, true );
 
     if ( intersects.length > 0 ) {
-        displayInfo(intersects[0].object.userData);
+        displayInfo(intersects);
     }
 }
 
