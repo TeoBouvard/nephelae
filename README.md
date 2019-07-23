@@ -51,11 +51,9 @@ A : You can reference any .nc file with your `$MESO_NH` environment variable, an
 - 3d model of uavs ?
 - simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
-- replace dat gui and materialize style in install script
 - preview uav toggle not update data
 - onChange -> onFinishChange
 - empty plot not white screen ?
-- background task on new thread ?
 
 ## Links  
 

@@ -55,6 +55,17 @@ def texture(request, file_name):
         return HttpResponseNotFound()
 
 
+# Render UAV 3D model
+def model3D(request, file_name):
+    try:
+        path = 'nephelae/img/3d_models/' + str(file_name)
+        with open(path, "rb") as f:
+            response = HttpResponse(f.read())
+            return response
+    except IOError:
+        return HttpResponseNotFound()
+
+
 # Render layer image
 def layer_img(request, variable_name):
 

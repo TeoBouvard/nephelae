@@ -28,6 +28,7 @@ urlpatterns = [
     path('simulation/discover/', views.discover),
     path('simulation/update/', views.get_positions),
     path('simulation/textures/<str:file_name>', views.texture),
+    path('simulation/models/<str:file_name>', views.model3D),
 
     # URL for commands page
     path('commands/', views.commands, name='commands'),
