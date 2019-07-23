@@ -1,7 +1,6 @@
 # NEPHELAE : Network for studying Entrainment and microPHysics of cLouds using Adaptive Exploration
-
----
-
+  
+  
 ### Table of contents
 
 * [Q/A](#qa)  
@@ -41,7 +40,7 @@ For updates concerning server-side files to take place, you have to restart the 
   
 
 **Why are all the javascript librairies locally downloaded and not taken from Content Delivery Networks ?**  
-This web application is supposed to be used in remote places without any internet connection. You may also notice some strange things in the design of this application, like user actions downloading files on the server. 
+This web application is supposed to be used in remote places without any internet connection, and therefore downloads every external asset during installation.
   
 
 **I do not have a Meso_NH.nc file, what can I do ?**  
@@ -105,12 +104,8 @@ Not yet implemented. Will be used to give high-level orders to the fleet.
 - requête box au mapping
 - bounds to json
 - reduce array size in image overlay (memory problems?)
-- organize base css
 - simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
-- preview uav toggle not update data
-- onChange -> onFinishChange
-- empty plot not white screen ?
 - roll estimate by heading change
 
 ---

@@ -118,6 +118,7 @@ function drawPlot(){
         Plotly.react('chart', data, layout, config);
         removeLoader();
     });
+
 }
 
 // Plot settings
