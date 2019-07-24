@@ -12,6 +12,8 @@ help:
 
 install: assets requirements
 
+full-install: sudo-requirements install
+
 assets : 
 	$(ECHO) -n "Creating static folders ... "
 	@mkdir web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons -p
@@ -60,13 +62,24 @@ assets :
 	@sed -i 's/src.*/src:url("icons\/MaterialIcons-Regular.ttf") format("truetype");/g' web/nephelae/static/css/libs/material-icons.css
 	$(ECHO) "OK"
 
-requirements : 
-	$(ECHO) -n "Installing requirements ... "
+sudo-requirements:
 	-@apt-get -y install python3-pip redis-server
 
-	@pip3 install wheel
-	@pip3 install --user -r requirements.txt
+requirements : 
+	$(ECHO) -n "Installing requirements ... "
+	
+	@if [ -d "nephelae_master" ]; then \
+		git -C nephelae_master pull; \
+	else \
+		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_master.git nephelae_master; \
+	fi
 
+	@git -C ./nephelae_master submodule init
+	@git -C ./nephelae_master submodule update
+	@pip3 install --user wheel
+	@pip3 install ./nephelae_master
+	@rm -rf ./nephelae_master
+	@pip3 install --user -r requirements.txt
 
 purge-maps :
 	@rm -rf web/nephelae/static/map_tiles/*
