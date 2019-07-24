@@ -11,7 +11,9 @@ sklearn
 sh
 ivy-python
 #Server
-gunicorn
+channels 
+asgi_redis
+channels_redis
 #Map tile downloader
 aiohttp
 # Loading bar

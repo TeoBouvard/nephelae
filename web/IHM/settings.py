@@ -32,7 +32,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'nephelae.apps.NephelaeConfig',
+    'channels',
+    'nephelae',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -70,6 +71,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'IHM.wsgi.application'
+ASGI_APPLICATION = 'IHM.asgi.application'
 
 
 # Database
@@ -121,3 +123,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 IMAGE_URL = '/img/'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],
+        },
+        'ROUTING': 'IHM.routing.channel_routing',
+    }
+}
