@@ -32,6 +32,8 @@ urlpatterns = [
 
     # URL for commands page
     path('commands/', views.commands, name='commands'),
+    path('commands/discover/', views.discover),
+    path('commands/update/', views.get_positions),
 
     # URL for sections page
     path('sections/', views.sections, name='sections'),

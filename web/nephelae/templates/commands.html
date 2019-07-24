@@ -5,11 +5,18 @@
 {% block additional_scripts %}
 
 	<script src="{% static 'js/commands.js' %}"></script>
+	<script src="{% static 'js/libs/googleCharts.js' %}"></script>
 
 {% endblock %}
 
 {% block page %}
 
-	<div class="container"></div>
+	<!-- Display controller -->
+	<div id="draggable" class="small-container">
+		<i class="material-icons" style="color:white;">reorder</i>
+    	<div id="gui_container"></div>
+	</div>
+
+	<div id="infolist"></div>
 
 {% endblock %}

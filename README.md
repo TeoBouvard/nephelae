@@ -5,6 +5,7 @@
 
 * [Q/A](#qa)  
 * [User Guide](#user-guide)  
+* [Dev Notes](#dev-notes)  
 * [Miscellaneous](#miscellaneous)  
 * [Todo](#todo) 
 * [Prerequisites](#prerequisites)  
@@ -92,6 +93,14 @@ Not yet implemented because of mapping interface still missing. Will be used to 
 **Commands**
 
 Not yet implemented. Will be used to give high-level orders to the fleet.
+
+---
+
+<a name="dev-notes"></a>
+
+**Dev Notes**
+
+- Current server is Gunicorn. It works great, but there seems to be races conditions when number of workers is not 1. To reproduce the issue, set NWORKERS variable in the `makefile` to  2 or more. Run server and open a tracking tool.
 
 ---
 

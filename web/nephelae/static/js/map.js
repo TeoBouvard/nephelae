@@ -162,19 +162,20 @@ function displayDrones(){
                 var polyline = L.polyline([drone_path], {color : drone_color, weight : '2', dashArray : '5,7'});
                 
                 // Update fleet dictionnary with discovered drone
-                fleet[drone_id] = ({
+                fleet[drone_id] = {
                     id: drone_id,
                     color : drone_color, 
                     position : marker, 
                     altitude : drone_altitude, 
                     heading: drone_heading,
                     path : polyline,
-                    time : drone_time
-                });
+                    time : drone_time,
+                    speed : drone_speed,
+                };
 
                 // Add drone marker to layer group
                 fleet[drone_id].position.setRotationAngle(drone_heading).addTo(uavs_overlay);
-                fleet[drone_id].position.bindPopup(infosToString(drone_id, drone_altitude, drone_heading), {autoClose: false});
+                fleet[drone_id].position.bindPopup(infosToString(fleet[drone_id]));
                 fleet[drone_id].path.addTo(uavs_overlay);
             }
             
@@ -224,7 +225,7 @@ function updateDrones(){
                 drone_to_update.altitude = drone_altitude;
                 drone_to_update.time = drone_time;
 
-                // Update markers
+                // Update markers and popup
                 drone_to_update.position.setLatLng(drone_position).setRotationAngle(drone_heading);
                 drone_to_update.position.setPopupContent(infosToString(drone_to_update));
 
@@ -233,11 +234,11 @@ function updateDrones(){
 
                 // Update time
                 drone_to_update.time = drone_time;
-
             } 
+
             // ... or display error message if drone id does not match -> update fleet dictionnary and start tracking it
             else {
-                console.error("no drone with id ", drone_id, " found !");
+                console.error("no uav with id ", drone_id, " found !");
                 displayDrones();
             }
         }
@@ -302,9 +303,9 @@ function infosToString(uav){
     var infos = '<p style="font-family:Roboto-Light;font-size:14px">';
 
     infos += '<b> UAV ' + uav.id + ' </b><br><br>' ;
-    infos += 'Altitude : ' + uav.altitude + 'm<br> ';
-    infos += 'Heading : ' + uav.heading + '° <br> ';
-    infos += 'Speed : ' + uav.speed + ' m/s <br><br>';
+    infos += 'Altitude : ' + uav.altitude.toFixed(1) + 'm<br> ';
+    infos += 'Heading : ' + uav.heading.toFixed(0) + '° <br> ';
+    infos += 'Speed : ' + uav.speed.toFixed(1) + ' m/s <br><br>';
     infos += '<a onClick="track(' + uav.id + ');" class="btn"><span class="white-text"><b>Sync MesoNH</b></span></a></p>'
 
     return infos;
