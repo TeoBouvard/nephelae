@@ -25,10 +25,10 @@ function discoverFleet(){
 
         for (uav_id of response.uavs) {
             fleet[uav_id] = {};
-
             generateItem(uav_id);
         }
 
+        displayFleet();
     });
 
 
@@ -37,7 +37,6 @@ function discoverFleet(){
 function displayFleet(){
 
     var query = $.param({uav_id: Object.keys(fleet), trail_length: 1});
-    console.log(fleet)
 
     $.getJSON('update/?' + query, (response) => {
 
@@ -59,11 +58,14 @@ function displayFleet(){
                 time : drone_time,
                 speed : drone_speed,
             };
+
+            updateItem(drone_id);
         }
+
         
         // Center map on drone last drone added
         if(Object.keys(fleet).length != 0){
-            setTimeout(displayFleet, 2000);
+            setTimeout(displayFleet, 500);
         } else {
             alert("No UAVs detected, try launching the simulation and restart the server");
             discoverFleet();
@@ -74,8 +76,19 @@ function displayFleet(){
 function generateItem(id){
 
     html = '<div id=' + id + ' class="row"> <div class="col s4"> <div class="card blue-grey darken-1"> <div class="card-content white-text">';
-    html += '<span class="card-title"></span>'
+    html += '<span class="card-title"></span>';
+    html += '<p id="altitude"></p>';
+    html += '<p id="heading"></p>';
+    html += '<p id="speed"></p>';
     html += '</div> </div> </div> </div>';
 
     $('#infolist').append(html);
+}
+
+function updateItem(id){
+    uav = fleet[id];
+    $('#'+id+' .card-title').text('UAV ' + id);
+    $('#'+id+' #altitude').text('altitude ' + uav.altitude.toFixed(1) + 'm');
+    $('#'+id+' #heading').text('heading ' + uav.heading.toFixed(0) + '°');
+    $('#'+id+' #speed').text('speed ' + uav.speed.toFixed(1) + 'm/s');
 }

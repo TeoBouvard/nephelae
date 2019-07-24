@@ -45,12 +45,12 @@
 				<a href="https://github.com/teobouvard/nephelae_gui" class="brand-logo right"><i class="material-icons">cloud</i></a>
 				<a href="#" data-target="small_nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
 				<ul id="large_nav" class="left hide-on-med-and-down">
+					<li id='nav_commands'><a href="{% url 'commands' %}">Fleet</a></li>
 					<li><a class="dropdown-trigger" href="#!" data-target="tracking_dropdown">Tracking<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li><a class="dropdown-trigger" href="#!" data-target="sensor_data_dropdown">Sensor Data<i class="material-icons right">arrow_drop_down</i></a></li>
 					<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
 					<li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li>
 					<li id='nav_sections'><a href="{% url 'sections' %}">Meso NH Analysis</a></li>
-					<li id='nav_commands'><a href="{% url 'commands' %}">Planning</a></li>
 				</ul>
 			</div>
 		</nav>
@@ -72,6 +72,7 @@
 		<!-- vertical navbar for small screens-->
 		
 		<ul class="sidenav" id="small_nav" style="z-index:2000;">
+			<li id='nav_commands'><a href="{% url 'commands' %}">Fleet</a></li>
 			<li id='nav_map'><a href="{% url 'map' %}">2D Tracking</a></li>
 			<li id='nav_simulation'><a href="{% url 'simulation' %}">3D Tracking</a></li>
 			<li id='nav_raw_data'><a href="{% url 'raw_data' %}">Temporal Sensor Data</a></li>
