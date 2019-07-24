@@ -6,18 +6,23 @@ Jinja2
 geopy
 utm
 scipy
+
 #MesoNH Probe -> to be packaged
 sklearn
 sh
 ivy-python
+
 #Server
 channels 
-asgi_redis
-redis
 channels_redis
+redis
+asgi_redis
+
 #Map tile downloader
 aiohttp
+
 # Loading bar
 tqdm
-# NetCDF and operators
+
+# NetCDF
 netCDF4

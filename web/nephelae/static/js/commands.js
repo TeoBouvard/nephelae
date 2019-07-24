@@ -42,7 +42,8 @@ function displayFleet(){
         console.log("message", e);
     };
     socket.onopen = function(e){
-        console.log("open", e);
+        console.log("websocket open", e);
+        socket.send('balance la data');
     };
     socket.onerror = function(e){
         console.log("error", e)

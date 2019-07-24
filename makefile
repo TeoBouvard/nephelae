@@ -65,7 +65,7 @@ requirements :
 	-@apt-get -y install python3-pip redis-server
 
 	@pip3 install wheel
-	@pip3 install -r requirements.txt
+	@pip3 install --user -r requirements.txt
 
 
 purge-maps :
@@ -74,7 +74,7 @@ purge-maps :
 runserver: check-meso
 	$(ECHO) "Starting server on 0.0.0.0:8000"
 #-@cd ./web && python3 manage.py runserver
-	-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log - IHM.asgi:application
+	-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 simulation: check-pprz
 	@$(PAPARAZZI_HOME)/sw/simulator/pprzsim-launch -b 127.255.255.255 -a Microjet_neph_0 -t sim --boot --norc &
