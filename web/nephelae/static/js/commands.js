@@ -36,7 +36,22 @@ function discoverFleet(){
 
 function displayFleet(){
 
-    var query = $.param({uav_id: Object.keys(fleet), trail_length: 1});
+    var socket = new WebSocket('ws://' + window.location.host + '/ws/');
+
+    socket.onmessage = function(e){
+        console.log("message", e);
+    };
+    socket.onopen = function(e){
+        console.log("open", e);
+    };
+    socket.onerror = function(e){
+        console.log("error", e)
+    };
+    socket.onclose = function(e){
+        console.log("close", e)
+    };
+
+    /*var query = $.param({uav_id: Object.keys(fleet), trail_length: 1});
 
     $.getJSON('update/?' + query, (response) => {
 
@@ -70,7 +85,7 @@ function displayFleet(){
             alert("No UAVs detected, try launching the simulation and restart the server");
             discoverFleet();
         }
-    });
+    });*/
 }
 
 function generateItem(id){

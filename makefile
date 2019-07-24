@@ -73,9 +73,8 @@ purge-maps :
 
 runserver: check-meso
 	$(ECHO) "Starting server on 0.0.0.0:8000"
-#-@cd ./web && gunicorn --threads=$(NTHREADS) --workers=$(NWORKERS) --timeout=200 --bind 0.0.0.0:8000 IHM.wsgi
 #-@cd ./web && python3 manage.py runserver
-	-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
+	-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log - IHM.asgi:application
 
 simulation: check-pprz
 	@$(PAPARAZZI_HOME)/sw/simulator/pprzsim-launch -b 127.255.255.255 -a Microjet_neph_0 -t sim --boot --norc &

@@ -14,9 +14,9 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
-IMG_DIR = os.path.join(BASE_DIR,'img')
-TEMPLATE_DIR = os.path.join(BASE_DIR,'templates')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+IMG_DIR = os.path.join(BASE_DIR, 'img')
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -70,9 +70,10 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'IHM.wsgi.application'
-ASGI_APPLICATION = 'IHM.asgi.application'
+# Entrypoints
 
+WSGI_APPLICATION = 'IHM.wsgi.application'
+ASGI_APPLICATION = 'IHM.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -126,10 +127,9 @@ IMAGE_URL = '/img/'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             'hosts': [('localhost', 6379)],
         },
-        'ROUTING': 'IHM.routing.channel_routing',
     }
 }

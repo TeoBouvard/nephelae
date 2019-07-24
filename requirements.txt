@@ -13,6 +13,7 @@ ivy-python
 #Server
 channels 
 asgi_redis
+redis
 channels_redis
 #Map tile downloader
 aiohttp
