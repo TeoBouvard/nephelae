@@ -6,6 +6,8 @@ var parameters = {};
 var chart;
 
 $(document).ready(function(){
+    //google.charts.load('current', {'packages':['timeline']});
+    //google.charts.setOnLoadCallback(setupChart);
 	removeLoader();
 
 	//setupGUI();
@@ -24,15 +26,29 @@ function setupChart(){
 
     dataTable.addColumn({ type: 'string', id: 'UAV' });
     dataTable.addColumn({ type: 'string', id: 'Label' });
-    dataTable.addColumn({ type: 'date', id: 'Start' });
-    dataTable.addColumn({ type: 'date', id: 'End' });
+    dataTable.addColumn({ type: 'number', id: 'Start' });
+    dataTable.addColumn({ type: 'number', id: 'End' });
 
     dataTable.addRows([
-        ['100', 'Idle', new Date(0), new Date(500)],
-        ['101', 'Idle', new Date(0), new Date(200)],
-        ['102', 'Idle', new Date(0), new Date(300)]]);
+        ['100', 'Idle', 0, 10000],
+        ['100', 'Takeoff', 10000, 15000],
+        ['100', 'Survey', 15000, 40000],
+        ['101', 'Idle', 0, 5000],
+        ['101', 'Takeoff', 5000, 10000],
+        ['101', 'Goto S1', 10000, 20000],
+        ['101', 'Idle', 20000, 40000],
+        ['102', 'Idle', 0, 5000],
+        ['102', 'Takeoff', 5000, 10000],
+        ['102', 'Survey', 10000, 40000]]);
 
-    chart.draw(dataTable);
+    // options does not work
+    var options = {
+            fontName: 'Roboto',
+            //colors: ['#cbb69d', '#603913', '#c69c6e'],
+            fontSize: 200,
+    };
+
+    chart.draw(dataTable, options);
 
 }
 

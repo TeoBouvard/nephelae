@@ -5,7 +5,8 @@
 {% block additional_scripts %}
 
 	<script src="{% static 'js/commands.js' %}"></script>
-	<script src="{% static 'js/libs/googleCharts.js' %}"></script>
+	<script src="{% static 'js/libs/googleCharts.js' %}">
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 {% endblock %}
 
@@ -20,19 +21,19 @@
 	</div>
 	{% endcomment %}
 
-	<div class="row">
-		<div class="col s4 free"></div>
-		<div class="col s4 free"></div>
-		<div class="col s4 free"></div>
-	</div>
-
-	<div class="row">
-		<div class="col s4 free"></div>
-		<div class="col s4 free"></div>
-		<div class="col s4 free"></div>
-	</div>
-
 	<div class="container">
+		<div class="row">
+			<div class="col s4 free"></div>
+			<div class="col s4 free"></div>
+			<div class="col s4 free"></div>
+		</div>
+
+		<div class="row">
+			<div class="col s4 free"></div>
+			<div class="col s4 free"></div>
+			<div class="col s4 free"></div>
+		</div>
+
 		<div id="chart"></div>
 	</div>
 
