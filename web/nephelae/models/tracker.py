@@ -1,6 +1,3 @@
-import os
-import sys
-
 import utm
 
 import nephelae_paparazzi.pprzinterface as ppint
@@ -56,11 +53,8 @@ def get_positions(uav_ids, trail_length):
 
         for message in messages:
 
-            position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
-            position.append(message['alt'])
-
-            frame_position = utils.translate_position(position, nav_frame)
-            frame_position.append(message['alt'])
+            position = compute_position(message)
+            frame_position = compute_frame_position(message)
 
             if 'path' not in positions[uav_id]:
                 positions[uav_id]['path'] = [position]
@@ -98,15 +92,34 @@ def get_data(uav_ids, trail_length, variables):
     return dict(data=data)
 
 
-def prettify(message):
-
-    position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
-    position.append(message['alt']),
+def prettify_gps(message):
 
     return dict(
         uav_id=message.uavId,
-        heading=message['course'],
-        position=position,
-        speed=message['speed'],
-        time=int(message['stamp'] - db.navFrame['stamp'])
+        heading=message.course,
+        position=compute_position(message),
+        speed=message.speed,
+        time=int(message.stamp - db.navFrame.stamp)
     )
+
+def prettify_sample(message):
+
+    return dict(
+        uav_id=message.producer,
+        variable_name=message.variableName,
+        position=message.position.data.tolist(),
+        data=message.data,
+    )
+
+
+def compute_position(message):
+    position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
+    position.append(message['alt'])
+    return position
+
+
+def compute_frame_position(message):
+    position = compute_position(message)
+    frame_position = utils.translate_position(position, nav_frame)
+    frame_position.append(message['alt'])
+    return frame_position
