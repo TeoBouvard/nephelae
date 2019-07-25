@@ -188,7 +188,7 @@ function handleMessage(message){
             // update chart range
             var new_range = {
                 xaxis: {
-                range: [message.position[0] - parameters.trail_length, message.position[0]]
+                range: [Math.max((message.position[0] - parameters.trail_length), 0), message.position[0]]
                 }
             };
 
