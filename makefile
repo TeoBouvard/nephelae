@@ -1,7 +1,6 @@
 ECHO = @echo
 FETCH = @curl --silent
-NTHREADS = 1
-NWORKERS = 1
+pip_options=
 
 help:
 	$(ECHO) "- help		: Display this message"
@@ -76,10 +75,10 @@ requirements :
 
 	@git -C ./nephelae_master submodule init
 	@git -C ./nephelae_master submodule update
-	@pip3 install --user wheel
-	@pip3 install ./nephelae_master
+	@pip3 install $(pip_options) wheel
+	@pip3 install $(pip_options) ./nephelae_master
 	@rm -rf ./nephelae_master
-	@pip3 install --user -r requirements.txt
+	@pip3 install $(pip_options) -r requirements.txt
 
 purge-maps :
 	@rm -rf web/nephelae/static/map_tiles/*
