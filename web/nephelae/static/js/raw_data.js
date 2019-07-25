@@ -45,7 +45,7 @@ function setupGUI(){
 
         for (var uav_id of response.uavs){
             parameters['uavs'][uav_id] = true;
-            f2.add(parameters['uavs'], uav_id).name('UAV ' + uav_id);
+            f2.add(parameters['uavs'], uav_id).name('UAV ' + uav_id).onChange(updateData);
         }
 
         for (var tag of response.sample_tags){
@@ -171,27 +171,31 @@ function handleMessage(message){
     // if variable is selected to be visible
     if(parameters.variables[message.variable_name]){
 
-        // identify chart DOM element and compute the trace's index ()
+        // identify chart DOM element and compute the trace's index
         var chart = $('#'+ message.variable_name);
         var trace_index = getTraceIndexByName(chart, message.uav_id);
 
-        // update data
-        var update = {
-            x:  [[message.position[0]]],
-           
-            y: [[message.data[0]]]
-        };
+        // if such a trace exists
+        if (trace_index > -1){
+            
+            // update data
+            var update = {
+                x:  [[message.position[0]]],
+            
+                y: [[message.data[0]]]
+            };
 
-        // update chart range
-        var new_range = {
-            xaxis: {
-            range: [message.position[0] - parameters.trail_length, message.position[0]]
-            }
-        };
+            // update chart range
+            var new_range = {
+                xaxis: {
+                range: [message.position[0] - parameters.trail_length, message.position[0]]
+                }
+            };
 
-        // react to changes
-        Plotly.relayout(message.variable_name, new_range);
-        Plotly.extendTraces(message.variable_name, update, [trace_index]);
+            // react to changes
+            Plotly.relayout(message.variable_name, new_range);
+            Plotly.extendTraces(message.variable_name, update, [trace_index]);
+        }
     }
 }
 
