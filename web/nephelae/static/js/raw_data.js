@@ -16,7 +16,7 @@ var config = {
 
 // Parameters
 var parameters = {
-    trail_length: 60,     // seconds
+    trail_length: 60, // seconds
     streaming: true,
     socket: null,
 }

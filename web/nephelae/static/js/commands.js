@@ -7,14 +7,13 @@ var parameters = {};
 $(document).ready(function(){
 	removeLoader();
 
-	setupGUI();
+	//setupGUI();
     discoverFleet();
 });
 
 function setupGUI(){
     gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
-
 }
 
 function discoverFleet(){
@@ -34,10 +33,6 @@ function displayFleet(){
 
     var socket = new WebSocket('ws://' + window.location.host + '/ws/GPS/');
 
-    socket.onopen = (e) => {
-        console.log("websocket opened", e);
-    };
-
     socket.onmessage = (e) => {
         var message = JSON.parse(e.data);
         fleet[message.uav_id] = {
@@ -49,32 +44,35 @@ function displayFleet(){
         updateItem(message.uav_id);
     };
 
-    socket.onerror = function(e){
-        console.log("error", e)
-    };
-
-    socket.onclose = function(e){
-        console.log("closed websocket", e)
-    };
-
 }
 
 function generateItem(id){
 
-    html = '<div id=' + id + ' class="row"> <div class="col s4"> <div class="card blue-grey darken-1"> <div class="card-content white-text">';
-    html += '<span class="card-title"></span>';
-    html += '<p id="altitude"></p>';
-    html += '<p id="heading"></p>';
-    html += '<p id="speed"></p>';
-    html += '</div> </div> </div> </div>';
+    var html = '<div id="'+ id +'" class="card blue-grey darken-1">';
+        html += '<div class="card-content white-text">';
+            html += '<span id="uav_id" class="card-title left"></span>';
+            html += '<span id="battery" class="card-title right"></span>';
+            html += '<br><br><hr><br>';
+            html += '<p id="altitude"></p>';
+            html += '<p id="heading"></p>';
+            html += '<p id="speed"></p>';
+            html += '<p id="time"></p>';
+        html += '</div>';
+    html += '</div>';
 
-    $('#infolist').append(html);
+    $('.free').first().removeClass("free").append(html);
 }
 
 function updateItem(id){
     uav = fleet[id];
-    $('#'+id+' .card-title').text('UAV ' + id);
+    $('#'+id+' #uav_id').text('UAV ' + id);
+    $('#'+id+' #battery').text(fakeBattery(uav.time).toFixed(0) + '%');
     $('#'+id+' #altitude').text('altitude ' + uav.altitude.toFixed(1) + 'm');
     $('#'+id+' #heading').text('heading ' + uav.heading.toFixed(0) + '°');
     $('#'+id+' #speed').text('speed ' + uav.speed.toFixed(1) + 'm/s');
+}
+
+// THIS IS MEANT TO BE DELETED WHEN A REAL BATTERY ESTIMATION EXISTS
+function fakeBattery(time){
+    return Math.max(100*((1000-time)%1000/1000), 0);
 }
