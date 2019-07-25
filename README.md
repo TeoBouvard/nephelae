@@ -37,7 +37,7 @@ Most of the display tuning is located in the javascript files. You can modify th
   
 
 **I updated the views/models but nothing changes, what is happening ?**  
-For updates concerning server-side files to take place, you have to restart the server. You can `ctrl-C` to stop it, and re-run `make runserver`. Note that this is not necessary when updating client-side files (js, css, html files), as long as browser caching is disabled.
+For updates concerning server-side files to take place, you have to restart the server. You can `ctrl-C` to stop it, and re-run `make runserver`. Note that this is not necessary when updating client-side files (js, css, html files), as long as browser caching is disabled. If you are in developement, use the dev server which reloads automatically by tracking file changes. To do so, switch to dev server in the `makefile`.
   
 
 **Why are all the javascript librairies locally downloaded and not taken from Content Delivery Networks ?**  
@@ -74,9 +74,9 @@ In the controller, `Focus on fleet` will place the camera so that every UAV is v
 
 * Choose the UAVs from which you want to display data by selecting them in the `UAVs` folder of the controller. 
 * Choose the sensor data you want to display in the `Variables` folder of the controller. 
-* Choose the length of the data you want to display in `Controls`. 
-* Select `Streaming` if you want incoming data to be displayed automatically. 
-* You can zoom on the charts by selecting a desired area. Zoom back out by double-clicking on the chart.
+* Choose the length of the data you want to display in `Controls`.
+* Select `Streaming` if you want incoming data to be displayed automatically.
+* While streaming is paused, you can zoom on the charts by selecting a desired area. Zoom back out by double-clicking on the chart.
 
 **Spatial Sensor Data**
 
@@ -92,7 +92,7 @@ Not yet implemented because of mapping interface still missing. Will be used to 
 
 **Commands**
 
-Not yet implemented. Will be used to give high-level orders to the fleet.
+Not yet implemented. Will be used to have an overview of the fleet's state and give high-level orders to the fleet.
 
 ---
 
@@ -100,7 +100,6 @@ Not yet implemented. Will be used to give high-level orders to the fleet.
 
 **Dev Notes**
 
-- Current server is Gunicorn. It works great, but there seems to be races conditions when number of workers is not 1. To reproduce the issue, set NWORKERS variable in the `makefile` to  2 or more. Run server and open a tracking tool.
 
 ---
 

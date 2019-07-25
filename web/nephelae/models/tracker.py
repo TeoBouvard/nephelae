@@ -1,5 +1,3 @@
-import os
-import sys
 
 import utm
 
@@ -26,8 +24,6 @@ from . import utils
 
 
 db = DatabasePlayer('/home/arthurdent/Documents/dev/nephelae/nephelae_mapping/tests/output/database02.neph')
-# db = DatabasePlayer('/home/pnarvor/work/nephelae/code/nephelae_mapping/tests/output/database01.neph')
-# db = DatabasePlayer('/home/pnarvor/work/nephelae/code/nephelae_mapping/tests/output/database02.neph')
 db.play(looped=True)
 
 
@@ -56,11 +52,8 @@ def get_positions(uav_ids, trail_length):
 
         for message in messages:
 
-            position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
-            position.append(message['alt'])
-
-            frame_position = utils.translate_position(position, nav_frame)
-            frame_position.append(message['alt'])
+            position = utils.compute_position(message)
+            frame_position = utils.compute_frame_position(message, nav_frame)
 
             if 'path' not in positions[uav_id]:
                 positions[uav_id]['path'] = [position]
@@ -96,3 +89,24 @@ def get_data(uav_ids, trail_length, variables):
                     data[uav_id][message.variableName]['values'].append(message.data[0])
     
     return dict(data=data)
+
+
+def prettify_gps(message):
+
+    return dict(
+        uav_id=message.uavId,
+        heading=message.course,
+        position=utils.compute_position(message),
+        speed=message.speed,
+        time=int(message.stamp - db.navFrame.stamp)
+    )
+
+
+def prettify_sample(message):
+
+    return dict(
+        uav_id=message.producer,
+        variable_name=message.variableName,
+        position=message.position.data.tolist(),
+        data=message.data,
+    )
