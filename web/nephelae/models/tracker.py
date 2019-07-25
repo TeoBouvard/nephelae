@@ -1,4 +1,4 @@
-
+import os
 import utm
 
 import nephelae_paparazzi.pprzinterface as ppint
@@ -14,12 +14,8 @@ from . import utils
 #    uav.add_gps_observer(db)
 #    return uav
 #
-#interface = ppint.PprzSimulation(os.environ['MESO_NH'],
-#                                 ['RCT', 'WT'],
-#                                 build_uav_callback=build_uav)
+#interface = ppint.PprzSimulation(os.environ['MESO_NH'], ['RCT', 'WT'], build_uav_callback=build_uav)
 #interface.start()
-## Has to be called after interface.start()
-## (block execution until a NAVIGATION_REF message is received, won't receive if not started.)
 #db.set_navigation_frame(interface.navFrame)
 
 

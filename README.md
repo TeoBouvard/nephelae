@@ -47,6 +47,9 @@ This web application is supposed to be used in remote places without any interne
 **I do not have a Meso_NH.nc file, what can I do ?**  
 You can download a copy from [their website](http://mesonh.aero.obs-mip.fr/mesonh54). However, if you don't feel like downloading such a big file, you can reference any `*.nc` file with your `$MESO_NH` environment variable, and it will *work*.
 
+**I don't want to install paparazzi but want a demo, what can I do ?**  
+I will upload a Paparazzi simultion to have a *standalone* demo in the future.
+
 ---
 
 <a name="user-guide"></a>
@@ -107,15 +110,15 @@ Not yet implemented. Will be used to have an overview of the fleet's state and g
 
 ### Todo
 
-- requête repère mobile au mapping
 - requête box au mapping
 - bounds to json
 - reduce array size in image overlay (memory problems?)
+- limit display radius in map or sparse matrix ? can't find a way 
 - simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
-- limit display radius in map or sparse matrix ? can't find a way 
 - get_positions parameters (real | simulation)
 - commands + scheduling
+- ability to focus on single uav in 3d
 
 - k-means clustering, then convex hull ?
 - why is message.data an array ? (3d data ?)
@@ -137,6 +140,6 @@ Not yet implemented. Will be used to have an overview of the fleet's state and g
 ### Prerequisites  
 
 - A running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). 
-- A Meso_NH file referenced by `$MESO_NH`. 
+- A Meso_NH file referenced by `$MESO_NH`.
 
 </p>

@@ -34,7 +34,7 @@ assets :
 	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_ui_module.js' >> web/nephelae/static/js/libs/googleCharts.js
 	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_fw_module.js' >> web/nephelae/static/js/libs/googleCharts.js
 	$(FETCH) 'https://www.gstatic.com/charts/46.2/third_party/dygraphs/dygraph-tickers-combined.js' >> web/nephelae/static/js/libs/googleCharts.js
-	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_gantt_module.js' >> web/nephelae/static/js/libs/googleCharts.js
+	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_timeline_module.js' >> web/nephelae/static/js/libs/googleCharts.js
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Downloading css files ... "

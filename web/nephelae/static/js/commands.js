@@ -3,17 +3,37 @@ $('#nav_commands').addClass('active');
 
 var fleet = {};
 var parameters = {};
+var chart;
 
 $(document).ready(function(){
 	removeLoader();
 
 	//setupGUI();
+    setupChart();
     discoverFleet();
 });
 
 function setupGUI(){
     gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
+}
+
+function setupChart(){
+    chart = new google.visualization.Timeline($('#chart')[0]);
+    var dataTable = new google.visualization.DataTable();
+
+    dataTable.addColumn({ type: 'string', id: 'UAV' });
+    dataTable.addColumn({ type: 'string', id: 'Label' });
+    dataTable.addColumn({ type: 'date', id: 'Start' });
+    dataTable.addColumn({ type: 'date', id: 'End' });
+
+    dataTable.addRows([
+        ['100', 'Idle', new Date(0), new Date(500)],
+        ['101', 'Idle', new Date(0), new Date(200)],
+        ['102', 'Idle', new Date(0), new Date(300)]]);
+
+    chart.draw(dataTable);
+
 }
 
 function discoverFleet(){
