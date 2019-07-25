@@ -96,3 +96,17 @@ def get_data(uav_ids, trail_length, variables):
                     data[uav_id][message.variableName]['values'].append(message.data[0])
     
     return dict(data=data)
+
+
+def prettify(message):
+
+    position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
+    position.append(message['alt']),
+
+    return dict(
+        uav_id=message.uavId,
+        heading=message['course'],
+        position=position,
+        speed=message['speed'],
+        time=int(message['stamp'] - db.navFrame['stamp'])
+    )
