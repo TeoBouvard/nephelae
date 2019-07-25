@@ -177,7 +177,7 @@ function handleMessage(message){
 
         // if such a trace exists
         if (trace_index > -1){
-            
+
             // update data
             var update = {
                 x:  [[message.position[0]]],

@@ -74,9 +74,9 @@ In the controller, `Focus on fleet` will place the camera so that every UAV is v
 
 * Choose the UAVs from which you want to display data by selecting them in the `UAVs` folder of the controller. 
 * Choose the sensor data you want to display in the `Variables` folder of the controller. 
-* Choose the length of the data you want to display in `Controls`. 
-* Select `Streaming` if you want incoming data to be displayed automatically. 
-* You can zoom on the charts by selecting a desired area. Zoom back out by double-clicking on the chart.
+* Choose the length of the data you want to display in `Controls`.
+* Select `Streaming` if you want incoming data to be displayed automatically.
+* While streaming is paused, you can zoom on the charts by selecting a desired area. Zoom back out by double-clicking on the chart.
 
 **Spatial Sensor Data**
 

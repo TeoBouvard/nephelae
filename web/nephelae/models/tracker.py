@@ -1,3 +1,4 @@
+
 import utm
 
 import nephelae_paparazzi.pprzinterface as ppint
@@ -23,8 +24,6 @@ from . import utils
 
 
 db = DatabasePlayer('/home/arthurdent/Documents/dev/nephelae/nephelae_mapping/tests/output/database02.neph')
-# db = DatabasePlayer('/home/pnarvor/work/nephelae/code/nephelae_mapping/tests/output/database01.neph')
-# db = DatabasePlayer('/home/pnarvor/work/nephelae/code/nephelae_mapping/tests/output/database02.neph')
 db.play(looped=True)
 
 
@@ -53,8 +52,8 @@ def get_positions(uav_ids, trail_length):
 
         for message in messages:
 
-            position = compute_position(message)
-            frame_position = compute_frame_position(message)
+            position = utils.compute_position(message)
+            frame_position = utils.compute_frame_position(message, nav_frame)
 
             if 'path' not in positions[uav_id]:
                 positions[uav_id]['path'] = [position]
@@ -97,10 +96,11 @@ def prettify_gps(message):
     return dict(
         uav_id=message.uavId,
         heading=message.course,
-        position=compute_position(message),
+        position=utils.compute_position(message),
         speed=message.speed,
         time=int(message.stamp - db.navFrame.stamp)
     )
+
 
 def prettify_sample(message):
 
@@ -110,16 +110,3 @@ def prettify_sample(message):
         position=message.position.data.tolist(),
         data=message.data,
     )
-
-
-def compute_position(message):
-    position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
-    position.append(message['alt'])
-    return position
-
-
-def compute_frame_position(message):
-    position = compute_position(message)
-    frame_position = utils.translate_position(position, nav_frame)
-    frame_position.append(message['alt'])
-    return frame_position
