@@ -93,9 +93,10 @@ This tool is used to explore MesoNH files by displaying cross sections at a give
 
 Not yet implemented because of mapping interface still missing. Will be used to display macro informations about the cloud being explored.
 
-**Commands**
+**Fleet**
 
-Not yet implemented. Will be used to have an overview of the fleet's state and give high-level orders to the fleet.
+Displays current state of the fleet, with tasks assigned to each UAV.
+In the future, you will be able to assign task via the controller. 
 
 ---
 
@@ -103,6 +104,7 @@ Not yet implemented. Will be used to have an overview of the fleet's state and g
 
 **Dev Notes**
 
+- Clients can initiate download of files on the server (map tiles). I think that this is particularly bad design, but it's mostly due to the fact that this app is supposed to be used without internet connection, and by running server and client on the same machine. If you think there is a better way to download map tiles for offline use, feel free to open an issue.
 
 ---
 
