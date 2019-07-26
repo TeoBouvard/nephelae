@@ -1,23 +1,59 @@
 // Activate current menu in nav
 $('#nav_commands').addClass('active');
 
-var fleet = {};
-var parameters = {};
-var chart;
+var gui, gui_commands, chart;
+
+var parameters = {
+    fleet: {},
+    commands: ['Vertical Profile', 'Horizontal Slice', 'Volumetric Flow Rate'],
+    allocation: ['Automatic', 'Manual'],
+};
+
 
 $(document).ready(function(){
-    //google.charts.load('current', {'packages':['timeline']});
-    //google.charts.setOnLoadCallback(setupChart);
 	removeLoader();
 
-	//setupGUI();
-    setupChart();
     discoverFleet();
+    setupChart();
 });
 
 function setupGUI(){
     gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
+
+    gui_commands = gui.addFolder("Commands")
+    gui_commands.add(parameters, 'commands', parameters.commands)
+        .setValue(parameters.commands[0])
+        .name('Command')
+        .onChange((selectedCommand) => updateGUI(selectedCommand));
+
+    
+    updateGUI(parameters.commands);
+}
+
+function updateGUI(selectedCommand){
+
+    $('.dg li.title').next().nextAll().remove();
+
+    switch (selectedCommand) {
+
+        case 'Vertical Profile':
+
+            gui_commands.add({fleet:Object.keys(parameters.fleet)}, 'fleet', Object.keys(parameters.fleet))
+                .name("UAV")
+                .setValue(Object.keys(parameters.fleet)[0]);
+
+            break;
+            
+        case 'Horizontal Slice':
+
+            gui_commands.add({altitude:500}, 'altitude', 0, 2000).name('Altitude');
+
+        break;
+    
+        default:
+            break;
+    }
 }
 
 function setupChart(){
@@ -29,6 +65,7 @@ function setupChart(){
     dataTable.addColumn({ type: 'number', id: 'Start' });
     dataTable.addColumn({ type: 'number', id: 'End' });
 
+    //fake data
     dataTable.addRows([
         ['100', 'Idle', 0, 10000],
         ['100', 'Takeoff', 10000, 15000],
@@ -41,11 +78,11 @@ function setupChart(){
         ['102', 'Takeoff', 5000, 10000],
         ['102', 'Survey', 10000, 40000]]);
 
-    // options does not work
+    // font options does not work ?
     var options = {
             fontName: 'Roboto',
-            //colors: ['#cbb69d', '#603913', '#c69c6e'],
-            fontSize: 200,
+            //colors: [ 'teal'],
+            fontSize: '200px',
     };
 
     chart.draw(dataTable, options);
@@ -57,10 +94,11 @@ function discoverFleet(){
     $.getJSON('discover/', (response) => {
 
         for (uav_id of response.uavs) {
-            fleet[uav_id] = {};
+            parameters.fleet[uav_id] = {};
             generateItem(uav_id);
         }
 
+        setupGUI();
         displayFleet();
     });
 }
@@ -71,7 +109,7 @@ function displayFleet(){
 
     socket.onmessage = (e) => {
         var message = JSON.parse(e.data);
-        fleet[message.uav_id] = {
+        parameters.fleet[message.uav_id] = {
             altitude : message.position[2], 
             heading: message.heading,
             time : message.time,
@@ -89,10 +127,9 @@ function generateItem(id){
             html += '<span id="uav_id" class="card-title left"></span>';
             html += '<span id="battery" class="card-title right"></span>';
             html += '<br><br><hr><br>';
-            html += '<p id="altitude"></p>';
-            html += '<p id="heading"></p>';
-            html += '<p id="speed"></p>';
-            html += '<p id="time"></p>';
+            html += '<span class="left">Altitude</span><p id="altitude" class="right"></p><br>';
+            html += '<span class="left">Heading</span><p id="heading" class="right"></p><br>';
+            html += '<span class="left">Speed</span><p id="speed" class="right"></p><br>';
         html += '</div>';
     html += '</div>';
 
@@ -100,12 +137,12 @@ function generateItem(id){
 }
 
 function updateItem(id){
-    uav = fleet[id];
+    uav = parameters.fleet[id];
     $('#'+id+' #uav_id').text('UAV ' + id);
     $('#'+id+' #battery').text(fakeBattery(uav.time).toFixed(0) + '%');
-    $('#'+id+' #altitude').text('altitude ' + uav.altitude.toFixed(1) + 'm');
-    $('#'+id+' #heading').text('heading ' + uav.heading.toFixed(0) + '°');
-    $('#'+id+' #speed').text('speed ' + uav.speed.toFixed(1) + 'm/s');
+    $('#'+id+' #altitude').text(uav.altitude.toFixed(1) + 'm');
+    $('#'+id+' #heading').text(uav.heading.toFixed(0) + '°');
+    $('#'+id+' #speed').text(uav.speed.toFixed(1) + 'm/s');
 }
 
 // THIS IS MEANT TO BE DELETED WHEN A REAL BATTERY ESTIMATION EXISTS

@@ -4,24 +4,24 @@
 
 {% block additional_scripts %}
 
+	<script src="{% static 'js/libs/googleCharts.js' %}"></script>
 	<script src="{% static 'js/commands.js' %}"></script>
-	<script src="{% static 'js/libs/googleCharts.js' %}">
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 {% endblock %}
 
 {% block page %}
 
 	
-	{% comment '' %}
-	<!-- Display controller -->
+    <!-- Display controller -->
+	
 	<div id="draggable" class="small-container">
 		<i class="material-icons" style="color:white;">reorder</i>
     	<div id="gui_container"></div>
 	</div>
-	{% endcomment %}
 
 	<div class="container">
+
+		<!-- 2*3 fleet grid -->
 		<div class="row">
 			<div class="col s4 free"></div>
 			<div class="col s4 free"></div>
@@ -34,8 +34,10 @@
 			<div class="col s4 free"></div>
 		</div>
 
+		<!-- Allocation chart -->
 		<div id="chart"></div>
+
 	</div>
 
-	
+
 {% endblock %}

@@ -2,16 +2,22 @@ ECHO = @echo
 FETCH = @curl --silent
 pip_options=
 
+
 help:
 	$(ECHO) "- help		: Display this message"
-	$(ECHO) "- install	: Run installation script"
+	$(ECHO) "- full-install	: Install server, requirements and assets"
+	$(ECHO) "- install	: Donwload requirements and external assets"
 	$(ECHO) "- purge-maps	: Delete all downloaded maps"
+	$(ECHO) "- purge-assets	: Delete external assets"
 	$(ECHO) "- runserver	: Run server"
 	$(ECHO) "- simulation	: Launch paparazzi simulation"
 
-install: assets requirements
 
 full-install: sudo-requirements install
+
+
+install: assets requirements
+
 
 assets : 
 	$(ECHO) -n "Creating static folders ... "
@@ -61,8 +67,10 @@ assets :
 	@sed -i 's/src.*/src:url("icons\/MaterialIcons-Regular.ttf") format("truetype");/g' web/nephelae/static/css/libs/material-icons.css
 	$(ECHO) "OK"
 
+
 sudo-requirements:
 	-@apt-get -y install python3-pip redis-server
+
 
 requirements : 
 	$(ECHO) -n "Installing requirements ... "
@@ -80,8 +88,13 @@ requirements :
 	@rm -rf ./nephelae_master
 	@pip3 install $(pip_options) -r requirements.txt
 
+
 purge-maps :
 	@rm -rf web/nephelae/static/map_tiles/*
+
+purge-assets :
+	@rm -rf web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons
+
 
 runserver: check-meso
 	$(ECHO) "Starting server on 0.0.0.0:8000"
@@ -90,6 +103,7 @@ runserver: check-meso
 #prod server 
 #-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
+
 simulation: check-pprz
 	@$(PAPARAZZI_HOME)/sw/simulator/pprzsim-launch -b 127.255.255.255 -a Microjet_neph_0 -t sim --boot --norc &
 	@$(PAPARAZZI_HOME)/sw/simulator/pprzsim-launch -b 127.255.255.255 -a Microjet_neph_1 -t sim --boot --norc &
@@ -97,10 +111,12 @@ simulation: check-pprz
 	@$(PAPARAZZI_HOME)/sw/ground_segment/cockpit/gcs -layout large_left_col.xml &
 	@$(PAPARAZZI_HOME)/sw/ground_segment/tmtc/server -n
 
+
 check-meso:
 ifndef MESO_NH
 	$(error MESO_NH is not defined)
 endif
+
 
 check-pprz:
 ifndef PAPARAZZI_HOME

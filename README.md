@@ -117,7 +117,6 @@ Not yet implemented. Will be used to have an overview of the fleet's state and g
 - simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - get_positions parameters (real | simulation)
-- commands + scheduling
 - ability to focus on single uav in 3d
 
 - k-means clustering, then convex hull ?
