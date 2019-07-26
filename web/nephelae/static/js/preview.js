@@ -37,7 +37,7 @@ function setupGUI(){
         .name("Sensor variable")
         .onChange(drawPlot);
 
-        for (var uav_id of response.fleet){
+        for (var uav_id of response.uavs){
             parameters['fleet'][uav_id] = true;
             f2.add(parameters['fleet'], uav_id).name('UAV ' + uav_id).onChange(drawPlot);
         }
