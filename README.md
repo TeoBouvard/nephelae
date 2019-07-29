@@ -106,6 +106,7 @@ In the future, you will be able to assign task via the controller.
 
 - Clients can initiate download of files on the server (map tiles). I think that this is particularly bad design, but it's mostly due to the fact that this app is supposed to be used without internet connection, and by running server and client on the same machine. If you think there is a better way to download map tiles for offline use, feel free to open an issue.
 - Data streaming with websockets (on dev server) seems to struggle when 4-5 UAVs are sending their messages through it. It could be wise to split streaming into multiple websockets, maybe one for each UAV ?
+- WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 
 ---
 

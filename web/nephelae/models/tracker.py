@@ -76,10 +76,10 @@ def get_data(uav_ids, trail_length, variables):
                 if uav_id not in data.keys():
                     data[uav_id] = dict()
                 elif message.variableName not in data[uav_id].keys():
-                    data[uav_id][message.variableName] = dict(
-                        positions=[message.position.data.tolist()],
-                        values=[message.data[0]],
-                    )
+                    data[uav_id][message.variableName] = {
+                        'positions': [message.position.data.tolist()],
+                        'values': [message.data[0]],
+                    }
                 else:
                     data[uav_id][message.variableName]['positions'].append(message.position.data.tolist())
                     data[uav_id][message.variableName]['values'].append(message.data[0])

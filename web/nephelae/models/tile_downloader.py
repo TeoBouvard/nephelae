@@ -64,13 +64,20 @@ async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east)
         
             print("Sending requests for zoom level", z, "...")
 
-            responses = [await r for r in tqdm(asyncio.as_completed(tasks), total=len(tasks))]
+            # await list comprehensions not supported in Python 3.5
+            #responses = [await r for r in tqdm(asyncio.as_completed(tasks), total=len(tasks))
+            responses = []
+            for task in tqdm(asyncio.as_completed(tasks)):
+                response = await task
+                responses.append(response)
+
             found_responses = [r for r in responses if r is not None]
 
             print("Writing images to disk ...")
 
             for response in found_responses:
-                f = open(response['filename'], 'wb')
+                # open requires a string in pyton 3.5, not path
+                f = open(str(response['filename']), 'wb')
                 f.write(response['image'])
                 saved_images += 1
                 f.close()
@@ -119,7 +126,7 @@ def dl(map_bounds):
 
 if __name__ == "__main__":
 
-    zoom_min, zoom_max = 5, 16
+    zoom_min, zoom_max = 5, 12
     lat_north, lon_east = 44, 4
     lat_south, lon_west = 42, 0
 
