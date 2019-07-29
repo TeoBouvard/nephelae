@@ -73,7 +73,7 @@ function setupGUI(){
 function setupMap(){
 
     // Map
-    flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 18, minZoom: 13});
+    flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 18, minZoom: 12});
     flight_map.on('moveend', updateLayerBounds);
 
     // Home button

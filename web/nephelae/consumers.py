@@ -1,4 +1,5 @@
 import json
+import urllib
 
 from channels.generic.websocket import WebsocketConsumer
 
@@ -31,6 +32,7 @@ class GPSConsumer(WebsocketConsumer):
 class SensorConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
+        self.id = urllib.parse.parse_qs(self.scope['query_string'].decode('utf8'))['uav_id'][0]
         tracker.db.add_sensor_observer(self)
 
 
@@ -38,7 +40,6 @@ class SensorConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        print(message)
 
 
     def disconnect(self, close_code):
@@ -47,5 +48,6 @@ class SensorConsumer(WebsocketConsumer):
 
 
     def add_sample(self, sample):
-        message = tracker.prettify_sample(sample)
-        self.send(json.dumps(message))
+        if sample.producer == self.id:
+            message = tracker.prettify_sample(sample)
+            self.send(json.dumps(message))

@@ -18,7 +18,7 @@ var config = {
 var parameters = {
     trail_length: 60, // seconds
     streaming: true,
-    socket: null,
+    sockets: [],
 }
 
 $(document).ready(function(){
@@ -45,6 +45,9 @@ function setupGUI(){
 
         for (var uav_id of response.uavs){
             parameters['uavs'][uav_id] = true;
+            var socket = new WebSocket('ws://' + window.location.host + '/ws/sensor/?uav_id='+ uav_id);
+            socket.onmessage = (e) => handleMessage(JSON.parse(e.data));
+            parameters.sockets.push(socket);
             f2.add(parameters['uavs'], uav_id).name('UAV ' + uav_id).onChange(updateData);
         }
 
@@ -105,16 +108,18 @@ function updateData(){
 
                 variable_name in data ? data[variable_name].push(new_data) : data[variable_name] = [new_data];
 
+                console.log(parameters)
+                if (parameters.streaming && parameters.sockets == []) {
+                    var socket = new WebSocket('ws://' + window.location.host + '/ws/sensor/?uav_id='+ uav_id);
+                    socket.onmessage = (e) => handleMessage(JSON.parse(e.data));
+                    parameters.sockets.push(socket);
+                }
             }
         }
 
         // Update charts
         updateCharts(data);
 
-        if (parameters.streaming && parameters.socket == null) {
-            parameters.socket = new WebSocket('ws://' + window.location.host + '/ws/sensor/');
-            parameters.socket.onmessage = (e) => handleMessage(JSON.parse(e.data));
-        }
 
         removeLoader();
     });
@@ -130,8 +135,10 @@ function toggleStreaming(state){
     if (state){
         updateData();
     } else {
-        parameters.socket.close();
-        parameters.socket = null;
+        for (socket of parameters.sockets){
+            socket.close();
+        }
+        parameters.sockets = [];
     }  
 }
 
@@ -188,7 +195,7 @@ function handleMessage(message){
             // update chart range
             var new_range = {
                 xaxis: {
-                range: [Math.max((message.position[0] - parameters.trail_length), 0), message.position[0]]
+                    range: [Math.max((message.position[0] - parameters.trail_length), 0), message.position[0]]
                 }
             };
 

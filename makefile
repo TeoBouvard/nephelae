@@ -99,9 +99,9 @@ purge-assets :
 runserver: check-meso
 	$(ECHO) "Starting server on 0.0.0.0:8000"
 #dev server
-	-@cd ./web && python3 manage.py runserver
+#-@cd ./web && python3 manage.py runserver
 #prod server 
-#-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
+	-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
 simulation: check-pprz
