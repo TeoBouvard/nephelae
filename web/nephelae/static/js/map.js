@@ -42,37 +42,31 @@ function setupGUI(){
     var gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
-    // Get sliders range
-    $.getJSON('box/', (response) => {
-        
-        // Parse response
-        var min_altitude = Math.ceil(response[1].min);
-        var max_altitude = Math.floor(response[1].max);
+    var min_altitude = 15;
+    var max_altitude = 2000;
 
-        // Setup GUI
-        var f1 = gui.addFolder('Options');
-        var f2 = gui.addFolder('Layer colors');
-        var f3 = gui.addFolder('Tools');
+    // Setup GUI
+    var f1 = gui.addFolder('Options');
+    var f2 = gui.addFolder('Layer colors');
+    var f3 = gui.addFolder('Tools');
 
-        f1.add(parameters, 'refresh_rate', 500, 3000).step(100).name('Delay (ms)');
-        f1.add(parameters, 'altitude', min_altitude, max_altitude)
-            .step(1)
-            .name('Altitude (m)')
-            .onFinishChange(() => {track(-1); updateWindData();})
-            .listen();
-        f1.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
-        f1.add(parameters, 'update_wind').name('Update wind');
+    f1.add(parameters, 'refresh_rate', 500, 3000).step(100).name('Delay (ms)');
+    f1.add(parameters, 'altitude', min_altitude, max_altitude)
+        .step(1)
+        .name('Altitude (m)')
+        .onFinishChange(() => {track(-1); updateWindData();})
+        .listen();
+    f1.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
+    f1.add(parameters, 'update_wind').name('Update wind');
 
-        f2.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
-        f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
-        f2.add(parameters, 'transparent').name('Transparent');
+    f2.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
+    f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
+    f2.add(parameters, 'transparent').name('Transparent');
 
-        f3.add(parameters, 'dl_map').name('Download IGN map');
+    f3.add(parameters, 'dl_map').name('Download IGN map');
 
-
-        // Once sliders are initialized -> create map
-        setupMap();
-    });
+    // Create map once sliders are initialized
+    setupMap();
 }
 
 
@@ -122,7 +116,7 @@ function setupMap(){
     // Add layers to the map
     L.control.layers(base_layers, overlays, {position: 'bottomright'}).addTo(flight_map);
 
-    // Display everything on initialization
+    // Display everything (except wind) on initialization 
     for(key in overlays) if(key != "Wind") overlays[key].addTo(flight_map);
     tiles_overlay_IGN.addTo(flight_map);
 
@@ -251,11 +245,6 @@ function updateDrones(){
 
 }
 
-function updateURL(){
-    cloud_overlay.setUrl('clouds_img/?'+ computeURL());
-    thermals_overlay.setUrl('thermals_img/?'+ computeURL());
-}
-
 function updateLayerBounds(){
     cloud_overlay.setBounds(flight_map.getBounds());
     thermals_overlay.setBounds(flight_map.getBounds());
@@ -266,6 +255,12 @@ function updateLayerBounds(){
     // Change checkbox style dynamically (fucking materialize framework)
     $(':checkbox').addClass('filled-in');
 }
+
+function updateURL(){
+    cloud_overlay.setUrl('clouds_img/?'+ computeURL());
+    thermals_overlay.setUrl('thermals_img/?'+ computeURL());
+}
+
 
 function computeURL(){
 
@@ -313,15 +308,10 @@ function infosToString(uav){
 
 // Attach or remove tracked uav in parameters
 function track(id){
-    if (id == -1){
-        parameters.tracked_drone = null;
-    } else {
-        parameters.tracked_drone = fleet[id];
-    }
+    (id == -1) ? parameters.tracked_drone = null : parameters.tracked_drone = fleet[id];
 }
 
 function updateWindData() {
-
     // Request updated data from the server
     $.getJSON('wind/?' + computeURL(), (response) => {
         wind_overlay.setData(response);

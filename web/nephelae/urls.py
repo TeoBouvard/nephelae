@@ -5,7 +5,7 @@ from . import views
 
 urlpatterns = [
     # URL for empty path
-    path('', RedirectView.as_view(url='preview')),
+    path('', RedirectView.as_view(url='commands')),
 
     # URL for preview page, update requests routed to map update view
     path('preview/', views.preview, name='preview'),

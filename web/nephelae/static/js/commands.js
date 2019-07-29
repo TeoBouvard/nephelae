@@ -117,7 +117,8 @@ function setupChart(){
         ['101', 'Idle', 20000, 40000],
         ['102', 'Idle', 0, 5000],
         ['102', 'Takeoff', 5000, 10000],
-        ['102', 'Survey', 10000, 40000]]);
+        ['102', 'Survey', 10000, 40000],
+        ['103', 'Idle', 0, 40000]]);
 
     // font options does not work ?
     var options = {

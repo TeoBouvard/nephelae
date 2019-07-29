@@ -32,6 +32,7 @@ function setupGUI(){
     var gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
+    // Wwait for every ajax call to finish
     $.when(
 
         $.getJSON('box/', (response) => {

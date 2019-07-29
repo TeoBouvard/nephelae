@@ -32,7 +32,7 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Controls');
 
-    f1.add(parameters, 'trail_length', 10, 2000).step(1).name("Log length (s)").onChange(updateData);
+    f1.add(parameters, 'trail_length', 10, 2000).step(1).name("Log length (s)").onFinishChange(updateData);
     f1.add(parameters, 'streaming').name("Streaming").onChange((state) => toggleStreaming(state));
 
     var f2 = gui.addFolder('UAVs');

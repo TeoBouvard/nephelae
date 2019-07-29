@@ -3,7 +3,7 @@ document.getElementById('nav_profiles').className = 'active';
 
 // Chart style and options
 var chart_height = 550;
-var max_alt = 5;
+var max_alt = 3;
 var max_temp = 40;
 var lm = 60;
 var rm = 30;
@@ -32,7 +32,6 @@ var config = {
 };
 
 // Keep track of chart state
-var isAlreadyDrawn = false;
 var refresh_rate = 2000; // ms
 
 $(document).ready(function(){
@@ -48,16 +47,12 @@ function updateData(){
         console.log('data received');
     
 
-        if(isAlreadyDrawn){
-            updateCharts(data);
+
+        if(data.length == 0){
+            //alert("No data received from the server, try refreshing the page");
         } else {
-            if(data.length == 0){
-                //alert("No data received from the server, try refreshing the page");
-            } else {
-                initializeCharts(data);
-                isAlreadyDrawn = true;
-                setInterval(updateData, refresh_rate);
-            }
+            updateCharts(data);
+            setTimeout(updateData, refresh_rate);
         }
     });
 }
@@ -65,10 +60,5 @@ function updateData(){
 function updateCharts(data){
     Plotly.react('temperature_chart', data.temperature, layouts.temperature, config);
     Plotly.react('humidity_chart', data.humidity, layouts.humidity, config);
-}
-
-function initializeCharts(data){
-    Plotly.newPlot('temperature_chart', data.temperature, layouts.temperature, config);
-    Plotly.newPlot('humidity_chart', data.humidity, layouts.humidity, config)
 }
 

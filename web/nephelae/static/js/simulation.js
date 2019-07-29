@@ -14,7 +14,7 @@ var then = new Date();
 // Parameters
 var parameters = {
 	refresh_rate: 500,
-	trail_length: 60,
+	trail_length: 10,
 	fleet_visibility: true,
 	fleet_focus: fitCameraToFleet,
 }
@@ -34,7 +34,7 @@ function setupGUI(){
 	var f2 = gui.addFolder('Layers');
 
     f1.add(parameters, 'refresh_rate', 500, 3000).step(100).name('Delay (ms)');
-    f1.add(parameters, 'trail_length', 0, 120).step(5).name('Trail');
+    f1.add(parameters, 'trail_length', 0, 60).step(5).name('Trail');
 	f1.add(parameters, 'fleet_focus').name('Focus on fleet');
 
 	f2.add(parameters, 'fleet_visibility').onChange(toggleFleetVisibility).name('Fleet');

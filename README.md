@@ -25,7 +25,7 @@ Clone the repo, cd into it and `make install`. You can get all the `make` target
 
 
 **How do I run it ?**  
-Once installed (make sure to check the prerequisites), you can launch the server by running [`make runserver`]. You can then open a web browser (chrome or chromium preferably) and go to [localhost:8000](http://localhost:8000). As the server broadcasts on the whole network, you can use this interface from every computer on the network, by changing `localhost` to the server's IP address in the URL.
+Once installed (make sure to check the prerequisites), you can launch the server by running `make runserver`. You can then open a web browser (chrome or chromium preferably) and go to [localhost:8000](http://localhost:8000). As the server broadcasts on the whole network, you can use this interface from every computer on the network, by changing `localhost` to the server's IP address in the URL.
   
 
 **How does it work ?**  
@@ -144,3 +144,8 @@ In the future, you will be able to assign task via the controller.
 - A Meso_NH file referenced by `$MESO_NH`.
 
 </p>
+
+mesures : flux de masse pour chaque section horizontale lwc, wt en priorité
+base 500-700 -> top 2000 -> ceiling 3km / wind 9m/s
+cellometer for box ?
+typage drones 
