@@ -8,7 +8,12 @@ def discover(request):
     return JsonResponse(tracker.discover(), safe=False)
 
 
-# Update UAV fleet positions
+# Get sections/map sliders bounds in mesonh analysis tool
+def mesonh_box(request):
+    return JsonResponse(hypercube.box(), safe=False)
+
+
+# Get UAV fleet positions
 def get_positions(request):
 
     # Parse request parameters
@@ -31,11 +36,6 @@ def get_sensor_data(request):
     return JsonResponse(tracker.get_data(uav_ids, trail_length, variables))
 
 
-# Get sections/map sliders bounds, bad design for now ..
-def mesonh_box(request):
-    return JsonResponse(hypercube.box(), safe=False)
-
-
 # Update MesoNH hyperslabs
 def get_section(request):
 
@@ -51,7 +51,7 @@ def get_section(request):
     return response
 
 
-# Data updates
+# TODO implement these methods when mapping exists TODO #
 def update_profiles(request):
     data = {}
     return JsonResponse(data)
@@ -81,7 +81,6 @@ def wind_data(request):
         float(query.getlist('origin[]')[0]),
         float(query.getlist('origin[]')[1])
     ]
-
 
     data = hypercube.get_wind(time_value, altitude_value, map_bounds, origin)
     return JsonResponse(data, safe=False)

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from netCDF4 import MFDataset
 
+from PIL import Image
 from nephelae_simulation.mesonh_interface import MesoNHVariable
 
 from . import utils
@@ -14,6 +15,8 @@ var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 var_wind_u = 'UT'          # Liquid water content in KG/KG ?
 var_wind_v = 'VT'          # Liquid water content in KG/KG ?
+
+MAX_SIZE = 256, 256
 
 # Precheck and variable assignment
 if 'MESO_NH' in os.environ:
@@ -45,14 +48,18 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
         max_slice = thermals.actual_range[1]
 
     # Reduce array density
-    #while max(np.shape(h_slice)) > 256:
-    
-    #print(np.shape(h_slice))
+
 
     # Write image to buffer
     buf = io.BytesIO()
     plt.imsave(buf, h_slice, origin='lower', vmin=min_slice, vmax=max_slice, cmap=colormap, format='png')
     plt.close()
+    buf.seek(0)
+    im = Image.open(io.BytesIO(buf.read()))
+    im.thumbnail(MAX_SIZE, Image.ANTIALIAS)
+
+    buf = io.BytesIO()
+    im.save(buf, 'PNG')
     buf.seek(0)
 
     return buf
@@ -126,4 +133,3 @@ def box():
         {'min': bounds[2].min, 'max':bounds[2].max},
         {'min': bounds[3].min, 'max':bounds[3].max}]
     return box
-

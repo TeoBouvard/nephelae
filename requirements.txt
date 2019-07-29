@@ -6,6 +6,7 @@ Jinja2
 geopy
 utm
 scipy
+pillow
 
 #MesoNH Probe -> to be packaged
 sklearn
