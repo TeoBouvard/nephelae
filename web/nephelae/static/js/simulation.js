@@ -1,6 +1,5 @@
 // Activate current menu in nav
 $('#nav_simulation').addClass('active');
-$('.sidenav').sidenav();
 
 var WIDTH = $('#canvas_container').width();
 var HEIGHT = $('#canvas_container').height();
@@ -14,7 +13,7 @@ var then = new Date();
 // Parameters
 var parameters = {
 	refresh_rate: 1000,
-	trail_length: 50,
+	trail_length: 20,
 	fleet_visibility: true,
 	fleet_focus: fitCameraToFleet,
 }
@@ -169,7 +168,6 @@ function createDrones() {
 					// Update fleet dictionnary with discovered drone
 					fleet[drone_id] = {
 						drone: drone_object,
-						path: path_object
 					};
 				}
 			
@@ -222,15 +220,19 @@ function update(){
 						altitude: drone_altitude, 
 					}
 
-					// Update path object
-					var path = [];
-					for (var position of drone_path){
-						path.push(new THREE.Vector3(position[0], position[1], position[2]));
+					// Update path object by recreating trail vertices (updating does not work properly)
+					scene.remove(fleet[key].path);
+
+					if(parameters.trail_length > 0){
+						var geometry = new THREE.Geometry();
+						for(var position of drone_path){
+							geometry.vertices.push(new THREE.Vector3(position[0], position[1], position[2]));	
+						}
+						var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
+						var path_object = new THREE.Line( geometry, material );
+
+						scene.add(path_object);
 					}
-
-					fleet[key].path.geometry.vertices = path;
-					fleet[key].path.geometry.verticesNeedUpdate = true;
-
 				}
 			}
 			// restart sending requests
