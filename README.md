@@ -118,10 +118,8 @@ In the future, you will be able to assign task via the controller.
 - bounds to json
 - reduce array size in image overlay (memory problems?)
 - limit display radius in map or sparse matrix ? can't find a way 
-- simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - ability to focus on single uav in 3d
-- change await list comprehension
 
 - k-means clustering, then convex hull ?
 

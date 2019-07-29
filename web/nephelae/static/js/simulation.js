@@ -13,8 +13,8 @@ var then = new Date();
 
 // Parameters
 var parameters = {
-	refresh_rate: 500,
-	trail_length: 10,
+	refresh_rate: 1000,
+	trail_length: 50,
 	fleet_visibility: true,
 	fleet_focus: fitCameraToFleet,
 }
@@ -72,7 +72,6 @@ function init() {
 }
 
 function createRenderer() {
-	// why is canvas size bigger than container ?
     renderer = new THREE.WebGLRenderer({ antialias: true });
 	renderer.setSize(WIDTH, HEIGHT);
 	$('#canvas_container').append( renderer.domElement );
@@ -151,20 +150,16 @@ function createDrones() {
 					var drone_color = global_colors[key%global_colors.length];
 
 					// Create a drone
-					//var geometry = new THREE.SphereBufferGeometry(5, 32, 32);
-					//var material = new THREE.MeshStandardMaterial({color: drone_color});
-					var drone_object = plane_model.clone();//new THREE.Mesh(geometry, material);
+					var drone_object = plane_model.clone();
 
 					drone_object.position.set(drone_position[0], drone_position[1], drone_position[2]);
 					drone_object.rotation.y = Math.PI - drone_heading.toRad();
-
 					scene.add(drone_object);
 
 					// Create a line
 					var geometry = new THREE.Geometry();
-					for(var position in drone_path){
-						var point = drone_path[position];
-						geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
+					for(var position of drone_path){
+						geometry.vertices.push(new THREE.Vector3(position[0], position[1], position[2]));	
 					}
 
 					var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
@@ -197,7 +192,7 @@ function update(){
 		then = null;
 
 		// add +1 to trail_length so that zero performs a valid slice
-		var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1});
+		var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1, reality: false});
 
 		// Update drones objects
 		$.getJSON('update/?' + query, (response) => {
@@ -212,9 +207,10 @@ function update(){
 					var drone_position = drone_path.slice(-1)[0];
                 	var drone_altitude = drone_path.slice(-1)[0][2];
 					var drone_heading = response.positions[key].heading;
+					// Roll estimation, might come from message later
 					var course_change = drone_heading.toRad() - fleet[key].drone.rotation.y;
 
-					// Compute color of marker
+					// Compute color of trail
 					var drone_color = global_colors[key%global_colors.length];
 
 					// Update drone object
@@ -226,24 +222,18 @@ function update(){
 						altitude: drone_altitude, 
 					}
 
-					// Recreate trail vertices (updating did not work properly)
-					scene.remove(fleet[key].path);
-
-					if(parameters.trail_length > 0){
-						var geometry = new THREE.Geometry();
-						for(var position in drone_path){
-							var point = drone_path[position];
-							geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));	
-						}
-						var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
-						var path_object = new THREE.Line( geometry, material );
-
-						scene.add(path_object);
-						fleet[key].path = path_object;
+					// Update path object
+					var path = [];
+					for (var position of drone_path){
+						path.push(new THREE.Vector3(position[0], position[1], position[2]));
 					}
+
+					fleet[key].path.geometry.vertices = path;
+					fleet[key].path.geometry.verticesNeedUpdate = true;
+
 				}
 			}
-			// restart sensing requests
+			// restart sending requests
 			then = new Date();
 		});
 	}

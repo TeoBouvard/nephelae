@@ -131,7 +131,7 @@ function displayDrones(){
         parameters.origin = response.origin;
         
         // add +1 to trail_length so that zero performs a valid slice
-        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length+1});
+        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length+1, reality: true});
 
         $.getJSON('update/?' + query, (response) => {
 
@@ -190,7 +190,7 @@ function displayDrones(){
 function updateDrones(){
 
     // add +1 to trail_length so that zero performs a valid slice
-    var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1});
+    var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1, reality: true});
 
     // Request updated data from the server
     $.getJSON('update/?' + query, (response) => {
