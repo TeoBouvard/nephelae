@@ -92,4 +92,4 @@ def layer_img(request, variable_name):
     ]
 
     buf = hypercube.print_horizontal_slice(variable_name, time_value, altitude_value, map_bounds, origin, thermals_cmap, clouds_cmap, transparent)
-    return HttpResponse(buf, content_type="image/png")
+    return HttpResponse(buf.read(), content_type="image/png")
