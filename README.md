@@ -116,10 +116,11 @@ In the future, you will be able to assign task via the controller.
 
 - requête box au mapping
 - bounds to json
+- reduce array size in image overlay (memory problems?)
+- limit display radius in map or sparse matrix ? can't find a way 
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - ability to focus on single uav in 3d
 - benchmark frame position computations
-- sensor observer with specific uav tag ?
 
 - k-means clustering, then convex hull ?
 
