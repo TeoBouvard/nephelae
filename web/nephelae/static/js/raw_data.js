@@ -193,8 +193,8 @@ function handleMessage(message){
             };
 
             // react to changes
-            Plotly.relayout(message.variable_name, new_range);
             Plotly.extendTraces(message.variable_name, update, [trace_index]);
+            Plotly.relayout(message.variable_name, new_range);
         }
     }
 }

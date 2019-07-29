@@ -97,7 +97,7 @@ purge-assets :
 
 
 runserver: check-meso
-	$(ECHO) "Starting server on 0.0.0.0:8000"
+	$(ECHO) "Starting server ..."
 #dev server
 	-@cd ./web && python3 manage.py runserver
 #prod server 

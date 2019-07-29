@@ -168,6 +168,7 @@ function createDrones() {
 					// Update fleet dictionnary with discovered drone
 					fleet[drone_id] = {
 						drone: drone_object,
+						last_heading: drone_heading.toRad(),
 					};
 				}
 			
@@ -206,18 +207,19 @@ function update(){
                 	var drone_altitude = drone_path.slice(-1)[0][2];
 					var drone_heading = response.positions[key].heading;
 					// Roll estimation, might come from message later
-					var course_change = drone_heading.toRad() - fleet[key].drone.rotation.y;
+					var course_change = drone_heading.toRad() - fleet[key].last_heading;
 
 					// Compute color of trail
 					var drone_color = global_colors[key%global_colors.length];
 
 					// Update drone object
+					fleet[key].last_heading = drone_heading.toRad();
 					fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
 					fleet[key].drone.rotation.y = Math.PI - drone_heading.toRad();
-					fleet[key].drone.rotation.z = 0.1*course_change;
+					fleet[key].drone.rotation.z = 2*course_change;
 					fleet[key].drone.userData = {
 						id: key,
-						altitude: drone_altitude, 
+						altitude: drone_altitude,
 					}
 
 					// Update path object by recreating trail vertices (updating does not work properly)
