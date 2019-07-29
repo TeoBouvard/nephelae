@@ -134,7 +134,7 @@ function createDrones() {
 		$.getJSON('discover/', (response) => {
 
 			// add +1 to trail_length so that zero performs a valid slice
-			var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length+1});
+			var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length+1, reality:false});
 
 			$.getJSON('update/?' + query, (response) => {
 
@@ -142,7 +142,7 @@ function createDrones() {
 
 					// Parse response data
 					var drone_id = key;
-					var drone_path = response.positions[key].frame_path;
+					var drone_path = response.positions[key].path;
 					var drone_position = drone_path.slice(-1)[0];
 					var drone_altitude = drone_path.slice(-1)[0][2];
 					var drone_heading = response.positions[key].heading;
@@ -208,7 +208,7 @@ function update(){
 
 					// Parse response data
 					var drone_id = key;
-					var drone_path = response.positions[key].frame_path;
+					var drone_path = response.positions[key].path;
 					var drone_position = drone_path.slice(-1)[0];
                 	var drone_altitude = drone_path.slice(-1)[0][2];
 					var drone_heading = response.positions[key].heading;

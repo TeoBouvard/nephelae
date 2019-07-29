@@ -31,7 +31,7 @@ def discover():
 
 
 # GPS time is *absolute*, but SAMPLE time is relative to navFrame
-def get_positions(uav_ids, trail_length):
+def get_positions(uav_ids, trail_length, reality=True):
     
     positions = dict()
 
@@ -47,16 +47,16 @@ def get_positions(uav_ids, trail_length):
         }
 
         for message in messages:
-
-            position = utils.compute_position(message)
-            frame_position = utils.compute_frame_position(message, nav_frame)
+            
+            if reality:
+                position = utils.compute_position(message)
+            else:
+                position = utils.compute_frame_position(message, nav_frame)
 
             if 'path' not in positions[uav_id]:
                 positions[uav_id]['path'] = [position]
-                positions[uav_id]['frame_path'] = [frame_position]
             else:
                 positions[uav_id]['path'].append(position)
-                positions[uav_id]['frame_path'].append(frame_position)
     
     return dict(positions=positions)
 

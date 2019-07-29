@@ -14,8 +14,10 @@ def get_positions(request):
     # Parse request parameters
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
+    reality = request.GET.get('reality', True) == "true"
+    print(reality, type(reality))
 
-    return JsonResponse(tracker.get_positions(uav_ids, trail_length))
+    return JsonResponse(tracker.get_positions(uav_ids, trail_length, reality))
 
 
 # Get sensor data with sample positions

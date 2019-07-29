@@ -105,6 +105,7 @@ In the future, you will be able to assign task via the controller.
 **Dev Notes**
 
 - Clients can initiate download of files on the server (map tiles). I think that this is particularly bad design, but it's mostly due to the fact that this app is supposed to be used without internet connection, and by running server and client on the same machine. If you think there is a better way to download map tiles for offline use, feel free to open an issue.
+- Data streaming with websockets (on dev server) seems to struggle when 4-5 UAVs are sending their messages through it. It could be wise to split streaming into multiple websockets, maybe one for each UAV ?
 
 ---
 
@@ -118,11 +119,10 @@ In the future, you will be able to assign task via the controller.
 - limit display radius in map or sparse matrix ? can't find a way 
 - simulation path update does not work, have to redraw it entirely
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
-- get_positions parameters (real | simulation)
 - ability to focus on single uav in 3d
+- change await list comprehension
 
 - k-means clustering, then convex hull ?
-- why is message.data an array ? (3d data ?)
 
 ---
 
