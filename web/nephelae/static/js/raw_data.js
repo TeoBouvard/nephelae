@@ -28,7 +28,7 @@ $(document).ready(function(){
 function setupGUI(){
 
     gui = new dat.GUI({ autoplace: false });
-    $('#gui_container').append(gui.domElement);
+    $('#gui_container').html(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
 
@@ -196,7 +196,13 @@ function handleMessage(message){
             Plotly.extendTraces(message.variable_name, update, [trace_index]);
             // The following operation is very expensive, uncomment it only if you need fixed range streaming plot
             //Plotly.relayout(message.variable_name, new_range);
+        } else {
+            // if trace index is not found, re-setup the page
+            setupGUI();
         }
+    // if variable does not exist, re-setup the page
+    } else if (!(message.variable_name in parameters.variables)) {
+        setupGUI();
     }
 }
 

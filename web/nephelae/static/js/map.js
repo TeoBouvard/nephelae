@@ -5,7 +5,7 @@ var flight_map, zoom_home, overlays;
 var uavs_overlay, cloud_overlay, wind_overlay;
 
 /*
-    fleet     : { drone_id : value_dict }
+    fleet     : { uav_id : value_dict }
     value_dict : { 
         color         :   global_colors[index_icon], 
         position      :   marker, 
@@ -25,7 +25,7 @@ var parameters = {
     thermals_cmap: 'Reds',
     clouds_cmap: 'Purples',
     transparent: true,
-    tracked_drone: null,
+    tracked_uav: null,
     time: null,
     update_wind: updateWindData,
     dl_map: downloadMap,
@@ -120,11 +120,11 @@ function setupMap(){
     for(key in overlays) if(key != "Wind") overlays[key].addTo(flight_map);
     tiles_overlay_IGN.addTo(flight_map);
 
-    // Prevent async conflicts by displaying drones once map is initialized
-    displayDrones();
+    // Prevent async conflicts by displaying uavs once map is initialized
+    displayUavs();
 }
 
-function displayDrones(){
+function displayUavs(){
 
     $.getJSON('discover/', (response) => {
         
@@ -135,59 +135,59 @@ function displayDrones(){
 
         $.getJSON('update/?' + query, (response) => {
 
-            // Initialize drone array with drone_id and position marker
+            // Initialize uav array with uav_id and position marker
             for (var key in response.positions){
 
                 // Parse response data
-                var drone_id = key;
-                var drone_path = response.positions[key].path;
-                var drone_position = drone_path.slice(-1)[0];
-                var drone_altitude = drone_path.slice(-1)[0][2];
-                var drone_heading = response.positions[key].heading;
-                var drone_speed = response.positions[key].speed;
-                var drone_time = response.positions[key].time;
+                var uav_id = key;
+                var uav_path = response.positions[key].path;
+                var uav_position = uav_path.slice(-1)[0];
+                var uav_altitude = uav_path.slice(-1)[0][2];
+                var uav_heading = response.positions[key].heading;
+                var uav_speed = response.positions[key].speed;
+                var uav_time = response.positions[key].time;
                 
-                // Compute color and icon of markers based on drone ID
-                var drone_color = global_colors[key%global_colors.length];
-                var drone_icon = global_icons[key%global_colors.length];
+                // Compute color and icon of markers based on uav ID
+                var uav_color = global_colors[key%global_colors.length];
+                var uav_icon = global_icons[key%global_colors.length];
                 
-                // Create leaflet marker and polyline at drone position
-                var marker = L.marker(drone_position, {icon: drone_icon}).bindTooltip("UAV " + key);
-                var polyline = L.polyline([drone_path], {color : drone_color, weight : '2', dashArray : '5,7'});
+                // Create leaflet marker and polyline at uav position
+                var marker = L.marker(uav_position, {icon: uav_icon}).bindTooltip("UAV " + key);
+                var polyline = L.polyline([uav_path], {color : uav_color, weight : '2', dashArray : '5,7'});
                 
-                // Update fleet dictionnary with discovered drone
-                fleet[drone_id] = {
-                    id: drone_id,
-                    color : drone_color, 
+                // Update fleet dictionnary with discovered uav
+                fleet[uav_id] = {
+                    id: uav_id,
+                    color : uav_color, 
                     position : marker, 
-                    altitude : drone_altitude, 
-                    heading: drone_heading,
+                    altitude : uav_altitude, 
+                    heading: uav_heading,
                     path : polyline,
-                    time : drone_time,
-                    speed : drone_speed,
+                    time : uav_time,
+                    speed : uav_speed,
                 };
 
-                // Add drone marker to layer group
-                fleet[drone_id].position.setRotationAngle(drone_heading).addTo(uavs_overlay);
-                fleet[drone_id].position.bindPopup(infosToString(fleet[drone_id]));
-                fleet[drone_id].path.addTo(uavs_overlay);
+                // Add uav marker to layer group
+                fleet[uav_id].position.setRotationAngle(uav_heading).addTo(uavs_overlay);
+                fleet[uav_id].position.bindPopup(infosToString(fleet[uav_id]));
+                fleet[uav_id].path.addTo(uavs_overlay);
             }
             
-            // Center map on drone last drone added
+            // Center map on uav last uav added
             if(Object.keys(fleet).length != 0){
-                flight_map.setView(drone_position, 15);
+                flight_map.setView(uav_position, 15);
                 zoomHome.addTo(flight_map);
-                updateDrones();
+                updateUavs();
             } else {
                 alert("No UAVs detected, try launching the simulation and restart the server");
-                updateDrones();
+                updateUavs();
             }
             removeLoader();
         });
     });
 }
 
-function updateDrones(){
+function updateUavs(){
 
     // add +1 to trail_length so that zero performs a valid slice
     var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1, reality: true});
@@ -199,48 +199,48 @@ function updateDrones(){
         for (var key in response.positions){
 
             // Parse response data
-            var drone_id = key;
-            var drone_path = response.positions[key].path;
-            var drone_position = drone_path.slice(-1)[0];
-            var drone_altitude = drone_path.slice(-1)[0][2];
-            var drone_heading = response.positions[key].heading;
-            var drone_speed = response.positions[key].speed;
-            var drone_time = response.positions[key].time;
+            var uav_id = key;
+            var uav_path = response.positions[key].path;
+            var uav_position = uav_path.slice(-1)[0];
+            var uav_altitude = uav_path.slice(-1)[0][2];
+            var uav_heading = response.positions[key].heading;
+            var uav_speed = response.positions[key].speed;
+            var uav_time = response.positions[key].time;
 
-            // Identify corresponding drone ...
-            var drone_to_update = fleet[drone_id];
+            // Identify corresponding uav ...
+            var uav_to_update = fleet[uav_id];
 
             // ... and update it
-            if(drone_to_update){
+            if(uav_to_update){
 
                 // Update infos
-                drone_to_update.heading = drone_heading;
-                drone_to_update.speed = drone_speed;
-                drone_to_update.altitude = drone_altitude;
-                drone_to_update.time = drone_time;
+                uav_to_update.heading = uav_heading;
+                uav_to_update.speed = uav_speed;
+                uav_to_update.altitude = uav_altitude;
+                uav_to_update.time = uav_time;
 
                 // Update markers and popup
-                drone_to_update.position.setLatLng(drone_position).setRotationAngle(drone_heading);
-                drone_to_update.position.setPopupContent(infosToString(drone_to_update));
+                uav_to_update.position.setLatLng(uav_position).setRotationAngle(uav_heading);
+                uav_to_update.position.setPopupContent(infosToString(uav_to_update));
 
                 // Update polyline
-                drone_to_update.path.setLatLngs(drone_path);
+                uav_to_update.path.setLatLngs(uav_path);
 
                 // Update time
-                drone_to_update.time = drone_time;
+                uav_to_update.time = uav_time;
             } 
 
-            // ... or display error message if drone id does not match -> update fleet dictionnary and start tracking it
+            // ... or display error message if uav id does not match -> update fleet dictionnary and start tracking it
             else {
-                console.error("no uav with id ", drone_id, " found !");
-                displayDrones();
+                console.error("no uav with id ", uav_id, " found !");
+                displayUavs();
             }
         }
 
         // Update home button coordinates and layers URL
         zoomHome.setHomeCoordinates(parameters.origin); // compute center of mass/getBoundsZoom later ?
         updateURL();
-        setTimeout(updateDrones, parameters.refresh_rate);
+        setTimeout(updateUavs, parameters.refresh_rate);
     });
 
 }
@@ -266,10 +266,10 @@ function computeURL(){
 
     var bounds = flight_map.getBounds();
 
-    // Check if a drone is being tracked with MesoNH
-    if (parameters.tracked_drone != null){
-        parameters.altitude = parameters.tracked_drone.altitude;
-        parameters.time = parameters.tracked_drone.time;
+    // Check if a uav is being tracked with MesoNH
+    if (parameters.tracked_uav != null){
+        parameters.altitude = parameters.tracked_uav.altitude;
+        parameters.time = parameters.tracked_uav.time;
     } else {
         parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : 0;
     }
@@ -308,7 +308,7 @@ function infosToString(uav){
 
 // Attach or remove tracked uav in parameters
 function track(id){
-    (id == -1) ? parameters.tracked_drone = null : parameters.tracked_drone = fleet[id];
+    (id == -1) ? parameters.tracked_uav = null : parameters.tracked_uav = fleet[id];
 }
 
 function updateWindData() {

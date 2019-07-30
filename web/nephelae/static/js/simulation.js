@@ -60,7 +60,7 @@ function init() {
 
 	createLights();
 
-	createDrones();
+	createUavs();
 
 	// start the animation loop
   	renderer.setAnimationLoop(() => {
@@ -118,7 +118,7 @@ function createLights() {
 	scene.add(light);
 }
 
-function createDrones() {
+function createUavs() {
 
 	var loader = new THREE.GLTFLoader();
 
@@ -139,36 +139,36 @@ function createDrones() {
 				for (var key in response.positions){
 
 					// Parse response data
-					var drone_id = key;
-					var drone_path = response.positions[key].path;
-					var drone_position = drone_path.slice(-1)[0];
-					var drone_altitude = drone_path.slice(-1)[0][2];
-					var drone_heading = response.positions[key].heading;
+					var uav_id = key;
+					var uav_path = response.positions[key].path;
+					var uav_position = uav_path.slice(-1)[0];
+					var uav_altitude = uav_path.slice(-1)[0][2];
+					var uav_heading = response.positions[key].heading;
 
 					// Compute color of marker
-					var drone_color = global_colors[key%global_colors.length];
+					var uav_color = global_colors[key%global_colors.length];
 
-					// Create a drone
-					var drone_object = plane_model.clone();
+					// Create a uav
+					var uav_object = plane_model.clone();
 
-					drone_object.position.set(drone_position[0], drone_position[1], drone_position[2]);
-					drone_object.rotation.y = Math.PI - drone_heading.toRad();
-					scene.add(drone_object);
+					uav_object.position.set(uav_position[0], uav_position[1], uav_position[2]);
+					uav_object.rotation.y = Math.PI - uav_heading.toRad();
+					scene.add(uav_object);
 
 					// Create a line
 					var geometry = new THREE.Geometry();
-					for(var position of drone_path){
+					for(var position of uav_path){
 						geometry.vertices.push(new THREE.Vector3(position[0], position[1], position[2]));	
 					}
 
-					var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
+					var material = new THREE.LineDashedMaterial({ color: uav_color, linewidth: 2});
 					var path_object = new THREE.Line( geometry, material );
 					scene.add(path_object);
 
-					// Update fleet dictionnary with discovered drone
-					fleet[drone_id] = {
-						drone: drone_object,
-						last_heading: drone_heading.toRad(),
+					// Update fleet dictionnary with discovered uav
+					fleet[uav_id] = {
+						uav: uav_object,
+						last_heading: uav_heading.toRad(),
 					};
 				}
 			
@@ -193,7 +193,7 @@ function update(){
 		// add +1 to trail_length so that zero performs a valid slice
 		var query = $.param({uav_id: Object.keys(fleet), trail_length: parameters.trail_length+1, reality: false});
 
-		// Update drones objects
+		// Update uavs objects
 		$.getJSON('update/?' + query, (response) => {
 
 			if (parameters.fleet_visibility){
@@ -201,25 +201,25 @@ function update(){
 				for(var key in response.positions){
 
 					// Parse response data
-					var drone_id = key;
-					var drone_path = response.positions[key].path;
-					var drone_position = drone_path.slice(-1)[0];
-                	var drone_altitude = drone_path.slice(-1)[0][2];
-					var drone_heading = response.positions[key].heading;
+					var uav_id = key;
+					var uav_path = response.positions[key].path;
+					var uav_position = uav_path.slice(-1)[0];
+                	var uav_altitude = uav_path.slice(-1)[0][2];
+					var uav_heading = response.positions[key].heading;
 					// Roll estimation, might come from message later
-					var course_change = drone_heading.toRad() - fleet[key].last_heading;
+					var course_change = uav_heading.toRad() - fleet[key].last_heading;
 
 					// Compute color of trail
-					var drone_color = global_colors[key%global_colors.length];
+					var uav_color = global_colors[key%global_colors.length];
 
-					// Update drone object
-					fleet[key].last_heading = drone_heading.toRad();
-					fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
-					fleet[key].drone.rotation.y = Math.PI - drone_heading.toRad();
-					fleet[key].drone.rotation.z = 0.5*course_change;
-					fleet[key].drone.userData = {
+					// Update uav object
+					fleet[key].last_heading = uav_heading.toRad();
+					fleet[key].uav.position.set(uav_position[0], uav_position[1], uav_position[2]);
+					fleet[key].uav.rotation.y = Math.PI - uav_heading.toRad();
+					fleet[key].uav.rotation.z = 0.5*course_change;
+					fleet[key].uav.userData = {
 						id: key,
-						altitude: drone_altitude,
+						altitude: uav_altitude,
 					}
 
 					// Update path object by recreating trail vertices (updating does not work properly)
@@ -227,10 +227,10 @@ function update(){
 
 					if(parameters.trail_length > 0){
 						var geometry = new THREE.Geometry();
-						for(var position of drone_path){
+						for(var position of uav_path){
 							geometry.vertices.push(new THREE.Vector3(position[0], position[1], position[2]));	
 						}
-						var material = new THREE.LineDashedMaterial({ color: drone_color, linewidth: 2});
+						var material = new THREE.LineDashedMaterial({ color: uav_color, linewidth: 2});
 						var path_object = new THREE.Line( geometry, material );
 
 						scene.add(path_object);
@@ -249,7 +249,7 @@ function render(){
 
 function toggleFleetVisibility(){
 	for(var key in fleet){
-		fleet[key].drone.visible = !fleet[key].drone.visible;
+		fleet[key].uav.visible = !fleet[key].uav.visible;
 		fleet[key].path.visible = !fleet[key].path.visible;
 	}
 }
@@ -258,7 +258,7 @@ function fitCameraToFleet(fitOffset = 1.5) {
 
 	var box = new THREE.Box3();
 
-	for(const key in fleet) box.expandByObject(fleet[key].drone);
+	for(const key in fleet) box.expandByObject(fleet[key].uav);
 
 	const size = box.getSize(new THREE.Vector3());
 	const center = box.getCenter(new THREE.Vector3());
@@ -310,7 +310,7 @@ function onClick( event ) {
 	// Create a list of intersectable objects
 	var objects = [];
 	for (var key in fleet){
-		objects.push(fleet[key].drone);
+		objects.push(fleet[key].uav);
 	}
 
 	// Update raycaster direction
