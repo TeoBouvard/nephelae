@@ -5,11 +5,12 @@ pip_options=
 
 help:
 	$(ECHO) "- help		: Display this message"
-	$(ECHO) "- full-install	: Install server, requirements and assets"
-	$(ECHO) "- install	: Donwload requirements and external assets"
-	$(ECHO) "- purge-maps	: Delete all downloaded maps"
-	$(ECHO) "- purge-assets	: Delete external assets"
 	$(ECHO) "- runserver	: Run server"
+	$(ECHO) "- full-install	: Install server, requirements and assets"
+	$(ECHO) "- install	: Donwload Python requirements and external assets"
+	$(ECHO) "- full-install	: Install server and requirements"
+	$(ECHO) "- clean-maps	: Delete all downloaded maps"
+	$(ECHO) "- clean-assets	: Delete external assets"
 	$(ECHO) "- simulation	: Launch paparazzi simulation"
 
 
@@ -21,7 +22,7 @@ install: assets requirements
 
 assets : 
 	$(ECHO) -n "Creating static folders ... "
-	@mkdir web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons -p
+	@mkdir -p web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Downloading javascript libraries ... "
@@ -89,10 +90,10 @@ requirements :
 	@pip3 install $(pip_options) -r requirements.txt
 
 
-purge-maps :
+clean-maps :
 	@rm -rf web/nephelae/static/map_tiles/*
 
-purge-assets :
+clean-assets :
 	@rm -rf web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons
 
 

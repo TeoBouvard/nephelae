@@ -216,7 +216,7 @@ function update(){
 					fleet[key].last_heading = drone_heading.toRad();
 					fleet[key].drone.position.set(drone_position[0], drone_position[1], drone_position[2]);
 					fleet[key].drone.rotation.y = Math.PI - drone_heading.toRad();
-					fleet[key].drone.rotation.z = 2*course_change;
+					fleet[key].drone.rotation.z = 0.5*course_change;
 					fleet[key].drone.userData = {
 						id: key,
 						altitude: drone_altitude,

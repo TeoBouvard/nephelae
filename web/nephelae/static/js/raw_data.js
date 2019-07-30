@@ -192,9 +192,10 @@ function handleMessage(message){
                 }
             };
 
-            // react to changes
+            // react to changes but draw only once in a while
             Plotly.extendTraces(message.variable_name, update, [trace_index]);
-            Plotly.relayout(message.variable_name, new_range);
+            // The following operation is very expensive, uncomment it only if you need fixed range streaming plot
+            //Plotly.relayout(message.variable_name, new_range);
         }
     }
 }
