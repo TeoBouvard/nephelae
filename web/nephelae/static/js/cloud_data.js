@@ -42,7 +42,6 @@ var config = {
 };
 
 // Keep track of chart state
-var isAlreadyDrawn = false;
 var refresh_rate = 2000; // ms
 
 $(document).ready(function(){
@@ -55,17 +54,14 @@ function updateData(){
 
     $.getJSON('update/', function(response){
         data = response;
-        console.log('data received');
+        console.log('data received'; response);
 
-        if(isAlreadyDrawn){
-            updateCharts(data);
-        } else {
+
             if(data.length == 0){
                 //alert("No data received from the server, try refreshing the page");
             }
-            initializeCharts(data);
-            isAlreadyDrawn = true;
-            setInterval(updateData, refresh_rate);
+            updateCharts(data);
+            setTimeout(updateData, refresh_rate);
         }
     });
 }
@@ -77,10 +73,4 @@ function updateCharts(data){
     Plotly.react('zx_chart', data.zx, layouts.zx, config);
 }
 
-function initializeCharts(data){
-    Plotly.newPlot('volume_chart', data.volume, layouts.volume, config);
-    Plotly.newPlot('height_chart', data.height, layouts.height, config);
-    Plotly.newPlot('radius_chart', data.radius, layouts.radius, config);
-    Plotly.newPlot('zx_chart', data.zx, layouts.zx, config);
-}
 
