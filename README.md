@@ -48,7 +48,7 @@ This web application is supposed to be used in remote places without any interne
 You can download a copy from [their website](http://mesonh.aero.obs-mip.fr/mesonh54). However, if you don't feel like downloading such a big file, you can reference any `*.nc` file with your `$MESO_NH` environment variable, and it will *work*.
 
 **I don't want to install paparazzi but want a demo, what can I do ?**  
-I will upload a Paparazzi simultion to have a *standalone* demo in the future.
+A [demo database](demo/) is available. 
 
 ---
 
@@ -105,7 +105,6 @@ In the future, you will be able to assign task via the controller.
 **Dev Notes**
 
 - Clients can initiate download of files on the server (map tiles). I think that this is particularly bad design, but it's mostly due to the fact that this app is supposed to be used without internet connection, and by running server and client on the same machine. If you think there is a better way to download map tiles for offline use, feel free to open an issue.
-- Data streaming with websockets (on dev server) seems to struggle when 4-5 UAVs are sending their messages through it. It could be wise to split streaming into multiple websockets, maybe one for each UAV ?
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 
 ---
@@ -139,7 +138,7 @@ In the future, you will be able to assign task via the controller.
 
 ### Prerequisites  
 
-- A running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). 
+- A Paparazzi database referenced by `$PPRZ_DB`, a running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). You can find a demo database [here](demo/).
 - A Meso_NH file referenced by `$MESO_NH`.
 
 </p>

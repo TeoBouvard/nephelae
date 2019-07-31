@@ -99,8 +99,14 @@ clean-assets :
 
 runserver: check-meso
 	$(ECHO) "Starting server ..."
+
 #dev server
+ifdef PPRZ_DB
 	-@cd ./web && python3 manage.py runserver
+else
+	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && python3 manage.py runserver
+endif
+
 #prod server 
 #-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
@@ -124,6 +130,7 @@ check-pprz:
 ifndef PAPARAZZI_HOME
 	$(error PAPARAZZI_HOME is not defined)
 endif
+
 
 # fix a dependency issue in pptk (Ubuntu 18.04)
 #mv venv/lib/python3.6/site-packages/pptk/libs/libz.so.1 venv/lib/python3.6/site-packages/pptk/libs/libz.so.1.old

@@ -34,7 +34,7 @@ var config = {
 // Keep track of chart state
 var refresh_rate = 2000; // ms
 
-$(document).ready(function(){
+$(document).ready( () => {
     updateData();
     removeLoader();
 });

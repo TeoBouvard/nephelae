@@ -18,9 +18,12 @@ from . import utils
 #interface.start()
 #db.set_navigation_frame(interface.navFrame)
 
-
-db = DatabasePlayer('/home/arthurdent/Documents/dev/nephelae/nephelae_mapping/tests/output/database02.neph')
-db.play(looped=True)
+if 'PPRZ_DB' in os.environ:
+    db = DatabasePlayer(os.environ['PPRZ_DB'])
+    db.play(looped=True)
+else:
+    print('No simulation database found. Export $PPRZ_DB variable.')
+    exit()
 
 
 nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
