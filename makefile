@@ -87,7 +87,7 @@ requirements :
 	@git -C ./nephelae_master submodule update
 	@pip3 install $(pip_options) wheel
 	@pip3 install $(pip_options) ./nephelae_master
-	#@rm -rf ./nephelae_master
+	#@rm -rf ./nephelae_master -> remove when nephelae is pip packaged
 	@pip3 install $(pip_options) -r requirements.txt
 
 
@@ -108,10 +108,8 @@ runserver: check-meso
 #-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
-demo: full-install 
-	-@export PYTHONPATH="$(PWD)/nephelae_master/"
-	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph"
-	runserver
+demo:
+	-@export PYTHONPATH="$(PWD)/nephelae_master/" && export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && python3 manage.py runserver
 
 
 simulation: check-pprz
