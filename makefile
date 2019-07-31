@@ -1,6 +1,7 @@
 ECHO = @echo
 FETCH = @curl --silent
 pip_options=
+.PHONY: demo runserver 
 
 
 help:
@@ -86,7 +87,7 @@ requirements :
 	@git -C ./nephelae_master submodule update
 	@pip3 install $(pip_options) wheel
 	@pip3 install $(pip_options) ./nephelae_master
-	@rm -rf ./nephelae_master
+	#@rm -rf ./nephelae_master
 	@pip3 install $(pip_options) -r requirements.txt
 
 
@@ -101,14 +102,16 @@ runserver: check-meso
 	$(ECHO) "Starting server ..."
 
 #dev server
-ifndef PPRZ_DB
-	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph"
-endif
-	-@export PYTHONPATH="$(PWD)/nephelae_master/"
 	-cd ./web && python3 manage.py runserver
 
 #prod server 
 #-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
+
+
+demo: full-install 
+	-@export PYTHONPATH="$(PWD)/nephelae_master/"
+	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph"
+	runserver
 
 
 simulation: check-pprz
@@ -130,8 +133,6 @@ check-pprz:
 ifndef PAPARAZZI_HOME
 	$(error PAPARAZZI_HOME is not defined)
 endif
-
-
 # fix a dependency issue in pptk (Ubuntu 18.04)
 #mv venv/lib/python3.6/site-packages/pptk/libs/libz.so.1 venv/lib/python3.6/site-packages/pptk/libs/libz.so.1.old
 #sudo ln --silent  /lib/x86_64-linux-gnu/libz.so.1 venv/lib/python3.6/site-packages/pptk/libs/
