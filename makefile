@@ -101,11 +101,11 @@ runserver: check-meso
 	$(ECHO) "Starting server ..."
 
 #dev server
-ifdef PPRZ_DB
-	-@cd ./web && python3 manage.py runserver
-else
-	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && python3 manage.py runserver
+ifndef PPRZ_DB
+	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph"
 endif
+	-@export PYTHONPATH="$(PWD)/nephelae_master/"
+	-cd ./web && python3 manage.py runserver
 
 #prod server 
 #-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
