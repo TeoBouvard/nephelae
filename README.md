@@ -25,7 +25,7 @@ This is a web application designed as an interface between the fleet of UAV used
 ```shell
 git clone https://github.com/teobouvard/nephelae_gui.git
 cd nephelae_gui
-sudo make packages
+sudo make requirements
 make install
 make demo
 

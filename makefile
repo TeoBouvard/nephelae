@@ -7,18 +7,14 @@ pip_options=
 help:
 	$(ECHO) "- help		: Display this message"
 	$(ECHO) "- runserver	: Run server"
-	$(ECHO) "- packages	: Install necessary packages (run with sudo)"
-	$(ECHO) "- install	: Donwload Python requirements and external assets"
-	$(ECHO) "- full-install	: Install server and requirements"
+	$(ECHO) "- requirements	: Install necessary packages (run with sudo)"
+	$(ECHO) "- install	: Donwload external assets"
 	$(ECHO) "- clean-maps	: Delete all downloaded maps"
 	$(ECHO) "- clean-assets	: Delete external assets"
 	$(ECHO) "- simulation	: Launch paparazzi simulation"
 
 
-install: assets requirements
-
-
-assets : 
+install : 
 	$(ECHO) -n "Creating static folders ... "
 	@mkdir -p web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons
 	$(ECHO) "OK"
@@ -67,11 +63,7 @@ assets :
 	$(ECHO) "OK"
 
 
-packages:
-	-@apt-get -y install python3-pip redis-server
-
-
-requirements : 
+requirements : packages
 	$(ECHO) -n "Installing requirements ... "
 	
 	@if [ -d "nephelae_master" ]; then \
@@ -86,6 +78,10 @@ requirements :
 	@pip3 install $(pip_options) ./nephelae_master
 	#@rm -rf ./nephelae_master -> remove when nephelae is pip packaged
 	@pip3 install $(pip_options) -r requirements.txt
+
+
+packages:
+	-@apt-get -y install python3-pip redis-server
 
 
 clean-maps :
