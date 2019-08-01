@@ -7,15 +7,12 @@ pip_options=
 help:
 	$(ECHO) "- help		: Display this message"
 	$(ECHO) "- runserver	: Run server"
-	$(ECHO) "- full-install	: Install server, requirements and assets"
+	$(ECHO) "- packages	: Install necessary packages (run with sudo)"
 	$(ECHO) "- install	: Donwload Python requirements and external assets"
 	$(ECHO) "- full-install	: Install server and requirements"
 	$(ECHO) "- clean-maps	: Delete all downloaded maps"
 	$(ECHO) "- clean-assets	: Delete external assets"
 	$(ECHO) "- simulation	: Launch paparazzi simulation"
-
-
-full-install: sudo-requirements install
 
 
 install: assets requirements
@@ -70,7 +67,7 @@ assets :
 	$(ECHO) "OK"
 
 
-sudo-requirements:
+packages:
 	-@apt-get -y install python3-pip redis-server
 
 

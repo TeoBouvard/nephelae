@@ -21,12 +21,16 @@ This is a web application designed as an interface between the fleet of UAV used
 
 
 **How do I install it ?**  
-Clone the repo, cd into it and `sudo make full-install` (check the makefile if you are not comfortable with sudoing an unknown script). You can get all the relevant `make` targets by simply running `make help`.
 
+```shell
+git clone https://github.com/teobouvard/nephelae_gui.git
+cd nephelae_gui
+sudo make packages
+make install
+make demo
 
-**How do I run it ?**  
-Once installed, you can launch a demo by running `make demo`.
-If you want to use it outside of the demo, make sure to check the [prerequisites](#prerequisites), and launch the server by running `make runserver`. You can then open a web browser (chrome or chromium preferably) and go to [localhost:8000](http://localhost:8000). As the server broadcasts on the whole network, you can use this interface from every computer on your network, by changing `localhost` to the server's IP address in the URL.
+```
+You can then open a web browser (chrome or chromium preferably) and go to [localhost:8000](http://localhost:8000). As the server broadcasts on the whole network, you can use this interface from every computer on your network, by changing `localhost` to the server's IP address in the URL.
   
 
 **How does it work ?**  
