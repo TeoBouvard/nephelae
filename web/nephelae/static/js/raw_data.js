@@ -197,8 +197,8 @@ function handleMessage(message){
             // The following operation is very expensive, uncomment it only if you need fixed range streaming plot
             //Plotly.relayout(message.variable_name, new_range);
         } else {
-            // if trace index is not found, re-setup the page
-            setupGUI();
+            // if trace index is not found, reload the page
+            location.reload();
         }
     // if variable does not exist, re-setup the page
     } else if (!(message.variable_name in parameters.variables)) {

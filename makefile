@@ -1,6 +1,6 @@
 ECHO = @echo
 FETCH = @curl --silent
-pip_options = --user
+pip_options = 
 .PHONY: demo runserver install assets requirements
 
 
