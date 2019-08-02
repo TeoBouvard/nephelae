@@ -92,8 +92,6 @@ function createScene() {
 }
 
 function createControls() {
-	console.log(camera)
-	console.log(renderer)
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 	raycaster = new THREE.Raycaster();
 	mouse = new THREE.Vector2;
@@ -171,6 +169,7 @@ function createUavs() {
 					fleet[uav_id] = {
 						uav: uav_object,
 						last_heading: uav_heading.toRad(),
+						path: path_object
 					};
 				}
 			
@@ -236,6 +235,7 @@ function update(){
 						var path_object = new THREE.Line( geometry, material );
 
 						scene.add(path_object);
+						fleet[key].path = path_object;
 					}
 				}
 			}
@@ -250,7 +250,9 @@ function render(){
 }
 
 function toggleFleetVisibility(){
+	console.log(fleet)
 	for(var key in fleet){
+		console.log(fleet[key].path.visible)
 		fleet[key].uav.visible = !fleet[key].uav.visible;
 		fleet[key].path.visible = !fleet[key].path.visible;
 	}
@@ -275,11 +277,11 @@ function fitCameraToFleet(fitOffset = 1.5) {
 		.normalize()
 		.multiplyScalar(distance);
 
-	controls.maxDistance = distance * 5;
+	//controls.maxDistance = distance * 5;
 	controls.target.copy(center);
 
-	camera.near = distance / 100;
-	camera.far = distance * 100;
+	//camera.near = distance / 100;
+	//camera.far = distance * 100;
 	camera.updateProjectionMatrix();
 
 	camera.position.copy(controls.target).sub(direction);
