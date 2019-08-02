@@ -93,12 +93,12 @@ function updateData(){
                     meta: [uav_id],
                     hovertemplate:
                         'timestamp : %{x:.1f}s <br>' +
-                        'sensor value : %{y:.3f} <br>' +
+                        'sensor value : %{y:.2f} <br>' +
                         '<extra>UAV %{meta[0]}</extra>',
                     hoverlabel: {
                         bgcolor: 'black',
                         bordercolor: 'black',
-                        font: {family: 'Roboto', size: '15', color: 'white'},
+                        font: {family: 'Roboto', si1ze: '15', color: 'white'},
                         align: 'left',
                     }
                 };

@@ -69,7 +69,7 @@ function drawPlot(){
                 y.push(positions[i][2]);
                 z.push(positions[i][3]);
                 // hack to send multiple data to plotly %text variable
-                text.push(positions[i][0].toFixed(2) + 's<br>sensor value : ' + sensor_values[i].toFixed(3));
+                text.push(positions[i][0].toFixed(1) + 's<br>sensor value : ' + sensor_values[i].toFixed(2));
             }
 
             // Display colorbar if only one UAV is selected, create zero-centered colorbars
