@@ -23,9 +23,9 @@ This is a web application designed as an interface between the fleet of UAV used
 **How do I install it ?**  
 
 ```shell
+apt-get -y install python3-pip redis-server
 git clone https://github.com/teobouvard/nephelae_gui.git
 cd nephelae_gui
-sudo make requirements
 make install
 make demo
 
@@ -111,6 +111,10 @@ In the future, you will be able to assign task via the controller.
 
 - Clients can initiate download of files on the server (map tiles). I think that this is particularly bad design, but it's mostly due to the fact that this app is supposed to be used without internet connection, and by running server and client on the same machine. If you think there is a better way to download map tiles for offline use, feel free to open an issue.
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
+-mesures : flux de masse pour chaque section horizontale lwc, wt en priorité
+base 500-700 -> top 2000 -> ceiling 3km / wind 9m/s
+cellometer for box ?
+typage drones 
 
 ---
 
@@ -145,10 +149,3 @@ In the future, you will be able to assign task via the controller.
 
 - A Paparazzi database referenced by `$PPRZ_DB`, a running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). You can find a demo database [here](demo/).
 - A Meso_NH file referenced by `$MESO_NH`.
-
-</p>
-
-mesures : flux de masse pour chaque section horizontale lwc, wt en priorité
-base 500-700 -> top 2000 -> ceiling 3km / wind 9m/s
-cellometer for box ?
-typage drones 

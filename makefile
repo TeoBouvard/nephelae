@@ -1,20 +1,21 @@
 ECHO = @echo
 FETCH = @curl --silent
-pip_options=
-.PHONY: demo runserver 
+pip_options = --user
+.PHONY: demo runserver
 
 
 help:
 	$(ECHO) "- help		: Display this message"
 	$(ECHO) "- runserver	: Run server"
-	$(ECHO) "- requirements	: Install necessary packages (run with sudo)"
-	$(ECHO) "- install	: Donwload external assets"
+	$(ECHO) "- install	: Donwload external assets and Python packages"
 	$(ECHO) "- clean-maps	: Delete all downloaded maps"
 	$(ECHO) "- clean-assets	: Delete external assets"
 	$(ECHO) "- simulation	: Launch paparazzi simulation"
 
 
-install : 
+install : requirements assets
+
+assets :
 	$(ECHO) -n "Creating static folders ... "
 	@mkdir -p web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons
 	$(ECHO) "OK"
@@ -63,7 +64,7 @@ install :
 	$(ECHO) "OK"
 
 
-requirements : packages
+requirements :
 	$(ECHO) -n "Installing requirements ... "
 	
 	@if [ -d "nephelae_master" ]; then \
@@ -78,10 +79,6 @@ requirements : packages
 	@pip3 install $(pip_options) ./nephelae_master
 	#@rm -rf ./nephelae_master -> remove when nephelae is pip packaged
 	@pip3 install $(pip_options) -r requirements.txt
-
-
-packages:
-	-@apt-get -y install python3-pip redis-server
 
 
 clean-maps :
@@ -124,6 +121,7 @@ check-pprz:
 ifndef PAPARAZZI_HOME
 	$(error PAPARAZZI_HOME is not defined)
 endif
+
 # fix a dependency issue in pptk (Ubuntu 18.04)
 #mv venv/lib/python3.6/site-packages/pptk/libs/libz.so.1 venv/lib/python3.6/site-packages/pptk/libs/libz.so.1.old
 #sudo ln --silent  /lib/x86_64-linux-gnu/libz.so.1 venv/lib/python3.6/site-packages/pptk/libs/
