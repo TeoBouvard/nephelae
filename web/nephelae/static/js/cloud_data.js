@@ -62,7 +62,6 @@ function updateData(){
             }
             updateCharts(data);
             setTimeout(updateData, refresh_rate);
-        }
     });
 }
 
