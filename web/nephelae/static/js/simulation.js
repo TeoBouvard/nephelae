@@ -250,9 +250,7 @@ function render(){
 }
 
 function toggleFleetVisibility(){
-	console.log(fleet)
 	for(var key in fleet){
-		console.log(fleet[key].path.visible)
 		fleet[key].uav.visible = !fleet[key].uav.visible;
 		fleet[key].path.visible = !fleet[key].path.visible;
 	}

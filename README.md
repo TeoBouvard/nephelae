@@ -28,9 +28,9 @@ git clone https://github.com/teobouvard/nephelae_gui.git
 cd nephelae_gui
 make install
 make demo
-
 ```
-You can then open a web browser (chrome or chromium preferably) and go to [localhost:8000](http://localhost:8000). As the server broadcasts on the whole network, you can use this interface from every computer on your network, by changing `localhost` to the server's IP address in the URL.
+
+You can then open a web browser and go to [localhost:8000](http://localhost:8000). As the server broadcasts on 0.0.0.0, you can use this interface from every computer on your network, by changing `localhost` to the server's IP address in the URL.
   
 
 **How does it work ?**  
@@ -100,8 +100,8 @@ Not yet implemented because of mapping interface still missing. Will be used to 
 
 **Fleet**
 
-Displays current state of the fleet, with tasks assigned to each UAV.
-In the future, you will be able to assign task via the controller.
+Displays current state of the fleet, with current and past tasks assigned to each UAV.
+In the future, you will be able to assign tasks via the controller.
 
 ---
 
@@ -128,6 +128,7 @@ typage drones
 - ability to focus on single uav in 3d
 - benchmark frame position computations
 - add pitch estimation in simulation 
+- test install on clean VM
 
 - k-means clustering, then convex hull ?
 
@@ -149,3 +150,4 @@ typage drones
 
 - A Paparazzi database referenced by `$PPRZ_DB`, a running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). You can find a demo database [here](demo/).
 - A Meso_NH file referenced by `$MESO_NH`.
+- git, curl, sed
