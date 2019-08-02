@@ -92,10 +92,10 @@ runserver: check-meso
 	$(ECHO) "Starting server ..."
 
 #dev server
-	-cd ./web && python3 manage.py runserver 0.0.0.0:8000
+#-cd ./web && python3 manage.py runserver 0.0.0.0:8000
 
 #prod server 
-#-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
+	-@export PYTHONPATH="$(PWD)/nephelae_master/" && export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
 demo: check-meso
