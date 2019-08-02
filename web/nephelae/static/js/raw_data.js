@@ -198,7 +198,7 @@ function handleMessage(message){
             //Plotly.relayout(message.variable_name, new_range);
         } else {
             // if trace index is not found, reload the page
-            location.reload();
+            //location.reload(); -> something has to be done
         }
     // if variable does not exist, re-setup the page
     } else if (!(message.variable_name in parameters.variables)) {
