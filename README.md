@@ -23,7 +23,7 @@ This is a web application designed as an interface between the fleet of UAV used
 **How do I install it ?**  
 
 ```shell
-apt-get -y install python3-pip redis-server
+sudo apt-get -y install python3-pip redis-server
 git clone https://github.com/teobouvard/nephelae_gui.git
 cd nephelae_gui
 make install

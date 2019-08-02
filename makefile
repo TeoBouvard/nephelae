@@ -1,7 +1,7 @@
 ECHO = @echo
 FETCH = @curl --silent
-pip_options = --user
-.PHONY: demo runserver
+pip_options =
+.PHONY: demo runserver install assets requirements
 
 
 help:
@@ -13,7 +13,7 @@ help:
 	$(ECHO) "- simulation	: Launch paparazzi simulation"
 
 
-install : requirements assets
+install : assets requirements
 
 assets :
 	$(ECHO) -n "Creating static folders ... "
@@ -27,7 +27,7 @@ assets :
 	$(FETCH) --output web/nephelae/static/js/libs/leaflet.js 'https://unpkg.com/leaflet@1.5.1/dist/leaflet.js'
 	$(FETCH) --output web/nephelae/static/js/libs/leafletRotatedMarker.js 'https://raw.githubusercontent.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js'
 	$(FETCH) --output web/nephelae/static/js/libs/materialize.js 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js'
-	$(FETCH) --output web/nephelae/static/js/libs/three.js 'https://cdnjs.cloudflare.com/ajax/libs/three.js/106/three.min.js'
+	$(FETCH) --output web/nephelae/static/js/libs/three.js 'https://cdnjs.cloudflare.com/ajax/libs/three.js/107/three.min.js'
 	$(FETCH) --output web/nephelae/static/js/libs/OrbitControls.js 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js'
 	$(FETCH) --output web/nephelae/static/js/libs/GLTFLoader.js 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js'
 	$(FETCH) --output web/nephelae/static/js/libs/plotly.js 'https://cdn.plot.ly/plotly-latest.min.js'
@@ -67,6 +67,10 @@ assets :
 requirements :
 	$(ECHO) -n "Installing requirements ... "
 	
+	pip3 $(pip_options) install virtualenv
+	virtualenv env
+	source venv/bin/activate
+
 	@if [ -d "nephelae_master" ]; then \
 		git -C nephelae_master pull; \
 	else \
@@ -92,14 +96,14 @@ runserver: check-meso
 	$(ECHO) "Starting server ..."
 
 #dev server
-	-cd ./web && python3 manage.py runserver
+	-cd ./web && python3 manage.py runserver 0.0.0.0:8000
 
 #prod server 
 #-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
-demo:
-	-@export PYTHONPATH="$(PWD)/nephelae_master/" && export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && python3 manage.py runserver
+demo: check-meso
+	-@export PYTHONPATH="$(PWD)/nephelae_master/" && export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && python3 manage.py runserver 0.0.0.0:8000
 
 
 simulation: check-pprz

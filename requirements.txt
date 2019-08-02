@@ -16,7 +16,6 @@ ivy-python
 channels 
 channels_redis
 redis
-asgi_redis
 
 #Map tile downloader
 aiohttp

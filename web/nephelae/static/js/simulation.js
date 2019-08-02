@@ -92,6 +92,8 @@ function createScene() {
 }
 
 function createControls() {
+	console.log(camera)
+	console.log(renderer)
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 	raycaster = new THREE.Raycaster();
 	mouse = new THREE.Vector2;
