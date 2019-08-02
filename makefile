@@ -1,6 +1,6 @@
 ECHO = @echo
 FETCH = @curl --silent
-pip_options =
+pip_options = --user
 .PHONY: demo runserver install assets requirements
 
 
@@ -67,10 +67,6 @@ assets :
 requirements :
 	$(ECHO) -n "Installing requirements ... "
 	
-	pip3 $(pip_options) install virtualenv
-	virtualenv env
-	source venv/bin/activate
-
 	@if [ -d "nephelae_master" ]; then \
 		git -C nephelae_master pull; \
 	else \
