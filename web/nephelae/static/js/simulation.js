@@ -189,7 +189,7 @@ function update(){
 
 	if (elapsed_time >= parameters.refresh_rate && then != null){
 
-		// stop sending request while this one is processed
+		// stop sending request while this one is processed 
 		then = null;
 
 		// add +1 to trail_length so that zero performs a valid slice

@@ -44,7 +44,7 @@ var config = {
 // Keep track of chart state
 var refresh_rate = 2000; // ms
 
-$(document).ready(function(){
+$(document).ready(() => {
     updateData();
     removeLoader();
 });
@@ -52,9 +52,9 @@ $(document).ready(function(){
 function updateData(){
     var data = {};
 
-    $.getJSON('update/', function(response){
+    $.getJSON('update/', (response) => {
         data = response;
-        console.log('data received'; response);
+        console.log('data received : ' + response);
 
 
             if(data.length == 0){
