@@ -22,7 +22,7 @@ var parameters = {
     refresh_rate: 1000,     // milliseconds
     altitude: 600,          // meters
     trail_length: 60,       // seconds
-    thermals_cmap: 'Reds',
+    thermals_cmap: 'seismic',
     clouds_cmap: 'Purples',
     transparent: true,
     tracked_uav: null,
@@ -59,7 +59,7 @@ function setupGUI(){
     f1.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
     f1.add(parameters, 'update_wind').name('Update wind');
 
-    f2.add(parameters, 'thermals_cmap', ['Reds', 'viridis']).name('Thermals color');
+    f2.add(parameters, 'thermals_cmap', ['seismic', 'viridis']).name('Thermals color');
     f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
     f2.add(parameters, 'transparent').name('Transparent');
 
@@ -199,7 +199,6 @@ function updateUavs(){
         for (var key in response.positions){
 
             // Parse response data
-            var uav_id = key;
             var uav_path = response.positions[key].path;
             var uav_position = uav_path.slice(-1)[0];
             var uav_altitude = uav_path.slice(-1)[0][2];
@@ -208,7 +207,7 @@ function updateUavs(){
             var uav_time = response.positions[key].time;
 
             // Identify corresponding uav ...
-            var uav_to_update = fleet[uav_id];
+            var uav_to_update = fleet[key];
 
             // ... and update it
             if(uav_to_update){
@@ -232,7 +231,7 @@ function updateUavs(){
 
             // ... or display error message if uav id does not match -> update fleet dictionnary and start tracking it
             else {
-                console.error("no uav with id ", uav_id, " found !");
+                console.error("no uav with id ", key, " found !");
                 displayUavs();
             }
         }
@@ -271,7 +270,7 @@ function computeURL(){
         parameters.altitude = parameters.tracked_uav.altitude;
         parameters.time = parameters.tracked_uav.time;
     } else {
-        parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : 0;
+        parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : new Date().getSeconds();
     }
 
     // Build query with parameters

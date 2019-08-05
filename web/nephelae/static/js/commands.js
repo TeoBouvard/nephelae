@@ -38,7 +38,8 @@ function setupGUI(){
 }
 
 function updateGUI(selectedCommand){
-
+    
+    // dynamic command options
     $('.dg li.title').next().nextAll().remove();
 
     switch (selectedCommand) {
@@ -174,7 +175,7 @@ function generateItem(id){
     var html = '<div id="'+ id +'" class="card blue-grey darken-1">';
         html += '<div class="card-content white-text">';
             html += '<span id="uav_id" class="card-title left"></span>';
-            html += '<span id="battery" class="card-title right"></span>';
+            html += '<span id="battery" class="new badge right" data-badge-caption=""></span>';
             html += '<br><br><hr><br>';
             html += '<span class="left">Flight Time</span><p id="flight_time" class="right"></p><br>';
             html += '<span class="left">Altitude</span><p id="altitude" class="right"></p><br>';
@@ -201,18 +202,16 @@ function fakeBattery(time){
     return Math.max(100*((1000-time)%1000/1000), 0);
 }
 
+// draw a vertical line at current time
 function referenceLine(div){
-
-//get the height of the timeline div
-	var height;
-  $('#' + div + ' rect').each(function(index){
-  	var x = parseFloat($(this).attr('x'));
-    var y = parseFloat($(this).attr('y'));
-    
-    if(x == 0 && y == 0) {height = parseFloat($(this).attr('height'))}
-  })
+    //get the height of the timeline div
+    var height;
+    $('#' + div + ' rect').each(function(index){
+        var x = parseFloat($(this).attr('x'));
+        var y = parseFloat($(this).attr('y'));
+        if(x == 0 && y == 0) height = parseFloat($(this).attr('height'));
+    });
 
 	var nowWord = $('#' + div + ' text:contains("Now")');
-  
-  nowWord.prev().first().attr('height', height + 'px').attr('width', '1px').attr('y', '0');
+    nowWord.prev().first().attr('height', height + 'px').attr('width', '1px').attr('y', '0');
 }
