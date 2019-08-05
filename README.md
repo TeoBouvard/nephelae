@@ -129,9 +129,9 @@ typage drones
 - benchmark frame position computations
 - add pitch estimation in simulation / attitude message ?
 - test install on clean VM
-- task streaming ?
+- db requests for macro parameters
 
-- k-means clustering, then convex hull ?
+- dbscan clustering, then convex hull ?
 
 ---
 
