@@ -48,8 +48,8 @@ async def download_tiles(z_min, z_max, lat_north, lat_south, lon_west, lon_east)
             #print("x range for zoom ", z, " : ", start_x, stop_x)
             #print("y range for 1000zoom ", z, " : ", start_y, stop_y)
 
-            for x in range(start_x, stop_x):
-                for y in range(start_y, stop_y):
+            for x in range(start_x-1, stop_x+1):
+                for y in range(start_y-1, stop_y+1):
                     
                     dir_path = pathlib.Path(__file__).parent.parent / pathlib.Path("static/map_tiles/%d/%d" % (z, x))
                     filename = pathlib.Path(dir_path, str(y) + ".jpg")
