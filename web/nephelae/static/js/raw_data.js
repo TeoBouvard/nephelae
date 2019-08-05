@@ -92,8 +92,8 @@ function updateData(){
                     },
                     meta: [uav_id],
                     hovertemplate:
-                        'timestamp : %{x:.1f}s <br>' +
-                        'sensor value : %{y:.2f} <br>' +
+                        'Time : %{x:.1f}s <br>' +
+                        'Value : %{y:.2f} <br>' +
                         '<extra>UAV %{meta[0]}</extra>',
                     hoverlabel: {
                         bgcolor: 'black',
@@ -192,10 +192,10 @@ function handleMessage(message){
                 }
             };
 
-            // react to changes but draw only once in a while
+            // react to changes
             Plotly.extendTraces(message.variable_name, update, [trace_index]);
             // The following operation is very expensive, uncomment it only if you need fixed range streaming plot
-            //Plotly.relayout(message.variable_name, new_range);
+            Plotly.relayout(message.variable_name, new_range);
         } else {
             // if trace index is not found, reload the page
             //location.reload(); -> something has to be done

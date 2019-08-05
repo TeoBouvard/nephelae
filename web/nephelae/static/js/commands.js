@@ -98,7 +98,7 @@ function sendCommand(){
 }
 
 function setupChart(){
-    chart = new google.visualization.Timeline($('#chart')[0]);
+    chart = new google.visualization.Timeline($('#chart_div')[0]);
     var dataTable = new google.visualization.DataTable();
 
     dataTable.addColumn({ type: 'string', id: 'UAV' });
@@ -108,26 +108,33 @@ function setupChart(){
 
     //fake data
     dataTable.addRows([
-        ['100', 'Idle', 0, 10000],
+        [ '\5', 'Now', 0, 0],
+        ['100', 'Idle', -5000, 10000],
         ['100', 'Takeoff', 10000, 15000],
         ['100', 'Survey', 15000, 40000],
-        ['101', 'Idle', 0, 5000],
+        ['101', 'Idle', -5000, 5000],
         ['101', 'Takeoff', 5000, 10000],
         ['101', 'Goto S1', 10000, 20000],
         ['101', 'Idle', 20000, 40000],
-        ['102', 'Idle', 0, 5000],
+        ['102', 'Idle', -5000, 5000],
         ['102', 'Takeoff', 5000, 10000],
         ['102', 'Survey', 10000, 40000],
-        ['103', 'Idle', 0, 40000]]);
+        ['103', 'Idle', -5000, 40000],
+        ['104', 'Idle', -5000, 40000],
+        ['105', 'Idle', -5000, 40000]]);
 
     // font options does not work ?
     var options = {
             fontName: 'Roboto',
             //colors: [ 'teal'],
             fontSize: 200,
+            height: 400,
     };
-
     chart.draw(dataTable, options);
+   
+    // draw refernce line over chart 
+    referenceLine('chart_div');
+    google.visualization.events.addListener(chart, 'onmouseout', () => {referenceLine('chart_div');});
 
 }
 
@@ -192,4 +199,20 @@ function updateItem(id){
 // THIS IS MEANT TO BE DELETED WHEN A REAL BATTERY ESTIMATION EXISTS
 function fakeBattery(time){
     return Math.max(100*((1000-time)%1000/1000), 0);
+}
+
+function referenceLine(div){
+
+//get the height of the timeline div
+	var height;
+  $('#' + div + ' rect').each(function(index){
+  	var x = parseFloat($(this).attr('x'));
+    var y = parseFloat($(this).attr('y'));
+    
+    if(x == 0 && y == 0) {height = parseFloat($(this).attr('height'))}
+  })
+
+	var nowWord = $('#' + div + ' text:contains("Now")');
+  
+  nowWord.prev().first().attr('height', height + 'px').attr('width', '1px').attr('y', '0');
 }
