@@ -127,8 +127,9 @@ typage drones
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - ability to focus on single uav in 3d
 - benchmark frame position computations
-- add pitch estimation in simulation 
+- add pitch estimation in simulation / attitude message ?
 - test install on clean VM
+- task streaming ?
 
 - k-means clustering, then convex hull ?
 

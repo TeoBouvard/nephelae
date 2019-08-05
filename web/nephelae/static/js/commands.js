@@ -169,6 +169,7 @@ function generateItem(id){
             html += '<span id="uav_id" class="card-title left"></span>';
             html += '<span id="battery" class="card-title right"></span>';
             html += '<br><br><hr><br>';
+            html += '<span class="left">Flight Time</span><p id="flight_time" class="right"></p><br>';
             html += '<span class="left">Altitude</span><p id="altitude" class="right"></p><br>';
             html += '<span class="left">Heading</span><p id="heading" class="right"></p><br>';
             html += '<span class="left">Speed</span><p id="speed" class="right"></p><br>';
@@ -182,6 +183,7 @@ function updateItem(id){
     uav = parameters.fleet[id];
     $('#'+id+' #uav_id').text('UAV ' + id);
     $('#'+id+' #battery').text(fakeBattery(uav.time).toFixed(0) + '%');
+    $('#'+id+' #flight_time').text(uav.time + 's');
     $('#'+id+' #altitude').text(uav.altitude.toFixed(1) + 'm');
     $('#'+id+' #heading').text(uav.heading.toFixed(0) + '°');
     $('#'+id+' #speed').text(uav.speed.toFixed(1) + 'm/s');
