@@ -22,6 +22,7 @@ assets :
 
 	$(ECHO) -n "Downloading javascript libraries ... "
 	$(FETCH) --output web/nephelae/static/js/libs/jquery.js 'https://code.jquery.com/jquery-3.4.1.min.js'
+	$(FETCH) --output web/nephelae/static/js/libs/cookies.js 'https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js'
 	$(FETCH) --output web/nephelae/static/js/libs/jqueryUI.js 'https://code.jquery.com/ui/1.12.1/jquery-ui.js'
 	$(FETCH) --output web/nephelae/static/js/libs/dat.gui.js 'https://raw.githubusercontent.com/dataarts/dat.gui/master/build/dat.gui.min.js'
 	$(FETCH) --output web/nephelae/static/js/libs/leaflet.js 'https://unpkg.com/leaflet@1.5.1/dist/leaflet.js'
