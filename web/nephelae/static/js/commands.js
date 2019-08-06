@@ -123,11 +123,20 @@ function setupChart(){
         ['104', 'Idle', -5000, 40000],
         ['105', 'Idle', -5000, 40000]]);
 
-    // font options does not work ?
+
     var options = {
-            fontName: 'Roboto',
-            //colors: [ 'teal'],
-            fontSize: 200,
+            colors: ['green','blue','red'],
+            timeline: {
+                rowLabelStyle: {
+                    fontName: 'Roboto', fontSize: 14
+                },
+                barLabelStyle: { 
+                    fontName: 'Roboto', fontSize: 12
+                }
+            },
+            tooltip: {
+                trigger: 'none',
+            },
             height: 400,
     };
     chart.draw(dataTable, options);

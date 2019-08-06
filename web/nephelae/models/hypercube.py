@@ -39,7 +39,7 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
         max_slice = clouds.actual_range[1]
     elif variable_name == 'thermals':
         h_slice = get_horizontal_slice(var_upwind, u_time, u_altitude, x0, x1, y0, y1)
-        #h_slice[h_slice < 0] = 0
+        #h_slice[h_slice < 0] = 0 # removes downwind from image
         colormap = utils.transparent_cmap(thermals_cmap) if transparent else thermals_cmap
         min_slice = thermals.actual_range[0]
         max_slice = thermals.actual_range[1]

@@ -95,6 +95,10 @@ nav ul li a {
     font-family: 'Roboto-Light';
 }
 
+.card {
+    min-width: 230px;
+}
+
 /* Leaflet styles */
 
 .leaflet-control-velocity {
