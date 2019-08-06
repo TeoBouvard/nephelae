@@ -2,7 +2,7 @@
 $('#nav_commands').addClass('active');
 
 var gui, gui_commands, chart;
-var command_list = ['Vertical Profile', 'Horizontal Slice', 'Volumetric Flow Rate']
+var command_list = ['Vertical Profile', 'Horizontal Slice', 'Volumetric Flow Rate', '...']
 
 var parameters = {
     fleet: {},

@@ -96,11 +96,11 @@ runserver: check-meso
 #-cd ./web && python3 manage.py runserver 0.0.0.0:8000
 
 #prod server 
-	-@export PYTHONPATH="$(PWD)/nephelae_master/" && export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
+	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
 demo: check-meso
-	-@export PYTHONPATH="$(PWD)/nephelae_master/" && export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && python3 manage.py runserver 0.0.0.0:8000
+	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && python3 manage.py runserver 0.0.0.0:8000
 
 
 simulation: check-pprz
