@@ -80,7 +80,7 @@ function updateData(){
                 }
 
                 var new_data = {
-                    type: 'scatter',
+                    type: 'line',
                     name: uav_id,
                     x: timestamps,
                     y: response.data[uav_id][variable_name]['values'],
