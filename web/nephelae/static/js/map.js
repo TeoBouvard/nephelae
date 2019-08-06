@@ -276,7 +276,7 @@ function computeURL(){
     // Build query with parameters
     var query = $.param({
         altitude: parameters.altitude,
-        time: parameters.time%715,
+        time: parameters.time%715, // HARDCODED VALUE TO REMOVE
         map_bounds: {
             west: bounds.getWest(), 
             east: bounds.getEast(),

@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block additional_head %}
-
-{% endblock %}
 
 {% block additional_scripts %}
 
@@ -12,13 +9,12 @@
 	<script src="{% static 'js/libs/OrbitControls.js' %}"></script>
 	<script src="{% static 'js/libs/GLTFLoader.js' %}"></script>
 
-	<!-- Load global variables and specific javascript -->
+	<!-- Load specific javascript -->
 	<script type="module" src="{% static 'js/simulation.js' %}"></script>
 
 {% endblock %}
 
 {% block page %}
-
 
     <!-- Display controller -->
 	<div id="draggable" class="small-container">

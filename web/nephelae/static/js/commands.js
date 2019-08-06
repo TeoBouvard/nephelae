@@ -16,9 +16,8 @@ var parameters = {
 };
 
 
-$(document).ready(function(){
+$(document).ready( () => {
 	removeLoader();
-
     discoverFleet();
     setupChart();
 });
@@ -133,9 +132,9 @@ function setupChart(){
     };
     chart.draw(dataTable, options);
    
-    // draw refernce line over chart 
+    // draw reference line over the chart 
     referenceLine('chart_div');
-    google.visualization.events.addListener(chart, 'onmouseout', () => {referenceLine('chart_div');});
+    google.visualization.events.addListener(chart, 'onmouseout', () => referenceLine('chart_div') );
 
 }
 
@@ -190,7 +189,7 @@ function generateItem(id){
 function updateItem(id){
     uav = parameters.fleet[id];
     $('#'+id+' #uav_id').text('UAV ' + id);
-    $('#'+id+' #battery').text(fakeBattery(uav.time).toFixed(0) + '%');
+    $('#'+id+' #battery').text('current task');
     $('#'+id+' #battery').addClass("green"); // to be replaced with task color
     $('#'+id+' #flight_time').text(uav.time + 's');
     $('#'+id+' #altitude').text(uav.altitude.toFixed(1) + 'm');
@@ -198,14 +197,8 @@ function updateItem(id){
     $('#'+id+' #speed').text(uav.speed.toFixed(1) + 'm/s');
 }
 
-// THIS IS MEANT TO BE DELETED WHEN A REAL BATTERY ESTIMATION EXISTS
-function fakeBattery(time){
-    return Math.max(100*((1000-time)%1000/1000), 0);
-}
-
-// draw a vertical line at current time
+// draw a vertical line at current time in the chart
 function referenceLine(div){
-    //get the height of the timeline div
     var height;
     $('#' + div + ' rect').each(function(index){
         var x = parseFloat($(this).attr('x'));

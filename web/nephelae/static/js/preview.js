@@ -14,7 +14,6 @@ var parameters = {
 $(document).ready(function(){
     // Inititalize parameters before drawing plot
     setupGUI();
-
 });
 
 function setupGUI(){
@@ -33,7 +32,7 @@ function setupGUI(){
         parameters['fleet'] = {};
 
         f1.add(parameters, 'variable', response.sample_tags)
-        .setValue(response.sample_tags[0])
+        .setValue(response.sample_tags.pop())
         .name("Sensor variable")
         .onChange(drawPlot);
 
