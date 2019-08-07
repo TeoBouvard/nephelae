@@ -9,3 +9,4 @@ web/nephelae/static/css/libs/*
 web/nephelae/static/js/libs/*
 web/nephelae/static/map_tiles/*
 nephelae_master
+venv

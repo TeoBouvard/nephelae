@@ -1,6 +1,6 @@
 ECHO = @echo
 FETCH = @curl --silent
-pip_options = 
+pip_options =
 .PHONY: demo runserver install assets requirements
 
 
@@ -93,14 +93,14 @@ runserver: check-meso
 	$(ECHO) "Starting server ..."
 
 #dev server (easy to kill, used in demo)
-	@-python3 web/manage.py runserver 0.0.0.0:8000
+	@-cd web && python3 manage.py runserver 0.0.0.0:8000
 
 #prod server (hard to kill)
 #-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
 demo: check-meso
-	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && python3 web/manage.py runserver 0.0.0.0:8000
+	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd web/ && python3 manage.py runserver 0.0.0.0:8000
 
 
 simulation: check-pprz

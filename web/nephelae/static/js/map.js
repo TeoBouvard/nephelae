@@ -319,4 +319,5 @@ function updateWindData() {
 
 function downloadMap(){
     $.get('dl_map/?' + computeURL());
+    setTimeout(window.location.reload.bind(window.location), 30000);
 }

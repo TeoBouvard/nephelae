@@ -26,6 +26,8 @@ This is a web application designed as an interface between the fleet of UAV used
 sudo apt-get -y install python3-pip redis-server
 git clone https://github.com/teobouvard/nephelae_gui.git
 cd nephelae_gui
+python3 -m venv venv
+. venv/bin/activate
 make install
 make demo
 ```
@@ -69,7 +71,7 @@ Every tool in this webapp has a controller located at the top right of the page.
 
 * You can choose which layers to display by hovering the layers icon at the bottom right of the map. 
 * You can tune the appearance of the clouds and thermals layers in the controller. 
-* You can download IGN map tiles of the visible map by clicking `Download IGN` in the `Tools` folder of the controller. This will download visible map tiles for offline use of the current map. This might take a few seconds (minutes?) depending on your internet connection. Keep in mind that a 10km * 10km map is at least 150MB (10k tiles).
+* You can download IGN map tiles of the visible area by clicking `Download IGN` in the `Tools` folder of the controller. This will download visible map tiles for offline use of the current map. This might take a few seconds (minutes?) depending on your internet connection. Keep in mind that a 10km * 10km map is at least 150MB (10k tiles). You can check download status by looking at the server access log. The page will automatically reload 30 seconds after download has begun, to fetch downloaded tiles.
 * You can get live infos about a UAV by clicking on it.
 * You can set MesoNH cross-section altitude in the controller. If you want the cross-section to follow one of the UAVs, you can do so by clicking on a UAV and then on `SYNC MESONH`. It will synchronize time and altitude of the cross-section with the position of the UAV. Click anywhere on the altitude slider to stop syncing.
 If you are lost, click the home icon at the top left of the map to get back to base.
@@ -151,4 +153,4 @@ typage drones
 
 - A Paparazzi database referenced by `$PPRZ_DB`, a running Paparazzi simulation, or real UAVs flying (see [Paparazzi wiki](https://wiki.paparazziuav.org/wiki/)). You can find a demo database [here](demo/).
 - A Meso_NH file referenced by `$MESO_NH`.
-- git, curl, sed
+- python3, git, curl, sed
