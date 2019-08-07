@@ -78,7 +78,7 @@ requirements :
 	@git -C ./nephelae_master submodule update
 	@pip3 install $(pip_options) wheel
 	@pip3 install $(pip_options) ./nephelae_master
-	#@rm -rf ./nephelae_master -> remove when nephelae is pip packaged
+	@rm -rf ./nephelae_master
 	@pip3 install $(pip_options) -r requirements.txt
 
 
@@ -92,15 +92,15 @@ clean-assets :
 runserver: check-meso
 	$(ECHO) "Starting server ..."
 
-#dev server
-#-cd ./web && python3 manage.py runserver 0.0.0.0:8000
+#dev server (easy to kill, used in demo)
+	@-python3 web/manage.py runserver 0.0.0.0:8000
 
-#prod server 
-	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
+#prod server (hard to kill)
+#-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
 demo: check-meso
-	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && python3 manage.py runserver 0.0.0.0:8000
+	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && python3 web/manage.py runserver 0.0.0.0:8000
 
 
 simulation: check-pprz
