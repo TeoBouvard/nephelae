@@ -32,6 +32,7 @@
 		<script src="{% static 'js/libs/leaflet.js' %}"></script>
 		<script src="{% static 'js/base.js' %}"></script>
 		<script src="{% static 'js/utils.js' %}"></script>
+		<script src="{% static 'js/settings.js' %}"></script>
 
 		{% block additional_head %}{% endblock %}
 		
@@ -43,8 +44,12 @@
 
 		<nav class="blue-grey darken-3 z-depth-0">
 			<div class="nav-wrapper">
-				<a href="https://github.com/teobouvard/nephelae_gui" class="brand-logo right"><i class="material-icons">cloud</i></a>
+
 				<a href="#" data-target="small_nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+				<li class= "right brand-logo">
+					<a href="{% url 'settings' %}"><i class="material-icons">settings</i></a>
+					<a href="https://github.com/teobouvard/nephelae_gui"><i class="material-icons">cloud</i></a>
+				</li>
 				<ul id="large_nav" class="left hide-on-med-and-down">
 					<li id='nav_commands'><a href="{% url 'commands' %}">Fleet</a></li>
 					<li><a class="dropdown-trigger" href="#!" data-target="tracking_dropdown">Tracking<i class="material-icons right">arrow_drop_down</i></a></li>

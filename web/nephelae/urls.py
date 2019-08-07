@@ -54,4 +54,6 @@ urlpatterns = [
     path('raw_data/update/', views.get_sensor_data),
     path('raw_data/discover/', views.discover),
 
+    # URL for settings page
+    path('settings/', views.settings, name='settings'),
 ]

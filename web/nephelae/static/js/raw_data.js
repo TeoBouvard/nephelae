@@ -21,7 +21,7 @@ var parameters = {
     socket: null,
 }
 
-$(document).ready(function(){
+$(document).ready(() => {
     setupGUI();
 });
 

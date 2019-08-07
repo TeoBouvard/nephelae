@@ -32,3 +32,7 @@ def sections(request):
 
 def simulation(request):
     return render(request, 'simulation.html')
+
+
+def settings(request):
+    return render(request, 'settings.html')
