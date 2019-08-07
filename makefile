@@ -78,7 +78,7 @@ requirements :
 	@git -C ./nephelae_master submodule update
 	@pip3 install $(pip_options) wheel
 	@pip3 install $(pip_options) ./nephelae_master
-	@rm -rf ./nephelae_master
+	#@rm -rf ./nephelae_master
 	@pip3 install $(pip_options) -r requirements.txt
 
 

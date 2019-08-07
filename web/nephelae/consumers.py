@@ -19,6 +19,7 @@ class GPSConsumer(WebsocketConsumer):
 
 
     def disconnect(self, close_code):
+        tracker.db.remove_gps_observer(self)
         self.channel_layer.group_discard
 
 
@@ -41,7 +42,8 @@ class SensorConsumer(WebsocketConsumer):
 
 
     def disconnect(self, close_code):
-        #tracker.db.add_gps_observer(self)
+        print("disconnecting")
+        tracker.db.remove_sensor_observer(self)
         self.channel_layer.group_discard
 
 

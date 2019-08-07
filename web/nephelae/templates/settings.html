@@ -4,9 +4,20 @@
 
 {% block additional_scripts %}
 
+	<!-- Load specific javascript -->
+	<script type="module" src="{% static 'js/settings.js' %}"></script>
+
 {% endblock %}
 
 
 {% block page %}
+
+<div class='container'>
+    <form action="#">
+        <p class="range-field">
+            <input type="range" id="test5" min="0" max="100" />
+        </p>
+    </form>
+</div>
 
 {% endblock %}
