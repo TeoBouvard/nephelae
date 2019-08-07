@@ -102,10 +102,10 @@ function createFloor() {
 	var texture = new THREE.TextureLoader().load("textures/seamless_water.jpg" );
 	texture.wrapS = THREE.RepeatWrapping;
 	texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set( 50, 60 );
+	texture.repeat.set( 2000, 2000 );
 
 	// Create a floor mesh
-	var geometry = new THREE.PlaneBufferGeometry(10000, 10000, 1, 1);
+	var geometry = new THREE.PlaneBufferGeometry(100000, 100000, 1, 1);
 	var material = new THREE.MeshMatcapMaterial({ map: texture });
 	var floor = new THREE.Mesh(geometry, material);
 	scene.add(floor);
