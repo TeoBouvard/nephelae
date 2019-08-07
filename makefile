@@ -92,10 +92,10 @@ clean-assets :
 runserver: check-meso
 	$(ECHO) "Starting server ..."
 
-#dev server (easy to kill, used in demo)
+#dev server (easy to kill, reloads on file changes, used in demo)
 	@-cd web && python3 manage.py runserver 0.0.0.0:8000
 
-#prod server (hard to kill)
+#prod server (hard to kill, doesn't reload)
 #-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 

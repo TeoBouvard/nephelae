@@ -319,5 +319,6 @@ function updateWindData() {
 
 function downloadMap(){
     $.get('dl_map/?' + computeURL());
+    // automatically reload the page in 30 seconds to fetch downloaded map tiles (not conventional)
     setTimeout(window.location.reload.bind(window.location), 30000);
 }
