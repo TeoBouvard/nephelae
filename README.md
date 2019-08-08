@@ -69,7 +69,12 @@ A [demo database](demo/) is available. When you run `make demo`, this is the def
 **General**
 
 Every tool in this webapp has a controller located at the top right of the page. You can move it along the vertical axis by dragging the handle, and extend it along the horizontal axis by dragging its left side. You can toggle its visibility by pressing the H key on your keyboard.
+  
+**Fleet**
 
+Displays current state of the fleet, with current and past tasks assigned to each UAV.
+In the future, you will be able to assign tasks via the controller.
+  
 **2D tracking**
 
 * You can choose which layers to display by hovering the layers icon at the bottom right of the map. 
@@ -103,10 +108,9 @@ This tool is used to explore MesoNH files by displaying cross sections at a give
 
 Not yet implemented because of mapping interface still missing. Will be used to display macro informations about the cloud being explored.
 
-**Fleet**
+**Settings**
 
-Displays current state of the fleet, with current and past tasks assigned to each UAV.
-In the future, you will be able to assign tasks via the controller.
+You can change the default values of variables used in the different pages. Changes are automatically saved, so you can exit the page right after making your changes. If you wish to revert all settings to their defaults, click the reset button.
 
 ---
 
