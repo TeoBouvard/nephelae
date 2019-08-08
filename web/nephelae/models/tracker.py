@@ -6,24 +6,26 @@ from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
 
 from . import utils
 
-#db = NephelaeDataServer()
-#
-#def build_uav(uavId, navRef):
-#    uav = ppint.PprzMesoNHUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
-#    uav.add_sensor_observer(db)
-#    uav.add_gps_observer(db)
-#    return uav
-#
-#interface = ppint.PprzSimulation(os.environ['MESO_NH'], ['RCT', 'WT'], build_uav_callback=build_uav)
-#interface.start()
-#db.set_navigation_frame(interface.navFrame)
 
 if 'PPRZ_DB' in os.environ:
+    # if PPRZ_DB is defined, do a replay
     db = DatabasePlayer(os.environ['PPRZ_DB'])
     db.play(looped=True)
 else:
-    print('No simulation database found. Export $PPRZ_DB variable.')
-    exit()
+    # else connect to paparazzi uavs
+    db = NephelaeDataServer()
+    if 'MESO_NH' in os.environ:
+        def build_uav(uavId, navRef):
+            uav = ppint.PprzMesoNHUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
+            uav.add_sensor_observer(db)
+            uav.add_gps_observer(db)
+            return uav
+        interface = ppint.PprzSimulation(os.environ['MESO_NH'], ['RCT', 'WT'], build_uav_callback=build_uav)
+    else:
+        print('Full UAV interface not implmented yet. Please set MESO_NH env variable to a mesonh dataset')
+        exit()
+    interface.start()
+    db.set_navigation_frame(interface.navFrame)
 
 
 nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
