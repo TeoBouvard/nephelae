@@ -1,5 +1,5 @@
 // Activate current menu in nav
-document.getElementById('nav_profiles').className = 'active';
+$('#nav_profiles').addClass('active');
 
 // Chart style and options
 var chart_height = 550;

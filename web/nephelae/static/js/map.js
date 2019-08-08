@@ -126,7 +126,7 @@ function setupMap(){
 
 function displayUavs(){
 
-    $.getJSON('discover/', (response) => {
+    $.getJSON('/discover/', (response) => {
         
         parameters.origin = response.origin;
         

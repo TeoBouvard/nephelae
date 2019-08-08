@@ -129,7 +129,7 @@ function createUavs() {
 	}))
 	.done( () => {
 
-		$.getJSON('discover/', (response) => {
+		$.getJSON('/discover/', (response) => {
 
 			// add +1 to trail_length so that zero performs a valid slice
 			var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length+1, reality:false});

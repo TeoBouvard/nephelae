@@ -1,5 +1,5 @@
 // Activate current menu in nav
-document.getElementById('nav_raw_data').className = 'active';
+$('#nav_raw_data').addClass('active');
 
 // Chart style
 var chart_height = 250;
@@ -38,7 +38,7 @@ function setupGUI(){
     var f2 = gui.addFolder('UAVs');
     var f3 = gui.addFolder('Variables');
 
-    $.getJSON('discover/', (response) => {
+    $.getJSON('/discover/', (response) => {
 
         parameters['uavs'] = {};
         parameters['variables'] = {};

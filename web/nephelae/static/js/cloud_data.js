@@ -1,5 +1,5 @@
 // Activate current menu in nav
-document.getElementById('nav_cloud_data').className = 'active';
+$('#nav_cloud_data').addClass('active');
 
 // Chart style and options
 var chart_height = 280;

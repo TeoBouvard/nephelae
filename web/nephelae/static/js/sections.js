@@ -66,7 +66,7 @@ function setupGUI(){
                 .onFinishChange(updateData);
         }),
 
-        $.getJSON('discover/', (response) => {
+        $.getJSON('/discover/', (response) => {
             gui.add(parameters, 'variable', response.sample_tags)
             .setValue(response.sample_tags[0])
             .name("Variable")

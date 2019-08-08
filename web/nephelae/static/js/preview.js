@@ -27,7 +27,7 @@ function setupGUI(){
 
     var f2 = gui.addFolder('UAVs');
 
-    $.getJSON('discover/', (response) => {
+    $.getJSON('/discover/', (response) => {
 
         parameters['fleet'] = {};
 
