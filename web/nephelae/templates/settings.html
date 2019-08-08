@@ -13,11 +13,21 @@
 {% block page %}
 
 <div class='container'>
-    <form action="#">
-        <p class="range-field">
-            <input type="range" id="test5" min="0" max="100" />
+
+    <div class='row center'>
+        <h3>Settings</h3>
+    </div>
+
+    <div class='row'>
+        <div class='col s4'>
+
+        <p class="range-field center"> 
+            Refresh rate 
+            <input type="range" id="slider_refresh_rate" min="500" max="10000" step="100"/>
         </p>
-    </form>
+        </div>
+
+    </div>
 </div>
 
 {% endblock %}

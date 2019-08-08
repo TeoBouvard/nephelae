@@ -1,6 +1,6 @@
 ECHO = @echo
 FETCH = @curl --silent
-pip_options =
+pip_options = --upgrade --no-deps --force-reinstall
 .PHONY: demo runserver install assets requirements
 
 

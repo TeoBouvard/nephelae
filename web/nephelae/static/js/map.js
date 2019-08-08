@@ -19,7 +19,7 @@ var fleet = {};
 
 // Parameters
 var parameters = {
-    refresh_rate: 1000,     // milliseconds
+    refresh_rate: parseInt(Cookies.get('refresh_rate')),     // milliseconds
     altitude: 600,          // meters
     trail_length: 60,       // seconds
     thermals_cmap: 'seismic',
