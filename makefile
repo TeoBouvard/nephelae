@@ -1,6 +1,9 @@
 ECHO = @echo
 FETCH = @curl --silent
-pip_options = --upgrade --no-deps --force-reinstall
+
+pip_options =
+DATABASE=$(PWD)/demo/demo_db.neph
+
 .PHONY: demo runserver install assets requirements
 
 
@@ -78,7 +81,7 @@ requirements :
 	@git -C ./nephelae_master submodule update
 	@pip3 install $(pip_options) wheel
 	@pip3 install $(pip_options) ./nephelae_master
-	#@rm -rf ./nephelae_master
+	@rm -rf ./nephelae_master
 	@pip3 install $(pip_options) -r requirements.txt
 
 
@@ -96,11 +99,11 @@ runserver: check-meso
 	@-cd web && python3 manage.py runserver 0.0.0.0:8000
 
 #prod server (hard to kill, doesn't reload)
-#-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
+#-@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
 demo: check-meso
-	-@export PPRZ_DB="$(PWD)/demo/demo_db.neph" && cd web/ && python3 manage.py runserver 0.0.0.0:8000
+	-@export PPRZ_DB=$(DATABASE) && cd web/ && python3 manage.py runserver 0.0.0.0:8000
 
 
 simulation: check-pprz

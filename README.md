@@ -23,11 +23,11 @@ This is a web application designed as an interface between the fleet of UAV used
 **How do I install it ?**  
 
 ```shell
-sudo apt-get -y install python3-pip redis-server
+sudo apt-get -y install python3-pip redis-server virtualenv
 git clone https://github.com/teobouvard/nephelae_gui.git
 cd nephelae_gui
 python3 -m venv venv
-. venv/bin/activate
+source venv/bin/activate
 make install
 make demo
 ```
@@ -36,7 +36,9 @@ You can then open a web browser and go to [localhost:8000](http://localhost:8000
   
 
 **How does it work ?**  
-This webapp is based on a client-server architecture. When the client requests a web page, the server compares the requested URL to every entry in the [URL file](web/nephelae/urls.py). If it matches one entry, the corresponding [view](web/nephelae/views/) is called. A view can call [model](web/nephelae/models) methods , where the logic is located. The view then returns a response containing the data requested. HTTP or JSON responses are sent back by the server to the client, where it is handled by [scripts](web/nephelae/static/js/) and displayed according to [templates](web/nephelae/templates/) and [stylesheets](web/nephelae/static/css/).
+This webapp is based on a client-server architecture. When the client requests a web page, the server compares the requested URL to every entry in the [URL file](web/nephelae/urls.py). If it matches one entry, the corresponding [view](web/nephelae/views/) is called. A view can call [model](web/nephelae/models/) methods , where the logic is located. The view then returns a response containing the data requested. HTTP or JSON responses are sent back by the server to the client, where it is handled by [scripts](web/nephelae/static/js/) and displayed according to [templates](web/nephelae/templates/) and [stylesheets](web/nephelae/static/css/).
+  
+To display real time data coming from the UAV sensors, this webapp also implements WebSockets, which allows a persistent connection between client and server, and provides a full-duplex comunication channel between them. [Routing](web/nephelae/routing.py) is to WebSockets what [URLs](web/nephelae/urls.py) are to standard requests. [Consumers](web/nephelae/consumers.py) are to WebSockets what [views](web/nephelae/views/) are to standard requests.
   
 
 **How can I tune it ?**  
@@ -49,13 +51,14 @@ For updates concerning server-side files to take place, you have to restart the 
 
 **Why are all the javascript librairies locally downloaded and not taken from Content Delivery Networks ?**  
 This web application is supposed to be used in remote places without any internet connection, and therefore downloads every external asset during installation.
-  
 
+ 
 **I do not have a Meso_NH.nc file, what can I do ?**  
 You can download a copy from [their website](http://mesonh.aero.obs-mip.fr/mesonh54). However, if you don't feel like downloading such a big file, you can reference any `*.nc` file with your `$MESO_NH` environment variable, and it will *work*.
-
+  
+  
 **I don't want to install paparazzi but want a demo, what can I do ?**  
-A [demo database](demo/) is available. 
+A [demo database](demo/) is available. When you run `make demo`, this is the default database used. You can change it by looking at the variable in the `makefile`.
 
 ---
 
@@ -113,7 +116,8 @@ In the future, you will be able to assign tasks via the controller.
 
 - Clients can initiate download of files on the server (map tiles). I think that this is particularly bad design, but it's mostly due to the fact that this app is supposed to be used without internet connection, and by running server and client on the same machine. If you think there is a better way to download map tiles for offline use, feel free to open an issue.
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
--mesures : flux de masse pour chaque section horizontale lwc, wt en priorité
+- On raw data page, redrawing the charts on every message received causes the page to drop frames on old computers, and can even lead to the browser crashing. However, if you drag your cursor on the screen, it runs nearly smoothly. Maybe dragging your cursor on the screen triggers more frequent repaints, but this behaviour is really strange. Either switch to a real-time graphing library like Epoch.js (made for this purpose but not maintained) or investigate this strange behaviour.
+- mesures : flux de masse pour chaque section horizontale lwc, wt en priorité
 base 500-700 -> top 2000 -> ceiling 3km / wind 9m/s
 cellometer for box ?
 typage drones 
