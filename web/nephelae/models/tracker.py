@@ -1,4 +1,5 @@
 import os
+import sys
 import utm
 
 import nephelae_paparazzi.pprzinterface as ppint
@@ -6,11 +7,13 @@ from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
 
 from . import utils
 
-
 if 'PPRZ_DB' in os.environ:
     # if PPRZ_DB is defined, do a replay
     db = DatabasePlayer(os.environ['PPRZ_DB'])
     db.play(looped=True)
+    def on_exit():
+        db.stop()
+        exit()
 else:
     # else connect to paparazzi uavs
     db = NephelaeDataServer()
@@ -26,6 +29,14 @@ else:
         exit()
     interface.start()
     db.set_navigation_frame(interface.navFrame)
+    def on_exit():
+        print("Shutting down paparazzi interface... ", end='')
+        sys.stdout.flush()
+        interface.stop()
+        print("Done.")
+        exit()
+
+
 
 
 nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
