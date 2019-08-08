@@ -122,10 +122,8 @@ You can change the default values of variables used in the different pages. Chan
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - On raw data page, redrawing the charts on every message received causes the page to drop frames on old computers, and can even lead to the browser crashing. However, if you drag your cursor on the screen, it runs nearly smoothly. Maybe dragging your cursor on the screen triggers more frequent repaints, but this behaviour is really strange. Either switch to a real-time graphing library like Epoch.js (made for this purpose but not maintained) or investigate this strange behaviour.
 - In file views, Path objects are casted to string for Python 3.5 compatibility. 
-- mesures : flux de masse pour chaque section horizontale lwc, wt en priorité
-base 500-700 -> top 2000 -> ceiling 3km / wind 9m/s
-cellometer for box ?
-typage drones 
+- Consider switching to Uvicorn as a deployment server, to handle interruption signals and shutdown the interface properly. It may be smart to have a module similar to manage.py, and to launch the server from here.
+
 
 ---
 
