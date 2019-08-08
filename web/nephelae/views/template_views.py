@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from ..models import tracker
 
 
 def cloud_data(request):
