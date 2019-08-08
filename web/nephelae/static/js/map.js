@@ -21,7 +21,7 @@ var fleet = {};
 var parameters = {
     refresh_rate: parseInt(Cookies.get('refresh_rate')),     // milliseconds
     altitude: 600,          // meters
-    trail_length: 60,       // seconds
+    trail_length: parseInt(Cookies.get('trail_length')),       // seconds
     thermals_cmap: 'seismic',
     clouds_cmap: 'Purples',
     transparent: true,

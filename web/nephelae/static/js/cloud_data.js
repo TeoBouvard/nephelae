@@ -42,7 +42,9 @@ var config = {
 };
 
 // Keep track of chart state
-var refresh_rate = 2000; // ms
+var parameters = {
+    refresh_rate: parseInt(Cookies.get('refresh_rate')),
+};
 
 $(document).ready(() => {
     updateData();
@@ -61,7 +63,7 @@ function updateData(){
                 //alert("No data received from the server, try refreshing the page");
             }
             updateCharts(data);
-            setTimeout(updateData, refresh_rate);
+            setTimeout(updateData, parameters.refresh_rate);
     });
 }
 

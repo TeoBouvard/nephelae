@@ -3,7 +3,7 @@ $('#nav_preview').addClass('active');
 
 // Parameters 
 var parameters = {
-    trail_length: 60,
+    trail_length: parseInt(Cookies.get('trail_length')),
     update: drawPlot,
     variable: [],
     bgcolor: 'rgb(32,32,32)',

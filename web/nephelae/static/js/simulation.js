@@ -13,7 +13,7 @@ var then = new Date();
 // Parameters
 var parameters = {
 	refresh_rate: parseInt(Cookies.get('refresh_rate')),
-	trail_length: 20,
+	trail_length: parseInt(Cookies.get('trail_length')),
 	fleet_visibility: true,
 	fleet_focus: fitCameraToFleet,
 }

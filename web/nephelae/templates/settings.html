@@ -21,20 +21,25 @@
     <div class='row'>
         <div class='col s4'>
 
-        <p style="display:inline;"> 
-            refresh rate : <div class="center" id="display_refresh_rate" style="display:inline;"></div> ms
-            <input type="range" id="slider_refresh_rate" min="500" max="10000" step="100"/>
-        </p>
+            <p style="display:inline;"> 
+                refresh rate : <div class="center" id="display_refresh_rate" style="display:inline;"></div> ms
+                <input type="range" id="slider_refresh_rate" min="500" max="10000" step="100"/>
+            </p>
 
-        <p style="display:inline;"> 
-            length of trails : <div id="display_trail_length" style="display:inline;"></div> s
-            <input type="range" id="slider_trail_length" min="0" max="500" step="10"/>
-        </p>
+        </div>
 
+        <div class="col s4 offset-s4">
+
+            <p style="display:inline;"> 
+                length of trails : <div id="display_trail_length" style="display:inline;"></div> s
+                <input type="range" id="slider_trail_length" min="10" max="3600" step="10"/>
+            </p>
 
         </div>
 
     </div>
+
+    <div class="center"><a id="reset_cookies" class="red btn">reset</a></div>
 </div>
 
 {% endblock %}

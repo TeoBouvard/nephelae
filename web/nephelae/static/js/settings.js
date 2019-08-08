@@ -10,6 +10,7 @@ function displayCookies() {
 }
 
 function addListeners() {
+    $('#reset_cookies').click(resetCookies);
     $('#slider_refresh_rate').on('change', () => updateDisplay('refresh_rate'));
     $('#slider_trail_length').on('change', () => updateDisplay('trail_length'));
 }
@@ -22,4 +23,9 @@ function setupDisplay(div_name){
 function updateDisplay(div_name){
     Cookies.set(div_name, $('#slider_' + div_name).val());
     $('#display_' + div_name).html($('#slider_' + div_name).val());
+}
+
+function resetCookies(){
+    Cookies.remove('visits');
+    window.location.reload();
 }

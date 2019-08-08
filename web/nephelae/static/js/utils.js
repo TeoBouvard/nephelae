@@ -1,4 +1,4 @@
-// Add CSS colors (in order corresponding to plane_icons folder) for more UAVs
+// Add CSS colors (in order corresponding to plane_icons folder) for more UAV colors
 global_colors = ["red", "green", "blue", "purple", "teal", "orange", "lime", "yellow", "fuchsia", "gray"];
 global_icons = [];
 
@@ -89,4 +89,12 @@ if (typeof(Number.prototype.toRad) === "undefined") {
   Number.prototype.toRad = function() {
     return this * (Math.PI / 180);
   }
+}
+
+// Removes the spinning loader (has to be called when important elements are loaded)
+function removeLoader(){
+    var element = document.getElementById("loader");
+    if (element != null){
+        element.parentNode.removeChild(element);
+    }
 }
