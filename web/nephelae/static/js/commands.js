@@ -74,12 +74,13 @@ function updateGUI(selectedCommand){
 function sendCommand(){
 
     /* TODO WHEN ALLOCATION ALGORITHM EXISTS */
-    /* implement a server request, or a websocket message to send command to server */
+    /* implement a server request to send command to server */
 
     switch (parameters.commands) {
 
         case command_list[0]:
             alert('Sending command : UAV' + parameters.fleet_array + ' -> ' + parameters.commands);
+            //$.getJSON('enter URL here', (response) => {and callback there} );
             break;
             
         case command_list[1]:
@@ -139,12 +140,16 @@ function setupChart(){
             },
             height: 400,
     };
+
+    // draw the chart
     chart.draw(dataTable, options);
    
-    // draw reference line over the chart 
+    // draw a reference line over the chart 
     referenceLine('chart_div');
     google.visualization.events.addListener(chart, 'onmouseout', () => referenceLine('chart_div') );
 
+    // make chart responsive
+    $(window).resize(() => {setupChart()});
 }
 
 function discoverFleet(){
