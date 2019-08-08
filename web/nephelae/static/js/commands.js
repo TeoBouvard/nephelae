@@ -185,8 +185,10 @@ function displayFleet(){
 }
 
 function handleBatMessage(msg){
-    if(message.variable_name == 'BAT'){
-        updateFlightTime(message.uav_id, message.data[3])
+    if(msg.variable_name == 'BAT'){
+        $('#'+msg.uav_id+' #flight_time').text(msg.data[3] + 's');
+        $('#'+msg.uav_id+' #vbat').text(msg.data[1] + 'V');
+        $('#'+msg.uav_id+' #throttle').text(msg.data[0] + 'pprz');
     }
 }
 
@@ -201,6 +203,8 @@ function generateItem(id){
             html += '<span class="left">Altitude</span><p id="altitude" class="right"></p><br>';
             html += '<span class="left">Heading</span><p id="heading" class="right"></p><br>';
             html += '<span class="left">Speed</span><p id="speed" class="right"></p><br>';
+            html += '<span class="left">Battery voltage</span><p id="vbat" class="right"></p><br>';
+            html += '<span class="left">Throttle</span><p id="throttle" class="right"></p><br>';
         html += '</div>';
     html += '</div>';
 
@@ -216,10 +220,6 @@ function updateItem(id){
     $('#'+id+' #altitude').text(uav.altitude.toFixed(1) + 'm');
     $('#'+id+' #heading').text(uav.heading.toFixed(0) + '°');
     $('#'+id+' #speed').text(uav.speed.toFixed(1) + 'm/s');
-}
-
-function updateFlightTime(uavId, flightTime){
-    $('#'+id+' #flight_time').text(uav.time + 's');
 }
 
 // draw a vertical line at current time in the chart
