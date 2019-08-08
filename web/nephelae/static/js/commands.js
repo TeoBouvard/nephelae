@@ -169,7 +169,6 @@ function discoverFleet(){
 function displayFleet(){
 
     var socket = new WebSocket('ws://' + window.location.host + '/ws/GPS/');
-
     socket.onmessage = (e) => {
         var message = JSON.parse(e.data);
         parameters.fleet[message.uav_id] = {
@@ -180,7 +179,15 @@ function displayFleet(){
         };
         updateItem(message.uav_id);
     };
+    
+    batSocket = new WebSocket('ws://' + window.location.host + '/ws/sensor/');
+    batSocket.onmessage = (e) => handleBatMessage(JSON.parse(e.data));
+}
 
+function handleBatMessage(msg){
+    if(message.variable_name == 'BAT'){
+        updateFlightTime(message.uav_id, message.data[3])
+    }
 }
 
 function generateItem(id){
@@ -205,10 +212,14 @@ function updateItem(id){
     $('#'+id+' #uav_id').text('UAV ' + id);
     $('#'+id+' #battery').text('current task');
     $('#'+id+' #battery').addClass("green"); // to be replaced with task color
-    $('#'+id+' #flight_time').text(uav.time + 's');
+    //$('#'+id+' #flight_time').text(uav.time + 's');
     $('#'+id+' #altitude').text(uav.altitude.toFixed(1) + 'm');
     $('#'+id+' #heading').text(uav.heading.toFixed(0) + '°');
     $('#'+id+' #speed').text(uav.speed.toFixed(1) + 'm/s');
+}
+
+function updateFlightTime(uavId, flightTime){
+    $('#'+id+' #flight_time').text(uav.time + 's');
 }
 
 // draw a vertical line at current time in the chart
