@@ -117,6 +117,7 @@ In the future, you will be able to assign tasks via the controller.
 - Clients can initiate download of files on the server (map tiles). I think that this is particularly bad design, but it's mostly due to the fact that this app is supposed to be used without internet connection, and by running server and client on the same machine. If you think there is a better way to download map tiles for offline use, feel free to open an issue.
 - WARNING HARDCODED VALUE OF MESONH MAX TIME IN MAP.JS(715)
 - On raw data page, redrawing the charts on every message received causes the page to drop frames on old computers, and can even lead to the browser crashing. However, if you drag your cursor on the screen, it runs nearly smoothly. Maybe dragging your cursor on the screen triggers more frequent repaints, but this behaviour is really strange. Either switch to a real-time graphing library like Epoch.js (made for this purpose but not maintained) or investigate this strange behaviour.
+- In file views, Path objects are casted to string for Python 3.5 compatibility. 
 - mesures : flux de masse pour chaque section horizontale lwc, wt en priorité
 base 500-700 -> top 2000 -> ceiling 3km / wind 9m/s
 cellometer for box ?
