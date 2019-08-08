@@ -8,12 +8,12 @@ urlpatterns = [
     path('', RedirectView.as_view(url='commands')),
 
     # URL for preview page, update requests routed to map update view
-    path('preview/', views.preview, name='preview'),
+    path('preview/', views.render_template, {'template_name': 'preview.html'}, name='preview'),
     path('preview/discover/', views.discover),
     path('preview/update/', views.get_sensor_data),
 
     # URL for map page
-    path('map/', views.map, name='map'),
+    path('map/', views.render_template, {'template_name': 'map.html'}, name='map'),
     path('map/discover/', views.discover),
     path('map/update/', views.get_positions),
     path('map/dl_map/', views.download_map),
@@ -24,36 +24,38 @@ urlpatterns = [
     path('map/<str:variable_name>_img/', views.layer_img, name='layer_img'),
 
     # URL for simulation page
-    path('simulation/', views.simulation, name='simulation'),
+    path('simulation/', views.render_template, {'template_name': 'simulation.html'}, name='simulation'),
     path('simulation/discover/', views.discover),
     path('simulation/update/', views.get_positions),
     path('simulation/textures/<str:file_name>', views.texture),
     path('simulation/models/<str:file_name>', views.model3D),
 
     # URL for commands page
-    path('commands/', views.commands, name='commands'),
+    path('commands/', views.render_template, {'template_name': 'commands.html'}, name='commands'),
     path('commands/discover/', views.discover),
     path('commands/update/', views.get_positions),
 
     # URL for sections page
-    path('sections/', views.sections, name='sections'),
+    path('sections/', views.render_template, {'template_name': 'sections.html'}, name='sections'),
     path('sections/discover/', views.discover),
     path('sections/box/', views.mesonh_box),
     path('sections/update/', views.get_section),
 
     # URL for vertical profiles page
-    path('profiles/', views.profiles, name='profiles'),
+    path('profiles/', views.render_template, {'template_name': 'profiles.html'}, name='profiles'),
     path('profiles/update/', views.update_profiles),
 
     # URL for cloud data page
-    path('cloud_data/', views.cloud_data, name='cloud_data'),
+    path('cloud_data/', views.render_template, {'template_name': 'cloud_data.html'}, name='cloud_data'),
     path('cloud_data/update/', views.update_cloud_data),
 
     # URL for raw data page
-    path('raw_data/', views.raw_data, name='raw_data'),
+    path('raw_data/', views.render_template, {'template_name': 'raw_data.html'}, name='raw_data'),
     path('raw_data/update/', views.get_sensor_data),
     path('raw_data/discover/', views.discover),
 
     # URL for settings page
-    path('settings/', views.settings, name='settings'),
+    path('settings/', views.render_template, {'template_name': 'settings.html'}, name='settings'),
+
+    # Absolute URLs accessible by every page
 ]
