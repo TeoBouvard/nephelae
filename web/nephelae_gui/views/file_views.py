@@ -27,7 +27,7 @@ def download_map(request):
 # Render icons for UAVs
 def plane_icon(request, index):
     try:
-        path = Path('nephelae/img/plane_icons/plane_icon' + str(index) + '.png')
+        path = Path('nephelae_gui/img/plane_icons/plane_icon' + str(index) + '.png')
         with open(str(path), 'rb') as f:
             return HttpResponse(f.read(), content_type="image/png")
     except IOError:
@@ -37,7 +37,7 @@ def plane_icon(request, index):
 # Render map tiles
 def map_tiles(request, z, x, y):
     try:
-        path = Path('nephelae/static/map_tiles/', str(z), str(x), str(y) + '.jpg')
+        path = Path('nephelae_gui/static/map_tiles/', str(z), str(x), str(y) + '.jpg')
         with open(str(path), "rb") as f:
             return HttpResponse(f.read(), content_type="image/jpg")
     except IOError:
@@ -47,7 +47,7 @@ def map_tiles(request, z, x, y):
 # Render simulation texture
 def texture(request, file_name):
     try:
-        path = Path('nephelae/img/textures/', str(file_name))
+        path = Path('nephelae_gui/img/textures/', str(file_name))
         with open(str(path), "rb") as f:
             response = HttpResponse(f.read(), content_type="image/jpg")
             return response
@@ -58,7 +58,7 @@ def texture(request, file_name):
 # Render UAV 3D model
 def model3D(request, file_name):
     try:
-        path = Path('nephelae/img/3d_models/', str(file_name))
+        path = Path('nephelae_gui/img/3d_models/', str(file_name))
         with open(str(path), "rb") as f:
             response = HttpResponse(f.read())
             return response

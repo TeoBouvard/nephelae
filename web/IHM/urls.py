@@ -19,7 +19,7 @@ from . import settings
 from django.contrib.staticfiles.urls import static, staticfiles_urlpatterns
 
 urlpatterns = [
-    path('', include('nephelae.urls')),
+    path('', include('nephelae_gui.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

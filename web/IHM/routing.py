@@ -1,6 +1,6 @@
 from channels.routing import ProtocolTypeRouter, URLRouter
-import nephelae.routing
+import nephelae_gui.routing
 
 application = ProtocolTypeRouter({
-    'websocket': URLRouter(nephelae.routing.websocket_urlpatterns)
+    'websocket': URLRouter(nephelae_gui.routing.websocket_urlpatterns)
 })
