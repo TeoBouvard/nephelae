@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('nephelae', '0002_auto_20190619_1106'),
+        ('nephelae_gui', '0002_auto_20190619_1106'),
     ]
 
     operations = [
