@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from netCDF4 import MFDataset
 
-from nephelae_mesonh import MesoNHVariable
+from nephelae_simulation.mesonh_interface import MesoNHVariable
+# from nephelae_mesonh import MesoNHVariable
 
 from . import utils
 
