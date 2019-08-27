@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 
-from ..models import hypercube, tracker
+# from ..models import hypercube, tracker
+from nephelae_gui.models import hypercube, tracker
 
 
 # Returns discovered UAVs and navigation frame info

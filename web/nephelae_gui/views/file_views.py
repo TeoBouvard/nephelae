@@ -3,7 +3,8 @@ from pathlib import Path
 
 from django.http import HttpResponse, HttpResponseNotFound
 
-from ..models import hypercube, tile_downloader
+# from ..models import hypercube, tile_downloader
+from nephelae_gui.models import hypercube, tile_downloader
 
 
 def download_map(request):
