@@ -20,51 +20,51 @@ install : assets requirements
 
 assets :
 	$(ECHO) -n "Creating static folders ... "
-	@mkdir -p web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons
+	@mkdir -p web/nephelae_gui/static/js/libs web/nephelae_gui/static/css/libs/images web/nephelae_gui/static/map_tiles web/nephelae_gui/static/css/libs/icons
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Downloading javascript libraries ... "
-	$(FETCH) --output web/nephelae/static/js/libs/jquery.js 'https://code.jquery.com/jquery-3.4.1.min.js'
-	$(FETCH) --output web/nephelae/static/js/libs/cookies.js 'https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js'
-	$(FETCH) --output web/nephelae/static/js/libs/jqueryUI.js 'https://code.jquery.com/ui/1.12.1/jquery-ui.js'
-	$(FETCH) --output web/nephelae/static/js/libs/dat.gui.js 'https://raw.githubusercontent.com/dataarts/dat.gui/master/build/dat.gui.min.js'
-	$(FETCH) --output web/nephelae/static/js/libs/leaflet.js 'https://unpkg.com/leaflet@1.5.1/dist/leaflet.js'
-	$(FETCH) --output web/nephelae/static/js/libs/leafletRotatedMarker.js 'https://raw.githubusercontent.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js'
-	$(FETCH) --output web/nephelae/static/js/libs/materialize.js 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js'
-	$(FETCH) --output web/nephelae/static/js/libs/three.js 'https://cdnjs.cloudflare.com/ajax/libs/three.js/107/three.min.js'
-	$(FETCH) --output web/nephelae/static/js/libs/OrbitControls.js 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js'
-	$(FETCH) --output web/nephelae/static/js/libs/GLTFLoader.js 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js'
-	$(FETCH) --output web/nephelae/static/js/libs/plotly.js 'https://cdn.plot.ly/plotly-latest.min.js'
-	$(FETCH) --output web/nephelae/static/js/libs/googleCharts.js 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_format_module.js'
-	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_default_module.js' >> web/nephelae/static/js/libs/googleCharts.js
-	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_ui_module.js' >> web/nephelae/static/js/libs/googleCharts.js
-	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_fw_module.js' >> web/nephelae/static/js/libs/googleCharts.js
-	$(FETCH) 'https://www.gstatic.com/charts/46.2/third_party/dygraphs/dygraph-tickers-combined.js' >> web/nephelae/static/js/libs/googleCharts.js
-	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_timeline_module.js' >> web/nephelae/static/js/libs/googleCharts.js
+	$(FETCH) --output web/nephelae_gui/static/js/libs/jquery.js 'https://code.jquery.com/jquery-3.4.1.min.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/cookies.js 'https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/jqueryUI.js 'https://code.jquery.com/ui/1.12.1/jquery-ui.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/dat.gui.js 'https://raw.githubusercontent.com/dataarts/dat.gui/master/build/dat.gui.min.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/leaflet.js 'https://unpkg.com/leaflet@1.5.1/dist/leaflet.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/leafletRotatedMarker.js 'https://raw.githubusercontent.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/materialize.js 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/three.js 'https://cdnjs.cloudflare.com/ajax/libs/three.js/107/three.min.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/OrbitControls.js 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/GLTFLoader.js 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/plotly.js 'https://cdn.plot.ly/plotly-latest.min.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/googleCharts.js 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_format_module.js'
+	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_default_module.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
+	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_ui_module.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
+	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_fw_module.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
+	$(FETCH) 'https://www.gstatic.com/charts/46.2/third_party/dygraphs/dygraph-tickers-combined.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
+	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_timeline_module.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Downloading css files ... "
-	$(FETCH) --output web/nephelae/static/css/libs/leaflet.css 'https://unpkg.com/leaflet@1.5.1/dist/leaflet.css'
-	$(FETCH) --output web/nephelae/static/css/libs/materialize.css 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css'
-	$(FETCH) --output web/nephelae/static/css/libs/material-icons.css 'https://fonts.googleapis.com/icon?family=Material+Icons'
+	$(FETCH) --output web/nephelae_gui/static/css/libs/leaflet.css 'https://unpkg.com/leaflet@1.5.1/dist/leaflet.css'
+	$(FETCH) --output web/nephelae_gui/static/css/libs/materialize.css 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css'
+	$(FETCH) --output web/nephelae_gui/static/css/libs/material-icons.css 'https://fonts.googleapis.com/icon?family=Material+Icons'
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Downloading images ... "
-	$(FETCH) --output web/nephelae/static/css/libs/images/layers.png 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/images/layers.png'
+	$(FETCH) --output web/nephelae_gui/static/css/libs/images/layers.png 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/images/layers.png'
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Downloading icons ... "
-	$(FETCH) --output web/nephelae/static/css/libs/icons/MaterialIcons-Regular.ttf 'https://raw.githubusercontent.com/google/material-design-icons/master/iconfont/MaterialIcons-Regular.ttf'
+	$(FETCH) --output web/nephelae_gui/static/css/libs/icons/MaterialIcons-Regular.ttf 'https://raw.githubusercontent.com/google/material-design-icons/master/iconfont/MaterialIcons-Regular.ttf'
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Downloading fonts ... "
-	$(FETCH) --output web/nephelae/static/css/libs/icons/MaterialIcons-Regular.ttf 'https://raw.githubusercontent.com/google/material-design-icons/master/iconfont/MaterialIcons-Regular.ttf'
+	$(FETCH) --output web/nephelae_gui/static/css/libs/icons/MaterialIcons-Regular.ttf 'https://raw.githubusercontent.com/google/material-design-icons/master/iconfont/MaterialIcons-Regular.ttf'
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Tuning libraries ... "
-	@sed -i 's/Open Controls/Open Controls (H to hide)/g' web/nephelae/static/js/libs/dat.gui.js
-	@sed -i 's/Close Controls/Close Controls (H to hide)/g' web/nephelae/static/js/libs/dat.gui.js
-	@sed -i 's/src.*/src:url("icons\/MaterialIcons-Regular.ttf") format("truetype");/g' web/nephelae/static/css/libs/material-icons.css
+	@sed -i 's/Open Controls/Open Controls (H to hide)/g' web/nephelae_gui/static/js/libs/dat.gui.js
+	@sed -i 's/Close Controls/Close Controls (H to hide)/g' web/nephelae_gui/static/js/libs/dat.gui.js
+	@sed -i 's/src.*/src:url("icons\/MaterialIcons-Regular.ttf") format("truetype");/g' web/nephelae_gui/static/css/libs/material-icons.css
 	$(ECHO) "OK"
 
 
@@ -74,7 +74,7 @@ requirements :
 	@if [ -d "nephelae_master" ]; then \
 		git -C nephelae_master pull; \
 	else \
-		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_master.git nephelae_master; \
+		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel-deprecated/nephelae_master.git nephelae_master; \
 	fi
 
 	@git -C ./nephelae_master submodule init
@@ -86,10 +86,10 @@ requirements :
 
 
 clean-maps :
-	@rm -rf web/nephelae/static/map_tiles/*
+	@rm -rf web/nephelae_gui/static/map_tiles/*
 
 clean-assets :
-	@rm -rf web/nephelae/static/js/libs web/nephelae/static/css/libs/images web/nephelae/static/map_tiles web/nephelae/static/css/libs/icons
+	@rm -rf web/nephelae_gui/static/js/libs web/nephelae_gui/static/css/libs/images web/nephelae_gui/static/map_tiles web/nephelae_gui/static/css/libs/icons
 
 
 runserver: check-meso
