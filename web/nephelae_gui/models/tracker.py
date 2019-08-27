@@ -2,10 +2,10 @@ import os
 import sys
 import utm
 
-import  nephelae_paparazzi.pprzinterface as ppint
-from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
-# from nephelae_paparazzi import PprzSimulation, PprzMesoNHUav
-# from nephelae.database import DatabasePlayer, NephelaeDataServer
+# import  nephelae_paparazzi.pprzinterface as ppint
+# from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
+from nephelae_paparazzi import PprzSimulation, PprzMesonhUav
+from nephelae.database  import DatabasePlayer, NephelaeDataServer
 
 from . import utils
 
@@ -21,11 +21,11 @@ else:
     db = NephelaeDataServer()
     if 'MESO_NH' in os.environ:
         def build_uav(uavId, navRef):
-            uav = ppint.PprzMesoNHUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
+            uav = PprzMesonhUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
             uav.add_sensor_observer(db)
             uav.add_gps_observer(db)
             return uav
-        interface = ppint.PprzSimulation(os.environ['MESO_NH'], ['RCT', 'WT'], build_uav_callback=build_uav)
+        interface = PprzSimulation(os.environ['MESO_NH'], ['RCT', 'WT'], build_uav_callback=build_uav)
     else:
         print('Full UAV interface not implmented yet. Please set MESO_NH env variable to a mesonh dataset')
         exit()

@@ -71,17 +71,27 @@ assets :
 requirements :
 	$(ECHO) -n "Installing requirements ... "
 	
-	@if [ -d "nephelae_master" ]; then \
-		git -C nephelae_master pull; \
+	@if [ -d "nephelae_base" ]; then \
+		git -C nephelae_base pull; \
 	else \
-		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel-deprecated/nephelae_master.git nephelae_master; \
+		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_base.git nephelae_base; \
+	fi
+	@if [ -d "nephelae_mesonh" ]; then \
+		git -C nephelae_mesonh pull; \
+	else \
+		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_mesonh.git nephelae_mesonh; \
+	fi
+	@if [ -d "nephelae_paparazzi" ]; then \
+		git -C nephelae_paparazzi pull; \
+	else \
+		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_paparazzi.git nephelae_paparazzi; \
 	fi
 
-	@git -C ./nephelae_master submodule init
-	@git -C ./nephelae_master submodule update
 	@pip3 install $(pip_options) wheel
-	@pip3 install $(pip_options) ./nephelae_master
-	@rm -rf ./nephelae_master
+	@pip3 install $(pip_options) ./nephelae_base
+	@pip3 install $(pip_options) ./nephelae_mesonh
+	@pip3 install $(pip_options) ./nephelae_paparazzi
+	@rm -rf ./nephelae_base ./nephelae_mesonh ./nephelae_paparazzi
 	@pip3 install $(pip_options) -r requirements.txt
 
 

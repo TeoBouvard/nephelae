@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from netCDF4 import MFDataset
 
-from nephelae_simulation.mesonh_interface import MesoNHVariable
-# from nephelae_mesonh import MesoNHVariable
+# from nephelae_simulation.mesonh_interface import MesoNHVariable
+from nephelae_mesonh import MesonhVariable
 
 from . import utils
 
@@ -19,10 +19,10 @@ var_wind_v = 'VT'          # Liquid water content in KG/KG ?
 # Precheck and variable assignment
 if 'MESO_NH' in os.environ:
     hypercube = MFDataset(os.environ['MESO_NH'])
-    clouds = MesoNHVariable(hypercube, var_lwc, interpolation='linear')
-    thermals = MesoNHVariable(hypercube, var_upwind, interpolation='linear')
-    wind_u = MesoNHVariable(hypercube, var_wind_u, interpolation='linear')
-    wind_v = MesoNHVariable(hypercube, var_wind_v, interpolation='linear')
+    clouds = MesonhVariable(hypercube, var_lwc, interpolation='linear')
+    thermals = MesonhVariable(hypercube, var_upwind, interpolation='linear')
+    wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
+    wind_v = MesonhVariable(hypercube, var_wind_v, interpolation='linear')
 else:
     print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
     exit()
@@ -37,13 +37,13 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
         h_slice = get_horizontal_slice(var_lwc, u_time, u_altitude, x0, x1, y0, y1)
         colormap = utils.transparent_cmap(clouds_cmap) if transparent else clouds_cmap
         min_slice = 0
-        max_slice = clouds.actual_range[1]
+        max_slice = clouds.actual_range[0][1]
     elif variable_name == 'thermals':
         h_slice = get_horizontal_slice(var_upwind, u_time, u_altitude, x0, x1, y0, y1)
         #h_slice[h_slice < 0] = 0 # removes downwind from image
         colormap = utils.transparent_cmap(thermals_cmap) if transparent else thermals_cmap
-        min_slice = thermals.actual_range[0]
-        max_slice = thermals.actual_range[1]
+        min_slice = thermals.actual_range[0][0]
+        max_slice = thermals.actual_range[0][1]
 
     # Write image to buffer
     buf = io.BytesIO()
@@ -57,16 +57,16 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
 
     if variable == var_lwc:
-        return clouds[time_value, altitude_value, y0:y1, x0:x1].data
+        return clouds[time_value, x0:x1, y0:y1, altitude_value].data.T
 
     elif variable == var_upwind:
-        return thermals[time_value, altitude_value, y0:y1, x0:x1].data
+        return thermals[time_value, x0:x1, y0:y1, altitude_value].data.T
 
     elif variable == var_wind_u:
-        return wind_u[time_value, altitude_value, y0:y1, x0:x1].data
+        return wind_u[time_value, x0:x1, y0:y1, altitude_value].data.T
 
     elif variable == var_wind_v:
-        return wind_v[time_value, altitude_value, y0:y1, x0:x1].data
+        return wind_v[time_value, x0:x1, y0:y1, altitude_value].data.T
 
 
 def get_wind(u_time, u_altitude, bounds, origin):
@@ -107,9 +107,9 @@ def get_wind(u_time, u_altitude, bounds, origin):
 
 
 def axes():
-    min_x = clouds.bounds[2].min
-    max_x = clouds.bounds[2].max
-    nb_points = len(clouds[clouds.bounds[0].min, clouds.bounds[1].min, :, :].data)
+    min_x = clouds.bounds[1].min
+    max_x = clouds.bounds[1].max
+    nb_points = len(clouds[clouds.bounds[0].min, clouds.bounds[3].min, :, :].data)
 
     return np.linspace(min_x, max_x, nb_points).tolist()
 
@@ -118,8 +118,8 @@ def box():
     bounds = clouds.bounds
     box = [
         {'min': bounds[0].min, 'max':bounds[0].max},
-        {'min': bounds[1].min, 'max':bounds[1].max},
+        {'min': bounds[3].min, 'max':bounds[3].max},
         {'min': bounds[2].min, 'max':bounds[2].max},
-        {'min': bounds[3].min, 'max':bounds[3].max}]
+        {'min': bounds[1].min, 'max':bounds[1].max}]
     return box
 
