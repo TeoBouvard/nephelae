@@ -25,7 +25,7 @@ var parameters = {
     thermals_cmap: 'seismic',
     clouds_cmap: 'Purples',
     transparent: true,
-    tracked_uav: null,
+    tracked_uav: 'None',
     time: null,
     update_wind: updateWindData,
     dl_map: downloadMap,
@@ -37,6 +37,12 @@ var parameters = {
 $(document).ready(setupGUI);
 
 function setupGUI(){
+
+    $.getJSON('/discover/', (response) => {
+    
+    //if(response.uavs.length != 0)
+    //    parameters.tracked_uav = response.uavs[0]
+    var tracked_uav_choices = ['None'].concat(response.uavs)
 
     // Construct dat.gui
     var gui = new dat.GUI({ autoplace: false });
@@ -54,7 +60,7 @@ function setupGUI(){
     f1.add(parameters, 'altitude', min_altitude, max_altitude)
         .step(1)
         .name('Altitude (m)')
-        .onFinishChange(() => {track(-1); updateWindData();})
+        .onFinishChange(() => {track('None'); updateWindData();})
         .listen();
     f1.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
     f1.add(parameters, 'update_wind').name('Update wind');
@@ -64,9 +70,11 @@ function setupGUI(){
     f2.add(parameters, 'transparent').name('Transparent');
 
     f3.add(parameters, 'dl_map').name('Download IGN map');
+    gui.add(parameters, 'tracked_uav', tracked_uav_choices);
 
     // Create map once sliders are initialized
     setupMap();
+    });
 }
 
 
@@ -266,9 +274,11 @@ function computeURL(){
     var bounds = flight_map.getBounds();
 
     // Check if a uav is being tracked with MesoNH
-    if (parameters.tracked_uav != null){
-        parameters.altitude = parameters.tracked_uav.altitude;
-        parameters.time = parameters.tracked_uav.time;
+    if (parameters.tracked_uav != null && parameters.tracked_uav != 'None'){
+        //parameters.altitude = parameters.tracked_uav.altitude;
+        //parameters.time = parameters.tracked_uav.time;
+        parameters.altitude = fleet[parameters.tracked_uav].altitude;
+        parameters.time     = fleet[parameters.tracked_uav].time;
     } else {
         parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : new Date().getSeconds();
     }
@@ -307,7 +317,8 @@ function infosToString(uav){
 
 // Attach or remove tracked uav in parameters
 function track(id){
-    (id == -1) ? parameters.tracked_uav = null : parameters.tracked_uav = fleet[id];
+    //(id == -1) ? parameters.tracked_uav = null : parameters.tracked_uav = fleet[id];
+    parameters.tracked_uav = id
 }
 
 function updateWindData() {
