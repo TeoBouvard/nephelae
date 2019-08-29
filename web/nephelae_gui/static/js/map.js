@@ -120,7 +120,7 @@ function setupMap(){
 
     maps_parameters = discovered_maps;
     for (var key in maps_parameters) {
-        overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeURL(), flight_map.getBounds());
+        overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), flight_map.getBounds());
     }
 
     // Add layers to the map
@@ -250,7 +250,7 @@ function updateUavs(){
 
         // Update home button coordinates and layers URL
         zoomHome.setHomeCoordinates(parameters.origin); // compute center of mass/getBoundsZoom later ?
-        updateURL();
+        updateMapsUrl();
         setTimeout(updateUavs, parameters.refresh_rate);
     });
 
@@ -262,21 +262,21 @@ function updateLayerBounds(){
         overlays[maps_parameters[key]['name']].setBounds(flight_map.getBounds());
     }
     
-    updateURL();
+    updateMapsUrl();
     updateWindData();
 
     // Change checkbox style dynamically (fucking materialize framework)
     $(':checkbox').addClass('filled-in');
 }
 
-function updateURL(){
+function updateMapsUrl(){
     for(var key in maps_parameters) {
-        overlays[maps_parameters[key]['name']].setUrl(maps_parameters[key]['url'] + '_img/?'+ computeURL());
+        overlays[maps_parameters[key]['name']].setUrl(maps_parameters[key]['url'] + '_img/?'+ computeMapUrl());
     }
 }
 
 
-function computeURL(){
+function computeMapUrl(){
 
     var bounds = flight_map.getBounds();
 
@@ -329,13 +329,13 @@ function track(id){
 
 function updateWindData() {
     // Request updated data from the server
-    $.getJSON('wind/?' + computeURL(), (response) => {
+    $.getJSON('wind/?' + computeMapUrl(), (response) => {
         wind_overlay.setData(response);
     });
 }
 
 function downloadMap(){
-    $.get('dl_map/?' + computeURL());
+    $.get('dl_map/?' + computeMapUrl());
     // automatically reload the page in 30 seconds to fetch downloaded map tiles (not conventional)
     setTimeout(window.location.reload.bind(window.location), 30000);
 }
