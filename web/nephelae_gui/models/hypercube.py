@@ -28,6 +28,10 @@ else:
     exit()
 
 
+def discover_maps():
+    return {'map_names': ['map0', 'map1', 'map2']}
+
+
 def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
 
     x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)

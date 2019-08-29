@@ -80,6 +80,8 @@ function setupGUI(){
 
 function setupMap(){
 
+    $.getJSON('/discover_maps/', (discovered_maps) => {
+
     // Map
     flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 18, minZoom: 13});
     flight_map.on('moveend', updateLayerBounds);
@@ -121,6 +123,10 @@ function setupMap(){
         "Wind": wind_overlay,
     };
 
+    for (var map_name in discovered_maps.map_names) {
+        overlays[discovered_maps.map_names[map_name]] = L.imageOverlay('thermals_img/?' + computeURL(), flight_map.getBounds())
+    }
+
     // Add layers to the map
     L.control.layers(base_layers, overlays, {position: 'bottomright'}).addTo(flight_map);
 
@@ -130,6 +136,8 @@ function setupMap(){
 
     // Prevent async conflicts by displaying uavs once map is initialized
     displayUavs();
+
+    });
 }
 
 function displayUavs(){

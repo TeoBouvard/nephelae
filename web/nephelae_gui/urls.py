@@ -52,5 +52,9 @@ urlpatterns = [
     path('settings/', views.render_template, {'template_name': 'settings.html'}, name='settings'),
 
     # Absolute URLs accessible by every page
-    path('discover/', views.discover)
+    # Return reference frame, list of uav ids, list of data sample tags
+    # to be renamed in discover uavs
+    path('discover/', views.discover),
+    # To discover mapping layers available (from a nephelae.mapping.MapServer
+    path('discover_maps/', views.discover_maps)
 ]

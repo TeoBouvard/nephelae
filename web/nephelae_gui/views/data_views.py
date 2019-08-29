@@ -9,6 +9,10 @@ def discover(request):
     return JsonResponse(tracker.discover(), safe=False)
 
 
+def discover_maps(request):
+    return JsonResponse(hypercube.discover_maps(), safe=False)
+
+
 # Update UAV fleet positions
 def get_positions(request):
 
