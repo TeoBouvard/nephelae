@@ -2,7 +2,8 @@
 $("#nav_map").addClass('active');
 
 var flight_map, zoom_home, overlays;
-var uavs_overlay, cloud_overlay, wind_overlay;
+var uavs_overlay, wind_overlay;
+var maps_parameters;
 
 /*
     fleet     : { uav_id : value_dict }
@@ -40,8 +41,6 @@ function setupGUI(){
 
     $.getJSON('/discover/', (response) => {
     
-    //if(response.uavs.length != 0)
-    //    parameters.tracked_uav = response.uavs[0]
     var tracked_uav_choices = ['None'].concat(response.uavs)
 
     // Construct dat.gui
@@ -97,9 +96,6 @@ function setupMap(){
     path_overlay = L.layerGroup();
     uavs_overlay = L.layerGroup();
 
-    cloud_overlay = L.imageOverlay('clouds_img/?' + computeURL(), flight_map.getBounds());
-    thermals_overlay = L.imageOverlay('thermals_img/?' + computeURL(), flight_map.getBounds());
-
     wind_overlay = L.velocityLayer({
         displayValues: true,
         displayOptions: {
@@ -116,15 +112,15 @@ function setupMap(){
         "IGN": tiles_overlay_IGN,
     };
 
+    // Adding non-dynamically fetched maps
     overlays = {
         "UAVs": uavs_overlay,
-        "Clouds": cloud_overlay,
-        "Thermals": thermals_overlay,
         "Wind": wind_overlay,
     };
 
-    for (var map_name in discovered_maps.map_names) {
-        overlays[discovered_maps.map_names[map_name]] = L.imageOverlay('thermals_img/?' + computeURL(), flight_map.getBounds())
+    maps_parameters = discovered_maps;
+    for (var key in maps_parameters) {
+        overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeURL(), flight_map.getBounds());
     }
 
     // Add layers to the map
@@ -261,8 +257,10 @@ function updateUavs(){
 }
 
 function updateLayerBounds(){
-    cloud_overlay.setBounds(flight_map.getBounds());
-    thermals_overlay.setBounds(flight_map.getBounds());
+
+    for(var key in maps_parameters) {
+        overlays[maps_parameters[key]['name']].setBounds(flight_map.getBounds());
+    }
     
     updateURL();
     updateWindData();
@@ -272,8 +270,9 @@ function updateLayerBounds(){
 }
 
 function updateURL(){
-    cloud_overlay.setUrl('clouds_img/?'+ computeURL());
-    thermals_overlay.setUrl('thermals_img/?'+ computeURL());
+    for(var key in maps_parameters) {
+        overlays[maps_parameters[key]['name']].setUrl(maps_parameters[key]['url'] + '_img/?'+ computeURL());
+    }
 }
 
 
@@ -325,7 +324,6 @@ function infosToString(uav){
 
 // Attach or remove tracked uav in parameters
 function track(id){
-    //(id == -1) ? parameters.tracked_uav = null : parameters.tracked_uav = fleet[id];
     parameters.tracked_uav = id
 }
 

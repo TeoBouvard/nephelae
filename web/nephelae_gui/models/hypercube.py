@@ -29,7 +29,12 @@ else:
 
 
 def discover_maps():
-    return {'map_names': ['map0', 'map1', 'map2']}
+    # return {'map_names': ['map0', 'map1', 'map2']}
+    # return {'map0': {'url':'thermals','name':'Map0'}, 
+    #         'map1': {'url':'thermals','name':'Map1'}, 
+    #         'map2': {'url':'thermals','name':'Map2'}}
+    return {'clouds'  : {'url':'clouds',  'name':'Clouds'}, 
+            'thermals': {'url':'thermals','name':'Thermals'}}
 
 
 def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
