@@ -38,9 +38,6 @@ else:
         print("Done.")
         exit()
 
-
-
-
 nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
 
 

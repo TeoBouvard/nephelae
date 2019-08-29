@@ -1,20 +1,42 @@
 import io
 import json
 import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from netCDF4 import MFDataset
 
-# from nephelae_simulation.mesonh_interface import MesoNHVariable
-from nephelae_mesonh import MesonhVariable
+from nephelae.mapping  import GprPredictor
+from nephelae.mapping  import WindKernel
+from nephelae.mapping  import WindMapConstant
+
+from nephelae_mesonh import MesonhVariable, MesonhMap
 
 from . import utils
+from . import tracker
 
 var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
 var_wind_u = 'UT'          # Liquid water content in KG/KG ?
 var_wind_v = 'VT'          # Liquid water content in KG/KG ?
+
+maps = {}
+
+try:
+    hwind = WindMapConstant('Horizontal wind', [8.5, 0.9])
+    maps['LWC']  = GprPredictor('Liquid water', tracker.db, ['RCT'],
+                                WindKernel([70.0, 80.0, 80.0, 60.0], 1.0e-8, 1.0e-10, hwind),
+                                computesStddev = False)
+    # maps['WT']   = GprPredictor('Vertical wind', tracker.db,  ['WT'],
+    #                             WindKernel([70.0, 80.0, 80.0, 60.0], 5, 0.05, maps['hwind']))
+except Exception as e:
+    print("Got exception ! :", e)
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
+    sys.stdout.flush()
+    raise e
 
 # Precheck and variable assignment
 if 'MESO_NH' in os.environ:
@@ -23,6 +45,9 @@ if 'MESO_NH' in os.environ:
     thermals = MesonhVariable(hypercube, var_upwind, interpolation='linear')
     wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
     wind_v = MesonhVariable(hypercube, var_wind_v, interpolation='linear')
+
+    maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
+    maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
 else:
     print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
     exit()
@@ -33,30 +58,34 @@ def discover_maps():
     # return {'map0': {'url':'thermals','name':'Map0'}, 
     #         'map1': {'url':'thermals','name':'Map1'}, 
     #         'map2': {'url':'thermals','name':'Map2'}}
-    return {'clouds'  : {'url':'clouds',  'name':'Clouds'}, 
-            'thermals': {'url':'thermals','name':'Thermals'}}
+    # return {'clouds'  : {'url':'clouds',  'name':'Clouds'}, 
+    #         'thermals': {'url':'thermals','name':'Thermals'}}
+    res = {}
+    for key in maps.keys():
+        res[key] = {'url':key, 'name' : maps[key].name}
+    return res
 
 
 def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
 
     x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)
 
-    # Get slice
+    h_slice = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude].data.squeeze().T
+    rng     = maps[variable_name].range()
+
+    # To be made dynamic
     if variable_name == 'clouds':
-        h_slice = get_horizontal_slice(var_lwc, u_time, u_altitude, x0, x1, y0, y1)
         colormap = utils.transparent_cmap(clouds_cmap) if transparent else clouds_cmap
-        min_slice = 0
-        max_slice = clouds.actual_range[0][1]
-    elif variable_name == 'thermals':
-        h_slice = get_horizontal_slice(var_upwind, u_time, u_altitude, x0, x1, y0, y1)
-        #h_slice[h_slice < 0] = 0 # removes downwind from image
+    # elif variable_name == 'thermals':
+    else:
         colormap = utils.transparent_cmap(thermals_cmap) if transparent else thermals_cmap
-        min_slice = thermals.actual_range[0][0]
-        max_slice = thermals.actual_range[0][1]
 
     # Write image to buffer
     buf = io.BytesIO()
-    plt.imsave(buf, h_slice, origin='lower', vmin=min_slice, vmax=max_slice, cmap=colormap, format='png')
+    if not rng:
+        plt.imsave(buf, h_slice, origin='lower', cmap=colormap, format='png')
+    else:
+        plt.imsave(buf, h_slice, origin='lower', vmin=rng[0].min, vmax=rng[0].max, cmap=colormap, format='png')
     plt.close()
     buf.seek(0)
 
