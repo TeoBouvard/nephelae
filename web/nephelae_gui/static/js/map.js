@@ -118,7 +118,8 @@ function setupMap(){
         "Wind": wind_overlay,
     };
 
-    maps_parameters = discovered_maps;
+    maps_parameters  = discovered_maps;
+    map_is_displayed = {};
     for (var key in maps_parameters) {
         overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), flight_map.getBounds());
     }
@@ -253,7 +254,7 @@ function updateUavs(){
         updateMapsUrl();
         setTimeout(updateUavs, parameters.refresh_rate);
     });
-
+    
 }
 
 function updateLayerBounds(){
@@ -271,7 +272,8 @@ function updateLayerBounds(){
 
 function updateMapsUrl(){
     for(var key in maps_parameters) {
-        overlays[maps_parameters[key]['name']].setUrl(maps_parameters[key]['url'] + '_img/?'+ computeMapUrl());
+        if(flight_map.hasLayer(overlays[maps_parameters[key]['name']]))
+            overlays[maps_parameters[key]['name']].setUrl(maps_parameters[key]['url'] + '_img/?'+ computeMapUrl());
     }
 }
 
