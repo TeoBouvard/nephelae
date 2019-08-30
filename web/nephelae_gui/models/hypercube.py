@@ -34,7 +34,8 @@ try:
     # Precheck and variable assignment
     if 'MESO_NH' in os.environ:
         # hypercube = MFDataset(os.environ['MESO_NH'])
-        hypercube = common.atm
+        # hypercube = common.atm
+        hypercube = MFDataset(common.atm)
         clouds = MesonhVariable(hypercube, var_lwc, interpolation='linear')
         thermals = MesonhVariable(hypercube, var_upwind, interpolation='linear')
         wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')

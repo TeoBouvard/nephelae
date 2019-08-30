@@ -16,7 +16,10 @@ try:
         db = NephelaeDataServer()
     
     if 'MESO_NH' in os.environ:
-        atm = MFDataset(os.environ['MESO_NH'])
+        # atm = MFDataset(os.environ['MESO_NH'])
+        # Apparenly MFDataset is pissy with several uses of one instance.
+        # Several instances on the same files seems to be ok though, go figure...
+        atm = os.environ['MESO_NH']
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
         exit()

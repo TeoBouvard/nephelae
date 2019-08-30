@@ -17,10 +17,10 @@ try:
             pass
     
         def add_sample(self, sample):
-            # if 'RCT' in sample.variableName:
-            #     print(sample, end="\n\n")
-            if 'WT' in sample.variableName:
+            if 'RCT' in sample.variableName:
                 print(sample, end="\n\n")
+            # if 'WT' in sample.variableName:
+            #     print(sample, end="\n\n")
             # print(sample, end="\n\n")
     
         def add_gps(self, gps):
