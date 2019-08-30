@@ -8,37 +8,68 @@ from nephelae_paparazzi import PprzSimulation, PprzMesonhUav
 from nephelae.database  import DatabasePlayer, NephelaeDataServer
 
 from . import utils
+from . import common
 
-if 'PPRZ_DB' in os.environ:
-    # if PPRZ_DB is defined, do a replay
-    db = DatabasePlayer(os.environ['PPRZ_DB'])
-    db.play(looped=True)
-    def on_exit():
-        db.stop()
-        exit()
-else:
-    # else connect to paparazzi uavs
-    db = NephelaeDataServer()
-    if 'MESO_NH' in os.environ:
-        def build_uav(uavId, navRef):
-            uav = PprzMesonhUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
-            uav.add_sensor_observer(db)
-            uav.add_gps_observer(db)
-            return uav
-        interface = PprzSimulation(os.environ['MESO_NH'], ['RCT', 'WT'], build_uav_callback=build_uav)
-    else:
-        print('Full UAV interface not implmented yet. Please set MESO_NH env variable to a mesonh dataset')
-        exit()
-    interface.start()
-    db.set_navigation_frame(interface.navFrame)
-    def on_exit():
-        print("Shutting down paparazzi interface... ", end='')
-        sys.stdout.flush()
-        interface.stop()
-        print("Done.")
-        exit()
-
-nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
+try:
+    class Logger:
+    
+        def __init__(self):
+            pass
+    
+        def add_sample(self, sample):
+            # if 'RCT' in sample.variableName:
+            #     print(sample, end="\n\n")
+            if 'WT' in sample.variableName:
+                print(sample, end="\n\n")
+            # print(sample, end="\n\n")
+    
+        def add_gps(self, gps):
+            print(gps, end="\n\n")
+    logger = Logger()
+    
+    # if 'PPRZ_DB' in os.environ:
+    #     # if PPRZ_DB is defined, do a replay
+    #     db = DatabasePlayer(os.environ['PPRZ_DB'])
+    #     db.play(looped=True)
+    #     def on_exit():
+    #         db.stop()
+    #         exit()
+    # else:
+    if not 'PPRZ_DB' in os.environ:
+        # else connect to paparazzi uavs
+        # db = NephelaeDataServer()
+        db = common.db
+        if 'MESO_NH' in os.environ:
+            def build_uav(uavId, navRef):
+                # uav = PprzMesonhUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
+                uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT'])
+                uav.add_sensor_observer(db)
+                uav.add_gps_observer(db)
+                uav.add_sensor_observer(logger)
+                # uav.add_gps_observer(logger)
+                return uav
+            interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav)
+        else:
+            print('Full UAV interface not implmented yet. Please set MESO_NH env variable to a mesonh dataset')
+            exit()
+        interface.start()
+        db.set_navigation_frame(interface.navFrame)
+        def on_exit():
+            print("Shutting down paparazzi interface... ", end='')
+            sys.stdout.flush()
+            interface.stop()
+            print("Done.")
+            exit()
+    
+    nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
+except Exception as e:
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+   print("# Caught exception #############################################\n    ", e)
+   exc_type, exc_obj, exc_tb = sys.exc_info()
+   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+   print(exc_type, fname, exc_tb.tb_lineno,
+         end="\n############################################################\n\n\n")
+   raise e
 
 
 def discover():

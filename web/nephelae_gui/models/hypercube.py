@@ -15,6 +15,7 @@ from nephelae_mesonh import MesonhVariable, MesonhMap
 
 from . import utils
 from . import tracker
+from . import common
 
 var_upwind = 'WT'        # Upwind in m/s
 var_lwc = 'RCT'          # Liquid water content in KG/KG ?
@@ -22,36 +23,37 @@ var_wind_u = 'UT'          # Liquid water content in KG/KG ?
 var_wind_v = 'VT'          # Liquid water content in KG/KG ?
 
 maps = {}
-
 try:
     hwind = WindMapConstant('Horizontal wind', [8.5, 0.9])
-    maps['LWC']  = GprPredictor('Liquid water', tracker.db, ['RCT'],
+    maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
                                 WindKernel([70.0, 80.0, 80.0, 60.0], 1.0e-8, 1.0e-10, hwind),
                                 computesStddev = False)
-    # maps['WT']   = GprPredictor('Vertical wind', tracker.db,  ['WT'],
+    # maps['WT']   = GprPredictor('Vertical wind', common.db,  ['WT'],
     #                             WindKernel([70.0, 80.0, 80.0, 60.0], 5, 0.05, maps['hwind']))
+
+    # Precheck and variable assignment
+    if 'MESO_NH' in os.environ:
+        # hypercube = MFDataset(os.environ['MESO_NH'])
+        hypercube = common.atm
+        clouds = MesonhVariable(hypercube, var_lwc, interpolation='linear')
+        thermals = MesonhVariable(hypercube, var_upwind, interpolation='linear')
+        wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
+        wind_v = MesonhVariable(hypercube, var_wind_v, interpolation='linear')
+    
+        maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
+        maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
+    else:
+        print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
+        exit()
+
 except Exception as e:
-    print("Got exception ! :", e)
-    exc_type, exc_obj, exc_tb = sys.exc_info()
-    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    print(exc_type, fname, exc_tb.tb_lineno)
-    sys.stdout.flush()
-    raise e
-
-# Precheck and variable assignment
-if 'MESO_NH' in os.environ:
-    hypercube = MFDataset(os.environ['MESO_NH'])
-    clouds = MesonhVariable(hypercube, var_lwc, interpolation='linear')
-    thermals = MesonhVariable(hypercube, var_upwind, interpolation='linear')
-    wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
-    wind_v = MesonhVariable(hypercube, var_wind_v, interpolation='linear')
-
-    maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
-    maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
-else:
-    print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
-    exit()
-
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+   print("# Caught exception #############################################\n    ", e)
+   exc_type, exc_obj, exc_tb = sys.exc_info()
+   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+   print(exc_type, fname, exc_tb.tb_lineno,
+         end="\n############################################################\n\n\n")
+   raise e
 
 def discover_maps():
     # return {'map_names': ['map0', 'map1', 'map2']}
@@ -69,6 +71,9 @@ def discover_maps():
 def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
 
     x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)
+
+    print("Printing slice,", variable_name + " : [" + 
+          str(u_time) + ", " + str(x0)+':'+str(x1) + ", " + str(y0)+':'+str(y1) + ", " + str(u_altitude) + "]")
 
     h_slice = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude].data.squeeze().T
     rng     = maps[variable_name].range()
@@ -93,7 +98,8 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
 
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
-
+    
+    print(variable)
     if variable == var_lwc:
         return clouds[time_value, x0:x1, y0:y1, altitude_value].data.T
 
