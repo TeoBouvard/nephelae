@@ -45,7 +45,7 @@ try:
                 uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT'])
                 uav.add_sensor_observer(db)
                 uav.add_gps_observer(db)
-                uav.add_sensor_observer(logger)
+                # uav.add_sensor_observer(logger)
                 # uav.add_gps_observer(logger)
                 return uav
             interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav)

@@ -73,8 +73,8 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
     x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)
 
-    print("Printing slice,", variable_name + " : [" + 
-          str(u_time) + ", " + str(x0)+':'+str(x1) + ", " + str(y0)+':'+str(y1) + ", " + str(u_altitude) + "]")
+    # print("Printing slice,", variable_name + " : [" + 
+    #       str(u_time) + ", " + str(x0)+':'+str(x1) + ", " + str(y0)+':'+str(y1) + ", " + str(u_altitude) + "]")
 
     h_slice = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude].data.squeeze().T
     rng     = maps[variable_name].range()
