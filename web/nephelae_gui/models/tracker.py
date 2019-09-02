@@ -21,6 +21,8 @@ try:
                 print(sample, end="\n\n")
             # if 'WT' in sample.variableName:
             #     print(sample, end="\n\n")
+            # if 'UT' in sample.variableName:
+            #     print(sample, end="\n\n")
             # print(sample, end="\n\n")
     
         def add_gps(self, gps):
@@ -42,13 +44,14 @@ try:
         if 'MESO_NH' in os.environ:
             def build_uav(uavId, navRef):
                 # uav = PprzMesonhUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
-                uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT'])
+                uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT', ['UT','VT']])
                 uav.add_sensor_observer(db)
                 uav.add_gps_observer(db)
                 # uav.add_sensor_observer(logger)
                 # uav.add_gps_observer(logger)
                 return uav
-            interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav)
+            # interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav)
+            interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav, windFeedback=False)
         else:
             print('Full UAV interface not implmented yet. Please set MESO_NH env variable to a mesonh dataset')
             exit()
