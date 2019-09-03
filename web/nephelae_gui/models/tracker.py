@@ -51,7 +51,7 @@ try:
                 # uav.add_gps_observer(logger)
                 return uav
             # interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav)
-            interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav, windFeedback=False)
+            interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav, windFeedback=True)
         else:
             print('Full UAV interface not implmented yet. Please set MESO_NH env variable to a mesonh dataset')
             exit()
