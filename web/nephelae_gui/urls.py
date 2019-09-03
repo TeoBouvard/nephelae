@@ -53,7 +53,7 @@ urlpatterns = [
 
     # Absolute URLs accessible by every page
     # Return reference frame, list of uav ids, list of data sample tags
-    # to be renamed in discover uavs
+    # to be renamed in discover uavs and to be separated from data_discovery
     path('discover/', views.discover),
     # To discover mapping layers available (from a nephelae.mapping.MapServer
     path('discover_maps/', views.discover_maps)

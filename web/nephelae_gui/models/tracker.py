@@ -63,7 +63,7 @@ try:
             interface.stop()
             print("Done.")
             exit()
-    
+    db_data_tags = ['RCT', 'WT'] 
     nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
 except Exception as e:
     # Have to do this because #@%*&@^*! django is hiding exceptions
@@ -76,7 +76,8 @@ except Exception as e:
 
 
 def discover():
-    return dict(origin=nav_frame, uavs=db.uavIds, sample_tags=db.variableNames)
+    # return dict(origin=nav_frame, uavs=db.uavIds, sample_tags=db.variableNames)
+    return dict(origin=nav_frame, uavs=db.uavIds, sample_tags=db_data_tags)
 
 
 # GPS time is *absolute*, but SAMPLE time is relative to navFrame

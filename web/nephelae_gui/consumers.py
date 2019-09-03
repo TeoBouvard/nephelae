@@ -48,5 +48,7 @@ class SensorConsumer(WebsocketConsumer):
 
 
     def add_sample(self, sample):
+        if sample.variableName not in tracker.db_data_tags:
+            return
         message = tracker.prettify_sample(sample)
         self.send(json.dumps(message))
