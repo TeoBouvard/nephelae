@@ -48,7 +48,7 @@ try:
         wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
         wind_v = MesonhVariable(hypercube, var_wind_v, interpolation='linear')
     
-        # maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
+        maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
         maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
