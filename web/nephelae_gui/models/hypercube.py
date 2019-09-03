@@ -27,13 +27,13 @@ try:
     
     maps = {}
     # hwind = WindMapConstant('Horizontal wind', [8.5, 0.9])
-    hwind = WindMapUav(common.db)
+    # hwind = WindMapUav(common.db)
     # maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
     #                             WindKernel([70.0, 50.0, 50.0, 60.0], 1.0e-8, 1.0e-10, hwind),
     #                             computesStddev = False)
-    maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
-                                WindKernel([35.0, 50.0, 50.0, 30.0], 1.0e-8, 1.0e-10, hwind),
-                                computesStddev = False)
+    # maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
+    #                             WindKernel([35.0, 50.0, 50.0, 30.0], 1.0e-8, 1.0e-10, hwind),
+    #                             computesStddev = False)
     # maps['WT']  = GprPredictor('Vertical wind', common.db, ['WT'],
     #                             WindKernel([70.0, 40.0, 40.0, 60.0], 1.0e-8, 1.0e-10, hwind),
     #                             computesStddev = False)
@@ -48,8 +48,8 @@ try:
         wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
         wind_v = MesonhVariable(hypercube, var_wind_v, interpolation='linear')
     
-        maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
-        # maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
+        # maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
+        maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
         exit()
@@ -108,10 +108,11 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
     # Write image to buffer
     colormap = 'viridis'
-    rng      = maps['clouds'].range()
+    # rng      = maps['clouds'].range()
     if "LWC" in variable_name:
         h_slice[h_slice < 0.0] = 0.0
 
+    # h_slice = h_slice[::2, ::2]
     buf = io.BytesIO()
     # plt.imsave(buf, h_slice, origin='lower', cmap=colormap, format='png')
     if not rng:
