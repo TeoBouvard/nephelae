@@ -295,7 +295,8 @@ function computeMapUrl(){
     // Build query with parameters
     var query = $.param({
         altitude: parameters.altitude,
-        time: parameters.time%715, // HARDCODED VALUE TO REMOVE
+        //time: parameters.time%715, // HARDCODED VALUE TO REMOVE
+        time: parameters.time,
         map_bounds: {
             west: bounds.getWest(), 
             east: bounds.getEast(),
