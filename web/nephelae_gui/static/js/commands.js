@@ -167,50 +167,29 @@ function discoverFleet(){
 }
 
 function displayFleet(){
-
-    var socket = new WebSocket('ws://' + window.location.host + '/ws/GPS/');
-    socket.onmessage = (e) => {
-        var message = JSON.parse(e.data);
-        parameters.fleet[message.uav_id] = {
-            altitude : message.position[2], 
-            heading: message.heading,
-            time : message.time,
-            speed : message.speed,
-        };
-        updateItem(message.uav_id);
-    };
-    
-    //batSocket = new WebSocket('ws://' + window.location.host + '/ws/sensor/');
-    //batSocket.onmessage = (e) => handleBatMessage(JSON.parse(e.data));
-    
     statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
     statusSocket.onmessage = (e) => {
-        msg = e.data;
-        console.log(msg);
+        var msg = JSON.parse(e.data);
+        parameters.fleet[msg.id] = msg
+        updateItem(msg.id);
     };
-}
-
-function handleBatMessage(msg){
-    if(msg.variable_name == 'BAT'){
-        $('#'+msg.uav_id+' #flight_time').text(msg.data[3] + 's');
-        $('#'+msg.uav_id+' #vbat').text(msg.data[1] + 'V');
-        $('#'+msg.uav_id+' #throttle').text(msg.data[0] + 'pprz');
-    }
 }
 
 function generateItem(id){
 
     var html = '<div id="'+ id +'" class="card blue-grey darken-1">';
         html += '<div class="card-content white-text">';
+
             html += '<span id="uav_id" class="card-title left"></span>';
-            html += '<span id="battery" class="new badge right" data-badge-caption=""></span>';
+            html += '<span id="current_block" class="new badge right" data-badge-caption=""></span>';
             html += '<br><br><hr><br>';
-            html += '<span class="left">Flight Time</span><p id="flight_time" class="right"></p><br>';
-            html += '<span class="left">Altitude</span><p id="altitude" class="right"></p><br>';
-            html += '<span class="left">Heading</span><p id="heading" class="right"></p><br>';
-            html += '<span class="left">Speed</span><p id="speed" class="right"></p><br>';
-            html += '<span class="left">Battery voltage</span><p id="vbat" class="right"></p><br>';
-            html += '<span class="left">Throttle</span><p id="throttle" class="right"></p><br>';
+
+            html += '<span class="left">Flight Time</span> <p id="flight_time" class="right"></p><br>';
+            html += '<span class="left">Altitude</span>    <p id="altitude" class="right"></p><br>';
+            html += '<span class="left">Course</span>      <p id="course" class="right"></p><br>';
+            html += '<span class="left">Speed</span>       <p id="speed" class="right"></p><br>';
+            html += '<span class="left">Climb</span>       <p id="climb" class="right"></p><br>';
+
         html += '</div>';
     html += '</div>';
 
@@ -219,13 +198,16 @@ function generateItem(id){
 
 function updateItem(id){
     uav = parameters.fleet[id];
+
     $('#'+id+' #uav_id').text('UAV ' + id);
-    $('#'+id+' #battery').text('current task');
-    $('#'+id+' #battery').addClass("green"); // to be replaced with task color
-    //$('#'+id+' #flight_time').text(uav.time + 's');
-    $('#'+id+' #altitude').text(uav.altitude.toFixed(1) + 'm');
-    $('#'+id+' #heading').text(uav.heading.toFixed(0) + '°');
-    $('#'+id+' #speed').text(uav.speed.toFixed(1) + 'm/s');
+    $('#'+id+' #current_block').text(uav.current_block);
+    $('#'+id+' #current_block').addClass("green"); // to be replaced with task color
+
+    $('#'+id+' #flight_time').text(uav.flight_time  + 's');
+    $('#'+id+' #altitude').text(uav.alt.toFixed(1)  + 'm');
+    $('#'+id+' #course').text(uav.course.toFixed(0) + '°');
+    $('#'+id+' #speed').text(uav.speed.toFixed(1)   + 'm/s');
+    $('#'+id+' #climb').text(uav.climb.toFixed(1)   + 'm/s');
 }
 
 // draw a vertical line at current time in the chart
