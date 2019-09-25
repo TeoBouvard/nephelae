@@ -217,6 +217,7 @@ function generateItems(){
     }
 }
 
+
 function secondsToMMSSstring(seconds) {
     secs = (seconds % 60).toString();
     if (secs.length != 2)
@@ -238,15 +239,22 @@ function secondsToHHMMSSstring(seconds) {
     return hours.toString() + ':' + minutes + ':' + secs;
 }
 
+function formatTime(seconds) {
+    if (seconds == "NA")
+        return seconds;
+    return secondsToMMSSstring(seconds);
+}
+
 function updateItem(id){
     uav = parameters.fleet[id];
+    
+    console.log(uav);
 
     $('#'+id+' #uav_id').text('UAV ' + id);
-    $('#'+id+' #current_block').text(uav.current_block + ' : ' + 
-                                     secondsToHHMMSSstring(uav.block_time));
+    $('#'+id+' #current_block').text(uav.current_block + ' : ' + formatTime(uav.block_time));
     $('#'+id+' #current_block').addClass("green"); // to be replaced with task color
 
-    $('#'+id+' #flight_time').text(secondsToHHMMSSstring(uav.flight_time));
+    $('#'+id+' #flight_time').text(formatTime(uav.flight_time));
     $('#'+id+' #altitude').text(uav.alt.toFixed(1)  + 'm');
     $('#'+id+' #course').text(uav.course.toFixed(0) + '°');
     $('#'+id+' #speed').text(uav.speed.toFixed(1)   + 'm/s');
