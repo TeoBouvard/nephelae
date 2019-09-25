@@ -35,7 +35,8 @@ function setupGUI(){
         .setValue(command_list[0])
         .name('Command')
         .onChange((selectedCommand) => updateGUI(selectedCommand));
-    gui.addFolder("Display").add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
+    //gui.addFolder("Display").add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
+    gui.add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
 
     updateGUI(parameters.commands);
 }
