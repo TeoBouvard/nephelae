@@ -180,8 +180,14 @@ function displayFleet(){
         updateItem(message.uav_id);
     };
     
-    batSocket = new WebSocket('ws://' + window.location.host + '/ws/sensor/');
-    batSocket.onmessage = (e) => handleBatMessage(JSON.parse(e.data));
+    //batSocket = new WebSocket('ws://' + window.location.host + '/ws/sensor/');
+    //batSocket.onmessage = (e) => handleBatMessage(JSON.parse(e.data));
+    
+    statusSocket = new WebSocket('ws://' + window.location.host + '/ws/status/');
+    statusSocket.onmessage = (e) => {
+        msg = e.data;
+        console.log(msg);
+    };
 }
 
 function handleBatMessage(msg){
