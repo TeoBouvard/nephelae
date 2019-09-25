@@ -189,13 +189,26 @@ function generateItems(){
                 html += '<span id="current_block" class="new badge right" data-badge-caption=""></span>';
                 html += '<br><br><hr><br>';
 
-                html += '<span class="left">Flight Time</span> <p id="flight_time" class="right"></p><br>';
-                html += '<span class="left">Altitude</span>    <p id="altitude" class="right"></p><br>';
-                html += '<span class="left">Course</span>      <p id="course" class="right"></p><br>';
-                html += '<span class="left">Speed</span>       <p id="speed" class="right"></p><br>';
-                html += '<span class="left">Climb</span>       <p id="climb" class="right"></p><br>';
-                if(gui_parameters.verbose)
-                    html += '<span class="left">Verbose</span>';
+                if(!gui_parameters.verbose) {
+                    html += '<span class="left">Flight Time</span> <p id="flight_time" class="right"></p><br>';
+                    html += '<span class="left">Altitude</span>    <p id="altitude"    class="right"></p><br>';
+                    html += '<span class="left">Course</span>      <p id="course"      class="right"></p><br>';
+                    html += '<span class="left">Speed</span>       <p id="speed"       class="right"></p><br>';
+                    html += '<span class="left">Climb</span>       <p id="climb"       class="right"></p><br>';
+                }
+                else {
+                    html += '<span class="left">Flight Time</span>     <p id="flight_time"     class="right"></p><br>';
+                    html += '<span class="left">Altitude</span>        <p id="altitude"        class="right"></p><br>';
+                    html += '<span class="left">Ground Altitude</span> <p id="ground_altitude" class="right"></p><br>';
+                    html += '<span class="left">Course</span>          <p id="course"          class="right"></p><br>';
+                    html += '<span class="left">Target Course</span>   <p id="target_course"   class="right"></p><br>';
+                    html += '<span class="left">Heading</span>         <p id="heading"         class="right"></p><br>';
+                    html += '<span class="left">Speed</span>           <p id="speed"           class="right"></p><br>';
+                    html += '<span class="left">Air Speed</span>       <p id="air_speed"       class="right"></p><br>';
+                    html += '<span class="left">Climb</span>           <p id="climb"           class="right"></p><br>';
+                    html += '<span class="left">Target Climb</span>    <p id="target_climb"    class="right"></p><br>';
+                    html += '<span class="left">ITOW</span>            <p id="itow"            class="right"></p><br>';
+                }
 
             html += '</div>';
         html += '</div>';
@@ -215,6 +228,15 @@ function updateItem(id){
     $('#'+id+' #course').text(uav.course.toFixed(0) + '°');
     $('#'+id+' #speed').text(uav.speed.toFixed(1)   + 'm/s');
     $('#'+id+' #climb').text(uav.climb.toFixed(1)   + 'm/s');
+    
+    if(gui_parameters.verbose) {
+        $('#'+id+' #ground_altitude').text(uav.agl.toFixed(1)+'m');
+        $('#'+id+' #target_course').text(uav.target_course.toFixed(0) + '°');
+        $('#'+id+' #heading').text(uav.heading.toFixed(0) + '°');
+        $('#'+id+' #air_speed').text(uav.air_speed.toFixed(1) + 'm/s');
+        $('#'+id+' #target_climb').text(uav.target_climb.toFixed(1) + 'm/s');
+        $('#'+id+' #itow').text(uav.itow);
+    }
 }
 
 // draw a vertical line at current time in the chart
