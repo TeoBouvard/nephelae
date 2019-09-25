@@ -220,7 +220,7 @@ function updateItem(id){
     uav = parameters.fleet[id];
 
     $('#'+id+' #uav_id').text('UAV ' + id);
-    $('#'+id+' #current_block').text(uav.current_block);
+    $('#'+id+' #current_block').text(uav.current_block + ' : ' + uav.block_time + 's');
     $('#'+id+' #current_block').addClass("green"); // to be replaced with task color
 
     $('#'+id+' #flight_time').text(uav.flight_time  + 's');
