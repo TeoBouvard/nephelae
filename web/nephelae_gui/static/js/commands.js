@@ -15,6 +15,10 @@ var parameters = {
     execute: sendCommand,
 };
 
+var gui_parameters = {
+    verbose : false,
+};
+
 
 $(document).ready( () => {
 	removeLoader();
@@ -31,8 +35,8 @@ function setupGUI(){
         .setValue(command_list[0])
         .name('Command')
         .onChange((selectedCommand) => updateGUI(selectedCommand));
+    gui.addFolder("Display").add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
 
-    
     updateGUI(parameters.commands);
 }
 
@@ -155,12 +159,10 @@ function setupChart(){
 function discoverFleet(){
 
     $.getJSON('/discover/', (response) => {
-
         for (uav_id of response.uavs) {
-            parameters.fleet[uav_id] = {};
-            generateItem(uav_id);
+            parameters.fleet[uav_id] = {id : uav_id};
         }
-
+        generateItems();
         setupGUI();
         displayFleet();
     });
@@ -175,25 +177,30 @@ function displayFleet(){
     };
 }
 
-function generateItem(id){
+function generateItems(){
 
-    var html = '<div id="'+ id +'" class="card blue-grey darken-1">';
-        html += '<div class="card-content white-text">';
+    // reseting cards
+    $('.filled').removeClass("filled").addClass("free").html("");
+    for (id in parameters.fleet) {
+        var html = '<div id="'+ id +'" class="card blue-grey darken-1">';
+            html += '<div class="card-content white-text">';
 
-            html += '<span id="uav_id" class="card-title left"></span>';
-            html += '<span id="current_block" class="new badge right" data-badge-caption=""></span>';
-            html += '<br><br><hr><br>';
+                html += '<span id="uav_id" class="card-title left"></span>';
+                html += '<span id="current_block" class="new badge right" data-badge-caption=""></span>';
+                html += '<br><br><hr><br>';
 
-            html += '<span class="left">Flight Time</span> <p id="flight_time" class="right"></p><br>';
-            html += '<span class="left">Altitude</span>    <p id="altitude" class="right"></p><br>';
-            html += '<span class="left">Course</span>      <p id="course" class="right"></p><br>';
-            html += '<span class="left">Speed</span>       <p id="speed" class="right"></p><br>';
-            html += '<span class="left">Climb</span>       <p id="climb" class="right"></p><br>';
+                html += '<span class="left">Flight Time</span> <p id="flight_time" class="right"></p><br>';
+                html += '<span class="left">Altitude</span>    <p id="altitude" class="right"></p><br>';
+                html += '<span class="left">Course</span>      <p id="course" class="right"></p><br>';
+                html += '<span class="left">Speed</span>       <p id="speed" class="right"></p><br>';
+                html += '<span class="left">Climb</span>       <p id="climb" class="right"></p><br>';
+                if(gui_parameters.verbose)
+                    html += '<span class="left">Verbose</span>';
 
+            html += '</div>';
         html += '</div>';
-    html += '</div>';
-
-    $('.free').first().removeClass("free").append(html);
+        $('.free').first().removeClass("free").addClass("filled").append(html);
+    }
 }
 
 function updateItem(id){
