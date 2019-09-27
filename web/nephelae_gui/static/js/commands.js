@@ -242,13 +242,14 @@ function secondsToHHMMSSstring(seconds) {
 function formatTime(seconds) {
     if (seconds == "NA")
         return seconds;
-    return secondsToMMSSstring(seconds);
+    //return secondsToMMSSstring(seconds);
+    return secondsToHHMMSSstring(seconds);
 }
 
 function updateItem(id){
     uav = parameters.fleet[id];
     
-    console.log(uav);
+    //console.log(uav);
 
     $('#'+id+' #uav_id').text('UAV ' + id);
     $('#'+id+' #current_block').text(uav.current_block + ' : ' + formatTime(uav.block_time));
