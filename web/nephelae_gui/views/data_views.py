@@ -2,6 +2,7 @@ from django.http import JsonResponse
 
 # from ..models import hypercube, tracker
 from nephelae_gui.models import hypercube, tracker
+from nephelae_paparazzi.missions import MissionBuilder
 
 
 # Returns discovered UAVs and navigation frame info
@@ -90,3 +91,13 @@ def wind_data(request):
 
     data = hypercube.get_wind(time_value, altitude_value, map_bounds, origin)
     return JsonResponse(data, safe=False)
+
+
+def get_available_missions(request):
+    return JsonResponse({'available_missions' : MissionBuilder.missionMessagesNames})
+
+
+def get_mission_parameters(request, mission_type):
+    return JsonResponse({"parameters" : MissionBuilder.get_parameter_list(mission_type)})
+
+

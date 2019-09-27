@@ -1,7 +1,7 @@
 // Activate current menu in nav
 $('#nav_commands').addClass('active');
 
-var gui, gui_commands, chart;
+var gui, gui_commands, gui_mission, chart;
 var command_list = ['Vertical Profile', 'Horizontal Slice', 'Volumetric Flow Rate', '...']
 
 var parameters = {
@@ -17,6 +17,7 @@ var parameters = {
 
 var gui_parameters = {
     verbose : false,
+    mission_list : ['None'],
 };
 
 
@@ -35,10 +36,27 @@ function setupGUI(){
         .setValue(command_list[0])
         .name('Command')
         .onChange((selectedCommand) => updateGUI(selectedCommand));
-    //gui.addFolder("Display").add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
     gui.add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
 
+    $.getJSON('/missions/available_missions/', (response) => {
+        for (mission of response.available_missions) {
+            gui_parameters.mission_list.push(mission);
+        }
+        gui_mission = gui_commands.add(gui_parameters,'mission_list', gui_parameters.mission_list)
+            .name('Mission')
+            .setValue(gui_parameters.mission_list[0])
+            .onChange((selectedMission) => updateGuiMission(selectedMission));
+    });
+
     updateGUI(parameters.commands);
+}
+
+function updateGuiMission(selectedMission) {
+    if (selectedMission == "None") return;
+
+    $.getJSON('/missions/mission_parameters/' + selectedMission, (response) => {
+        console.log("Fetching mission parameters for " + response.parameters);
+    });
 }
 
 function updateGUI(selectedCommand){
@@ -283,3 +301,11 @@ function referenceLine(div){
 	var nowWord = $('#' + div + ' text:contains("Now")');
     nowWord.prev().first().attr('height', height + 'px').attr('width', '1px').attr('y', '0');
 }
+
+function fetchMissionList(){
+    $.getJSON('/missions/available_missions/', (response) => {
+        console.log(response);
+    });
+}
+
+
