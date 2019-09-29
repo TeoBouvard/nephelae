@@ -20,7 +20,7 @@
 This is a web application designed as an interface between the fleet of UAV used by the Nephelae project and Météo-France users. It comprises various tools to help them visualize the data being acquired from the drones.
 
 
-**How do I install it ?**  
+~~**How do I install it ?**~~ For the moment, you can't. Nephelae base classes and are not yet properly packaged.
 
 ```shell
 sudo apt-get -y install python3-pip redis-server virtualenv
