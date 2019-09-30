@@ -5,8 +5,8 @@ __pycache__
 *.pyc
 *.swp
 db.sqlite3
-web/nephelae/static/css/libs/*
-web/nephelae/static/js/libs/*
-web/nephelae/static/map_tiles/*
+web/nephelae_gui/static/css/libs/*
+web/nephelae_gui/static/js/libs/*
+web/nephelae_gui/static/map_tiles/*
 nephelae_master
 venv
