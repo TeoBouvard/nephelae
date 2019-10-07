@@ -74,26 +74,26 @@ requirements :
 	@pip3 install $(pip_options) wheel
 	@pip3 install $(pip_options) -r requirements.txt
 
-# @if [ -d "nephelae_base" ]; then \
-# 	git -C nephelae_base pull; \
-# else \
-# 	git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_base.git nephelae_base; \
-# fi
-# @if [ -d "nephelae_mesonh" ]; then \
-# 	git -C nephelae_mesonh pull; \
-# else \
-# 	git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_mesonh.git nephelae_mesonh; \
-# fi
-# @if [ -d "nephelae_paparazzi" ]; then \
-# 	git -C nephelae_paparazzi pull; \
-# else \
-# 	git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_paparazzi.git nephelae_paparazzi; \
-# fi
-# 
-# @pip3 install $(pip_options) ./nephelae_base
-# @pip3 install $(pip_options) ./nephelae_mesonh
-# @pip3 install $(pip_options) ./nephelae_paparazzi
-# @rm -rf ./nephelae_base ./nephelae_mesonh ./nephelae_paparazzi
+	@if [ -d "nephelae_base" ]; then \
+		git -C nephelae_base pull; \
+	else \
+		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_base.git nephelae_base; \
+	fi
+	@if [ -d "nephelae_mesonh" ]; then \
+		git -C nephelae_mesonh pull; \
+	else \
+		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_mesonh.git nephelae_mesonh; \
+	fi
+	@if [ -d "nephelae_paparazzi" ]; then \
+		git -C nephelae_paparazzi pull; \
+	else \
+		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_paparazzi.git nephelae_paparazzi; \
+	fi
+	
+	@pip3 install $(pip_options) ./nephelae_base
+	@pip3 install $(pip_options) ./nephelae_mesonh
+	@pip3 install $(pip_options) ./nephelae_paparazzi
+	@rm -rf ./nephelae_base ./nephelae_mesonh ./nephelae_paparazzi
 
 clean-maps :
 	@rm -rf web/nephelae_gui/static/map_tiles/*
