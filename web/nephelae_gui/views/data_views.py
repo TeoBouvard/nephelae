@@ -101,3 +101,7 @@ def get_mission_parameters(request, mission_type):
     return JsonResponse({"parameters" : MissionBuilder.get_parameter_list(mission_type)})
 
 
+
+
+
+

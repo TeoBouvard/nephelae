@@ -18,8 +18,8 @@ var parameters = {
 var gui_parameters = {
     verbose : false,
     mission_list : ['None'],
+    mission_parameters : {},
 };
-
 
 $(document).ready( () => {
 	removeLoader();
@@ -52,10 +52,19 @@ function setupGUI(){
 }
 
 function updateGuiMission(selectedMission) {
+
+    console.log(gui_commands);
+    console.log();
+    if (gui_commands.__folders.hasOwnProperty("Parameters")) {
+        gui_commands.removeFolder(gui_commands.__folders.Parameters);
+    }
     if (selectedMission == "None") return;
 
+    console.log(gui_commands)
     $.getJSON('/missions/mission_parameters/' + selectedMission, (response) => {
         console.log("Fetching mission parameters for " + response.parameters);
+        gui_params = gui_commands.addFolder("Parameters");
+
     });
 }
 

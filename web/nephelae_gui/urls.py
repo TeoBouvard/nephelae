@@ -61,3 +61,10 @@ urlpatterns = [
     path('missions/available_missions/', views.get_available_missions),
     path('missions/mission_parameters/<str:mission_type>', views.get_mission_parameters)
 ]
+
+
+
+
+
+
+
