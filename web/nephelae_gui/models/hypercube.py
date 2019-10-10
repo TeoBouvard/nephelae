@@ -6,7 +6,6 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
-from netCDF4 import MFDataset
 
 imcount = 0
 try:
@@ -14,7 +13,7 @@ try:
     from nephelae.mapping  import WindKernel
     from nephelae.mapping  import WindMapConstant, WindMapUav
     
-    from nephelae_mesonh import MesonhVariable, MesonhMap
+    from nephelae_mesonh import MesonhVariable, MesonhMap, MesonhDataset
     
     from . import utils
     from . import tracker
@@ -42,7 +41,7 @@ try:
     if 'MESO_NH' in os.environ:
         # hypercube = MFDataset(os.environ['MESO_NH'])
         # hypercube = common.atm
-        hypercube = MFDataset(common.atm)
+        hypercube = MesonhDataset(common.atm)
         clouds = MesonhVariable(hypercube, var_lwc, interpolation='linear')
         thermals = MesonhVariable(hypercube, var_upwind, interpolation='linear')
         wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
