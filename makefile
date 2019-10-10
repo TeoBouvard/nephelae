@@ -1,7 +1,8 @@
 ECHO = @echo
 FETCH = @curl --silent
 
-pip_options =
+pip_options=
+install_mode=user
 DATABASE=$(PWD)/demo/demo_db.neph
 
 .PHONY: demo runserver install assets requirements
@@ -70,10 +71,12 @@ assets :
 
 requirements :
 	$(ECHO) -n "Installing requirements ... "
-
+	
+	@pip3 install $(pip_options) --upgrade pip
 	@pip3 install $(pip_options) wheel
 	@pip3 install $(pip_options) -r requirements.txt
 
+ifeq ($(install_mode), user)
 	@if [ -d "nephelae_base" ]; then \
 		git -C nephelae_base pull; \
 	else \
@@ -89,11 +92,12 @@ requirements :
 	else \
 		git clone git://redmine.laas.fr/laas/users/simon/nephelae/nephelae-devel/nephelae_paparazzi.git nephelae_paparazzi; \
 	fi
-	
+
 	@pip3 install $(pip_options) ./nephelae_base
 	@pip3 install $(pip_options) ./nephelae_mesonh
 	@pip3 install $(pip_options) ./nephelae_paparazzi
 	@rm -rf ./nephelae_base ./nephelae_mesonh ./nephelae_paparazzi
+endif
 
 clean-maps :
 	@rm -rf web/nephelae_gui/static/map_tiles/*
