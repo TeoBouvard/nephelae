@@ -4,7 +4,7 @@ import utm
 
 # import  nephelae_paparazzi.pprzinterface as ppint
 # from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
-from nephelae_paparazzi import PprzSimulation, PprzMesonhUav
+from nephelae_paparazzi import PprzSimulation, PprzMesonhUav, print_status
 from nephelae.database  import DatabasePlayer, NephelaeDataServer
 
 from . import utils
@@ -27,6 +27,9 @@ try:
     
         def add_gps(self, gps):
             print(gps, end="\n\n")
+
+        def notify_status(self, status):
+            print_status(status, flush=True)
     logger = Logger()
     
     # if 'PPRZ_DB' in os.environ:
@@ -49,6 +52,7 @@ try:
                 uav.add_gps_observer(db)
                 # uav.add_sensor_observer(logger)
                 # uav.add_gps_observer(logger)
+                uav.add_status_observer(logger)
                 return uav
             # interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav)
             interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav, windFeedback=True)
