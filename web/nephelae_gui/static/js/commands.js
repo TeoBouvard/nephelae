@@ -270,7 +270,8 @@ function formatTime(seconds) {
     if (seconds == "NA")
         return seconds;
     //return secondsToMMSSstring(seconds);
-    return secondsToHHMMSSstring(seconds);
+    //return secondsToHHMMSSstring(seconds);
+    return seconds.toString()
 }
 
 function updateItem(id){
