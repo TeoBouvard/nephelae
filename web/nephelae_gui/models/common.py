@@ -14,6 +14,8 @@ try:
     else:
         # else connect to paparazzi uavs
         db = NephelaeDataServer()
+        # print("Enabling database save")
+        # db.enable_periodic_save('/home/pnarvor/work/nephelae/data/temp/dt5_01.neph', timerTick=10.0, force=True)
     
     if 'MESO_NH' in os.environ:
         # atm = MFDataset(os.environ['MESO_NH'])
