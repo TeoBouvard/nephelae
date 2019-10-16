@@ -3,6 +3,7 @@ FETCH = @curl --silent
 
 pip_options=
 install_mode=user
+install_pprzlink=False
 DATABASE=$(PWD)/demo/demo_db.neph
 
 .PHONY: demo runserver install assets requirements
@@ -97,6 +98,16 @@ ifeq ($(install_mode), user)
 	@pip3 install $(pip_options) ./nephelae_mesonh
 	@pip3 install $(pip_options) ./nephelae_paparazzi
 	@rm -rf ./nephelae_base ./nephelae_mesonh ./nephelae_paparazzi
+endif
+
+ifeq ($(install_pprzlink), true)
+	@if [ -d "pprzlink" ]; then \
+		git -C pprzlink pull; \
+	else \
+		git clone https://github.com/paparazzi/pprzlink.git pprzlink; \
+	fi
+
+	@echo "You requested a standalone pprzlink installation. Please set the environment variable PAPARAZZI_PPRZLINK=$$(pwd)/pprzlink"
 endif
 
 clean-maps :
