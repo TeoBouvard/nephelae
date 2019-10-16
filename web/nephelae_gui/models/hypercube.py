@@ -186,11 +186,11 @@ def axes():
 
 
 def box():
-    bounds = clouds.bounds
+    dims = hypercube.dimensions
     box = [
-        {'min': bounds[0].min, 'max':bounds[0].max},
-        {'min': bounds[3].min, 'max':bounds[3].max},
-        {'min': bounds[2].min, 'max':bounds[2].max},
-        {'min': bounds[1].min, 'max':bounds[1].max}]
+        {'min': dims[0]['data'][0], 'max':dims[0]['data'][-1]},
+        {'min': dims[1]['data'][0], 'max':dims[1]['data'][-1]},
+        {'min': dims[3]['data'][0], 'max':dims[3]['data'][-1]},
+        {'min': dims[2]['data'][0], 'max':dims[2]['data'][-1]}]
     return box
 
