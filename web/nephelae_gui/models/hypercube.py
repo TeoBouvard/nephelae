@@ -178,11 +178,7 @@ def get_wind(u_time, u_altitude, bounds, origin):
 
 
 def axes():
-    min_x = clouds.bounds[1].min
-    max_x = clouds.bounds[1].max
-    nb_points = len(clouds[clouds.bounds[0].min, clouds.bounds[3].min, :, :].data)
-
-    return np.linspace(min_x, max_x, nb_points).tolist()
+    return hypercube.dimensions[3]['data'].tolist()
 
 
 def box():
