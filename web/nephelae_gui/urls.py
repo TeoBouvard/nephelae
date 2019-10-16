@@ -15,7 +15,6 @@ urlpatterns = [
     path('map/', views.render_template, {'template_name': 'map.html'}, name='map'),
     path('map/update/', views.get_positions),
     path('map/dl_map/', views.download_map),
-    path('map/box/', views.mesonh_box),
     path('map/wind/', views.wind_data),
     path('map/tile/<int:z>/<int:x>/<int:y>', views.map_tiles, name='map_tiles'),
     path('map/plane_icon/<int:index>', views.plane_icon, name='plane_icon'),
