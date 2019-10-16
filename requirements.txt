@@ -1,3 +1,5 @@
+asgiref==3.1.4
+
 Django
 #django-background-tasks -> useless ?
 matplotlib
@@ -25,3 +27,6 @@ tqdm
 
 # NetCDF
 netCDF4
+
+dask
+toolz
