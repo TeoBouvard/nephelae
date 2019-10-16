@@ -2,8 +2,6 @@ import os
 import sys
 import utm
 
-# import  nephelae_paparazzi.pprzinterface as ppint
-# from nephelae_mapping.database import DatabasePlayer, NephelaeDataServer
 from nephelae_paparazzi import PprzSimulation, PprzMesonhUav, print_status
 from nephelae.database  import DatabasePlayer, NephelaeDataServer
 
@@ -44,10 +42,10 @@ try:
     #         db.stop()
     #         exit()
     # else:
+    db = common.db
     if not 'PPRZ_DB' in os.environ:
         # else connect to paparazzi uavs
         # db = NephelaeDataServer()
-        db = common.db
         if 'MESO_NH' in os.environ:
             def build_uav(uavId, navRef):
                 # uav = PprzMesonhUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
