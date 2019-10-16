@@ -42,7 +42,6 @@ try:
         # hypercube = MFDataset(os.environ['MESO_NH'])
         # hypercube = common.atm
         hypercube = MesonhDataset(common.atm)
-        clouds = MesonhVariable(hypercube, var_lwc, interpolation='linear')
         thermals = MesonhVariable(hypercube, var_upwind, interpolation='linear')
         wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
         wind_v = MesonhVariable(hypercube, var_wind_v, interpolation='linear')
@@ -63,12 +62,6 @@ except Exception as e:
    raise e
 
 def discover_maps():
-    # return {'map_names': ['map0', 'map1', 'map2']}
-    # return {'map0': {'url':'thermals','name':'Map0'}, 
-    #         'map1': {'url':'thermals','name':'Map1'}, 
-    #         'map2': {'url':'thermals','name':'Map2'}}
-    # return {'clouds'  : {'url':'clouds',  'name':'Clouds'}, 
-    #         'thermals': {'url':'thermals','name':'Thermals'}}
     res = {}
     for key in maps.keys():
         res[key] = {'url':key, 'name' : maps[key].name}
@@ -126,19 +119,12 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
     
-    print(variable)
-    if variable == var_lwc:
-        return clouds[time_value, x0:x1, y0:y1, altitude_value].data.T
-
-    elif variable == var_upwind:
-        return thermals[time_value, x0:x1, y0:y1, altitude_value].data.T
-
-    elif variable == var_wind_u:
+    if variable == var_wind_u:
         return wind_u[time_value, x0:x1, y0:y1, altitude_value].data.T
-
     elif variable == var_wind_v:
         return wind_v[time_value, x0:x1, y0:y1, altitude_value].data.T
-
+    else:
+        return maps[variable][time_value, x0:x1, y0:y1, altitude_value].data.T
 
 def get_wind(u_time, u_altitude, bounds, origin):
 

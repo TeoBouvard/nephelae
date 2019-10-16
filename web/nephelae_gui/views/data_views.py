@@ -49,9 +49,14 @@ def get_section(request):
     altitude_value = int(request.GET.get('altitude'))
     variable = request.GET.get('variable')
 
+    data = hypercube.get_horizontal_slice(variable, time_value, altitude_value)
+    if data is not None:
+        data = data.tolist()
+    else:
+        data = []
     response = JsonResponse({
         'axes': hypercube.axes(),
-        'data': hypercube.get_horizontal_slice(variable, time_value, altitude_value).tolist(),
+        'data': data
     })
 
     return response

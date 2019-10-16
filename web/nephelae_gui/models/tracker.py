@@ -69,7 +69,9 @@ try:
             interface.stop()
             print("Done.")
             exit()
-    db_data_tags = ['RCT', 'WT'] 
+    # db_data_tags = ['RCT', 'WT'] 
+    db_data_tags = ['clouds', 'thermals'] 
+
     nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
 except Exception as e:
     # Have to do this because #@%*&@^*! django is hiding exceptions
