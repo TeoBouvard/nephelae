@@ -21,8 +21,8 @@ try:
     
     var_upwind = 'WT'        # Upwind in m/s
     var_lwc = 'RCT'          # Liquid water content in KG/KG ?
-    var_wind_u = 'UT'          # Liquid water content in KG/KG ?
-    var_wind_v = 'VT'          # Liquid water content in KG/KG ?
+    var_wind_u = 'wind_u'          # Liquid water content in KG/KG ?
+    var_wind_v = 'wind_v'          # Liquid water content in KG/KG ?
     
     maps = {}
     # hwind = WindMapConstant('Horizontal wind', [8.5, 0.9])
@@ -42,12 +42,11 @@ try:
         # hypercube = MFDataset(os.environ['MESO_NH'])
         # hypercube = common.atm
         hypercube = MesonhDataset(common.atm)
-        thermals = MesonhVariable(hypercube, var_upwind, interpolation='linear')
-        wind_u = MesonhVariable(hypercube, var_wind_u, interpolation='linear')
-        wind_v = MesonhVariable(hypercube, var_wind_v, interpolation='linear')
     
         maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
         maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
+        maps['wind_u']   = MesonhMap('West wind (MesoNH)',     hypercube, 'UT')
+        maps['wind_v']   = MesonhMap('South wind (MesoNH)',    hypercube, 'VT')
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
         exit()
@@ -65,6 +64,7 @@ def discover_maps():
     res = {}
     for key in maps.keys():
         res[key] = {'url':key, 'name' : maps[key].name}
+    print(res)
     return res
 
 
@@ -118,13 +118,7 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
 
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
-    
-    if variable == var_wind_u:
-        return wind_u[time_value, x0:x1, y0:y1, altitude_value].data.T
-    elif variable == var_wind_v:
-        return wind_v[time_value, x0:x1, y0:y1, altitude_value].data.T
-    else:
-        return maps[variable][time_value, x0:x1, y0:y1, altitude_value].data.T
+    return maps[variable][time_value, x0:x1, y0:y1, altitude_value].data.T
 
 def get_wind(u_time, u_altitude, bounds, origin):
 
