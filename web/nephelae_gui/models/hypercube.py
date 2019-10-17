@@ -6,12 +6,14 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 
 imcount = 0
 try:
+    from nephelae.types    import Bounds
     from nephelae.mapping  import GprPredictor
     from nephelae.mapping  import WindKernel
-    from nephelae.mapping  import WindMapConstant, WindMapUav
+    from nephelae.mapping  import WindMapConstant, WindObserverMap
     
     from nephelae_mesonh import MesonhVariable, MesonhMap, MesonhDataset
     
@@ -22,13 +24,13 @@ try:
     maps = {}
 
     # hwind = WindMapConstant('Horizontal wind', [8.5, 0.9])
-    # hwind = WindMapUav(common.db)
-    # maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
-    #                             WindKernel([70.0, 50.0, 50.0, 60.0], 1.0e-8, 1.0e-10, hwind),
-    #                             computesStddev = False)
-    # maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
-    #                             WindKernel([35.0, 50.0, 50.0, 30.0], 1.0e-8, 1.0e-10, hwind),
-    #                             computesStddev = False)
+    hwind = WindObserverMap('Horizontal wind', sampleName=str(['UT','VT']))
+    common.db.add_sensor_observer(hwind)
+
+    maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
+                                WindKernel([50.0, 50.0, 50.0, 60.0], 1.0e-8, 1.0e-10, hwind),
+                                computesStddev = False, updateRange=False)
+    maps['LWC'].dataRange = (Bounds(0.0,1.0e-4),)
     # maps['WT']  = GprPredictor('Vertical wind', common.db, ['WT'],
     #                             WindKernel([70.0, 40.0, 40.0, 60.0], 1.0e-8, 1.0e-10, hwind),
     #                             computesStddev = False)
@@ -36,9 +38,10 @@ try:
     # Precheck and variable assignment
     if 'MESO_NH' in os.environ:
         hypercube = MesonhDataset(common.atm)
-        maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
-        maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
-        maps['hwind']    = MesonhMap('WS Wind (Mesonh)',       hypercube, ['UT','VT'])
+        maps['clouds'] = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
+        maps['clouds'].actualRange = (Bounds(0.0,1.0e-4),)
+        # maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
+        # maps['hwind']    = MesonhMap('WS Wind (Mesonh)',       hypercube, ['UT','VT'])
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
         exit()
@@ -95,7 +98,10 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
     # rng      = maps['clouds'].range()
     if "LWC" in variable_name:
         h_slice[h_slice < 0.0] = 0.0
-
+    
+    rFactor = 4
+    img = Image.fromarray(h_slice)
+    h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.BICUBIC))
     # h_slice = h_slice[::2, ::2]
     buf = io.BytesIO()
     # plt.imsave(buf, h_slice, origin='lower', cmap=colormap, format='png')
