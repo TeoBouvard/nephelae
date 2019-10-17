@@ -46,7 +46,7 @@ $(document).ready(() => {
 function setupGUI(){
 
     gui = new dat.GUI({ autoplace: false });
-    $('#gui_container').html(gui.domElement);
+    $('#gui_container').append(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
 
@@ -72,29 +72,8 @@ function setupGUI(){
         }
 
         // Draw charts once GUI is initialized
-        toggleChart(true);
         updateData();
     });
-}
-
-function toggleChart(state){
-    // not 100% sure why this works
-    for (variable in parameters.variables){
-        if(state == parameters.variables[variable]){
-            if (state){
-                $('#charts').append(
-                    '<div id="container_'+ variable + '" class="row">' +
-                        '<div class="col s12">' +
-                            '<div id=' + variable + '></div>' +
-                        '</div>' +
-                    '</div>'
-                );
-                updateData();
-            } else {
-                $('#container_' + variable).find('*').addBack().remove();
-            }
-        }
-    }
 }
 
 function updateData(){
@@ -103,14 +82,12 @@ function updateData(){
     $.getJSON('update/', function(response){
         data = response;
 
-        if(data.length == 0){
-            //alert("No data received from the server, try refreshing the page");
-        } else {
+        if(data.length != 0){
             updateCharts(data);
             setTimeout(updateData, refresh_rate);
         }
+    	removeLoader();
     });
-    removeLoader();
 }
 
 function updateCharts(data){
