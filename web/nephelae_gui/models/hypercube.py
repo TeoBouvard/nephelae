@@ -39,16 +39,10 @@ try:
 
     # Precheck and variable assignment
     if 'MESO_NH' in os.environ:
-        # hypercube = MFDataset(os.environ['MESO_NH'])
-        # hypercube = common.atm
         hypercube = MesonhDataset(common.atm)
-    
         maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
         maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
-        # maps['wind_u']   = MesonhMap('West wind (MesoNH)',     hypercube, 'UT')
-        # maps['wind_v']   = MesonhMap('South wind (MesoNH)',    hypercube, 'VT')
-        maps['hwind']     = MesonhMap('WS Wind (Mesonh)',      hypercube, ['UT','VT'])
-        wind_map          = MesonhMap('WS Wind (Mesonh)',      hypercube, ['UT','VT'])
+        maps['hwind']    = MesonhMap('WS Wind (Mesonh)',      hypercube, ['UT','VT'])
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
         exit()
