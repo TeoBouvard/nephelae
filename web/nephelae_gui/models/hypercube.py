@@ -19,12 +19,8 @@ try:
     from . import tracker
     from . import common
     
-    var_upwind = 'WT'        # Upwind in m/s
-    var_lwc = 'RCT'          # Liquid water content in KG/KG ?
-    var_wind_u = 'wind_u'          # Liquid water content in KG/KG ?
-    var_wind_v = 'wind_v'          # Liquid water content in KG/KG ?
-    
     maps = {}
+
     # hwind = WindMapConstant('Horizontal wind', [8.5, 0.9])
     # hwind = WindMapUav(common.db)
     # maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
@@ -42,7 +38,7 @@ try:
         hypercube = MesonhDataset(common.atm)
         maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
         maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
-        maps['hwind']    = MesonhMap('WS Wind (Mesonh)',      hypercube, ['UT','VT'])
+        maps['hwind']    = MesonhMap('WS Wind (Mesonh)',       hypercube, ['UT','VT'])
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
         exit()
