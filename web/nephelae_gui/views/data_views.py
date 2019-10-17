@@ -73,7 +73,7 @@ def update_cloud_data(request):
     return JsonResponse(data)
 
 
-def wind_data(request):
+def wind_data(request, variable_name):
 
     # Parse request parameters
     query = request.GET
@@ -94,7 +94,7 @@ def wind_data(request):
     ]
 
 
-    data = hypercube.get_wind(time_value, altitude_value, map_bounds, origin)
+    data = hypercube.get_wind(variable_name, time_value, altitude_value, map_bounds, origin)
     return JsonResponse(data, safe=False)
 
 

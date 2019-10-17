@@ -2,7 +2,7 @@
 $("#nav_map").addClass('active');
 
 var flight_map, zoom_home, overlays;
-var uavs_overlay, wind_overlay;
+var uavs_overlay;
 var maps_parameters;
 
 /*
@@ -96,15 +96,6 @@ function setupMap(){
     path_overlay = L.layerGroup();
     uavs_overlay = L.layerGroup();
 
-    wind_overlay = L.velocityLayer({
-        displayValues: true,
-        displayOptions: {
-            velocityType: "Wind",
-            displayEmptyString: "No wind data"
-        },
-        maxVelocity: 15
-    });
-
     // Set layer dictionnary for control initialization
     var base_layers = {
         "None": tiles_overlay_none,
@@ -115,20 +106,38 @@ function setupMap(){
     // Adding non-dynamically fetched maps
     overlays = {
         "UAVs": uavs_overlay,
-        "Wind": wind_overlay,
     };
 
     maps_parameters  = discovered_maps;
     map_is_displayed = {};
     for (var key in maps_parameters) {
-        overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), flight_map.getBounds());
+        if (maps_parameters[key]['sample_size'] == 1)
+            overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), flight_map.getBounds());
+        if (maps_parameters[key]['sample_size'] == 2) {
+            overlays[maps_parameters[key]['name']] = L.velocityLayer({
+                displayValues: true,
+                displayOptions: {
+                    velocityType: "Wind",
+                    displayEmptyString: "No wind data"
+                },
+                maxVelocity: 15
+            });
+            console.log(overlays[maps_parameters[key]['name']])
+        }
     }
 
     // Add layers to the map
     L.control.layers(base_layers, overlays, {position: 'bottomright'}).addTo(flight_map);
 
-    // Display everything (except wind) on initialization 
-    for(key in overlays) if(key != "Wind") overlays[key].addTo(flight_map);
+    //for(key in overlays) if(key != "Wind") overlays[key].addTo(flight_map);
+
+    // Display everything except vector field (wind) on initialization 
+    overlays["UAVs"].addTo(flight_map);
+    for (var key in maps_parameters) {
+        if (maps_parameters[key]['sample_size'] == 1)
+            overlays[maps_parameters[key]['name']].addTo(flight_map);
+    }
+
     tiles_overlay_IGN.addTo(flight_map);
 
     // Prevent async conflicts by displaying uavs once map is initialized
@@ -260,7 +269,8 @@ function updateUavs(){
 function updateLayerBounds(){
 
     for(var key in maps_parameters) {
-        overlays[maps_parameters[key]['name']].setBounds(flight_map.getBounds());
+        if(maps_parameters[key]['sample_size'] == 1)
+            overlays[maps_parameters[key]['name']].setBounds(flight_map.getBounds());
     }
     
     updateMapsUrl();
@@ -272,8 +282,31 @@ function updateLayerBounds(){
 
 function updateMapsUrl(){
     for(var key in maps_parameters) {
-        if(flight_map.hasLayer(overlays[maps_parameters[key]['name']]))
-            overlays[maps_parameters[key]['name']].setUrl(maps_parameters[key]['url'] + '_img/?'+ computeMapUrl());
+        if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) { // checks if map if currently displayed
+            if(maps_parameters[key]['sample_size'] == 1) {
+                overlays[maps_parameters[key]['name']].setUrl(maps_parameters[key]['url'] + '_img/?'+ computeMapUrl());
+            }
+
+            // Wind map actualization disabled because particles are reset each time. Not good for epilepsy.
+
+            //if(maps_parameters[key]['sample_size'] == 2) {
+            //    $.getJSON('wind/?' + computeMapUrl(), (response) => {
+            //        overlays[maps_parameters[key]['name']].setData(response);
+            //    });
+            //}
+        }
+    }
+}
+
+function updateWindData() {
+    for(var key in maps_parameters) {
+        if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) { // checks if map if currently displayed
+            if(maps_parameters[key]['sample_size'] == 2) {
+                $.getJSON(maps_parameters[key]['url'] + '_wind/?' + computeMapUrl(), (response) => {
+                    overlays[maps_parameters[key]['name']].setData(response);
+                });
+            }
+        }
     }
 }
 
@@ -284,8 +317,6 @@ function computeMapUrl(){
 
     // Check if a uav is being tracked with MesoNH
     if (parameters.tracked_uav != null && parameters.tracked_uav != 'None'){
-        //parameters.altitude = parameters.tracked_uav.altitude;
-        //parameters.time = parameters.tracked_uav.time;
         parameters.altitude = fleet[parameters.tracked_uav].altitude;
         parameters.time     = fleet[parameters.tracked_uav].time;
     } else {
@@ -295,7 +326,6 @@ function computeMapUrl(){
     // Build query with parameters
     var query = $.param({
         altitude: parameters.altitude,
-        //time: parameters.time%715, // HARDCODED VALUE TO REMOVE
         time: parameters.time,
         map_bounds: {
             west: bounds.getWest(), 
@@ -328,13 +358,6 @@ function infosToString(uav){
 // Attach or remove tracked uav in parameters
 function track(id){
     parameters.tracked_uav = id
-}
-
-function updateWindData() {
-    // Request updated data from the server
-    $.getJSON('wind/?' + computeMapUrl(), (response) => {
-        wind_overlay.setData(response);
-    });
 }
 
 function downloadMap(){

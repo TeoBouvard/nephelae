@@ -45,8 +45,10 @@ try:
     
         maps['clouds']   = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
         maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
-        maps['wind_u']   = MesonhMap('West wind (MesoNH)',     hypercube, 'UT')
-        maps['wind_v']   = MesonhMap('South wind (MesoNH)',    hypercube, 'VT')
+        # maps['wind_u']   = MesonhMap('West wind (MesoNH)',     hypercube, 'UT')
+        # maps['wind_v']   = MesonhMap('South wind (MesoNH)',    hypercube, 'VT')
+        maps['hwind']     = MesonhMap('WS Wind (Mesonh)',      hypercube, ['UT','VT'])
+        wind_map          = MesonhMap('WS Wind (Mesonh)',      hypercube, ['UT','VT'])
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
         exit()
@@ -63,7 +65,7 @@ except Exception as e:
 def discover_maps():
     res = {}
     for key in maps.keys():
-        res[key] = {'url':key, 'name' : maps[key].name}
+        res[key] = {'url':key, 'name' : maps[key].name, 'sample_size': maps[key].sample_size()}
     print(res)
     return res
 
@@ -120,39 +122,36 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
     return maps[variable][time_value, x0:x1, y0:y1, altitude_value].data.T
 
-def get_wind(u_time, u_altitude, bounds, origin):
+def get_wind(variable, u_time, u_altitude, bounds, origin):
+
+    """Used to fetch vector2D field from maps for the wind overlay"""
 
     x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)
-    u = get_horizontal_slice(var_wind_u, u_time, u_altitude, x0, x1, y0, y1)
-    v = get_horizontal_slice(var_wind_v, u_time, u_altitude, x0, x1, y0, y1)
-    u_data = u.flatten()
-    v_data = v.flatten()
+    wind = maps[variable][u_time, x0:x1, y0:y1, u_altitude].data.squeeze()
 
     # header template
     header = {
         'parameterUnit': 'm.s-1',
         'parameterCategory': 2,
         'parameterNumber': 2,
-        'parameterNumberName': 'eastward_wind',
-        'dx': 25.0,
-        'dy': 25.0,
+        'parameterNumberName': 'eastward_wid',
+        'dx' : 25.0,
+        'dy' : 25.0,
         'la1': bounds['north'],
         'la2': bounds['south'],
         'lo1': bounds['west'],
         'lo2': bounds['east'],
-        'nx': np.size(u, 0),
-        'ny': np.size(u, 1),
+        'nx' : wind.shape[0],
+        'ny' : wind.shape[1],
 
     }
 
-    s1 = json.dumps({'header': header, 'data': u_data.tolist()})
+    s1 = json.dumps({'header': header, 'data': wind[:,:,0].ravel().tolist()})
 
     header['parameterNumber'] = 3
     header['parameterNumberName'] = 'northward_wind'
-    header['nx'] = np.size(v, 0)
-    header['ny'] = np.size(v, 1)
 
-    s2 = json.dumps({'header': header, 'data': v_data.tolist()})
+    s2 = json.dumps({'header': header, 'data': wind[:,:,1].ravel().tolist()})
 
     return [eval(s1), eval(s2)]
 
