@@ -49,7 +49,7 @@ try:
         if 'MESO_NH' in os.environ:
             def build_uav(uavId, navRef):
                 # uav = PprzMesonhUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
-                uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT', ['UT','VT']])
+                uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT', ['UT','VT'], 'THT'])
                 uav.add_sensor_observer(db)
                 uav.add_gps_observer(db)
                 # uav.add_sensor_observer(logger)
@@ -69,7 +69,7 @@ try:
             interface.stop()
             print("Done.")
             exit()
-    db_data_tags = ['RCT', 'WT'] 
+    db_data_tags = ['RCT', 'WT', 'THT'] 
     nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
 except Exception as e:
     # Have to do this because #@%*&@^*! django is hiding exceptions

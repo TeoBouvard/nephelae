@@ -33,20 +33,75 @@ var config = {
 
 // Keep track of chart state
 var refresh_rate = 2000; // ms
+var parameters = {
+    trail_length: parseInt(Cookies.get('trail_length')), // seconds
+    streaming: true,
+    socket: null,
+}
 
-$(document).ready( () => {
-    updateData();
-    removeLoader();
+$(document).ready(() => {
+    setupGUI();
 });
+
+function setupGUI(){
+
+    gui = new dat.GUI({ autoplace: false });
+    $('#gui_container').html(gui.domElement);
+
+    var f1 = gui.addFolder('Controls');
+
+    f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
+    f1.add(parameters, 'streaming').name("Streaming").onChange((state) => toggleStreaming(state));
+
+    var f2 = gui.addFolder('UAVs');
+    var f3 = gui.addFolder('Variables');
+
+    $.getJSON('/discover/', (response) => {
+
+        parameters['uavs'] = {};
+        parameters['variables'] = {};
+
+        for (var uav_id of response.uavs){
+            parameters['uavs'][uav_id] = true;
+            f2.add(parameters['uavs'], uav_id).name('UAV ' + uav_id).onChange(updateData);
+        }
+
+        for (var tag of response.sample_tags){
+            parameters['variables'][tag] = true;
+            f3.add(parameters['variables'], tag).name(tag).onChange((state) => toggleChart(state));
+        }
+
+        // Draw charts once GUI is initialized
+        toggleChart(true);
+        updateData();
+    });
+}
+
+function toggleChart(state){
+    // not 100% sure why this works
+    for (variable in parameters.variables){
+        if(state == parameters.variables[variable]){
+            if (state){
+                $('#charts').append(
+                    '<div id="container_'+ variable + '" class="row">' +
+                        '<div class="col s12">' +
+                            '<div id=' + variable + '></div>' +
+                        '</div>' +
+                    '</div>'
+                );
+                updateData();
+            } else {
+                $('#container_' + variable).find('*').addBack().remove();
+            }
+        }
+    }
+}
 
 function updateData(){
     var data = {};
 
     $.getJSON('update/', function(response){
         data = response;
-        console.log('data received');
-    
-
 
         if(data.length == 0){
             //alert("No data received from the server, try refreshing the page");
@@ -55,6 +110,7 @@ function updateData(){
             setTimeout(updateData, refresh_rate);
         }
     });
+    removeLoader();
 }
 
 function updateCharts(data){
