@@ -52,7 +52,6 @@ function setupGUI(){
     var f1 = gui.addFolder('Controls');
     
     $.getJSON('box/', (response) => {
-	    console.log(response)
             // Parse response
             var min_altitude = Math.ceil(response[1].min);
             var max_altitude = Math.floor(response[1].max);
@@ -93,7 +92,6 @@ function setupGUI(){
 
 function updateData(){
     var data = {};
-    console.log(parameters)
     var query = $.param({trail_length: parameters.trail_length, uav_id: getSelectedElements(parameters.uavs), variables: getSelectedElements(parameters.variables)});
     $.getJSON('update/?'+query, function(response){
         var positions = response.data['100']['THT']['positions'];
@@ -104,8 +102,8 @@ function updateData(){
         var new_data = {
             type: 'line',
             name: '100',
-            x: altitudes,
-            y: response.data['100']['THT']['values'],
+            x: response.data['100']['THT']['values'],
+            y: altitudes,
             mode: 'line',
             line: {
                 width: 1,
@@ -114,8 +112,8 @@ function updateData(){
             },
             meta: ['100'],
             hovertemplate:
-                'Time : %{x:.1f}s <br>' +
-                'Value : %{y:.2f} <br>' +
+                'Temperature : %{x:.1f}s <br>' +
+                'Altitude : %{y:.2f} <br>' +
                 '<extra>UAV %{meta[0]}</extra>',
             hoverlabel: {
                 bgcolor: 'black',
