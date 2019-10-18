@@ -122,7 +122,6 @@ def get_data(uav_ids, trail_length, variables):
     data = dict()
 
     for variable in variables:
-
         for uav_id in uav_ids:
 
             messages = [entry.data for entry in db.find_entries([variable, str(uav_id)], (slice(-trail_length, None, -1), ), lambda entry: entry.data.timeStamp)]
@@ -139,7 +138,6 @@ def get_data(uav_ids, trail_length, variables):
                 else:
                     data[uav_id][message.variableName]['positions'].append(message.position.data.tolist())
                     data[uav_id][message.variableName]['values'].append(message.data[0])
-    
     return dict(data=data)
 
 

@@ -35,6 +35,7 @@ var config = {
 var refresh_rate = 2000; // ms
 var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
+    altitude: 0,
     streaming: true,
     socket: null,
 }
@@ -49,7 +50,21 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
+    
+    $.getJSON('box/', (response) => {
+	    console.log(response)
+            // Parse response
+            var min_altitude = Math.ceil(response[1].min);
+            var max_altitude = Math.floor(response[1].max);
+            var initial_altitude = 1075;
 
+            // Setup GUI
+            f1.add(parameters, 'altitude', min_altitude, max_altitude)
+                .setValue(initial_altitude)
+                .step(1)
+                .name('Altitude (m)')
+                .onFinishChange(updateData);
+    });
     f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
     f1.add(parameters, 'streaming').name("Streaming").onChange((state) => toggleStreaming(state));
 
@@ -78,20 +93,47 @@ function setupGUI(){
 
 function updateData(){
     var data = {};
-
-    $.getJSON('update/', function(response){
-        data = response;
-
-        if(data.length != 0){
-            updateCharts(data);
-            setTimeout(updateData, refresh_rate);
+    console.log(parameters)
+    var query = $.param({trail_length: parameters.trail_length, uav_id: getSelectedElements(parameters.uavs), variables: getSelectedElements(parameters.variables)});
+    $.getJSON('update/?'+query, function(response){
+        var positions = response.data['100']['THT']['positions'];
+        var altitudes = [];
+        for(var i = 0; i < positions.length ; i++){
+            altitudes.push(positions[i][3]);
         }
+        var new_data = {
+            type: 'line',
+            name: '100',
+            x: altitudes,
+            y: response.data['100']['THT']['values'],
+            mode: 'line',
+            line: {
+                width: 1,
+                shape: 'linear',
+                color: global_colors['100'%global_colors.length],
+            },
+            meta: ['100'],
+            hovertemplate:
+                'Time : %{x:.1f}s <br>' +
+                'Value : %{y:.2f} <br>' +
+                '<extra>UAV %{meta[0]}</extra>',
+            hoverlabel: {
+                bgcolor: 'black',
+                bordercolor: 'black',
+                font: {family: 'Roboto', si1ze: '15', color: 'white'},
+                align: 'left',
+            }
+        };
+        'THT' in data ? data['THT'].push(new_data) : data['THT'] = [new_data];
+        updateCharts(data);
+	setTimeout(updateData, refresh_rate);
     	removeLoader();
     });
 }
 
 function updateCharts(data){
-    Plotly.react('temperature_chart', data.temperature, layouts.temperature, config);
+    
+    Plotly.react('temperature_chart', data.THT, layouts.temperature, config);
     Plotly.react('humidity_chart', data.humidity, layouts.humidity, config);
 }
 

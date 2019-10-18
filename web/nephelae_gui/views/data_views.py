@@ -31,6 +31,7 @@ def get_sensor_data(request):
     # Parse request parameters, get variables as array and as single value to factor code
     trail_length = int(request.GET.get('trail_length'))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
+    print(request.GET)
     variables = request.GET.getlist('variables[]')
     variables.append(request.GET.get('variable'))
 
@@ -44,7 +45,6 @@ def mesonh_box(request):
 
 # Update MesoNH hyperslabs
 def get_section(request):
-
     time_value = int(request.GET.get('time'))
     altitude_value = int(request.GET.get('altitude'))
     variable = request.GET.get('variable')
@@ -61,7 +61,6 @@ def get_section(request):
 def update_profiles(request):
     data = {}
     return JsonResponse(data)
-
 
 def update_cloud_data(request):
     data = {}
