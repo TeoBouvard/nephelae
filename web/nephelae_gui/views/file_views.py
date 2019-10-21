@@ -1,5 +1,9 @@
 import threading
 from pathlib import Path
+from PIL import Image
+import numpy as np
+import io
+from matplotlib.colors import hex2color
 
 from django.http import HttpResponse, HttpResponseNotFound
 
@@ -32,6 +36,25 @@ def plane_icon(request, index):
         with open(str(path), 'rb') as f:
             return HttpResponse(f.read(), content_type="image/png")
     except IOError:
+        return HttpResponseNotFound()
+
+# Render icons for UAVs
+def generate_plane_icon(request, color):
+    try:
+        # Getting base image for uav icons and using its alpha channel.
+        rgb = (255.0*np.array(list(hex2color('#' + color)) + [0.0])).astype('uint8')
+        img = Image.open('nephelae_gui/img/plane_icons/plane_icon0.png').convert('RGBA')
+        colors = np.array([rgb]*img.width*img.height, dtype='uint8')
+        colors[:,3] = np.array(img)[:,:,3].ravel()
+        img = Image.fromarray(colors.reshape([img.width, img.height, 4]))
+
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+
+        return HttpResponse(buf.read(), content_type="image/png")
+    except IOError as e:
+        print("Exception generating plane icons :", e)
         return HttpResponseNotFound()
 
 

@@ -154,6 +154,7 @@ function displayUavs(){
     $.getJSON('/discover/', (response) => {
         
         parameters.origin = response.origin;
+        parameters.uavs   = response.uavs
         var uav_ids = []
         for (var id in response.uavs)
             uav_ids.push(id);
@@ -176,8 +177,10 @@ function displayUavs(){
                 var uav_time = response.positions[key].time;
                 
                 // Compute color and icon of markers based on uav ID
-                var uav_color = global_colors[key%global_colors.length];
-                var uav_icon = global_icons[key%global_colors.length];
+                //console.log(parameters.uavs[key])
+                var uav_color = parameters.uavs[key].gui_color
+                // var uav_icon = global_icons[key%global_colors.length];
+                var uav_icon = get_plane_icon(uav_color)
                 
                 // Create leaflet marker and polyline at uav position
                 var marker = L.marker(uav_position, {icon: uav_icon}).bindTooltip("UAV " + key);
