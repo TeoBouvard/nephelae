@@ -3,8 +3,6 @@ $('#nav_profiles').addClass('active');
 
 // Chart style and options
 var chart_height = 550;
-var max_alt = 3;
-var max_temp = 40;
 var lm = 60;
 var rm = 30;
 var bm = 60;
@@ -12,16 +10,18 @@ var tm = 50;
 
 var layouts = {
     temperature: {
-        xaxis:{title: 'Temperature (°C)', range:[0,max_temp]},
-        yaxis:{title: 'Altitude (km)', range:[0,max_alt]},
+        xaxis:{title: 'Temperature (°C)'},
+        yaxis:{title: 'Altitude (km)'},
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
+        hovermode: 'closest'
     },
     humidity: {
-        xaxis:{title: 'Relative Humidity (%)', range:[0,100]},
-        yaxis:{title: 'Altitude (km)', range:[0,max_alt]},
+        xaxis:{title: 'Relative Humidity (%)'},
+        yaxis:{title: 'Altitude (km)'},
         height: chart_height,
         margin: { l: lm, r: rm, b: bm, t: tm },
+        hovermode: 'closest'
     },
 };
 var config = {
@@ -35,7 +35,6 @@ var config = {
 var refresh_rate = 2000; // ms
 var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
-    altitude: 0,
     streaming: true,
     socket: null,
 }
@@ -50,25 +49,10 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
-    
-    $.getJSON('box/', (response) => {
-            // Parse response
-            var min_altitude = Math.ceil(response[1].min);
-            var max_altitude = Math.floor(response[1].max);
-            var initial_altitude = 1075;
-
-            // Setup GUI
-            f1.add(parameters, 'altitude', min_altitude, max_altitude)
-                .setValue(initial_altitude)
-                .step(1)
-                .name('Altitude (m)')
-                .onFinishChange(updateData);
-    });
     f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
     f1.add(parameters, 'streaming').name("Streaming").onChange((state) => toggleStreaming(state));
 
     var f2 = gui.addFolder('UAVs');
-    var f3 = gui.addFolder('Variables');
 
     $.getJSON('/discover/', (response) => {
 
@@ -81,8 +65,7 @@ function setupGUI(){
         }
 
         for (var tag of response.sample_tags){
-            parameters['variables'][tag] = true;
-            f3.add(parameters['variables'], tag).name(tag).onChange((state) => toggleChart(state));
+            parameters['variables'][tag] = (tag == 'THT' || tag == 'RCT');
         }
 
         // Draw charts once GUI is initialized
@@ -94,35 +77,40 @@ function updateData(){
     var data = {};
     var query = $.param({trail_length: parameters.trail_length, uav_id: getSelectedElements(parameters.uavs), variables: getSelectedElements(parameters.variables)});
     $.getJSON('update/?'+query, function(response){
-        var positions = response.data['100']['THT']['positions'];
-        var altitudes = [];
-        for(var i = 0; i < positions.length ; i++){
-            altitudes.push(positions[i][3]);
-        }
-        var new_data = {
-            type: 'line',
-            name: '100',
-            x: response.data['100']['THT']['values'],
-            y: altitudes,
-            mode: 'line',
-            line: {
-                width: 1,
-                shape: 'linear',
-                color: global_colors['100'%global_colors.length],
-            },
-            meta: ['100'],
-            hovertemplate:
-                'Temperature : %{x:.1f}s <br>' +
-                'Altitude : %{y:.2f} <br>' +
-                '<extra>UAV %{meta[0]}</extra>',
-            hoverlabel: {
-                bgcolor: 'black',
-                bordercolor: 'black',
-                font: {family: 'Roboto', si1ze: '15', color: 'white'},
-                align: 'left',
+        for(var uav_id in response.data){
+            for(var variable_name in response.data[uav_id]){
+                var positions = response.data[uav_id][variable_name]['positions'];
+                var altitudes = [];
+                
+                for(var i = 0; i < positions.length ; i++){
+                    altitudes.push(positions[i][3]);
+                }
+                var new_data = {
+                    type: 'line',
+                    name: uav_id,
+                    x: response.data[uav_id][variable_name]['values'],
+                    y: altitudes,
+                    mode: 'line',
+                    line: {
+                        width: 1,
+                        shape: 'linear',
+                        color: global_colors[uav_id%global_colors.length],
+                    },
+                    meta: [uav_id],
+                    hovertemplate:
+                        'Valeur : %{x:.1f}s <br>' +
+                        'Altitude : %{y:.2f} <br>' +
+                        '<extra>UAV %{meta[0]}</extra>',
+                    hoverlabel: {
+                        bgcolor: 'black',
+                        bordercolor: 'black',
+                        font: {family: 'Roboto', si1ze: '15', color: 'white'},
+                        align: 'left',
+                    }
+                };
+        variable_name in data ? data[variable_name].push(new_data) : data[variable_name] = [new_data];
             }
-        };
-        'THT' in data ? data['THT'].push(new_data) : data['THT'] = [new_data];
+        }
         updateCharts(data);
 	setTimeout(updateData, refresh_rate);
     	removeLoader();
@@ -130,8 +118,7 @@ function updateData(){
 }
 
 function updateCharts(data){
-    
     Plotly.react('temperature_chart', data.THT, layouts.temperature, config);
-    Plotly.react('humidity_chart', data.humidity, layouts.humidity, config);
+    Plotly.react('humidity_chart', data.RCT, layouts.humidity, config);
 }
 
