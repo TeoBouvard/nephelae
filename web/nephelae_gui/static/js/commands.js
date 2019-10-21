@@ -187,7 +187,7 @@ function setupChart(){
 function discoverFleet(){
 
     $.getJSON('/discover/', (response) => {
-        for (uav_id of response.uavs) {
+        for (uav_id in response.uavs) {
             parameters.fleet[uav_id] = {id : uav_id};
         }
         generateItems();
