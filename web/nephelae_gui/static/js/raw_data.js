@@ -50,7 +50,7 @@ function setupGUI(){
         parameters['uavs'] = {};
         parameters['variables'] = {};
 
-        for (var uav_id of response.uavs){
+        for (var uav_id in response.uavs){
             parameters['uavs'][uav_id] = true;
             f3.add(parameters['uavs'], uav_id).name('UAV ' + uav_id).onChange(updateData);
         }

@@ -40,8 +40,11 @@ $(document).ready(setupGUI);
 function setupGUI(){
 
     $.getJSON('/discover/', (response) => {
+   
     
-    var tracked_uav_choices = ['None'].concat(response.uavs)
+    var tracked_uav_choices = ['None']
+    for (var id in response.uavs)
+        tracked_uav_choices.push(id);
 
     // Construct dat.gui
     var gui = new dat.GUI({ autoplace: false });
@@ -151,9 +154,12 @@ function displayUavs(){
     $.getJSON('/discover/', (response) => {
         
         parameters.origin = response.origin;
+        var uav_ids = []
+        for (var id in response.uavs)
+            uav_ids.push(id);
         
         // add +1 to trail_length so that zero performs a valid slice
-        var query = $.param({uav_id: response.uavs, trail_length: parameters.trail_length+1, reality: true});
+        var query = $.param({uav_id: uav_ids, trail_length: parameters.trail_length+1, reality: true});
 
         $.getJSON('update/?' + query, (response) => {
 

@@ -83,8 +83,17 @@ except Exception as e:
 
 
 def discover():
-    # return dict(origin=nav_frame, uavs=db.uavIds, sample_tags=db.variableNames)
-    return dict(origin=nav_frame, uavs=db.uavIds, sample_tags=db_data_tags)
+    try:
+        uavs = {}
+        for key in interface.uavs.keys():
+            uavs[key] = {}
+            uavs[key]['id'] = str(key)
+            uavs[key]['name'] = interface.uavs[key].config.ac_name
+            uavs[key]['gui_color'] = interface.uavs[key].config.default_gui_color
+    except NameError as e:
+        print("No interface defined (in a replay ?).", e)
+
+    return {'origin': nav_frame, 'uavs':uavs, 'sample_tags':db_data_tags}
 
 
 # GPS time is *absolute*, but SAMPLE time is relative to navFrame
