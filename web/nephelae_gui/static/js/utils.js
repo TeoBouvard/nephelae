@@ -17,6 +17,10 @@ for(var i = 0; i < global_colors.length; i++){
     global_icons.push(random_icon);
 }
 
+function get_plane_icon(color){
+    return new planeIcon({iconUrl: '/map/generated_plane_icon/' + color.substr(1,color.length-1)});
+}
+
 
 function createLayout(variable, values=[]){
 

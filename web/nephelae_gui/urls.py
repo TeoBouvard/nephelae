@@ -18,6 +18,7 @@ urlpatterns = [
     path('map/<str:variable_name>_wind/', views.wind_data),
     path('map/tile/<int:z>/<int:x>/<int:y>', views.map_tiles, name='map_tiles'),
     path('map/plane_icon/<int:index>', views.plane_icon, name='plane_icon'),
+    path('map/generated_plane_icon/<str:color>', views.generate_plane_icon, name='generated_plane_icon'),
     path('map/<str:variable_name>_img/', views.layer_img, name='layer_img'),
 
     # URL for simulation page
