@@ -37,6 +37,7 @@ var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
     streaming: true,
     socket: null,
+    tracked_uav: 'None'
 }
 
 $(document).ready(() => {
@@ -52,19 +53,18 @@ function setupGUI(){
     f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
     f1.add(parameters, 'streaming').name("Streaming").onChange((state) => toggleStreaming(state));
 
-    var f2 = gui.addFolder('UAVs');
-
     $.getJSON('/discover/', (response) => {
 
         parameters['uavs'] = {};
         parameters['variables'] = {};
 
-        for (var uav_id of response.uavs){
+	gui.add(parameters, 'tracked_uav', response.uavs).setValue(response.uavs[0]).onChange(updateData);
+        
+	for (var uav_id of response.uavs){
             parameters['uavs'][uav_id] = true;
-            f2.add(parameters['uavs'], uav_id).name('UAV ' + uav_id).onChange(updateData);
         }
-
-        for (var tag of response.sample_tags){
+        
+	for (var tag of response.sample_tags){
             parameters['variables'][tag] = (tag == 'THT' || tag == 'RCT');
         }
 
@@ -75,11 +75,12 @@ function setupGUI(){
 
 function updateData(){
     var data = {};
-    var query = $.param({trail_length: parameters.trail_length, uav_id: getSelectedElements(parameters.uavs), variables: getSelectedElements(parameters.variables)});
+    var query = $.param({trail_length: parameters.trail_length,
+			 variables: getSelectedElements(parameters.variables),
+			 uav_id: getSelectedElements(parameters.uavs)});
     $.getJSON('update/?'+query, function(response){
-        for(var uav_id in response.data){
-            for(var variable_name in response.data[uav_id]){
-                var positions = response.data[uav_id][variable_name]['positions'];
+        for(var variable_name in response.data[parameters.tracked_uav]){
+                var positions = response.data[parameters.tracked_uav][variable_name]['positions'];
                 var altitudes = [];
                 
                 for(var i = 0; i < positions.length ; i++){
@@ -87,16 +88,16 @@ function updateData(){
                 }
                 var new_data = {
                     type: 'line',
-                    name: uav_id,
-                    x: response.data[uav_id][variable_name]['values'],
+                    name: parameters.tracked_uav,
+                    x: response.data[parameters.tracked_uav][variable_name]['values'],
                     y: altitudes,
                     mode: 'line',
                     line: {
                         width: 1,
                         shape: 'linear',
-                        color: global_colors[uav_id%global_colors.length],
+                        color: global_colors[parameters.tracked_uav%global_colors.length],
                     },
-                    meta: [uav_id],
+                    meta: [parameters.tracked_uav],
                     hovertemplate:
                         'Valeur : %{x:.1f}s <br>' +
                         'Altitude : %{y:.2f} <br>' +
@@ -109,7 +110,6 @@ function updateData(){
                     }
                 };
         variable_name in data ? data[variable_name].push(new_data) : data[variable_name] = [new_data];
-            }
         }
         updateCharts(data);
 	setTimeout(updateData, refresh_rate);
