@@ -38,6 +38,7 @@ var parameters = {
     streaming: true,
     socket: null,
     tracked_uav: 'None',
+    buffer_size: parseInt(Cookies.get('buffer_size')),
 }
 
 $(document).ready(() => {
@@ -50,8 +51,17 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     var f1 = gui.addFolder('Controls');
-    f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
+    f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(
+	function() {
+		Cookies.set('trail_length', parameters.trail_length);	
+		updateData();
+	});
     f1.add(parameters, 'streaming').name("Streaming").onChange((state) => toggleStreaming(state));
+    f1.add(parameters, 'buffer_size', 5, 1000).step(1).name("Buffer size").onFinishChange(
+	function() {
+		Cookies.set('buffer_size', parameters.buffer_size);	
+		updateData();
+	});
 	$.getJSON('/discover/', (response) => {
 
         parameters['uavs'] = {};
@@ -122,7 +132,7 @@ function updateData(){
 function handleMessage(data){
 	var chart_name = '';
 	if ((data['uav_id'] == parameters.tracked_uav)  
-			&& (parameters.variables[data.variable_name])){
+		&& (parameters.variables[data.variable_name])){
 		if (data['variable_name'] == 'THT')
 			chart_name = 'temperature_chart';
 		else if (data['variable_name'] == 'RCT')
@@ -133,7 +143,7 @@ function handleMessage(data){
 			y: [[data.position[3]]],
 			x: [[data.data[0]]]
 		};
-        Plotly.extendTraces(chart_name, update, [trace_index]);
+		Plotly.extendTraces(chart_name, update, [trace_index]);
 	}
 }
 
@@ -152,6 +162,5 @@ function updateCharts(data){
 }
 
 function getTraceIndexByName(chart, name){
-    // find the index of the first trace in the chart with name 'name'
     return chart[0].data.findIndex(element => element.name == name);
 }
