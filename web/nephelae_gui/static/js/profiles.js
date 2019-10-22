@@ -37,7 +37,7 @@ var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
     streaming: true,
     socket: null,
-    tracked_uav: 'None'
+    tracked_uav: 'None',
 }
 
 $(document).ready(() => {
@@ -52,8 +52,7 @@ function setupGUI(){
     var f1 = gui.addFolder('Controls');
     f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
     f1.add(parameters, 'streaming').name("Streaming").onChange((state) => toggleStreaming(state));
-
-    $.getJSON('/discover/', (response) => {
+	$.getJSON('/discover/', (response) => {
 
         parameters['uavs'] = {};
         parameters['variables'] = {};
@@ -80,41 +79,71 @@ function updateData(){
 			 uav_id: getSelectedElements(parameters.uavs)});
     $.getJSON('update/?'+query, function(response){
         for(var variable_name in response.data[parameters.tracked_uav]){
-                var positions = response.data[parameters.tracked_uav][variable_name]['positions'];
-                var altitudes = [];
+            var positions = response.data[parameters.tracked_uav][variable_name]['positions'];
+            var altitudes = [];
                 
-                for(var i = 0; i < positions.length ; i++){
-                    altitudes.push(positions[i][3]);
+            for(var i = 0; i < positions.length ; i++){
+                altitudes.push(positions[i][3]);
+            }
+            var new_data = {
+                type: 'line',
+                name: parameters.tracked_uav,
+                x: response.data[parameters.tracked_uav][variable_name]['values'],
+                y: altitudes,
+                mode: 'line',
+                line: {
+                    width: 1,
+                    shape: 'linear',
+                    color: global_colors[parameters.tracked_uav%global_colors.length],
+                },
+                meta: [parameters.tracked_uav],
+                hovertemplate:
+                    'Valeur : %{x:.1f}s <br>' +
+                    'Altitude : %{y:.2f} <br>' +
+                    '<extra>UAV %{meta[0]}</extra>',
+                hoverlabel: {
+                    bgcolor: 'black',
+                    bordercolor: 'black',
+                    font: {family: 'Roboto', si1ze: '15', color: 'white'},
+                    align: 'left',
                 }
-                var new_data = {
-                    type: 'line',
-                    name: parameters.tracked_uav,
-                    x: response.data[parameters.tracked_uav][variable_name]['values'],
-                    y: altitudes,
-                    mode: 'line',
-                    line: {
-                        width: 1,
-                        shape: 'linear',
-                        color: global_colors[parameters.tracked_uav%global_colors.length],
-                    },
-                    meta: [parameters.tracked_uav],
-                    hovertemplate:
-                        'Valeur : %{x:.1f}s <br>' +
-                        'Altitude : %{y:.2f} <br>' +
-                        '<extra>UAV %{meta[0]}</extra>',
-                    hoverlabel: {
-                        bgcolor: 'black',
-                        bordercolor: 'black',
-                        font: {family: 'Roboto', si1ze: '15', color: 'white'},
-                        align: 'left',
-                    }
-                };
-        variable_name in data ? data[variable_name].push(new_data) : data[variable_name] = [new_data];
+            };
+            variable_name in data ? data[variable_name].push(new_data) : data[variable_name] = [new_data];
         }
         updateCharts(data);
-	setTimeout(updateData, refresh_rate);
+        if (parameters.streaming && parameters.socket == null) {
+            parameters.socket = new WebSocket('ws://' + window.location.host + '/ws/sensor/');
+            parameters.socket.onmessage = (e) => handleMessage(JSON.parse(e.data));
+        }
     	removeLoader();
     });
+}
+
+function handleMessage(data){
+	var chart_name = '';
+	if ((data['uav_id'] == parameters.tracked_uav)  
+			&& (parameters.variables[data.variable_name])){
+		if (data['variable_name'] == 'THT')
+			chart_name = 'temperature_chart';
+		else if (data['variable_name'] == 'RCT')
+			chart_name = 'humidity_chart';
+		var chart = $('#' + chart_name);
+		var trace_index = getTraceIndexByName(chart, data.uav_id)
+		var update = {
+			y: [[data.position[3]]],
+			x: [[data.data[0]]]
+		};
+        Plotly.extendTraces(chart_name, update, [trace_index]);
+	}
+}
+
+function toggleStreaming(state){
+    if (state){
+        updateData();
+    } else {
+        parameters.socket.close();
+        parameters.socket = null;
+    }  
 }
 
 function updateCharts(data){
@@ -122,3 +151,7 @@ function updateCharts(data){
     Plotly.react('humidity_chart', data.RCT, layouts.humidity, config);
 }
 
+function getTraceIndexByName(chart, name){
+    // find the index of the first trace in the chart with name 'name'
+    return chart[0].data.findIndex(element => element.name == name);
+}
