@@ -9,5 +9,4 @@ if(!Cookies.get('visits')){
 function setDefaultParameters() {
     Cookies.set('refresh_rate', 1000);
     Cookies.set('trail_length', 60);
-    Cookies.set('buffer_size', 100);
 }

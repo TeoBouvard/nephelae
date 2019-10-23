@@ -62,7 +62,7 @@ function setupGUI(){
 function updateData(){
 
     var data = {};
-    var query = $.param({uav_id: getSelectedElements(parameters.uavs), trail_length: parameters.trail_length, variables:getSelectedElements(parameters.variables)});
+    var query = $.param({uav_id: getSelectedElements(parameters.uavs), start: parameters.trail_length, variables:getSelectedElements(parameters.variables)});
 
     $.getJSON('update/?' + query, (response) => {
         

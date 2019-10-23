@@ -29,13 +29,13 @@ def get_positions(request):
 def get_sensor_data(request):
 
     # Parse request parameters, get variables as array and as single value to factor code
-    trail_length = int(request.GET.get('trail_length'))
+    start = int(request.GET.get('start'))
+    end = (None if request.GET.get('end') is None else int(request.GET.get('end')))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
-    print(request.GET)
+    step = (-1 if request.GET.get('step') is None else int(request.GET.get('step')))
     variables = request.GET.getlist('variables[]')
     variables.append(request.GET.get('variable'))
-
-    return JsonResponse(tracker.get_data(uav_ids, trail_length, variables))
+    return JsonResponse(tracker.get_data(uav_ids, variables, start, end, step))
 
 
 # Get sections/map sliders bounds, bad design for now ..
@@ -56,11 +56,6 @@ def get_section(request):
 
     return response
 
-
-# Data updates
-def update_profiles(request):
-    data = {}
-    return JsonResponse(data)
 
 def update_cloud_data(request):
     data = {}

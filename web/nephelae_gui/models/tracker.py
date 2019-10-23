@@ -117,14 +117,12 @@ def get_positions(uav_ids, trail_length, reality=True):
     return dict(positions=positions)
 
 
-def get_data(uav_ids, trail_length, variables):
+def get_data(uav_ids, variables, start=None, end=None, step=-1):
 
     data = dict()
-
     for variable in variables:
         for uav_id in uav_ids:
-
-            messages = [entry.data for entry in db.find_entries([variable, str(uav_id)], (slice(-trail_length, None, -1), ), lambda entry: entry.data.timeStamp)]
+            messages = [entry.data for entry in db.find_entries([variable, str(uav_id)], (slice(-start, end, step), ), lambda entry: entry.data.timeStamp)]
 
             for message in messages:
 

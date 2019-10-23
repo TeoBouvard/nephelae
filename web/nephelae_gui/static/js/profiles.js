@@ -38,7 +38,8 @@ var parameters = {
     streaming: true,
     socket: null,
     tracked_uav: 'None',
-    buffer_size: parseInt(Cookies.get('buffer_size')),
+    start_buff : 0,
+    end_buff : 100
 }
 
 $(document).ready(() => {
@@ -50,23 +51,21 @@ function setupGUI(){
     gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
 
-    var f1 = gui.addFolder('Controls');
-    f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(
-	function() {
-		Cookies.set('trail_length', parameters.trail_length);	
-		updateData();
-	});
-    f1.add(parameters, 'streaming').name("Streaming").onChange((state) => toggleStreaming(state));
-    f1.add(parameters, 'buffer_size', 5, 1000).step(1).name("Buffer size").onFinishChange(
-	function() {
-		Cookies.set('buffer_size', parameters.buffer_size);	
-		updateData();
-	});
-	$.getJSON('/discover/', (response) => {
+    var f1 = gui.addFolder('Real-Time');
+    f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
+    var f2 = gui.addFolder('History');
+    f2.add(parameters, 'start_buff').name("Start Buffer").onChange(updateData);
+    f2.add(parameters, 'end_buff').name("End Buffer").onChange(updateData);
+	fieldsBehavior(parameters.streaming, f1, f2);
+    $.getJSON('/discover/', (response) => {
 
         parameters['uavs'] = {};
         parameters['variables'] = {};
 
+    gui.add(parameters, 'streaming').name("Streaming").onChange(function(state) {
+        fieldsBehavior(state, f1, f2);
+        toggleStreaming(state);
+    });
 	gui.add(parameters, 'tracked_uav', response.uavs).setValue(response.uavs[0]).onChange(updateData);
         
 	for (var uav_id of response.uavs){
@@ -84,14 +83,11 @@ function setupGUI(){
 
 function updateData(){
     var data = {};
-    var query = $.param({trail_length: parameters.trail_length,
-			 variables: getSelectedElements(parameters.variables),
-			 uav_id: getSelectedElements(parameters.uavs)});
+    var query = makeQuery();
     $.getJSON('update/?'+query, function(response){
         for(var variable_name in response.data[parameters.tracked_uav]){
             var positions = response.data[parameters.tracked_uav][variable_name]['positions'];
             var altitudes = [];
-                
             for(var i = 0; i < positions.length ; i++){
                 altitudes.push(positions[i][3]);
             }
@@ -148,12 +144,11 @@ function handleMessage(data){
 }
 
 function toggleStreaming(state){
-    if (state){
-        updateData();
-    } else {
+    if (!state){
         parameters.socket.close();
         parameters.socket = null;
     }  
+    updateData();
 }
 
 function updateCharts(data){
@@ -163,4 +158,30 @@ function updateCharts(data){
 
 function getTraceIndexByName(chart, name){
     return chart[0].data.findIndex(element => element.name == name);
+}
+
+function makeQuery(){
+    return (parameters.streaming 
+            ? 
+            $.param({start: parameters.trail_length,
+                variables: getSelectedElements(parameters.variables),
+			 	uav_id: getSelectedElements(parameters.uavs)})
+            :
+			$.param({start: -parameters.start_buff,
+                variables: getSelectedElements(parameters.variables),
+			 	uav_id: getSelectedElements(parameters.uavs),
+                step: 1,
+                end: parameters.end_buff}));
+}
+
+function fieldsBehavior(state, f1, f2){
+    if (state){
+        f1.show();
+        f1.open();
+        f2.hide();
+    } else {
+        f1.hide();
+        f2.show();
+        f2.open();
+    }
 }

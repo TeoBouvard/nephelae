@@ -7,14 +7,12 @@ $(document).ready(() => {
 function displayCookies() {
     setupDisplay('refresh_rate');
     setupDisplay('trail_length');
-    setupDisplay('buffer_size');
 }
 
 function addListeners() {
     $('#reset_cookies').click(resetCookies);
     $('#slider_refresh_rate').on('change', () => updateDisplay('refresh_rate'));
     $('#slider_trail_length').on('change', () => updateDisplay('trail_length'));
-    $('#slider_buffer_size').on('change', () => updateDisplay('buffer_size'));
 }
 
 function setupDisplay(div_name){
