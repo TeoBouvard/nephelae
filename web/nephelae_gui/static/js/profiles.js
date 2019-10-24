@@ -56,7 +56,7 @@ function setupGUI(){
     var f2 = gui.addFolder('History');
     f2.add(parameters, 'start_buff').name("Start Buffer").onChange(updateData);
     f2.add(parameters, 'end_buff').name("End Buffer").onChange(updateData);
-	fieldsBehavior(parameters.streaming, f1, f2);
+    fieldsBehavior(parameters.streaming, f1, f2);
     $.getJSON('/discover/', (response) => {
 
         parameters['uavs'] = {};
@@ -126,7 +126,7 @@ function updateData(){
 }
 
 function handleMessage(data){
-	var chart_name = '';
+    var chart_name = '';
 	if ((data['uav_id'] == parameters.tracked_uav)  
 		&& (parameters.variables[data.variable_name])){
 		if (data['variable_name'] == 'THT')

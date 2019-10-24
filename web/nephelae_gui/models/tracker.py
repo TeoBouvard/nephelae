@@ -117,7 +117,7 @@ def get_positions(uav_ids, trail_length, reality=True):
     return dict(positions=positions)
 
 
-def get_data(uav_ids, variables, start=None, end=None, step=-1):
+def get_data(uav_ids, variables, start, end=None, step=-1):
 
     data = dict()
     for variable in variables:
