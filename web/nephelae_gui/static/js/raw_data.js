@@ -189,14 +189,20 @@ function handleMessage(message){
         if (trace_index > -1){
 
             // update data
+            var document_data = document.getElementById(message.variable_name).data;
+            for(var i = 0; i < document_data.length; i++){
+              var first_time = document_data[i].x[0];
+              while (message.position[0]-first_time > parameters.trail_length){
+                  document_data[i].x.shift();
+                  document_data[i].y.shift();
+                  first_time = document_data[i].x[0];
+              }
+            }
             var update = {
-                x:  [[message.position[0]]],
-            
-                y: [[message.data[0]]]
+                    x:  [[message.position[0]]],
+              
+                    y: [[message.data[0]]]
             };
-
-            // update chart range
-            // react to changes
             Plotly.extendTraces(message.variable_name, update, [trace_index]);
             // The following operation is very expensive, uncomment it only if you need fixed range streaming plot
         } else {
