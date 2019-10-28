@@ -39,7 +39,7 @@ try:
     if 'MESO_NH' in os.environ:
         hypercube = MesonhDataset(common.atm)
         maps['clouds'] = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
-        maps['clouds'].actualRange = (Bounds(0.0,1.0e-4),)
+        maps['clouds'].dataRange = (Bounds(0.0,1.0e-4),)
         # maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
         # maps['hwind']    = MesonhMap('WS Wind (Mesonh)',       hypercube, ['UT','VT'])
     else:
@@ -102,6 +102,7 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
     rFactor = 4
     img = Image.fromarray(h_slice)
     h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.BICUBIC))
+    # h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.NEAREST))
     # h_slice = h_slice[::2, ::2]
     buf = io.BytesIO()
     # plt.imsave(buf, h_slice, origin='lower', cmap=colormap, format='png')

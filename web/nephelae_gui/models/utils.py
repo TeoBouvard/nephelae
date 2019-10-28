@@ -4,6 +4,7 @@ import utm
 from geopy.distance import distance
 from matplotlib.colors import ListedColormap
 
+from . import common
 
 def compute_position(message):
     position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
@@ -43,6 +44,11 @@ def bounds2indices(bounds, origin):
     x1 = translate_position([bounds['south'], bounds['east']], origin)[0]
     y0 = translate_position([bounds['south'], bounds['west']], origin)[1]
     y1 = translate_position([bounds['north'], bounds['west']], origin)[1]
+
+    # x0 = utm.from_latlon(bounds['south'], bounds['west'])[0] - common.db.navFrame.utm_east
+    # x1 = utm.from_latlon(bounds['south'], bounds['east'])[0] - common.db.navFrame.utm_east
+    # y0 = utm.from_latlon(bounds['south'], bounds['west'])[1] - common.db.navFrame.utm_north
+    # y1 = utm.from_latlon(bounds['north'], bounds['west'])[1] - common.db.navFrame.utm_north
 
     return x0, x1, y0, y1
 

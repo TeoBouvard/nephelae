@@ -40,7 +40,8 @@ $(document).ready(setupGUI);
 function setupGUI(){
 
     $.getJSON('/discover/', (response) => {
-   
+
+    parameters.origin = response.origin;
     
     var tracked_uav_choices = ['None']
     for (var id in response.uavs)
