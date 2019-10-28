@@ -1,12 +1,13 @@
 ECHO = @echo
 FETCH = @curl --silent
+SHELL:=/bin/bash
 
 pip_options=
 install_mode=user
 install_pprzlink=False
 DATABASE=$(PWD)/demo/demo_db.neph
 
-.PHONY: demo runserver install assets requirements
+.PHONY: demo runserver install assets requirements paparazzi
 
 
 help:
@@ -18,7 +19,7 @@ help:
 	$(ECHO) "- simulation	: Launch paparazzi simulation"
 
 
-install : assets requirements
+install : assets requirements paparazzi
 
 assets :
 	$(ECHO) -n "Creating static folders ... "
@@ -100,21 +101,36 @@ ifeq ($(install_mode), user)
 	@rm -rf ./nephelae_base ./nephelae_mesonh ./nephelae_paparazzi
 endif
 
+paparazzi :
 ifndef PAPARAZZI_HOME
-    @echo "The environment variable PAPARAZZI_HOME is not defined in your environment."
-    @echo "This usually indicates that paparazzi is not installed."
-    @echo "Would you like to download a copy ? (This won't install anything on your system. If you are unsure, the answer is probably yes) [Y/n]"
-    @read line \
-    if [ "$$line" == "Y" ] || [ "$$line" == "y"]; then \
-            git clone -b laas_master https://github.com/pnarvor/paparazzi.git paparazzi && \ 
-            echo "A copy of paparazzi was copied in $$(pwd)." && \
-            echo "Don't forget to add these two lines to your ~/.bashrc file" && \
-            echo "\"export PAPARAZZI_HOME=$$(pwd)/paparazzi\"" && \
-            echo "\"export PAPARAZZI_SRC=$$(pwd)/paparazzi\""; \
-    else \
-        echo "You chose not to download a copy of paparazzi. May you have a safe journey." \ 
-    fi
-
+	@echo ""
+	@echo "The environment variable PAPARAZZI_HOME is not defined in your environment."
+	@echo "This usually indicates that Paparazzi is not installed."
+	@echo "Would you like to download a copy ? (This won't install anything on your system. If you are unsure, the answer is probably yes) [Y/n]"
+	@read -sr -n1 answer && \
+	if [ "$$answer" == "Y" ] || [ "$$answer" == "y" ]; then \
+		if [ -d "paparazzi" ]; then \
+			git -C paparazzi pull; \
+		else \
+			git clone -b laas_master https://github.com/pnarvor/paparazzi.git paparazzi; \
+		fi && \
+		echo "" && \
+		echo "" && \
+		echo "A copy of Paparazzi was cloned in $$(pwd)." && \
+		echo "Don't forget to add these two lines to your ~/.bashrc file" && \
+		echo "export PAPARAZZI_HOME=$$(pwd)/paparazzi" && \
+		echo "export PAPARAZZI_SRC=$$(pwd)/paparazzi"; \
+	elif [ "$$answer" == "n" ]; then \
+		echo "" && \
+		echo "" && \
+		echo "WARNING : You chose not to download a copy of paparazzi." && \
+		echo "Please note that a copy of Paparazzi pointed by the PAPARAZZI_HOME environment variable is mandatory for this software to run." && \
+		echo "(Paparazzi does not have to be installed or build. Only the pprzlink python package provided with paparazzi is needed.)"; \
+	else \
+		echo "" && \
+		echo "" && \
+		echo "ERROR : You typed \"$$answer\". I did not understand. Please try again by typing \"make paparazzi\""; \
+	fi
 endif
 
 # ifeq ($(install_pprzlink), true)
