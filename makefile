@@ -100,15 +100,32 @@ ifeq ($(install_mode), user)
 	@rm -rf ./nephelae_base ./nephelae_mesonh ./nephelae_paparazzi
 endif
 
-ifeq ($(install_pprzlink), true)
-	@if [ -d "pprzlink" ]; then \
-		git -C pprzlink pull; \
-	else \
-		git clone https://github.com/paparazzi/pprzlink.git pprzlink; \
-	fi
+ifndef PAPARAZZI_HOME
+    @echo "The environment variable PAPARAZZI_HOME is not defined in your environment."
+    @echo "This usually indicates that paparazzi is not installed."
+    @echo "Would you like to download a copy ? (This won't install anything on your system. If you are unsure, the answer is probably yes) [Y/n]"
+    @read line \
+    if [ "$$line" == "Y" ] || [ "$$line" == "y"]; then \
+            git clone -b laas_master https://github.com/pnarvor/paparazzi.git paparazzi && \ 
+            echo "A copy of paparazzi was copied in $$(pwd)." && \
+            echo "Don't forget to add these two lines to your ~/.bashrc file" && \
+            echo "\"export PAPARAZZI_HOME=$$(pwd)/paparazzi\"" && \
+            echo "\"export PAPARAZZI_SRC=$$(pwd)/paparazzi\""; \
+    else \
+        echo "You chose not to download a copy of paparazzi. May you have a safe journey." \ 
+    fi
 
-	@echo "You requested a standalone pprzlink installation. Please set the environment variable PAPARAZZI_PPRZLINK=$$(pwd)/pprzlink"
 endif
+
+# ifeq ($(install_pprzlink), true)
+# 	@if [ -d "pprzlink" ]; then \
+# 		git -C pprzlink pull; \
+# 	else \
+# 		git clone https://github.com/paparazzi/pprzlink.git pprzlink; \
+# 	fi
+# 
+# 	@echo "You requested a standalone pprzlink installation. Please set the environment variable PAPARAZZI_PPRZLINK=$$(pwd)/pprzlink"
+# endif
 
 clean-maps :
 	@rm -rf web/nephelae_gui/static/map_tiles/*
