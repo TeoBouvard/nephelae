@@ -30,6 +30,11 @@ class GPSConsumer(WebsocketConsumer):
 
 
 class SensorConsumer(WebsocketConsumer):
+    def __init__(self, number_of_messages, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.list_of_messages = []
+        self.number_of_messages = number_of_messages
+
     def connect(self):
         self.accept()
         tracker.db.add_sensor_observer(self)
@@ -52,7 +57,10 @@ class SensorConsumer(WebsocketConsumer):
         if sample.variableName not in tracker.db_data_tags:
             return
         message = tracker.prettify_sample(sample)
-        self.send(json.dumps(message))
+        self.list_of_messages.append(message)
+        if(len(self.list_of_messages) >= self.number_of_messages):
+            self.send(json.dumps(self.list_of_messages))
+            self.list_of_messages = []
 
 
 class StatusConsumer(WebsocketConsumer):

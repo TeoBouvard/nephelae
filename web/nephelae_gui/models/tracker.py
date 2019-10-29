@@ -49,7 +49,7 @@ try:
         if 'MESO_NH' in os.environ:
             def build_uav(uavId, navRef):
                 # uav = PprzMesonhUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
-                uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT', ['UT','VT']])
+                uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT', ['UT','VT'], 'THT'])
                 uav.add_sensor_observer(db)
                 uav.add_gps_observer(db)
                 # uav.add_sensor_observer(logger)
@@ -69,9 +69,8 @@ try:
             interface.stop()
             print("Done.")
             exit()
-    db_data_tags = ['RCT', 'WT'] 
     # db_data_tags = ['clouds', 'thermals', 'wind_u', 'wind_v'] 
-
+    db_data_tags = ['RCT', 'WT', 'THT'] 
     nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
 except Exception as e:
     # Have to do this because #@%*&@^*! django is hiding exceptions
@@ -119,15 +118,12 @@ def get_positions(uav_ids, trail_length, reality=True):
     return dict(positions=positions)
 
 
-def get_data(uav_ids, trail_length, variables):
+def get_data(uav_ids, variables, start, end=None, step=-1):
 
     data = dict()
-
     for variable in variables:
-
         for uav_id in uav_ids:
-
-            messages = [entry.data for entry in db.find_entries([variable, str(uav_id)], (slice(-trail_length, None, -1), ), lambda entry: entry.data.timeStamp)]
+            messages = [entry.data for entry in db.find_entries([variable, str(uav_id)], (slice(-start, end, step), ), lambda entry: entry.data.timeStamp)]
 
             for message in messages:
 
@@ -141,7 +137,6 @@ def get_data(uav_ids, trail_length, variables):
                 else:
                     data[uav_id][message.variableName]['positions'].append(message.position.data.tolist())
                     data[uav_id][message.variableName]['values'].append(message.data[0])
-    
     return dict(data=data)
 
 

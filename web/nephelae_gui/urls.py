@@ -37,7 +37,8 @@ urlpatterns = [
 
     # URL for vertical profiles page
     path('profiles/', views.render_template, {'template_name': 'profiles.html'}, name='profiles'),
-    path('profiles/update/', views.update_profiles),
+    path('profiles/box/', views.mesonh_box),
+    path('profiles/update/', views.get_sensor_data),
 
     # URL for cloud data page
     path('cloud_data/', views.render_template, {'template_name': 'cloud_data.html'}, name='cloud_data'),
