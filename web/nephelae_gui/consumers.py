@@ -30,10 +30,10 @@ class GPSConsumer(WebsocketConsumer):
 
 
 class SensorConsumer(WebsocketConsumer):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, number_of_messages, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.list_of_messages = []
-        self.number_of_messages = 10
+        self.number_of_messages = number_of_messages
 
     def connect(self):
         self.accept()

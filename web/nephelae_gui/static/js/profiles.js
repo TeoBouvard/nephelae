@@ -155,7 +155,7 @@ function updateData(){
         }];
         updateCharts(data);
         if (parameters.streaming && parameters.socket == null) {
-            parameters.socket = new WebSocket('ws://' + window.location.host + '/ws/sensor/');
+            parameters.socket = new WebSocket('ws://' + window.location.host + '/ws/sensor/profiles/');
             parameters.socket.onmessage = (e) => handleMessage(JSON.parse(e.data));
         }
         removeLoader();
