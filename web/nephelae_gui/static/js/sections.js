@@ -18,8 +18,10 @@ var parameters = {
     time: 0,
     altitude: 0,
     variable: [],
+    sensors: true,
 }
 
+var coords_box = {};
 
 $(document).ready(function(){
     // set sliders range and display initial image
@@ -46,11 +48,11 @@ function setupGUI(){
             var max_altitude = Math.floor(response[1].max);
             var initial_altitude = 1075;
 
-            var min_x = Math.ceil(response[2].min);
-            var max_x = Math.floor(response[2].max);
+            coords_box['min_x'] = Math.ceil(response[2].min);
+            coords_box['max_x'] = Math.floor(response[2].max);
 
-            var min_y = Math.ceil(response[3].min);
-            var max_y = Math.floor(response[3].max);
+            coords_box['min_y'] = Math.ceil(response[3].min);
+            coords_box['max_y'] = Math.floor(response[3].max);
 
             // Setup GUI
             gui.add(parameters, 'time', min_time, max_time)
@@ -64,6 +66,7 @@ function setupGUI(){
                 .step(1)
                 .name('Altitude (m)')
                 .onFinishChange(updateData);
+            gui.add(parameters, 'sensors');
         }),
 
         $.getJSON('/discover/', (response) => {
@@ -72,15 +75,14 @@ function setupGUI(){
             .name("Variable")
             .onChange(updateData);
         }))
-
     // Once sliders are initialized, display initial section
     .done(updateData);
 }
 
 function updateData(){
     
-    var query = $.param({altitude: parameters.altitude, time: parameters.time, variable: parameters.variable});
-
+    var query = $.param({altitude: parameters.altitude, time: parameters.time, variable: 'clouds', 'min_x':coords_box.min_x, 'max_x':coords_box.max_x, 'min_y':coords_box.min_y, 'max_y':coords_box.max_y});
+    console.log(query);
     $.getJSON('update/?' + query, (response) => {
 
         var lay = createLayout(parameters.variable, response.data);

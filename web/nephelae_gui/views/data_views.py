@@ -48,8 +48,12 @@ def get_section(request):
     time_value = int(request.GET.get('time'))
     altitude_value = int(request.GET.get('altitude'))
     variable = request.GET.get('variable')
-
-    data = hypercube.get_horizontal_slice(variable, time_value, altitude_value)
+    min_x = float(request.GET.get('min_x'));
+    max_x = float(request.GET.get('max_x'));
+    min_y = float(request.GET.get('min_y'));
+    max_y = float(request.GET.get('max_y'));
+    data = hypercube.get_horizontal_slice(variable, time_value, altitude_value,
+            x0=min_x, x1=max_x, y0=min_y, y1=max_y)
     if data is not None:
         data = data.tolist()
     else:
