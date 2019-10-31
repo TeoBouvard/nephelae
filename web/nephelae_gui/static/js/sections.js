@@ -37,6 +37,7 @@ function setupGUI(){
     // Wwait for every ajax call to finish
     $.when(
 
+        gui.add(parameters, 'sensors').name('Sensor Data').onChange(updateData),
         $.getJSON('box/', (response) => {
 
             // Parse response
@@ -66,7 +67,6 @@ function setupGUI(){
                 .step(1)
                 .name('Altitude (m)')
                 .onFinishChange(updateData);
-            gui.add(parameters, 'sensors');
         }),
 
         $.getJSON('/discover/', (response) => {
@@ -80,11 +80,10 @@ function setupGUI(){
 }
 
 function updateData(){
-    
-    var query = $.param({altitude: parameters.altitude, time: parameters.time, variable: 'clouds', 'min_x':coords_box.min_x, 'max_x':coords_box.max_x, 'min_y':coords_box.min_y, 'max_y':coords_box.max_y});
-    console.log(query);
+    var map_extraction = parameters.sensors ? 'LWC' : 'clouds';
+    var query = $.param({altitude: parameters.altitude, time: parameters.time, variable: map_extraction, 'min_x':coords_box.min_x, 'max_x':coords_box.max_x, 'min_y':coords_box.min_y, 'max_y':coords_box.max_y});
     $.getJSON('update/?' + query, (response) => {
-
+        console.log(response)
         var lay = createLayout(parameters.variable, response.data);
 
         var data = [{
@@ -97,6 +96,6 @@ function updateData(){
         layout.title = lay['title'];
 
         Plotly.react('chart', data, layout, config);
-        removeLoader();
     });
+    removeLoader();
 }
