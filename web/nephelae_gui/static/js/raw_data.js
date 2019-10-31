@@ -101,7 +101,7 @@ function updateData(){
                     line: {
                         width: 1,
                         shape: 'linear',
-                        color: parameters.uav_color[parameters.tracked_uav],
+                        color: parameters.uav_color[uav_id],
                     },
                     meta: [uav_id],
                     hovertemplate:
@@ -115,9 +115,7 @@ function updateData(){
                         align: 'left',
                     }
                 };
-
                 variable_name in data ? data[variable_name].push(new_data) : data[variable_name] = [new_data];
-
             }
         }
 
