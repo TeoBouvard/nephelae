@@ -19,7 +19,8 @@ var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
     streaming: true,
     socket: null,
-    start_buff: 0,
+    uav_color: {},
+    start_buff: 1,
     end_buff: 100
 }
 
@@ -52,6 +53,7 @@ function setupGUI(){
 
         for (var uav_id in response.uavs){
             parameters['uavs'][uav_id] = true;
+            parameters['uav_color'][uav_id] = response.uavs[uav_id].gui_color;
             f3.add(parameters['uavs'], uav_id).name('UAV ' + uav_id).onChange(updateData);
         }
 
@@ -99,7 +101,7 @@ function updateData(){
                     line: {
                         width: 1,
                         shape: 'linear',
-                        color: global_colors[uav_id%global_colors.length],
+                        color: parameters.uav_color[parameters.tracked_uav],
                     },
                     meta: [uav_id],
                     hovertemplate:

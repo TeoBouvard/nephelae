@@ -44,7 +44,8 @@ var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
     streaming: true,
     socket: null,
-    tracked_uav: 'None',
+    tracked_uav: [],
+    uav_color: {},
     start_buff : 1,
     end_buff : 100
 }
@@ -75,10 +76,15 @@ function setupGUI(){
             fieldsBehavior(state, f1, f2);
             toggleStreaming(state);
         });
-        gui.add(parameters, 'tracked_uav', response.uavs).setValue(response.uavs[0]).onChange(updateData);
+        list_of_uavs = [];
+        for (x of Object.keys(response.uavs)){
+            list_of_uavs.push(x);
+        }
+        gui.add(parameters, 'tracked_uav', list_of_uavs).setValue(list_of_uavs[0]).onChange(updateData);
 
-        for (var uav_id of response.uavs){
+        for (var uav_id in response.uavs){
             parameters['uavs'][uav_id] = true;
+            parameters['uav_color'][uav_id] = response.uavs[uav_id].gui_color;
         }
 
         for (var tag of response.sample_tags){
@@ -114,7 +120,7 @@ function updateData(){
                 line: {
                     width: 1,
                     shape: 'linear',
-                    color: global_colors[parameters.tracked_uav%global_colors.length],
+                    color: parameters.uav_color[parameters.tracked_uav],
                 },
                 meta: [parameters.tracked_uav],
                 hovertemplate:
@@ -139,7 +145,7 @@ function updateData(){
             line: {
                 width: 1,
                 shape: 'linear',
-                color: global_colors[parameters.tracked_uav%global_colors.length],
+                color: parameters.uav_color[parameters.tracked_uav],
             },
             meta: [parameters.tracked_uav],
             hovertemplate:

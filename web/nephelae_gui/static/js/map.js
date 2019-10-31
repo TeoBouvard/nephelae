@@ -126,7 +126,6 @@ function setupMap(){
                 },
                 maxVelocity: 15
             });
-            console.log(overlays[maps_parameters[key]['name']])
         }
     }
 
