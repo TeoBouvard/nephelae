@@ -18,10 +18,11 @@ var parameters = {
     time: 0,
     altitude: 0,
     variable: [],
-    sensors: true,
+    sensors: false,
+    tracked_uav: 'None'
 }
 
-var coords_box = {};
+var mesonh_box = {};
 
 $(document).ready(function(){
     // set sliders range and display initial image
@@ -35,11 +36,16 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     // Wwait for every ajax call to finish
+    var test = {THT: true}
+    var query = $.param({at_time: 10,
+                variables: getSelectedElements({RCT: true}),
+                uav_id: getSelectedElements({204: true})})
+    $.getJSON('nom_temporaire/?' + query, (response) => {console.log(response)})
+
     $.when(
 
         gui.add(parameters, 'sensors').name('Sensor Data').onChange(updateData),
-        $.getJSON('box/', (response) => {
-
+        $.getJSON('mesonh_dims/', (response) => {
             // Parse response
             var min_time = Math.ceil(response[0].min);
             var max_time = Math.floor(response[0].max);
@@ -49,11 +55,11 @@ function setupGUI(){
             var max_altitude = Math.floor(response[1].max);
             var initial_altitude = 1075;
 
-            coords_box['min_x'] = Math.ceil(response[2].min);
-            coords_box['max_x'] = Math.floor(response[2].max);
+            mesonh_box['min_x'] = Math.ceil(response[2].min);
+            mesonh_box['max_x'] = Math.floor(response[2].max);
 
-            coords_box['min_y'] = Math.ceil(response[3].min);
-            coords_box['max_y'] = Math.floor(response[3].max);
+            mesonh_box['min_y'] = Math.ceil(response[3].min);
+            mesonh_box['max_y'] = Math.floor(response[3].max);
 
             // Setup GUI
             gui.add(parameters, 'time', min_time, max_time)
@@ -70,22 +76,29 @@ function setupGUI(){
         }),
 
         $.getJSON('/discover/', (response) => {
+            gui.add(parameters, 'tracked_uav', Object.keys(response.uavs))
+            .setValue(Object.keys(response.uavs)[0])
+            .name("UAV")
+            .onChange(updateData);
+            
             gui.add(parameters, 'variable', response.sample_tags)
             .setValue(response.sample_tags[0])
             .name("Variable")
             .onChange(updateData);
-        }))
+        }),
     // Once sliders are initialized, display initial section
-    .done(updateData);
+    ).done(updateData);
 }
 
 function updateData(){
     var map_extraction = parameters.sensors ? 'LWC' : 'clouds';
-    var query = $.param({altitude: parameters.altitude, time: parameters.time, variable: map_extraction, 'min_x':coords_box.min_x, 'max_x':coords_box.max_x, 'min_y':coords_box.min_y, 'max_y':coords_box.max_y});
-    $.getJSON('update/?' + query, (response) => {
-        console.log(response)
-        var lay = createLayout(parameters.variable, response.data);
 
+    var query = $.param({altitude: parameters.altitude, time: parameters.time, 
+        variable: map_extraction, 'min_x':100, 
+        'max_x':1000, 'min_y':100, 
+        'max_y':1000});
+    $.getJSON('mesonh_section/?' + query, (response) => {
+        var lay = createLayout(parameters.variable, response.data);
         var data = [{
             x: response.axes,
             y: response.axes,

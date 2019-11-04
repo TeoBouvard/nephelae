@@ -33,12 +33,13 @@ urlpatterns = [
 
     # URL for sections page
     path('sections/', views.render_template, {'template_name': 'sections.html'}, name='sections'),
-    path('sections/box/', views.mesonh_box),
-    path('sections/update/', views.get_section),
+    path('sections/mesonh_dims/', views.mesonh_box),
+    path('sections/nom_temporaire/', views.get_state_at_time),
+    path('sections/gpr_section/', views.get_sensor_data),
+    path('sections/mesonh_section/', views.get_section),
 
     # URL for vertical profiles page
     path('profiles/', views.render_template, {'template_name': 'profiles.html'}, name='profiles'),
-    path('profiles/box/', views.mesonh_box),
     path('profiles/update/', views.get_sensor_data),
 
     # URL for cloud data page

@@ -142,7 +142,7 @@ function setupMap(){
     }
 
     tiles_overlay_IGN.addTo(flight_map);
-
+    L.control.scale().addTo(flight_map);
     // Prevent async conflicts by displaying uavs once map is initialized
     displayUavs();
 
