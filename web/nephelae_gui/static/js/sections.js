@@ -36,12 +36,10 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     // Wwait for every ajax call to finish
-    var test = {THT: true}
     var query = $.param({at_time: 10,
-                variables: getSelectedElements({RCT: true}),
-                uav_id: getSelectedElements({204: true})})
+                variables: getSelectedElements({'RCT': true}),
+                uav_id: getSelectedElements({'204': true})})
     $.getJSON('nom_temporaire/?' + query, (response) => {console.log(response)})
-
     $.when(
 
         gui.add(parameters, 'sensors').name('Sensor Data').onChange(updateData),
@@ -88,6 +86,7 @@ function setupGUI(){
         }),
     // Once sliders are initialized, display initial section
     ).done(updateData);
+
 }
 
 function updateData(){

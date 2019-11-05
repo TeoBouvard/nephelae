@@ -149,11 +149,16 @@ def get_data(uav_ids, variables, start, end=None, step=-1):
     return dict(data=data)
 
 def get_state_at_time(uav_ids, variables, at_time):
+    data = dict()
     for variable in variables:
         for uav_id in uav_ids:
-            messages = [entry.data for entry in db.find_entry(
-                [variable, str(uav_id)], at_time)]
-    return {}
+            message = db[variable, str(uav_id)][float(at_time)][0].data
+            data[uav_id] = dict()
+            data[uav_id][message.variableName] = {
+                    'positions': [message.position.data.tolist()],
+                    'values': [message.data],
+            }
+    return data
 
 def prettify_gps(message):
 
