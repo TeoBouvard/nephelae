@@ -68,7 +68,7 @@ def get_section(request):
 def get_state_at_time(request):
     variables = request.GET.getlist('variables[]')
     uavs = request.GET.getlist('uav_id[]')
-    at_time = int(request.GET.get('at_time'))
+    at_time = float(request.GET.get('at_time'))
     return JsonResponse(tracker.get_state_at_time(uavs, variables, at_time))
 
 def update_cloud_data(request):

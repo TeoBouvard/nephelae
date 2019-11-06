@@ -17,7 +17,6 @@ var config = {
 var parameters = {
     time: 0,
     altitude: 0,
-    variable: [],
     sensors: false,
     uav: '',
     resolution: 100,
@@ -50,44 +49,31 @@ function setupGUI(){
         .onFinishChange(updateData);
 
     $.getJSON('mesonh_dims/', (response) => {
-        // Parse response
-        var min_time = Math.ceil(response[0].min);
-        var max_time = Math.floor(response[0].max);
-
-        var min_altitude = Math.ceil(response[1].min);
-        var max_altitude = Math.floor(response[1].max);
-        var initial_altitude = 700;
-
-        var min_axe_x = Math.ceil(response[2].min);
-        var max_axe_x = Math.floor(response[2].max);
-
-        var min_axe_y = Math.ceil(response[3].min);
-        var max_axe_y = Math.floor(response[3].max);
-
         // Setup GUI
-        gui.add(parameters, 'time', min_time, max_time)
-            .setValue(min_time)
-            .step(1)
-            .name('Time (s)')
-            .onFinishChange(updateData);
+        controller_collection['time'] =
+            gui.add(parameters, 'time')
+                .setValue(0)
+                .step(1)
+                .name('Time (s)')
+                .onFinishChange(updateData);
 
         controller_collection['altitude'] =
-            gui.add(parameters, 'altitude', min_altitude, max_altitude)
-                .setValue(initial_altitude)
+            gui.add(parameters, 'altitude')
+                .setValue(0)
                 .step(1)
                 .name('Altitude (m)')
                 .onFinishChange(updateData);
         
         controller_collection['position_x'] =
-            gui.add(parameters, 'position_x', min_axe_x, max_axe_x)
-                .setValue(min_axe_x)
+            gui.add(parameters, 'position_x')
+                .setValue(900)
                 .step(1)
                 .name('Pos. X axis')
                 .onFinishChange(updateData);
         
         controller_collection['position_y'] =
-            gui.add(parameters, 'position_y', min_axe_y, max_axe_y)
-                .setValue(min_axe_y)
+            gui.add(parameters, 'position_y')
+                .setValue(-900)
                 .step(1)
                 .name('Pos. Y axis')
                 .onFinishChange(updateData);
@@ -98,11 +84,6 @@ function setupGUI(){
             gui.add(parameters, 'uav', x)
             .setValue(x[0])
             .name("UAV")
-            .onChange(updateData);
-            
-            gui.add(parameters, 'variable', response.sample_tags)
-            .setValue(response.sample_tags[0])
-            .name("Variable")
             .onChange(updateData);
         
             parameters['uavs'] = {};
@@ -128,13 +109,15 @@ function updateData(){
         });
         $.getJSON('nom_temporaire/?' + query, (response) => {
             var coordonnees = 
-                response[parameters.uav][parameters.variable].positions[0];
+                response[parameters.uav][Object.keys(parameters.variables)[0]].positions[0];
             parameters.position_x = coordonnees[1];
             controller_collection['position_x'].updateDisplay();
             parameters.position_y = coordonnees[2];
             controller_collection['position_y'].updateDisplay();
             parameters.altitude = coordonnees[3];
             controller_collection['altitude'].updateDisplay();
+            parameters.time = coordonnees[0];
+            controller_collection['time'].updateDisplay();
             updateStaticMap();
         });
     }
