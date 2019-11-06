@@ -235,7 +235,6 @@ function getTraceIndexByName(chart, name){
 }
 
 function makeQuery(){
-    console.log(parameters.variables);
     return (parameters.streaming 
         ? 
         $.param({start: parameters.trail_length,

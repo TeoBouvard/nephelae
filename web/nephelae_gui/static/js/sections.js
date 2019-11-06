@@ -21,9 +21,13 @@ var parameters = {
     sensors: false,
     uav: '',
     resolution: 100,
+    position_x: 0,
+    position_y: 0,
+    altitude: 0,
 }
 
 var position_of_uav = {};
+var controller_collection = {};
 
 $(document).ready(function(){
     // set sliders range and display initial image
@@ -37,34 +41,62 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     // Wwait for every ajax call to finish
-        gui.add(parameters, 'sensors').name('Sensor Data').onChange(updateData),
-        $.getJSON('mesonh_dims/', (response) => {
-            // Parse response
-            var min_time = Math.ceil(response[0].min);
-            var max_time = Math.floor(response[0].max);
-            var initial_time = Math.ceil(response[0].min);
+    gui.add(parameters, 'sensors').name('Sensor Data').onChange(updateData),
 
-            var min_altitude = Math.ceil(response[1].min);
-            var max_altitude = Math.floor(response[1].max);
-            var initial_altitude = 1075;
+    gui.add(parameters, 'resolution', 100, 5000)
+        .setValue(2500)
+        .step(1)
+        .name('Resolution (pixels)')
+        .onFinishChange(updateData);
 
-            // Setup GUI
-            gui.add(parameters, 'time', min_time, max_time)
-                .setValue(initial_time)
+    $.getJSON('mesonh_dims/', (response) => {
+        // Parse response
+        var min_time = Math.ceil(response[0].min);
+        var max_time = Math.floor(response[0].max);
+
+        var min_altitude = Math.ceil(response[1].min);
+        var max_altitude = Math.floor(response[1].max);
+        var initial_altitude = 700;
+
+        var min_axe_x = Math.ceil(response[2].min);
+        var max_axe_x = Math.floor(response[2].max);
+
+        var min_axe_y = Math.ceil(response[3].min);
+        var max_axe_y = Math.floor(response[3].max);
+
+        // Setup GUI
+        gui.add(parameters, 'time', min_time, max_time)
+            .setValue(min_time)
+            .step(1)
+            .name('Time (s)')
+            .onFinishChange(updateData);
+
+        controller_collection['altitude'] =
+            gui.add(parameters, 'altitude', min_altitude, max_altitude)
+                .setValue(initial_altitude)
                 .step(1)
-                .name('Time (s)')
+                .name('Altitude (m)')
                 .onFinishChange(updateData);
-
-            gui.add(parameters, 'resolution', 100, 5000)
-                .setValue(100)
+        
+        controller_collection['position_x'] =
+            gui.add(parameters, 'position_x', min_axe_x, max_axe_x)
+                .setValue(min_axe_x)
                 .step(1)
-                .name('Resolution (pixels)')
+                .name('Pos. X axis')
                 .onFinishChange(updateData);
-        });
-
+        
+        controller_collection['position_y'] =
+            gui.add(parameters, 'position_y', min_axe_y, max_axe_y)
+                .setValue(min_axe_y)
+                .step(1)
+                .name('Pos. Y axis')
+                .onFinishChange(updateData);
+            
         $.getJSON('/discover/', (response) => {
-            gui.add(parameters, 'uav', Object.keys(response.uavs))
-            .setValue(Object.keys(response.uavs)[0])
+            x = Object.keys(response.uavs).concat('None')
+            
+            gui.add(parameters, 'uav', x)
+            .setValue(x[0])
             .name("UAV")
             .onChange(updateData);
             
@@ -72,49 +104,54 @@ function setupGUI(){
             .setValue(response.sample_tags[0])
             .name("Variable")
             .onChange(updateData);
-
+        
             parameters['uavs'] = {};
             parameters['variables'] = {};
-
+        
             for (var uav_id in response.uavs){
                 parameters['uavs'][uav_id] = true;
             };
             for (var vari of response.sample_tags){
                 parameters['variables'][vari] = true;
             };
-
             updateData();
         });
-    // Once sliders are initialized, display initial section
-
+    });
 }
 
 function updateData(){
-    var query = $.param({
-        at_time: parameters.time,
-        variables: getSelectedElements(parameters.variables),
-        uav_id: getSelectedElements(parameters.uavs)
-    });
-    $.getJSON('nom_temporaire/?' + query, (response) => {
-        var coordonnees = 
-            response[parameters.uav][parameters.variable].positions[0];
-        position_of_uav.x = coordonnees[1];
-        position_of_uav.y = coordonnees[2];
-        position_of_uav.z = coordonnees[3];
+    if (parameters.uav != 'None'){
+        var query = $.param({
+            at_time: parameters.time,
+            variables: getSelectedElements(parameters.variables),
+            uav_id: getSelectedElements(parameters.uavs)
+        });
+        $.getJSON('nom_temporaire/?' + query, (response) => {
+            var coordonnees = 
+                response[parameters.uav][parameters.variable].positions[0];
+            parameters.position_x = coordonnees[1];
+            controller_collection['position_x'].updateDisplay();
+            parameters.position_y = coordonnees[2];
+            controller_collection['position_y'].updateDisplay();
+            parameters.altitude = coordonnees[3];
+            controller_collection['altitude'].updateDisplay();
+            updateStaticMap();
+        });
+    }
+    else
         updateStaticMap();
-     });
 }
 
 function updateStaticMap(){
     var map_extraction = parameters.sensors ? 'LWC' : 'clouds';
     var query = $.param({
         time: parameters.time,
-        altitude: position_of_uav.z,
+        altitude: parameters.altitude,
         variable: map_extraction,
-        min_x: position_of_uav.x - parameters.resolution,
-        max_x: position_of_uav.x + parameters.resolution,
-        min_y: position_of_uav.y - parameters.resolution,
-        max_y: position_of_uav.y + parameters.resolution,
+        min_x: parameters.position_x - parameters.resolution,
+        max_x: parameters.position_x + parameters.resolution,
+        min_y: parameters.position_y - parameters.resolution,
+        max_y: parameters.position_y + parameters.resolution,
     });
     $.getJSON('map_section/?' + query, (response) => {
         var lay = createLayout(parameters.variable, response.data);
