@@ -45,8 +45,8 @@ def mesonh_box(request):
 
 # Update MesoNH hyperslabs
 def get_section(request):
-    time_value = int(request.GET.get('time'))
-    altitude_value = int(request.GET.get('altitude'))
+    time_value = float(request.GET.get('time'))
+    altitude_value = float(request.GET.get('altitude'))
     variable = request.GET.get('variable')
     min_x = float(request.GET.get('min_x'));
     max_x = float(request.GET.get('max_x'));

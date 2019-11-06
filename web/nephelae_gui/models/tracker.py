@@ -153,7 +153,8 @@ def get_state_at_time(uav_ids, variables, at_time):
     for variable in variables:
         for uav_id in uav_ids:
             message = db[variable, str(uav_id)][float(at_time)][0].data
-            data[uav_id] = dict()
+            if not uav_id in data.keys():
+                data[uav_id] = dict()
             data[uav_id][message.variableName] = {
                     'positions': [message.position.data.tolist()],
                     'values': [message.data],

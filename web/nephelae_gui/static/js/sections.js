@@ -19,10 +19,11 @@ var parameters = {
     altitude: 0,
     variable: [],
     sensors: false,
-    tracked_uav: 'None'
+    uav: '',
+    resolution: 100,
 }
 
-var mesonh_box = {};
+var position_of_uav = {};
 
 $(document).ready(function(){
     // set sliders range and display initial image
@@ -36,12 +37,6 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     // Wwait for every ajax call to finish
-    var query = $.param({at_time: 10,
-                variables: getSelectedElements({'RCT': true}),
-                uav_id: getSelectedElements({'204': true})})
-    $.getJSON('nom_temporaire/?' + query, (response) => {console.log(response)})
-    $.when(
-
         gui.add(parameters, 'sensors').name('Sensor Data').onChange(updateData),
         $.getJSON('mesonh_dims/', (response) => {
             // Parse response
@@ -53,12 +48,6 @@ function setupGUI(){
             var max_altitude = Math.floor(response[1].max);
             var initial_altitude = 1075;
 
-            mesonh_box['min_x'] = Math.ceil(response[2].min);
-            mesonh_box['max_x'] = Math.floor(response[2].max);
-
-            mesonh_box['min_y'] = Math.ceil(response[3].min);
-            mesonh_box['max_y'] = Math.floor(response[3].max);
-
             // Setup GUI
             gui.add(parameters, 'time', min_time, max_time)
                 .setValue(initial_time)
@@ -66,15 +55,15 @@ function setupGUI(){
                 .name('Time (s)')
                 .onFinishChange(updateData);
 
-            gui.add(parameters, 'altitude', min_altitude, max_altitude)
-                .setValue(initial_altitude)
+            gui.add(parameters, 'resolution', 100, 5000)
+                .setValue(100)
                 .step(1)
-                .name('Altitude (m)')
+                .name('Resolution (pixels)')
                 .onFinishChange(updateData);
-        }),
+        });
 
         $.getJSON('/discover/', (response) => {
-            gui.add(parameters, 'tracked_uav', Object.keys(response.uavs))
+            gui.add(parameters, 'uav', Object.keys(response.uavs))
             .setValue(Object.keys(response.uavs)[0])
             .name("UAV")
             .onChange(updateData);
@@ -83,20 +72,51 @@ function setupGUI(){
             .setValue(response.sample_tags[0])
             .name("Variable")
             .onChange(updateData);
-        }),
+
+            parameters['uavs'] = {};
+            parameters['variables'] = {};
+
+            for (var uav_id in response.uavs){
+                parameters['uavs'][uav_id] = true;
+            };
+            for (var vari of response.sample_tags){
+                parameters['variables'][vari] = true;
+            };
+
+            updateData();
+        });
     // Once sliders are initialized, display initial section
-    ).done(updateData);
 
 }
 
 function updateData(){
-    var map_extraction = parameters.sensors ? 'LWC' : 'clouds';
+    var query = $.param({
+        at_time: parameters.time,
+        variables: getSelectedElements(parameters.variables),
+        uav_id: getSelectedElements(parameters.uavs)
+    });
+    $.getJSON('nom_temporaire/?' + query, (response) => {
+        var coordonnees = 
+            response[parameters.uav][parameters.variable].positions[0];
+        position_of_uav.x = coordonnees[1];
+        position_of_uav.y = coordonnees[2];
+        position_of_uav.z = coordonnees[3];
+        updateStaticMap();
+     });
+}
 
-    var query = $.param({altitude: parameters.altitude, time: parameters.time, 
-        variable: map_extraction, 'min_x':100, 
-        'max_x':1000, 'min_y':100, 
-        'max_y':1000});
-    $.getJSON('mesonh_section/?' + query, (response) => {
+function updateStaticMap(){
+    var map_extraction = parameters.sensors ? 'LWC' : 'clouds';
+    var query = $.param({
+        time: parameters.time,
+        altitude: position_of_uav.z,
+        variable: map_extraction,
+        min_x: position_of_uav.x - parameters.resolution,
+        max_x: position_of_uav.x + parameters.resolution,
+        min_y: position_of_uav.y - parameters.resolution,
+        max_y: position_of_uav.y + parameters.resolution,
+    });
+    $.getJSON('map_section/?' + query, (response) => {
         var lay = createLayout(parameters.variable, response.data);
         var data = [{
             x: response.axes,
@@ -106,7 +126,6 @@ function updateData(){
             type: 'heatmap'     
         }];
         layout.title = lay['title'];
-
         Plotly.react('chart', data, layout, config);
     });
     removeLoader();

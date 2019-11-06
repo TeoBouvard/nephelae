@@ -35,8 +35,7 @@ urlpatterns = [
     path('sections/', views.render_template, {'template_name': 'sections.html'}, name='sections'),
     path('sections/mesonh_dims/', views.mesonh_box),
     path('sections/nom_temporaire/', views.get_state_at_time),
-    path('sections/gpr_section/', views.get_sensor_data),
-    path('sections/mesonh_section/', views.get_section),
+    path('sections/map_section/', views.get_section),
 
     # URL for vertical profiles page
     path('profiles/', views.render_template, {'template_name': 'profiles.html'}, name='profiles'),
