@@ -31,9 +31,9 @@ try:
                                 WindKernel([50.0, 50.0, 50.0, 60.0], 1.0e-8, 1.0e-10, hwind),
                                 computesStddev = False, updateRange=False)
     maps['LWC'].dataRange = (Bounds(0.0,1.0e-4),)
-    # maps['WT']  = GprPredictor('Vertical wind', common.db, ['WT'],
-    #                             WindKernel([70.0, 40.0, 40.0, 60.0], 1.0e-8, 1.0e-10, hwind),
-    #                             computesStddev = False)
+    maps['WT']  = GprPredictor('Vertical wind', common.db, ['WT'],
+                                WindKernel([70.0, 40.0, 40.0, 60.0], 1.0e-8, 1.0e-10, hwind),
+                                 computesStddev = False)
 
     # Precheck and variable assignment
     if 'MESO_NH' in os.environ:

@@ -17,12 +17,12 @@ var config = {
 var parameters = {
     time: 0,
     altitude: 0,
-    sensors: false,
     uav: '',
     resolution: 100,
     position_x: 0,
     position_y: 0,
     altitude: 0,
+    map: '',
 }
 
 var position_of_uav = {};
@@ -40,8 +40,6 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     // Wwait for every ajax call to finish
-    gui.add(parameters, 'sensors').name('Sensor Data').onChange(updateData),
-
     gui.add(parameters, 'resolution', 100, 5000)
         .setValue(2500)
         .step(1)
@@ -95,7 +93,15 @@ function setupGUI(){
             for (var vari of response.sample_tags){
                 parameters['variables'][vari] = true;
             };
-            updateData();
+            $.getJSON('/discover_maps/', (response) => {
+                
+                gui.add(parameters, 'map', Object.keys(response))
+                .setValue('clouds')
+                .name('Map')
+                .onChange(updateData);
+
+                updateData();
+            });
         });
     });
 }
@@ -126,11 +132,10 @@ function updateData(){
 }
 
 function updateStaticMap(){
-    var map_extraction = parameters.sensors ? 'LWC' : 'clouds';
     var query = $.param({
         time: parameters.time,
         altitude: parameters.altitude,
-        variable: map_extraction,
+        variable: parameters.map,
         min_x: parameters.position_x - parameters.resolution,
         max_x: parameters.position_x + parameters.resolution,
         min_y: parameters.position_y - parameters.resolution,
