@@ -114,7 +114,6 @@ function setupMap(){
     };
 
     maps_parameters  = discovered_maps;
-    map_is_displayed = {};
     for (var key in maps_parameters) {
         if (maps_parameters[key]['sample_size'] == 1)
             overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), flight_map.getBounds());
@@ -287,7 +286,17 @@ function handleMessageUAV(message){
 
     uav_to_update.position.setLatLng(message.position).setRotationAngle(message.heading);
     uav_to_update.position.setPopupContent(infosToString(uav_to_update));
-
+    var i = -1;
+    var found = false;
+    var keys = Object.keys(maps_parameters).reverse()
+    console.log(keys);
+    while(i < keys.length-1 && !found){
+        i = i+1;
+        found = flight_map.hasLayer(overlays[maps_parameters[keys[i]]['name']]) // checks if map if currently displayed
+    }
+    if(maps_parameters[keys[i]]['sample_size'] == 1 && found) {
+        overlays[maps_parameters[keys[i]]['name']].setUrl(maps_parameters[keys[i]]['url'] + '_img/?'+ computeMapUrl());
+    }
 }
 
 
