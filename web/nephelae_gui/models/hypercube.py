@@ -40,8 +40,8 @@ try:
         hypercube = MesonhDataset(common.atm)
         maps['clouds'] = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
         maps['clouds'].dataRange = (Bounds(0.0,1.0e-4),)
-        # maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
-        # maps['hwind']    = MesonhMap('WS Wind (Mesonh)',       hypercube, ['UT','VT'])
+        maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
+        maps['hwind']    = MesonhMap('WS Wind (Mesonh)',       hypercube, ['UT','VT'])
     else:
         print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
         exit()

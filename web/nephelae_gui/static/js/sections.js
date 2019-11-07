@@ -80,7 +80,7 @@ function setupGUI(){
             x = Object.keys(response.uavs).concat('None')
             
             gui.add(parameters, 'uav', x)
-            .setValue(x[0])
+            .setValue('None')
             .name("UAV")
             .onChange(updateData);
         

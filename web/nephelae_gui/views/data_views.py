@@ -29,7 +29,8 @@ def get_positions(request):
 def get_sensor_data(request):
 
     # Parse request parameters, get variables as array and as single value to factor code
-    start = int(request.GET.get('start'))
+    start = (0 if request.GET.get('start') is None else
+        int(request.GET.get('start')))
     end = (None if request.GET.get('end') is None else int(request.GET.get('end')))
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
     step = (-1 if request.GET.get('step') is None else int(request.GET.get('step')))

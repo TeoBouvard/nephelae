@@ -27,6 +27,7 @@ var parameters = {
     clouds_cmap: 'Purples',
     transparent: true,
     tracked_uav: 'None',
+    socket_uavs: null,
     time: null,
     update_wind: updateWindData,
     dl_map: downloadMap,
@@ -228,7 +229,6 @@ function updateUavs(){
 
         // Parse response
         for (var key in response.positions){
-
             // Parse response data
             var uav_path = response.positions[key].path;
             var uav_position = uav_path.slice(-1)[0];
@@ -270,10 +270,27 @@ function updateUavs(){
         // Update home button coordinates and layers URL
         zoomHome.setHomeCoordinates(parameters.origin); // compute center of mass/getBoundsZoom later ?
         updateMapsUrl();
-        setTimeout(updateUavs, parameters.refresh_rate);
     });
-    
+    if (parameters.socket_uavs == null){
+        parameters.socket_uavs = new WebSocket('ws://' + 
+            window.location.host + '/ws/GPS/');
+        parameters.socket_uavs.onmessage = (e) => handleMessageUAV(JSON.parse(e.data));
+    }
 }
+
+function handleMessageUAV(message){
+    var uav_to_update = fleet[message.uav_id];
+    uav_to_update.heading = message.heading;
+    uav_to_update.speed = message.speed;
+    uav_to_update.altitude = message.position[2];
+    uav_to_update.time = message.time;
+
+    uav_to_update.position.setLatLng(message.position).setRotationAngle(message.heading);
+    uav_to_update.position.setPopupContent(infosToString(uav_to_update));
+
+}
+
+
 
 function updateLayerBounds(){
 
@@ -331,7 +348,6 @@ function computeMapUrl(){
     } else {
         parameters.time = Object.keys(fleet).length > 0 ? fleet[Object.keys(fleet)[0]].time : new Date().getSeconds();
     }
-
     // Build query with parameters
     var query = $.param({
         altitude: parameters.altitude,
