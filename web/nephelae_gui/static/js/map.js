@@ -116,7 +116,8 @@ function setupMap(){
     maps_parameters  = discovered_maps;
     for (var key in maps_parameters) {
         if (maps_parameters[key]['sample_size'] == 1) {
-            overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), flight_map.getBounds());
+            var bounds = setBounds();
+            overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(bounds), bounds);
             overlays[maps_parameters[key]['name']].on('load', updateMapsUrl);
         }
         if (maps_parameters[key]['sample_size'] == 2) {
@@ -295,15 +296,24 @@ function handleMessageUAV(message){
 function updateMapsUrl(){
     var i = -1;
     var found = false;
-    var keys = Object.keys(maps_parameters).reverse()
+    var keys_normal = Object.keys(maps_parameters);
+    var keys = keys_normal.reverse()
+    for (key of keys_normal){
+        if(maps_parameters[key]['sample_size'] > 1){
+            var index = keys.indexOf(key);
+            keys.splice(key,1);
+        }
+    }
     while((i+1) < keys.length && !found){
         i += 1;
         found = flight_map.hasLayer(overlays[maps_parameters[keys[i]]['name']]);
     }
     if(found && maps_parameters[keys[i]]['sample_size'] == 1) {
         map_to_update = overlays[maps_parameters[keys[i]]['name']];
+        var new_bounds = setBounds();
         map_to_update.setUrl(maps_parameters[keys[i]]['url'] +
-            '_img/?'+ computeMapUrl());
+            '_img/?'+ computeMapUrl(new_bounds));
+        map_to_update.setBounds(new_bounds);
     }
 }
 
@@ -319,8 +329,7 @@ function updateWindData() {
     }
 }
 
-
-function computeMapUrl(){
+function computeMapUrl(bounds){
 
     // Check if a uav is being tracked with MesoNH
     if (parameters.tracked_uav != null && parameters.tracked_uav != 'None'){
@@ -334,10 +343,10 @@ function computeMapUrl(){
         altitude: parameters.altitude,
         time: parameters.time,
         map_bounds: {
-            west: zone_on_map[0][1],
-            east: zone_on_map[1][1],
-            south: zone_on_map[1][0],
-            north: zone_on_map[0][0]
+            west: bounds[0][1],
+            east: bounds[1][1],
+            south: bounds[1][0],
+            north: bounds[0][0]
         },
         origin: parameters.origin,
         thermals_cmap: parameters.thermals_cmap,
@@ -345,6 +354,18 @@ function computeMapUrl(){
         transparent: parameters.transparent,
     });
     return query;
+}
+
+function setBounds(){
+    var screen_bounds = flight_map.getBounds();
+    var return_bounds = zone_on_map;
+    if(screen_bounds.getNorth() <= zone_on_map[0][0] &&
+    screen_bounds.getSouth() <= zone_on_map[1][0] &&
+    screen_bounds.getEast() <= zone_on_map[1][1] &&
+    screen_bounds.getWest() <= zone_on_map[0][1])
+        return_bounds = [[screen_bounds.getNorth(), screen_bounds.getWest()],
+            [screen_bounds.getSouth(), screen_bounds.getEast()]]
+    return return_bounds;
 }
 
 // Print HTML formatted string so that it can be added to marker popup
