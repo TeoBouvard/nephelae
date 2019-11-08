@@ -2,12 +2,20 @@
 global_colors = ["red", "green", "blue", "purple", "teal", "orange", "lime", "yellow", "fuchsia", "gray"];
 global_icons = [];
 
+zone_on_map = [[41.52000, 1.21527],[41.472357,1.291527]]
+
 // Icon class
 var planeIcon = L.Icon.extend({
     options: { 
         iconSize:     [20, 20], // size of the icon
         iconAnchor:   [10, 10], // marker's location.setView([43.6047, 1.4442], 13);
         popupAnchor:  [0, 0]    // relative to the iconAnchor
+    }
+});
+
+L.ImageOverlay.include({ // to be included in your script before instantiating image overlays.
+    getBounds: function () {
+        return this._bounds;
     }
 });
 

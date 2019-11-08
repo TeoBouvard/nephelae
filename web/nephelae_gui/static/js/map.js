@@ -88,8 +88,8 @@ function setupMap(){
 
     // Map
     flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 18, minZoom: 13});
-    flight_map.on('moveend', updateLayerBounds);
-
+    flight_map.on('overlayadd', updateMapsUrl);
+    flight_map.on('overlayremove', updateMapsUrl);
     // Home button
     zoomHome = L.Control.zoomHome();
 
@@ -115,8 +115,10 @@ function setupMap(){
 
     maps_parameters  = discovered_maps;
     for (var key in maps_parameters) {
-        if (maps_parameters[key]['sample_size'] == 1)
+        if (maps_parameters[key]['sample_size'] == 1) {
             overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), flight_map.getBounds());
+            overlays[maps_parameters[key]['name']].on('load', updateMapsUrl);
+        }
         if (maps_parameters[key]['sample_size'] == 2) {
             overlays[maps_parameters[key]['name']] = L.velocityLayer({
                 displayValues: true,
@@ -130,7 +132,8 @@ function setupMap(){
     }
 
     // Add layers to the map
-    L.control.layers(base_layers, overlays, {position: 'bottomright'}).addTo(flight_map);
+    var layers_controller = L.control.layers(base_layers, overlays, {position:
+        'bottomright'}).addTo(flight_map);
 
     //for(key in overlays) if(key != "Wind") overlays[key].addTo(flight_map);
 
@@ -268,7 +271,7 @@ function updateUavs(){
 
         // Update home button coordinates and layers URL
         zoomHome.setHomeCoordinates(parameters.origin); // compute center of mass/getBoundsZoom later ?
-        updateMapsUrl();
+        $(':checkbox').addClass('filled-in');
     });
     if (parameters.socket_uavs == null){
         parameters.socket_uavs = new WebSocket('ws://' + 
@@ -284,52 +287,23 @@ function handleMessageUAV(message){
     uav_to_update.altitude = message.position[2];
     uav_to_update.time = message.time;
 
+    uav_to_update.path.addLatLng(message.position);
     uav_to_update.position.setLatLng(message.position).setRotationAngle(message.heading);
     uav_to_update.position.setPopupContent(infosToString(uav_to_update));
-    var i = -1;
-    var found = false;
-    var keys = Object.keys(maps_parameters).reverse()
-    console.log(keys);
-    while(i < keys.length-1 && !found){
-        i = i+1;
-        found = flight_map.hasLayer(overlays[maps_parameters[keys[i]]['name']]) // checks if map if currently displayed
-    }
-    if(maps_parameters[keys[i]]['sample_size'] == 1 && found) {
-        overlays[maps_parameters[keys[i]]['name']].setUrl(maps_parameters[keys[i]]['url'] + '_img/?'+ computeMapUrl());
-    }
-}
-
-
-
-function updateLayerBounds(){
-
-    for(var key in maps_parameters) {
-        if(maps_parameters[key]['sample_size'] == 1)
-            overlays[maps_parameters[key]['name']].setBounds(flight_map.getBounds());
-    }
-    
-    updateMapsUrl();
-    updateWindData();
-
-    // Change checkbox style dynamically (fucking materialize framework)
-    $(':checkbox').addClass('filled-in');
 }
 
 function updateMapsUrl(){
-    for(var key in maps_parameters) {
-        if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) { // checks if map if currently displayed
-            if(maps_parameters[key]['sample_size'] == 1) {
-                overlays[maps_parameters[key]['name']].setUrl(maps_parameters[key]['url'] + '_img/?'+ computeMapUrl());
-            }
-
-            // Wind map actualization disabled because particles are reset each time. Not good for epilepsy.
-
-            //if(maps_parameters[key]['sample_size'] == 2) {
-            //    $.getJSON('wind/?' + computeMapUrl(), (response) => {
-            //        overlays[maps_parameters[key]['name']].setData(response);
-            //    });
-            //}
-        }
+    var i = -1;
+    var found = false;
+    var keys = Object.keys(maps_parameters).reverse()
+    while((i+1) < keys.length && !found){
+        i += 1;
+        found = flight_map.hasLayer(overlays[maps_parameters[keys[i]]['name']]);
+    }
+    if(found && maps_parameters[keys[i]]['sample_size'] == 1) {
+        map_to_update = overlays[maps_parameters[keys[i]]['name']];
+        map_to_update.setUrl(maps_parameters[keys[i]]['url'] +
+            '_img/?'+ computeMapUrl());
     }
 }
 
@@ -348,8 +322,6 @@ function updateWindData() {
 
 function computeMapUrl(){
 
-    var bounds = flight_map.getBounds();
-
     // Check if a uav is being tracked with MesoNH
     if (parameters.tracked_uav != null && parameters.tracked_uav != 'None'){
         parameters.altitude = fleet[parameters.tracked_uav].altitude;
@@ -362,17 +334,16 @@ function computeMapUrl(){
         altitude: parameters.altitude,
         time: parameters.time,
         map_bounds: {
-            west: bounds.getWest(), 
-            east: bounds.getEast(),
-            south: bounds.getSouth(),
-            north: bounds.getNorth()
+            west: zone_on_map[0][1],
+            east: zone_on_map[1][1],
+            south: zone_on_map[1][0],
+            north: zone_on_map[0][0]
         },
         origin: parameters.origin,
         thermals_cmap: parameters.thermals_cmap,
         clouds_cmap: parameters.clouds_cmap,
         transparent: parameters.transparent,
     });
-
     return query;
 }
 
