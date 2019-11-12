@@ -17,7 +17,7 @@ var maps_parameters;
 */
 
 var fleet = {};
-
+var bounds;
 // Parameters
 var parameters = {
     refresh_rate: parseInt(Cookies.get('refresh_rate')),     // milliseconds
@@ -90,6 +90,7 @@ function setupMap(){
     flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 18, minZoom: 13});
     flight_map.on('overlayadd', updateMapsUrl);
     flight_map.on('overlayremove', updateMapsUrl);
+    flight_map.on('move', updateLayerBounds);
     // Home button
     zoomHome = L.Control.zoomHome();
 
@@ -116,8 +117,8 @@ function setupMap(){
     maps_parameters  = discovered_maps;
     for (var key in maps_parameters) {
         if (maps_parameters[key]['sample_size'] == 1) {
-            var bounds = setBounds();
-            overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(bounds), bounds);
+            bounds = setBounds();
+            overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), bounds);
             overlays[maps_parameters[key]['name']].on('load', updateMapsUrl);
         }
         if (maps_parameters[key]['sample_size'] == 2) {
@@ -310,10 +311,8 @@ function updateMapsUrl(){
     }
     if(found && maps_parameters[keys[i]]['sample_size'] == 1) {
         map_to_update = overlays[maps_parameters[keys[i]]['name']];
-        var new_bounds = setBounds();
         map_to_update.setUrl(maps_parameters[keys[i]]['url'] +
-            '_img/?'+ computeMapUrl(new_bounds));
-        map_to_update.setBounds(new_bounds);
+            '_img/?'+ computeMapUrl());
     }
 }
 
@@ -329,8 +328,7 @@ function updateWindData() {
     }
 }
 
-function computeMapUrl(bounds){
-
+function computeMapUrl(){
     // Check if a uav is being tracked with MesoNH
     if (parameters.tracked_uav != null && parameters.tracked_uav != 'None'){
         parameters.altitude = fleet[parameters.tracked_uav].altitude;
@@ -343,10 +341,10 @@ function computeMapUrl(bounds){
         altitude: parameters.altitude,
         time: parameters.time,
         map_bounds: {
-            west: bounds[0][1],
-            east: bounds[1][1],
-            south: bounds[1][0],
-            north: bounds[0][0]
+            west: bounds.getWest(),
+            east: bounds.getEast(),
+            south: bounds.getSouth(),
+            north: bounds.getNorth()
         },
         origin: parameters.origin,
         thermals_cmap: parameters.thermals_cmap,
@@ -358,14 +356,31 @@ function computeMapUrl(bounds){
 
 function setBounds(){
     var screen_bounds = flight_map.getBounds();
-    var return_bounds = zone_on_map;
-    if(screen_bounds.getNorth() <= zone_on_map[0][0] &&
-    screen_bounds.getSouth() <= zone_on_map[1][0] &&
-    screen_bounds.getEast() <= zone_on_map[1][1] &&
-    screen_bounds.getWest() <= zone_on_map[0][1])
-        return_bounds = [[screen_bounds.getNorth(), screen_bounds.getWest()],
-            [screen_bounds.getSouth(), screen_bounds.getEast()]]
-    return return_bounds;
+    var south_bound, east_bound, west_bound, north_bound;
+
+    if(screen_bounds.getSouth() >= zone_on_map.getSouth())
+        south_bound = screen_bounds.getSouth();
+    else
+        south_bound = zone_on_map.getSouth();
+    
+    if(screen_bounds.getNorth() <= zone_on_map.getNorth())
+        north_bound = screen_bounds.getNorth();
+    else
+        north_bound = zone_on_map.getNorth();
+    
+    if(screen_bounds.getEast() <= zone_on_map.getEast())
+        east_bound = screen_bounds.getEast();
+    else
+        east_bound = zone_on_map.getEast();
+    
+    if(screen_bounds.getWest() >= zone_on_map.getWest())
+        west_bound = screen_bounds.getWest();
+    else
+        west_bound = zone_on_map.getWest();
+    return L.latLngBounds(
+        L.latLng([north_bound, east_bound]),
+        L.latLng([south_bound, west_bound])
+    );
 }
 
 // Print HTML formatted string so that it can be added to marker popup
@@ -380,6 +395,15 @@ function infosToString(uav){
 
     return infos;
 }
+
+function updateLayerBounds(){
+    bounds = setBounds();
+    for(var key in maps_parameters) {
+        if(maps_parameters[key]['sample_size'] == 1)
+            overlays[maps_parameters[key]['name']].setBounds(bounds);
+    }
+}
+
 
 // Attach or remove tracked uav in parameters
 function track(id){
