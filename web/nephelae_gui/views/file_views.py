@@ -10,25 +10,6 @@ from django.http import HttpResponse, HttpResponseNotFound
 # from ..models import hypercube, tile_downloader
 from nephelae_gui.models import hypercube, tile_downloader
 
-
-def download_map(request):
-
-    # Parse request parameters
-    query = request.GET
-
-    map_bounds = {
-        'east': float(query.get('map_bounds[east]')),
-        'west': float(query.get('map_bounds[west]')),
-        'south': float(query.get('map_bounds[south]')),
-        'north': float(query.get('map_bounds[north]'))
-    }
-
-    t = threading.Thread(target=tile_downloader.dl, args=[map_bounds])
-    t.setDaemon(True)
-    t.start()
-    return HttpResponse()
-
-
 # Render icons for UAVs
 def plane_icon(request, index):
     try:

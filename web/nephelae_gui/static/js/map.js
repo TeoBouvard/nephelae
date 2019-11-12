@@ -20,7 +20,6 @@ var fleet = {};
 var bounds;
 // Parameters
 var parameters = {
-    refresh_rate: parseInt(Cookies.get('refresh_rate')),     // milliseconds
     altitude: 600,          // meters
     trail_length: parseInt(Cookies.get('trail_length')),       // seconds
     thermals_cmap: 'seismic',
@@ -30,7 +29,6 @@ var parameters = {
     socket_uavs: null,
     time: null,
     update_wind: updateWindData,
-    dl_map: downloadMap,
 
     origin: [43.46, 1.27] // used to compute layer images
 }
@@ -58,9 +56,7 @@ function setupGUI(){
     // Setup GUI
     var f1 = gui.addFolder('Options');
     var f2 = gui.addFolder('Layer colors');
-    var f3 = gui.addFolder('Tools');
 
-    f1.add(parameters, 'refresh_rate', 500, 3000).step(100).name('Delay (ms)');
     f1.add(parameters, 'altitude', min_altitude, max_altitude)
         .step(1)
         .name('Altitude (m)')
@@ -73,7 +69,6 @@ function setupGUI(){
     f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
     f2.add(parameters, 'transparent').name('Transparent');
 
-    f3.add(parameters, 'dl_map').name('Download IGN map');
     gui.add(parameters, 'tracked_uav', tracked_uav_choices);
 
     // Create map once sliders are initialized
@@ -415,10 +410,4 @@ function updateLayerBounds(){
 // Attach or remove tracked uav in parameters
 function track(id){
     parameters.tracked_uav = id
-}
-
-function downloadMap(){
-    $.get('dl_map/?' + computeMapUrl());
-    // automatically reload the page in 30 seconds to fetch downloaded map tiles (not conventional)
-    setTimeout(window.location.reload.bind(window.location), 30000);
 }

@@ -11,7 +11,7 @@ try:
     from .data_views import get_positions_uavs_map
     
     from .template_views import render_template
-    from .file_views import download_map, plane_icon, generate_plane_icon, map_tiles, texture, model3D, layer_img
+    from .file_views import plane_icon, generate_plane_icon, map_tiles, texture, model3D, layer_img
 except Exception as e:
     # Have to do this because #@%*&@^*! django is hiding exceptions
    print("# Caught exception #############################################\n    ", e)
