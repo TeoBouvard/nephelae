@@ -90,7 +90,7 @@ function setupMap(){
     flight_map = L.map('map_container', {zoomControl: false, center: parameters.origin, zoom: 15, maxZoom: 18, minZoom: 13});
     flight_map.on('overlayadd', updateMapsUrl);
     flight_map.on('overlayremove', updateMapsUrl);
-    flight_map.on('move', updateLayerBounds);
+    flight_map.on('moveend', updateLayerBounds);
     // Home button
     zoomHome = L.Control.zoomHome();
 
@@ -230,7 +230,6 @@ function updateUavs(){
 
     // Request updated data from the server
     $.getJSON('update/?' + query, (response) => {
-
         // Parse response
         for (var key in response.positions){
             // Parse response data
@@ -240,10 +239,9 @@ function updateUavs(){
             var uav_heading = response.positions[key].heading;
             var uav_speed = response.positions[key].speed;
             var uav_time = response.positions[key].time;
-
+            var uav_times = response.positions[key].times;
             // Identify corresponding uav ...
             var uav_to_update = fleet[key];
-
             // ... and update it
             if(uav_to_update){
 
@@ -256,12 +254,14 @@ function updateUavs(){
                 // Update markers and popup
                 uav_to_update.position.setLatLng(uav_position).setRotationAngle(uav_heading);
                 uav_to_update.position.setPopupContent(infosToString(uav_to_update));
-
+                uav_to_update.path_data = uav_path;
                 // Update polyline
                 uav_to_update.path.setLatLngs(uav_path);
 
                 // Update time
                 uav_to_update.time = uav_time;
+                uav_to_update.times = uav_times;
+
             } 
 
             // ... or display error message if uav id does not match -> update fleet dictionnary and start tracking it
@@ -284,13 +284,20 @@ function updateUavs(){
 
 function handleMessageUAV(message){
     var uav_to_update = fleet[message.uav_id];
+    while(uav_to_update.times.length >= 0 &&
+        message.time-uav_to_update.times[0] > parameters.trail_length){
+        uav_to_update.times.shift();
+        uav_to_update.path_data.shift();
+    }
+    uav_to_update.times.push(message.time);
+    uav_to_update.path_data.push(message.position);
     uav_to_update.heading = message.heading;
     uav_to_update.speed = message.speed;
     uav_to_update.altitude = message.position[2];
     uav_to_update.time = message.time;
 
-    uav_to_update.path.addLatLng(message.position);
     uav_to_update.position.setLatLng(message.position).setRotationAngle(message.heading);
+    uav_to_update.path.setLatLngs(uav_to_update.path_data);
     uav_to_update.position.setPopupContent(infosToString(uav_to_update));
 }
 

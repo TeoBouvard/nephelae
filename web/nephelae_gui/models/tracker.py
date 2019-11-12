@@ -109,23 +109,48 @@ def get_positions(uav_ids, trail_length, reality=True):
         positions[uav_id] = {
             'heading': messages[-1]['course'],
             'speed': messages[-1]['speed'],
-            'time': int(messages[-1]['stamp'] - db.navFrame['stamp'])
+            'time': messages[-1]['stamp'] - db.navFrame['stamp']
         }
 
         for message in messages:
             
             if reality:
-                position = utils.compute_position(message)
+                position = utils.utm_to_latlon(message)
             else:
                 position = utils.compute_frame_position(message, nav_frame)
-
             if 'path' not in positions[uav_id]:
                 positions[uav_id]['path'] = [position]
             else:
                 positions[uav_id]['path'].append(position)
-    
     return dict(positions=positions)
+            
+def get_positions_uavs_map(uav_ids, trail_length):
 
+    positions = dict()
+    for uav_id in uav_ids:
+        messages = [entry.data for entry in db.find_entries(
+            ['GPS', str(uav_id)], (slice(-trail_length, None, -1), ),
+            lambda entry: entry.data.stamp)]
+
+        # Gather most recent information for display
+        positions[uav_id] = {
+            'heading': messages[-1]['course'],
+            'speed': messages[-1]['speed'],
+            'time': messages[-1]['stamp'] - db.navFrame['stamp']
+        }
+        for message in messages:
+            position = utils.utm_to_latlon(message)
+            if 'path' not in positions[uav_id]:
+                positions[uav_id]['path'] = [position]
+            else:
+                positions[uav_id]['path'].append(position)
+            if 'times' not in positions[uav_id]:
+                positions[uav_id]['times'] = [message['stamp'] -
+                        db.navFrame['stamp']]
+            else:
+                positions[uav_id]['times'].append(message['stamp'] -
+                        db.navFrame['stamp'])
+    return dict(positions=positions)
 
 def get_data(uav_ids, variables, start, end=None, step=-1):
 
@@ -166,7 +191,7 @@ def prettify_gps(message):
     return dict(
         uav_id=message.uavId,
         heading=message.course,
-        position=utils.compute_position(message),
+        position=utils.utm_to_latlon(message),
         speed=message.speed,
         time=int(message.stamp - db.navFrame.stamp)
     )

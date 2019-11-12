@@ -6,14 +6,14 @@ from matplotlib.colors import ListedColormap
 
 from . import common
 
-def compute_position(message):
+def utm_to_latlon(message):
     position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
     position.append(message['alt'])
     return position
 
 
 def compute_frame_position(message, nav_frame):
-    position = compute_position(message)
+    position = utm_to_latlon(message)
     frame_position = translate_position(position, nav_frame)
     frame_position.append(message['alt'])
     return frame_position
