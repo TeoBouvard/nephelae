@@ -50,43 +50,43 @@ function setupGUI(){
         // Setup GUI
         controller_collection['time'] =
             gui.add(parameters, 'time')
-                .setValue(0)
-                .step(1)
-                .name('Time (s)')
-                .onFinishChange(updateData);
+            .setValue(0)
+            .step(1)
+            .name('Time (s)')
+            .onFinishChange(updateData);
 
         controller_collection['altitude'] =
             gui.add(parameters, 'altitude')
-                .setValue(0)
-                .step(1)
-                .name('Altitude (m)')
-                .onFinishChange(updateData);
-        
+            .setValue(0)
+            .step(1)
+            .name('Altitude (m)')
+            .onFinishChange(updateData);
+
         controller_collection['position_x'] =
             gui.add(parameters, 'position_x')
-                .setValue(900)
-                .step(1)
-                .name('Pos. X axis')
-                .onFinishChange(updateData);
-        
+            .setValue(900)
+            .step(1)
+            .name('Pos. X axis')
+            .onFinishChange(updateData);
+
         controller_collection['position_y'] =
             gui.add(parameters, 'position_y')
-                .setValue(-900)
-                .step(1)
-                .name('Pos. Y axis')
-                .onFinishChange(updateData);
-            
+            .setValue(-900)
+            .step(1)
+            .name('Pos. Y axis')
+            .onFinishChange(updateData);
+
         $.getJSON('/discover/', (response) => {
             x = Object.keys(response.uavs).concat('None')
-            
+
             gui.add(parameters, 'uav', x)
-            .setValue('None')
-            .name("UAV")
-            .onChange(updateData);
-        
+                .setValue('None')
+                .name("UAV")
+                .onChange(updateData);
+
             parameters['uavs'] = {};
             parameters['variables'] = {};
-        
+
             for (var uav_id in response.uavs){
                 parameters['uavs'][uav_id] = true;
             };
@@ -94,11 +94,11 @@ function setupGUI(){
                 parameters['variables'][vari] = true;
             };
             $.getJSON('/discover_maps/', (response) => {
-                
+
                 gui.add(parameters, 'map', Object.keys(response))
-                .setValue('clouds')
-                .name('Map')
-                .onChange(updateData);
+                    .setValue('clouds')
+                    .name('Map')
+                    .onChange(updateData);
 
                 updateData();
             });
@@ -113,7 +113,7 @@ function updateData(){
             variables: getSelectedElements(parameters.variables),
             uav_id: getSelectedElements(parameters.uavs)
         });
-        $.getJSON('nom_temporaire/?' + query, (response) => {
+        $.getJSON('uav_state_at_time/?' + query, (response) => {
             var coordonnees = 
                 response[parameters.uav][Object.keys(parameters.variables)[0]].positions[0];
             parameters.position_x = coordonnees[1];
