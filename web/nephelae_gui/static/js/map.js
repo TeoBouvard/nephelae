@@ -286,7 +286,8 @@ function updateUavs(){
                     window.location.host + '/ws/GPS/');
                 parameters.socket_uavs.onmessage = (e) =>
                     handleMessageUAV(JSON.parse(e.data))
-            }});
+            }
+        });
 }
 
 function handleMessageUAV(message){
@@ -323,12 +324,11 @@ function controller_callbackLoad(){
 function updateMapsUrl(map){
     if(map['sample_size'] == 1)
         overlays[map['name']].setUrl(map['url'] + '_img/?' + computeMapUrl());
-    /*if(maps_parameters[keys]['sample_size'] == 2) {
+    else {
         $.getJSON('wind/?' + computeMapUrl(), (response) => {
-            overlays[maps_parameters[key]['name']].setData(response);
+            overlays[map['name']].setData(response);
         });
-    }*/
-
+    }
 }
 
 function updateWindData() {

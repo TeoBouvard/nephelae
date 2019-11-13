@@ -18,7 +18,9 @@ var parameters = {
     time: 0,
     altitude: 0,
     uav: '',
-    resolution: 100,
+    taille_x: 100,
+    taille_y: 100,
+    taille: 100,
     position_x: 0,
     position_y: 0,
     altitude: 0,
@@ -40,10 +42,24 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
 
     // Wwait for every ajax call to finish
-    gui.add(parameters, 'resolution', 100, 5000)
-        .setValue(2500)
+    var f1 = gui.addFolder('Pixels');
+    var f2 = gui.addFolder('Pixels (UAV)');
+    f1.add(parameters, 'taille_x', 100, 10000)
+        .setValue(5000)
         .step(1)
-        .name('Resolution (pixels)')
+        .name('Taille x')
+        .onFinishChange(updateData);
+
+    f1.add(parameters, 'taille_y', 100, 10000)
+        .setValue(5000)
+        .step(1)
+        .name('Taille y')
+        .onFinishChange(updateData);
+
+    f2.add(parameters, 'taille', 100, 10000)
+        .setValue(5000)
+        .step(1)
+        .name('Taille')
         .onFinishChange(updateData);
 
     $.getJSON('mesonh_dims/', (response) => {
@@ -82,8 +98,12 @@ function setupGUI(){
             gui.add(parameters, 'uav', x)
                 .setValue('None')
                 .name("UAV")
-                .onChange(updateData);
+                .onChange(function(){
+                    fieldsBehavior(parameters.uav == 'None', f1, f2)
+                    updateData();
+                });
 
+            fieldsBehavior(parameters.uav == 'None', f1, f2);
             parameters['uavs'] = {};
             parameters['variables'] = {};
 
@@ -115,7 +135,8 @@ function updateData(){
         });
         $.getJSON('uav_state_at_time/?' + query, (response) => {
             var coordonnees = 
-                response[parameters.uav][Object.keys(parameters.variables)[0]].positions[0];
+                response[parameters.uav][Object.keys(parameters.variables)[0]]
+                .positions[0];
             parameters.position_x = coordonnees[1];
             controller_collection['position_x'].updateDisplay();
             parameters.position_y = coordonnees[2];
@@ -132,15 +153,27 @@ function updateData(){
 }
 
 function updateStaticMap(){
-    var query = $.param({
-        time: parameters.time,
-        altitude: parameters.altitude,
-        variable: parameters.map,
-        min_x: parameters.position_x - parameters.resolution,
-        max_x: parameters.position_x + parameters.resolution,
-        min_y: parameters.position_y - parameters.resolution,
-        max_y: parameters.position_y + parameters.resolution,
-    });
+    if (parameters.uav != 'None') {
+        var query = $.param({
+            time: parameters.time,
+            altitude: parameters.altitude,
+            variable: parameters.map,
+            min_x: parameters.position_x - parameters.taille/2,
+            max_x: parameters.position_x + parameters.taille/2,
+            min_y: parameters.position_y - parameters.taille/2,
+            max_y: parameters.position_y + parameters.taille/2,
+        });
+    } else {
+        var query = $.param({
+            time: parameters.time,
+            altitude: parameters.altitude,
+            variable: parameters.map,
+            min_x: parameters.position_x - parameters.taille_x/2,
+            max_x: parameters.position_x + parameters.taille_x/2,
+            min_y: parameters.position_y - parameters.taille_y/2,
+            max_y: parameters.position_y + parameters.taille_y/2,
+        });
+    }
     $.getJSON('map_section/?' + query, (response) => {
         var lay = createLayout(parameters.variable, response.data);
         var data = [{
@@ -148,10 +181,22 @@ function updateStaticMap(){
             y: response.axes,
             z: response.data,
             colorscale : lay['cmap'],
-            type: 'heatmap'     
+            type: 'heatmap'
         }];
         layout.title = lay['title'];
         Plotly.react('chart', data, layout, config);
     });
     removeLoader();
+}
+
+function fieldsBehavior(state, f1, f2){
+    if (state){
+        f1.show();
+        f1.open();
+        f2.hide();
+    } else {
+        f1.hide();
+        f2.show();
+        f2.open();
+    }
 }
