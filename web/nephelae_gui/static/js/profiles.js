@@ -190,7 +190,7 @@ function plotMessage(data, dict_values){
     var chart_humidity = document.getElementById('humidity_chart');
     var first_time = chart_altitude.data[0].x[0];
     list_charts = [chart_altitude, chart_temperature, chart_humidity];
-    while (typeof chart.data.x !== 'undefined' &&
+    while (list_charts[0].data[0].x[0] !== 'undefined' &&
         data.position[0]-first_time > parameters.trail_length){
         list_charts.forEach(function(chart){
             chart.data[0].x.shift();
