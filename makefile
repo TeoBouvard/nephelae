@@ -7,8 +7,16 @@ install_mode=user
 install_pprzlink=False
 DATABASE=$(PWD)/demo/demo_db.neph
 
-.PHONY: demo runserver install assets requirements paparazzi
+# Getting this file location
+mkfile_path:=$(abspath $(lastword $(MAKEFILE_LIST)))
+current_dir:=$(dir $(mkfile_path))
 
+# Find a way to tell the user default config is used
+ifndef NEPHELAE_CONFIG
+export NEPHELAE_CONFIG:=$(current_dir)config/examples/test01.yaml
+endif
+
+.PHONY: demo runserver install assets requirements paparazzi
 
 help:
 	$(ECHO) "- help		: Display this message"
@@ -17,6 +25,8 @@ help:
 	$(ECHO) "- clean-maps	: Delete all downloaded maps"
 	$(ECHO) "- clean-assets	: Delete external assets"
 	$(ECHO) "- simulation	: Launch paparazzi simulation"
+	$(ECHO) $(mkfile_path)
+	$(ECHO) $(current_dir)
 
 
 install : assets requirements paparazzi
@@ -150,7 +160,7 @@ clean-assets :
 	@rm -rf web/nephelae_gui/static/js/libs web/nephelae_gui/static/css/libs/images web/nephelae_gui/static/map_tiles web/nephelae_gui/static/css/libs/icons
 
 
-runserver: check-config
+runserver:
 	$(ECHO) "Starting server ..."
 
 #dev server (easy to kill, reloads on file changes, used in demo)
@@ -176,11 +186,6 @@ simulation: check-pprz
 check-meso:
 ifndef MESO_NH
 	$(error MESO_NH is not defined)
-endif
-
-check-config:
-ifndef NEPHELAE_CONFIG
-	$(error NEPHELAE_CONFIG is not defined)
 endif
 
 
