@@ -36,15 +36,12 @@ try:
                                  computesStddev = False)
 
     # Precheck and variable assignment
-    if 'MESO_NH' in os.environ:
-        hypercube = MesonhDataset(common.atm)
+    if common.scenario.mesonhFiles is not None:
+        hypercube = MesonhDataset(common.scenario.mesonhFiles)
         maps['clouds'] = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
         maps['clouds'].dataRange = (Bounds(0.0,1.0e-4),)
         maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
         maps['hwind']    = MesonhMap('WS Wind (Mesonh)',       hypercube, ['UT','VT'])
-    else:
-        print('Environement variable $MESO_NH is not set. Update it in /etc/environment')
-        exit()
 
 except Exception as e:
     # Have to do this because #@%*&@^*! django is hiding exceptions

@@ -2,6 +2,8 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 
+from .models.common import scenario
+
 from .models import tracker
 
 # propably some names to change in here
@@ -9,7 +11,7 @@ from .models import tracker
 class GPSConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
-        tracker.db.add_gps_observer(self)
+        scenario.database.add_gps_observer(self)
 
 
     # Receive message from WebSocket
@@ -20,7 +22,7 @@ class GPSConsumer(WebsocketConsumer):
 
 
     def disconnect(self, close_code):
-        tracker.db.remove_gps_observer(self)
+        scenario.database.remove_gps_observer(self)
         self.channel_layer.group_discard
 
 
@@ -37,7 +39,7 @@ class SensorConsumer(WebsocketConsumer):
 
     def connect(self):
         self.accept()
-        tracker.db.add_sensor_observer(self)
+        scenario.database.add_sensor_observer(self)
 
 
     # Receive message from WebSocket
@@ -49,7 +51,7 @@ class SensorConsumer(WebsocketConsumer):
 
     def disconnect(self, close_code):
         print("disconnecting")
-        tracker.db.remove_sensor_observer(self)
+        scenario.database.remove_sensor_observer(self)
         self.channel_layer.group_discard
 
 
@@ -66,8 +68,8 @@ class SensorConsumer(WebsocketConsumer):
 class StatusConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
-        for uav in tracker.interface.uavs.values():
-            uav.add_status_observer(self)
+        for aircraft in scenario.aircrafts.values():
+            aircraft.add_status_observer(self)
 
 
     # Receive message from WebSocket
@@ -78,10 +80,10 @@ class StatusConsumer(WebsocketConsumer):
 
 
     def disconnect(self, close_code):
-        for uav in tracker.interface.uavs.values():
-            uav.remove_status_observer(self)
+        for aircraft in scenario.aircrafts.values():
+            aircraft.remove_status_observer(self)
         self.channel_layer.group_discard
 
 
     def notify_status(self, status):
-        self.send(json.dumps(status))
+        self.send(json.dumps(status.to_dict()))

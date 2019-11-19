@@ -2,97 +2,24 @@ import os
 import sys
 import utm
 
-from nephelae_paparazzi import PprzSimulation, PprzMesonhUav, print_status
-from nephelae.database  import DatabasePlayer, NephelaeDataServer
-
 from . import utils
 from . import common
 
-try:
-    class Logger:
-    
-        def __init__(self):
-            pass
-    
-        def add_sample(self, sample):
-            # print(sample, end="\n\n")
-            # if 'RCT' in sample.variableName:
-            #     print(sample, end="\n\n")
-            # if 'WT' in sample.variableName:
-            #     print(sample, end="\n\n")
-            # if 'UT' in sample.variableName:
-            #     print(sample, end="\n\n")
-            # if 'WT' in sample.variableName and '104' in sample.producer:
-            #     print(sample, end="\n\n")
-            if 'UT' in sample.variableName and '104' in sample.producer:
-                print(sample, end="\n\n")
-    
-        def add_gps(self, gps):
-            print(gps, end="\n\n")
+from .common import scenario
 
-        def notify_status(self, status):
-            print_status(status, flush=True)
-    logger = Logger()
-    
-    # if 'PPRZ_DB' in os.environ:
-    #     # if PPRZ_DB is defined, do a replay
-    #     db = DatabasePlayer(os.environ['PPRZ_DB'])
-    #     db.play(looped=True)
-    #     def on_exit():
-    #         db.stop()
-    #         exit()
-    # else:
-    db = common.db
-    if not 'PPRZ_DB' in os.environ:
-        # else connect to paparazzi uavs
-        # db = NephelaeDataServer()
-        if 'MESO_NH' in os.environ:
-            def build_uav(uavId, navRef):
-                # uav = PprzMesonhUav(uavId, navRef, os.environ['MESO_NH'], ['RCT', 'WT'])
-                uav = PprzMesonhUav(uavId, navRef, common.atm, ['RCT', 'WT', ['UT','VT'], 'THT'])
-                uav.add_sensor_observer(db)
-                uav.add_gps_observer(db)
-                # uav.add_sensor_observer(logger)
-                # uav.add_gps_observer(logger)
-                # uav.add_status_observer(logger)
-                return uav
-            # interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav)
-            interface = PprzSimulation(common.atm, ['RCT', 'WT'], build_uav_callback=build_uav, windFeedback=True)
-        else:
-            print('Full UAV interface not implmented yet. Please set MESO_NH env variable to a mesonh dataset')
-            exit()
-        interface.start()
-        db.set_navigation_frame(interface.navFrame)
-        def on_exit():
-            print("Shutting down paparazzi interface... ", end='')
-            sys.stdout.flush()
-            interface.stop()
-            print("Done.")
-            exit()
-    # db_data_tags = ['clouds', 'thermals', 'wind_u', 'wind_v'] 
-    db_data_tags = ['RCT', 'WT', 'THT'] 
-    nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
-except Exception as e:
-    # Have to do this because #@%*&@^*! django is hiding exceptions
-   print("# Caught exception #############################################\n    ", e)
-   exc_type, exc_obj, exc_tb = sys.exc_info()
-   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-   print(exc_type, fname, exc_tb.tb_lineno,
-         end="\n############################################################\n\n\n")
-   raise e
+# Defines displayable samples, to keep for now. Find an alternative to put in scenario
+db_data_tags = ['RCT', 'WT', 'THT'] 
 
+db = scenario.database
+nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
 
 def discover():
-    try:
-        uavs = {}
-        for key in interface.uavs.keys():
-            uavs[key] = {}
-            uavs[key]['id'] = str(key)
-            uavs[key]['name'] = interface.uavs[key].config.ac_name
-            uavs[key]['gui_color'] = interface.uavs[key].config.default_gui_color
-    except NameError as e:
-        print("No interface defined (in a replay ?).", e)
-
+    uavs = {}
+    for key in scenario.aircrafts.keys():
+        uavs[key] = {}
+        uavs[key]['id'] = str(key)
+        uavs[key]['name'] = scenario.aircrafts[key].config.ac_name
+        uavs[key]['gui_color'] = scenario.aircrafts[key].config.default_gui_color
     return {'origin': nav_frame, 'uavs':uavs, 'sample_tags':db_data_tags}
 
 
