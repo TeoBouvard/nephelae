@@ -13,7 +13,7 @@ current_dir:=$(dir $(mkfile_path))
 
 # Find a way to tell the user default config is used
 ifndef NEPHELAE_CONFIG
-export NEPHELAE_CONFIG:=$(current_dir)config/examples/test01.yaml
+export NEPHELAE_CONFIG:=$(current_dir)config/examples/test05.yaml
 endif
 
 .PHONY: demo runserver install assets requirements paparazzi
