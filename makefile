@@ -150,7 +150,7 @@ clean-assets :
 	@rm -rf web/nephelae_gui/static/js/libs web/nephelae_gui/static/css/libs/images web/nephelae_gui/static/map_tiles web/nephelae_gui/static/css/libs/icons
 
 
-runserver: check-meso
+runserver: check-config
 	$(ECHO) "Starting server ..."
 
 #dev server (easy to kill, reloads on file changes, used in demo)
@@ -160,7 +160,7 @@ runserver: check-meso
 	# -@cd ./web && daphne -b 0.0.0.0 -p 8000 --access-log /dev/null IHM.asgi:application
 
 
-demo: check-meso
+demo: check-config
 	-@export PPRZ_DB=$(DATABASE) && cd web/ && python3 manage.py runserver 0.0.0.0:8000
 
 
@@ -176,6 +176,11 @@ simulation: check-pprz
 check-meso:
 ifndef MESO_NH
 	$(error MESO_NH is not defined)
+endif
+
+check-config:
+ifndef NEPHELAE_CONFIG
+	$(error NEPHELAE_CONFIG is not defined)
 endif
 
 
