@@ -11,7 +11,7 @@ from PIL import Image
 imcount = 0
 try:
     from nephelae.types    import Bounds
-    from nephelae.mapping  import GprPredictor
+    from nephelae.mapping  import GprPredictor, ValueMap, StdMap
     from nephelae.mapping  import WindKernel
     from nephelae.mapping  import WindMapConstant, WindObserverMap
     
@@ -27,13 +27,17 @@ try:
     hwind = WindObserverMap('Horizontal wind', sampleName=str(['UT','VT']))
     common.db.add_sensor_observer(hwind)
 
-    maps['LWC']  = GprPredictor('Liquid water', common.db, ['RCT'],
-                                WindKernel([50.0, 50.0, 50.0, 60.0], 1.0e-8, 1.0e-10, hwind),
-                                computesStddev = False, updateRange=False)
-    maps['LWC'].dataRange = (Bounds(0.0,1.0e-4),)
-    maps['WT']  = GprPredictor('Vertical wind', common.db, ['WT'],
-                                WindKernel([70.0, 40.0, 40.0, 60.0], 1.0e-8, 1.0e-10, hwind),
-                                 computesStddev = False)
+    liquid_kernel = WindKernel([50.0, 50.0, 50.0, 60.0], 1.0e-8, 1.0e-10, hwind)
+    wind_kernel = WindKernel([70.0, 40.0, 40.0, 60.0], 1.0e-8, 1.0e-10, hwind)
+    
+    gpr_lwc = GprPredictor(common.db, ['RCT'], liquid_kernel)
+    gpr_wt = GprPredictor(common.db, ['WT'], wind_kernel)
+
+    maps['LWC'] = ValueMap('Liquid Water', gpr_lwc)
+    maps['LWC_STD'] = StdMap('Liquid Water std', gpr_lwc)
+
+    maps['WT'] = ValueMap('Vertical Wind', gpr_wt)
+    maps['WT_STD'] = StdMap('Vertical Wind std', gpr_wt)
 
     # Precheck and variable assignment
     if common.scenario.mesonhFiles is not None:
@@ -91,15 +95,15 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
         colormap = utils.transparent_cmap(thermals_cmap) if transparent else thermals_cmap
 
     # Write image to buffer
-    colormap = 'viridis'
+    # colormap = 'viridis'
     # rng      = maps['clouds'].range()
     if "LWC" in variable_name:
         h_slice[h_slice < 0.0] = 0.0
     
     rFactor = 4
     img = Image.fromarray(h_slice)
-    h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.BICUBIC))
-    # h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.NEAREST))
+    # h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.BICUBIC))
+    h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.NEAREST))
     # h_slice = h_slice[::2, ::2]
     buf = io.BytesIO()
     # plt.imsave(buf, h_slice, origin='lower', cmap=colormap, format='png')
