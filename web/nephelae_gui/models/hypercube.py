@@ -84,7 +84,7 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
         colormap = utils.transparent_cmap(thermals_cmap) if transparent else thermals_cmap
 
     # Write image to buffer
-    # colormap = 'viridis'
+    colormap = 'viridis'
     # rng      = maps['clouds'].range()
     if "LWC" in variable_name:
         h_slice[h_slice < 0.0] = 0.0
