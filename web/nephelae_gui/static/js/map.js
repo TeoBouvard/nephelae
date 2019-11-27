@@ -145,7 +145,6 @@ function setupMap(){
         L.control.scale().addTo(flight_map);
         // Prevent async conflicts by displaying uavs once map is initialized
         displayUavs();
-
     });
 }
 
@@ -312,7 +311,10 @@ function handleMessageUAV(message){
 function controller_callbackLoad(){
     for(var key in maps_parameters){
         // checks if map if currently displayed
-        if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
+        if(maps_parameters[key]['sample_size'] == 2){
+            updateMapsWind(maps_parameters[key]);
+        }
+        else if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
             overlays[maps_parameters[key]['name']].on('load', maps_parameters[key]['lambda'])
             updateMapsUrl(maps_parameters[key]);
         } else {
@@ -322,13 +324,13 @@ function controller_callbackLoad(){
 }
 
 function updateMapsUrl(map){
-    if(map['sample_size'] == 1)
-        overlays[map['name']].setUrl(map['url'] + '_img/?' + computeMapUrl());
-    else {
-        $.getJSON('wind/?' + computeMapUrl(), (response) => {
-            overlays[map['name']].setData(response);
-        });
-    }
+    overlays[map['name']].setUrl(map['url'] + '_img/?' + computeMapUrl());
+}
+
+function updateMapsWind(map){
+    $.getJSON(map['url'] + '_wind/?' + computeMapUrl(), (response) => {
+        overlays[map['name']].setData(response);
+    });
 }
 
 function updateWindData() {
