@@ -9,52 +9,12 @@ import numpy as np
 from PIL import Image
 
 imcount = 0
-try:
-    from nephelae.types    import Bounds
-    from nephelae.mapping  import GprPredictor, ValueMap, StdMap
-    from nephelae.mapping  import WindKernel
-    from nephelae.mapping  import WindMapConstant, WindObserverMap
-    
-    from nephelae_mesonh import MesonhVariable, MesonhMap, MesonhDataset
-    
-    from . import utils
-    from . import tracker
-    from . import common
-    
-    maps = {}
 
-    # hwind = WindMapConstant('Horizontal wind', [8.5, 0.9])
-    hwind = WindObserverMap('Horizontal wind', sampleName=str(['UT','VT']))
-    common.db.add_sensor_observer(hwind)
+from . import utils
+from . import common
 
-    liquid_kernel = WindKernel([50.0, 50.0, 50.0, 60.0], 1.0e-8, 1.0e-10, hwind)
-    wind_kernel = WindKernel([70.0, 40.0, 40.0, 60.0], 1.0e-8, 1.0e-10, hwind)
-    
-    gpr_lwc = GprPredictor(common.db, ['RCT'], liquid_kernel)
-    gpr_wt = GprPredictor(common.db, ['WT'], wind_kernel)
-
-    maps['LWC'] = ValueMap('Liquid Water', gpr_lwc)
-    maps['LWC_STD'] = StdMap('Liquid Water std', gpr_lwc)
-
-    maps['WT'] = ValueMap('Vertical Wind', gpr_wt)
-    maps['WT_STD'] = StdMap('Vertical Wind std', gpr_wt)
-
-    # Precheck and variable assignment
-    if common.scenario.mesonhFiles is not None:
-        hypercube = MesonhDataset(common.scenario.mesonhFiles)
-        maps['clouds'] = MesonhMap('Liquid water (MesoNH)',  hypercube, 'RCT')
-        maps['clouds'].dataRange = (Bounds(0.0,1.0e-4),)
-        maps['thermals'] = MesonhMap('Vertical wind (MesoNH)', hypercube, 'WT')
-        maps['hwind']    = MesonhMap('WS Wind (Mesonh)',       hypercube, ['UT','VT'])
-
-except Exception as e:
-    # Have to do this because #@%*&@^*! django is hiding exceptions
-   print("# Caught exception #############################################\n    ", e)
-   exc_type, exc_obj, exc_tb = sys.exc_info()
-   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-   print(exc_type, fname, exc_tb.tb_lineno,
-         end="\n############################################################\n\n\n")
-   raise e
+maps      = common.scenario.maps
+hypercube = common.scenario.mesonhDataset
 
 def discover_maps():
     res = {}
