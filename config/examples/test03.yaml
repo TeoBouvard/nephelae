@@ -84,3 +84,28 @@ aircrafts:
                 mesonhVariables: ['RCT', 'WT', 'THT', ['UT', 'VT']]
                 rctFeedback: True
 
+maps:
+    kernels:
+        lwc_kernel:
+            type: 'WindKernel'
+            length_scales: [50.0, 50.0, 50.0, 60.0]
+            variance: 1.0e-8
+            noise_variance: 1.0e-10
+        thermals_kernel:
+            type: 'WindKernel'
+            length_scales: [70.0, 40.0, 40.0, 60.0]
+            variance: 1.0e-8
+            noise_variance: 1.0e-10
+    LWC:
+        name: 'Liquid Water'
+        type: 'GprMap'
+        kernel: 'lwc_kernel'
+        database_tags: ['RCT']
+        data_range: [0.0, 1.0e-4]
+        std_map: 'Liquid Water std' # optional
+
+    clouds:
+        name: 'Liquid Water (MesoNH)'
+        type: 'MesonhMap'
+        mesonh_variable: 'RCT'
+        # origin: *mesonh_origin
