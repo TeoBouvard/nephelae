@@ -25,8 +25,18 @@ def discover_maps():
 
 
 def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
-    
+   
     x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)
+    # indices must be adapted to the resolution of the map. Indices are related
+    # to the outer limit of the image outside the pixels, whereas coordinates
+    # in maps are assumed to be relative the the center of pixels (i.e. bounds
+    # must shrink by half of a pixel size).
+    resx_2 = maps[variable_name].resolution()[1] / 2.0
+    resy_2 = maps[variable_name].resolution()[2] / 2.0
+    x0 = x0 + resx_2
+    x1 = x1 - resx_2
+    y0 = y0 + resy_2
+    y1 = y1 - resy_2
 
     if "LWC" in variable_name:
         print("Printing slice,", variable_name + " : [" + 
