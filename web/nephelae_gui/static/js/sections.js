@@ -239,32 +239,30 @@ function fieldsBehavior(state, f1, f2){
 
 function boundsChangement(){
     if (map_boundaries[parameters.map][0] != null){
-        sliders_length['taille_x'].min(map_boundaries[parameters.map][0])
-        sliders_length['taille_x'].max(map_boundaries[parameters.map][1])
-        sliders_length['taille_y'].min(map_boundaries[parameters.map][2])
-        sliders_length['taille_y'].max(map_boundaries[parameters.map][3])
+        sliders_length['taille_x'].max(map_boundaries[parameters.map][1] + 
+            Math.abs(map_boundaries[parameters.map][0]))
+        sliders_length['taille_y'].max(map_boundaries[parameters.map][3] +
+            Math.abs(map_boundaries[parameters.map][2]))
         
+        if (sliders_length['taille_x'].getValue() >
+            map_boundaries[parameters.map][1] +
+            Math.abs(map_boundaries[parameters.map][0]))
 
-        if (sliders_length['taille_x'].getValue() < map_boundaries[parameters.map][0])
-            sliders_length['taille_x'].setValue(map_boundaries[parameters.map][0])
-        if (sliders_length['taille_x'].getValue() > map_boundaries[parameters.map][1])
-            sliders_length['taille_x'].setValue(map_boundaries[parameters.map][1])
-        if (sliders_length['taille_y'].getValue() < map_boundaries[parameters.map][2])
-            sliders_length['taille_y'].setValue(map_boundaries[parameters.map][2])
-        if (sliders_length['taille_y'].getValue() > map_boundaries[parameters.map][3])
-            sliders_length['taille_y'].setValue(map_boundaries[parameters.map][3])
+                sliders_length['taille_x'].setValue(
+                    map_boundaries[parameters.map][1])
+
+        if (sliders_length['taille_y'].getValue() >
+            map_boundaries[parameters.map][3] +
+            Math.abs(map_boundaries[parameters.map][2]))
+
+                sliders_length['taille_y'].setValue(
+                    map_boundaries[parameters.map][3])
     } else {
-        sliders_length['taille_x'].min(parameters.default_min)
         sliders_length['taille_x'].max(parameters.default_max)
-        sliders_length['taille_y'].min(parameters.default_min)
         sliders_length['taille_y'].max(parameters.default_max)
         
-        if (sliders_length['taille_x'].getValue() < parameters.default_min)
-            sliders_length['taille_x'].setValue(parameters.default_min)
         if (sliders_length['taille_x'].getValue() > parameters.default_max)
             sliders_length['taille_x'].setValue(parameters.default_max)
-        if (sliders_length['taille_y'].getValue() < parameters.default_min)
-            sliders_length['taille_y'].setValue(parameters.default_min)
         if (sliders_length['taille_y'].getValue() > parameters.default_max)
             sliders_length['taille_y'].setValue(parameters.default_max)
     }
