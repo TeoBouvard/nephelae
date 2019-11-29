@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
+from nephelae.mapping import compute_com
+
 imcount = 0
 
 from . import utils
@@ -19,7 +21,14 @@ hypercube = common.scenario.mesonhDataset
 def discover_maps():
     res = {}
     for key in maps.keys():
-        res[key] = {'url':key, 'name' : maps[key].name, 'sample_size': maps[key].sample_size()}
+        if maps[key].bounds()[0] is not None:
+            x = maps[key].bounds()
+            boundaries = (x[0].min, x[0].max, x[1].min, x[1].max)
+        else:
+            boundaries = maps[key].bounds()
+
+        res[key] = {'url':key, 'name' : maps[key].name, 'sample_size':
+                maps[key].sample_size(), 'range': boundaries}
     print(res)
     return res
 
@@ -88,7 +97,17 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
 
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
-    return maps[variable][time_value, x0:x1, y0:y1, altitude_value].data.T
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
+            map0.data.T.shape[0])
+    y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
+            map0.data.T.shape[1])
+    return (map0.data.T, x_axis, y_axis)
+
+def get_center_of_horizontal_slice(variable, time_value, altitude_value,
+        x0=None, x1=None, y0=None, y1=None):
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    return {'data': compute_com(map0)}
 
 def get_wind(variable, u_time, u_altitude, bounds, origin):
 

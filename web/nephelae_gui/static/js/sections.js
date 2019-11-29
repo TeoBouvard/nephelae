@@ -25,10 +25,17 @@ var parameters = {
     position_y: 0,
     altitude: 0,
     map: '',
+    default_min: 100,
+    default_max: 10000,
+    center_fun: drawCenter
 }
+
+var map_boundaries = {};
 
 var position_of_uav = {};
 var controller_collection = {};
+
+var sliders_length = {}
 
 $(document).ready(function(){
     // set sliders range and display initial image
@@ -44,23 +51,28 @@ function setupGUI(){
     // Wwait for every ajax call to finish
     var f1 = gui.addFolder('Pixels');
     var f2 = gui.addFolder('Pixels (UAV)');
-    f1.add(parameters, 'taille_x', 100, 10000)
+    sliders_length['taille_x'] = f1.add(parameters, 'taille_x', 
+        parameters.default_min, parameters.default_max)
         .setValue(5000)
         .step(1)
         .name('Taille x')
         .onFinishChange(updateData);
 
-    f1.add(parameters, 'taille_y', 100, 10000)
+    sliders_length['taille_y'] = f1.add(parameters, 'taille_y', 
+        parameters.default_min, parameters.default_max)
         .setValue(5000)
         .step(1)
         .name('Taille y')
         .onFinishChange(updateData);
 
-    f2.add(parameters, 'taille', 100, 10000)
+    f2.add(parameters, 'taille', parameters.default_min, parameters.default_max)
         .setValue(5000)
         .step(1)
         .name('Taille')
         .onFinishChange(updateData);
+    
+    gui.add(parameters, 'center_fun')
+        .name('Draw center');
 
     $.getJSON('mesonh_dims/', (response) => {
         // Setup GUI
@@ -114,11 +126,16 @@ function setupGUI(){
                 parameters['variables'][vari] = true;
             };
             $.getJSON('/discover_maps/', (response) => {
-
+                for (var map in response){
+                    map_boundaries[map] = response[map]['range']
+                }
                 gui.add(parameters, 'map', Object.keys(response))
-                    .setValue('clouds')
+                    .setValue(Object.keys(response)[0])
                     .name('Map')
-                    .onChange(updateData);
+                    .onChange(function(){
+                        boundsChangement();
+                        updateData();
+                    });
 
                 updateData();
             });
@@ -153,6 +170,37 @@ function updateData(){
 }
 
 function updateStaticMap(){
+    var query = doQuery();
+    $.getJSON('map_section/?' + query, (response) => {
+        var lay = createLayout(parameters.variable, response.data);
+        var data = [{
+            x: response.axe_x,
+            y: response.axe_y,
+            z: response.data,
+            colorscale : lay['cmap'],
+            type: 'heatmap'
+        }];
+        layout.title = lay['title'];
+        Plotly.react('chart', data, layout, config);
+    });
+    removeLoader();
+}
+
+function drawCenter(){
+    var query = doQuery();
+    $.getJSON('center_cloud/?' + query, (response) => {
+        var center = {
+            x: [response.data[0]],
+            y: [response.data[1]],
+            mode: 'markers',
+            type: 'scatter'
+        }
+        data = [center];
+        Plotly.addTraces('chart', data);
+    });
+}
+
+function doQuery(){
     if (parameters.uav != 'None') {
         var query = $.param({
             time: parameters.time,
@@ -174,19 +222,7 @@ function updateStaticMap(){
             max_y: parameters.position_y + parameters.taille_y/2,
         });
     }
-    $.getJSON('map_section/?' + query, (response) => {
-        var lay = createLayout(parameters.variable, response.data);
-        var data = [{
-            x: response.axes,
-            y: response.axes,
-            z: response.data,
-            colorscale : lay['cmap'],
-            type: 'heatmap'
-        }];
-        layout.title = lay['title'];
-        Plotly.react('chart', data, layout, config);
-    });
-    removeLoader();
+    return query
 }
 
 function fieldsBehavior(state, f1, f2){
@@ -199,4 +235,39 @@ function fieldsBehavior(state, f1, f2){
         f2.show();
         f2.open();
     }
+}
+
+function boundsChangement(){
+    if (map_boundaries[parameters.map][0] != null){
+        sliders_length['taille_x'].min(map_boundaries[parameters.map][0])
+        sliders_length['taille_x'].max(map_boundaries[parameters.map][1])
+        sliders_length['taille_y'].min(map_boundaries[parameters.map][2])
+        sliders_length['taille_y'].max(map_boundaries[parameters.map][3])
+        
+
+        if (sliders_length['taille_x'].getValue() < map_boundaries[parameters.map][0])
+            sliders_length['taille_x'].setValue(map_boundaries[parameters.map][0])
+        if (sliders_length['taille_x'].getValue() > map_boundaries[parameters.map][1])
+            sliders_length['taille_x'].setValue(map_boundaries[parameters.map][1])
+        if (sliders_length['taille_y'].getValue() < map_boundaries[parameters.map][2])
+            sliders_length['taille_y'].setValue(map_boundaries[parameters.map][2])
+        if (sliders_length['taille_y'].getValue() > map_boundaries[parameters.map][3])
+            sliders_length['taille_y'].setValue(map_boundaries[parameters.map][3])
+    } else {
+        sliders_length['taille_x'].min(parameters.default_min)
+        sliders_length['taille_x'].max(parameters.default_max)
+        sliders_length['taille_y'].min(parameters.default_min)
+        sliders_length['taille_y'].max(parameters.default_max)
+        
+        if (sliders_length['taille_x'].getValue() < parameters.default_min)
+            sliders_length['taille_x'].setValue(parameters.default_min)
+        if (sliders_length['taille_x'].getValue() > parameters.default_max)
+            sliders_length['taille_x'].setValue(parameters.default_max)
+        if (sliders_length['taille_y'].getValue() < parameters.default_min)
+            sliders_length['taille_y'].setValue(parameters.default_min)
+        if (sliders_length['taille_y'].getValue() > parameters.default_max)
+            sliders_length['taille_y'].setValue(parameters.default_max)
+    }
+    sliders_length['taille_x'].updateDisplay()
+    sliders_length['taille_y'].updateDisplay()
 }
