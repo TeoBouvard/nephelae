@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from nephelae.mapping import compute_com
+from nephelae.mapping import compute_com, compute_cross_section_border
 
 imcount = 0
 
@@ -99,15 +99,26 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
     x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
-            map0.data.T.shape[0])
+            map0.data.shape[0])
     y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
-            map0.data.T.shape[1])
+            map0.data.shape[1])
     return (map0.data.T, x_axis, y_axis)
 
 def get_center_of_horizontal_slice(variable, time_value, altitude_value,
         x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
-    return {'data': compute_com(map0)}
+    x = compute_com(map0);
+    return {'data': (x[1], x[0])}
+
+
+# To rework, the get_contour_of_horizontal_slice must use a contour object
+def get_contour_of_horizontal_slice(variable, variable_std, time_value,
+        altitude_value, x0=None, x1=None, y0=None, y1=None):
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    std0 = maps[variable_std][time_value, x0:x1, y0:y1, altitude_value]
+    res = compute_cross_section_border(map0, std0);
+    return {'inner_border': res[0].tolist(),
+            'outer_border': res[1].tolist()}
 
 def get_wind(variable, u_time, u_altitude, bounds, origin):
 

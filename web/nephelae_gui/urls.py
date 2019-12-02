@@ -36,6 +36,7 @@ urlpatterns = [
     path('sections/uav_state_at_time/', views.get_state_at_time),
     path('sections/map_section/', views.get_section),
     path('sections/center_cloud/', views.get_center_of_horizontal_slice),
+    path('sections/contour_cloud/', views.get_contour_of_horizontal_slice),
 
     # URL for vertical profiles page
     path('profiles/', views.render_template, {'template_name': 'profiles.html'}, name='profiles'),

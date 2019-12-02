@@ -27,7 +27,8 @@ var parameters = {
     map: '',
     default_min: 100,
     default_max: 10000,
-    center_fun: drawCenter
+    center_fun: drawCenter,
+    contour_fun: drawContour
 }
 
 var map_boundaries = {};
@@ -74,6 +75,9 @@ function setupGUI(){
     gui.add(parameters, 'center_fun')
         .name('Draw center');
 
+    gui.add(parameters, 'contour_fun')
+        .name('Draw contour');
+
     $.getJSON('mesonh_dims/', (response) => {
         // Setup GUI
         controller_collection['time'] =
@@ -85,7 +89,7 @@ function setupGUI(){
 
         controller_collection['altitude'] =
             gui.add(parameters, 'altitude')
-            .setValue(0)
+            .setValue(700)
             .step(1)
             .name('Altitude (m)')
             .onFinishChange(updateData);
@@ -181,6 +185,17 @@ function updateStaticMap(){
             type: 'heatmap'
         }];
         layout.title = lay['title'];
+        layout.xaxis = {
+            autorange:false,
+            range: [Math.min.apply(Math, response.axe_x),
+                Math.max.apply(Math, response.axe_x)],
+            zeroline:false};
+        layout.yaxis = {
+            autorange:false,
+            range: [Math.min.apply(Math, response.axe_y),
+                Math.max.apply(Math, response.axe_y)],
+            zeroline: false};
+        layout.autosize = false;
         Plotly.react('chart', data, layout, config);
     });
     removeLoader();
@@ -197,6 +212,14 @@ function drawCenter(){
         }
         data = [center];
         Plotly.addTraces('chart', data);
+    });
+}
+
+function drawContour(){
+    var query = doQuery();
+    query += '&variable_std=LWC_std';
+    $.getJSON('contour_cloud/?' + query, (response) => {
+        console.log(response);
     });
 }
 
