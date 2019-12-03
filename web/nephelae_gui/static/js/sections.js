@@ -180,7 +180,8 @@ function setupGUI(){
                 gui.add(parameters, 'scale')
                     .name('Scale')
                     .onChange(function(){
-                        fieldsBehavior(parameters.scale, f2, f1)
+                        fieldsBehavior(parameters.scale, f2, f1);
+                        updateData();
                     });
                 boundsChangement(bounds_folder, no_bounds_folder);
                 updateData();
@@ -270,7 +271,6 @@ function plotUAV(coord_x, coord_y){
             color: parameters.uav_color[parameters.uav],
         },
     }
-    console.log(uav)
     data = [uav];
     Plotly.addTraces('chart', data);
 }
