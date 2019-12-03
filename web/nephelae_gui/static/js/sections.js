@@ -18,6 +18,7 @@ var parameters = {
     time: 0,
     altitude: 0,
     uav: '',
+    uav_color: {},
     taille_x: 100,
     taille_y: 100,
     taille: 100,
@@ -29,7 +30,8 @@ var parameters = {
     default_max: 10000,
     scale: false,
     center_fun: drawCenter,
-    contour_fun: drawContour
+    contour_fun: drawContour,
+    using_sliders: false
 }
 
 var map_boundaries = {};
@@ -157,10 +159,12 @@ function setupGUI(){
             parameters['variables'] = {};
 
             for (var uav_id in response.uavs){
+                parameters['uav_color'][uav_id] = response.uavs[uav_id].gui_color;
                 parameters['uavs'][uav_id] = true;
             };
             for (var vari of response.sample_tags){
-                parameters['variables'][vari] = true;
+                if(vari == 'RCT')
+                    parameters['variables'][vari] = true;
             };
             $.getJSON('/discover_maps/', (response) => {
                 for (var map in response){
@@ -186,12 +190,12 @@ function setupGUI(){
 }
 
 function updateData(){
-    if (parameters.uav != 'None'){
-        var query = $.param({
-            at_time: parameters.time,
-            variables: getSelectedElements(parameters.variables),
-            uav_id: getSelectedElements(parameters.uavs)
-        });
+    var query = $.param({
+        at_time: parameters.time,
+        variables: getSelectedElements(parameters.variables),
+        uav_id: getSelectedElements(parameters.uavs)
+    });
+    if (parameters.uav != 'None' && !parameters.using_sliders){
         $.getJSON('uav_state_at_time/?' + query, (response) => {
             var coordonnees = 
                 response[parameters.uav][Object.keys(parameters.variables)[0]]
@@ -206,9 +210,69 @@ function updateData(){
             controller_collection['time'].updateDisplay();
             updateStaticMap();
         });
-    }
-    else
+    } else if (parameters.uav != 'None'){
+        $.getJSON('uav_state_at_time/?' + query, (response) => {
+            var coordonnees = 
+                response[parameters.uav][Object.keys(parameters.variables)[0]]
+                .positions[0];
+            parameters.altitude = coordonnees[3];
+            controller_collection['altitude_bounds'].updateDisplay();
+            parameters.time = coordonnees[0];
+            controller_collection['time_bounds'].updateDisplay();
+            parameters.position_x = controller_collection['slider_position_x'].__min
+            controller_collection['slider_position_x'].updateDisplay();
+            parameters.position_y = controller_collection['slider_position_y'].__min
+            controller_collection['slider_position_y'].updateDisplay();
+            updateStaticMapWithUAV(coordonnees[1], coordonnees[2]);
+        });
+    } else {
         updateStaticMap();
+    }
+}
+
+function updateStaticMapWithUAV(coord_x, coord_y){
+    var query = doQuery();
+    $.getJSON('map_section/?' + query, (response) => {
+        var lay = createLayout(parameters.variable, response.data);
+        var data = [{
+            x: response.axe_x,
+            y: response.axe_y,
+            z: response.data,
+            colorscale : lay['cmap'],
+            type: 'heatmap'
+        }];
+        layout.title = lay['title'];
+        layout.xaxis = {
+            autorange:false,
+            range: [Math.min.apply(Math, response.axe_x),
+                Math.max.apply(Math, response.axe_x)],
+            zeroline:false};
+        layout.yaxis = {
+            autorange:false,
+            range: [Math.min.apply(Math, response.axe_y),
+                Math.max.apply(Math, response.axe_y)],
+            zeroline: false};
+        layout.autosize = false;
+        Plotly.react('chart', data, layout, config);
+        plotUAV(coord_x, coord_y);
+    });
+    removeLoader();
+}
+
+function plotUAV(coord_x, coord_y){
+    var uav = {
+        x: [coord_x],
+        y: [coord_y],
+        mode: 'markers',
+        type: 'scatter',
+        name: 'UAV ' + parameters.uav,
+        marker: {
+            color: parameters.uav_color[parameters.uav],
+        },
+    }
+    console.log(uav)
+    data = [uav];
+    Plotly.addTraces('chart', data);
 }
 
 function updateStaticMap(){
@@ -246,6 +310,7 @@ function drawCenter(){
             x: [response.data[0]],
             y: [response.data[1]],
             mode: 'markers',
+            name: 'Cloud center',
             type: 'scatter'
         }
         data = [center];
@@ -303,6 +368,7 @@ function fieldsBehavior(state, f1, f2){
 function boundsChangement(f1, f2){
     if (map_boundaries[parameters.map][0] != null){
         fieldsBehavior(true, f1, f2);
+        parameters.using_sliders = true;
         controller_collection['slider_position_x'].min(map_boundaries[parameters.map][0])
         controller_collection['slider_position_x'].max(map_boundaries[parameters.map][1])
         controller_collection['slider_position_y'].min(map_boundaries[parameters.map][2])
@@ -333,6 +399,7 @@ function boundsChangement(f1, f2){
                     map_boundaries[parameters.map][3])
     } else {
         fieldsBehavior(false, f1, f2);
+        parameters.using_sliders = false;
     }
     controller_collection['slider_position_x'].updateDisplay()
     controller_collection['slider_position_y'].updateDisplay()
