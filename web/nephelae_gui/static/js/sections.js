@@ -27,6 +27,7 @@ var parameters = {
     map: '',
     default_min: 100,
     default_max: 10000,
+    scale: false,
     center_fun: drawCenter,
     contour_fun: drawContour
 }
@@ -35,8 +36,6 @@ var map_boundaries = {};
 
 var position_of_uav = {};
 var controller_collection = {};
-
-var sliders_length = {}
 
 $(document).ready(function(){
     // set sliders range and display initial image
@@ -51,21 +50,26 @@ function setupGUI(){
 
     // Wwait for every ajax call to finish
     var f1 = gui.addFolder('Pixels');
-    var f2 = gui.addFolder('Pixels (UAV)');
-    sliders_length['taille_x'] = f1.add(parameters, 'taille_x', 
-        parameters.default_min, parameters.default_max)
+    var f2 = gui.addFolder('Pixels (Scaled)');
+    
+    var no_bounds_folder = gui.addFolder('Center choice');
+    var bounds_folder = gui.addFolder('Space choice');
+    
+    
+    f1.add(parameters, 'taille_x', parameters.default_min,
+        parameters.default_max)
         .setValue(5000)
         .step(1)
         .name('Taille x')
         .onFinishChange(updateData);
 
-    sliders_length['taille_y'] = f1.add(parameters, 'taille_y', 
-        parameters.default_min, parameters.default_max)
+    f1.add(parameters, 'taille_y', parameters.default_min,
+        parameters.default_max)
         .setValue(5000)
         .step(1)
         .name('Taille y')
         .onFinishChange(updateData);
-
+    
     f2.add(parameters, 'taille', parameters.default_min, parameters.default_max)
         .setValue(5000)
         .step(1)
@@ -81,31 +85,61 @@ function setupGUI(){
     $.getJSON('mesonh_dims/', (response) => {
         // Setup GUI
         controller_collection['time'] =
-            gui.add(parameters, 'time')
+            no_bounds_folder.add(parameters, 'time')
             .setValue(0)
             .step(1)
             .name('Time (s)')
             .onFinishChange(updateData);
 
         controller_collection['altitude'] =
-            gui.add(parameters, 'altitude')
+            no_bounds_folder.add(parameters, 'altitude')
+            .setValue(700)
+            .step(1)
+            .name('Altitude (m)')
+            .onFinishChange(updateData);
+        
+        controller_collection['time_bounds'] =
+            bounds_folder.add(parameters, 'time')
+            .setValue(0)
+            .step(1)
+            .name('Time (s)')
+            .onFinishChange(updateData);
+
+        controller_collection['altitude_bounds'] =
+            bounds_folder.add(parameters, 'altitude')
             .setValue(700)
             .step(1)
             .name('Altitude (m)')
             .onFinishChange(updateData);
 
         controller_collection['position_x'] =
-            gui.add(parameters, 'position_x')
+            no_bounds_folder.add(parameters, 'position_x')
             .setValue(900)
             .step(1)
             .name('Pos. X axis')
             .onFinishChange(updateData);
 
         controller_collection['position_y'] =
-            gui.add(parameters, 'position_y')
+            no_bounds_folder.add(parameters, 'position_y')
             .setValue(-900)
             .step(1)
             .name('Pos. Y axis')
+            .onFinishChange(updateData);
+        
+        controller_collection['slider_position_x'] =
+            bounds_folder.add(parameters, 'position_x', parameters.default_min,
+                parameters.default_max)
+            .setValue(-900)
+            .step(1)
+            .name('X')
+            .onFinishChange(updateData);
+        
+        controller_collection['slider_position_y'] =
+            bounds_folder.add(parameters, 'position_y', parameters.default_min,
+                parameters.default_max)
+            .setValue(-100)
+            .step(1)
+            .name('Y')
             .onFinishChange(updateData);
 
         $.getJSON('/discover/', (response) => {
@@ -115,7 +149,6 @@ function setupGUI(){
                 .setValue('None')
                 .name("UAV")
                 .onChange(function(){
-                    fieldsBehavior(parameters.uav == 'None', f1, f2)
                     updateData();
                 });
 
@@ -137,10 +170,15 @@ function setupGUI(){
                     .setValue(Object.keys(response)[0])
                     .name('Map')
                     .onChange(function(){
-                        boundsChangement();
+                        boundsChangement(bounds_folder, no_bounds_folder);
                         updateData();
                     });
-
+                gui.add(parameters, 'scale')
+                    .name('Scale')
+                    .onChange(function(){
+                        fieldsBehavior(parameters.scale, f2, f1)
+                    });
+                boundsChangement(bounds_folder, no_bounds_folder);
                 updateData();
             });
         });
@@ -215,6 +253,8 @@ function drawCenter(){
     });
 }
 
+
+// NOT YET IMPLEMENTED -- WIP
 function drawContour(){
     var query = doQuery();
     query += '&variable_std=LWC_std';
@@ -224,7 +264,7 @@ function drawContour(){
 }
 
 function doQuery(){
-    if (parameters.uav != 'None') {
+    if (parameters.scale) {
         var query = $.param({
             time: parameters.time,
             altitude: parameters.altitude,
@@ -260,35 +300,40 @@ function fieldsBehavior(state, f1, f2){
     }
 }
 
-function boundsChangement(){
+function boundsChangement(f1, f2){
     if (map_boundaries[parameters.map][0] != null){
-        sliders_length['taille_x'].max(map_boundaries[parameters.map][1] + 
-            Math.abs(map_boundaries[parameters.map][0]))
-        sliders_length['taille_y'].max(map_boundaries[parameters.map][3] +
-            Math.abs(map_boundaries[parameters.map][2]))
+        fieldsBehavior(true, f1, f2);
+        controller_collection['slider_position_x'].min(map_boundaries[parameters.map][0])
+        controller_collection['slider_position_x'].max(map_boundaries[parameters.map][1])
+        controller_collection['slider_position_y'].min(map_boundaries[parameters.map][2])
+        controller_collection['slider_position_y'].max(map_boundaries[parameters.map][3])
         
-        if (sliders_length['taille_x'].getValue() >
-            map_boundaries[parameters.map][1] +
-            Math.abs(map_boundaries[parameters.map][0]))
+        if (controller_collection['slider_position_x'].getValue() <
+            map_boundaries[parameters.map][0])
 
-                sliders_length['taille_x'].setValue(
+                controller_collection['slider_position_x'].setValue(
+                    map_boundaries[parameters.map][0])
+
+        if (controller_collection['slider_position_x'].getValue() >
+            map_boundaries[parameters.map][1])
+
+                controller_collection['slider_position_x'].setValue(
                     map_boundaries[parameters.map][1])
+        
+        if (controller_collection['slider_position_y'].getValue() <
+            map_boundaries[parameters.map][2])
 
-        if (sliders_length['taille_y'].getValue() >
-            map_boundaries[parameters.map][3] +
-            Math.abs(map_boundaries[parameters.map][2]))
+                controller_collection['slider_position_y'].setValue(
+                    map_boundaries[parameters.map][2])
 
-                sliders_length['taille_y'].setValue(
+        if (controller_collection['slider_position_y'].getValue() >
+            map_boundaries[parameters.map][3])
+
+                controller_collection['slider_position_y'].setValue(
                     map_boundaries[parameters.map][3])
     } else {
-        sliders_length['taille_x'].max(parameters.default_max)
-        sliders_length['taille_y'].max(parameters.default_max)
-        
-        if (sliders_length['taille_x'].getValue() > parameters.default_max)
-            sliders_length['taille_x'].setValue(parameters.default_max)
-        if (sliders_length['taille_y'].getValue() > parameters.default_max)
-            sliders_length['taille_y'].setValue(parameters.default_max)
+        fieldsBehavior(false, f1, f2);
     }
-    sliders_length['taille_x'].updateDisplay()
-    sliders_length['taille_y'].updateDisplay()
+    controller_collection['slider_position_x'].updateDisplay()
+    controller_collection['slider_position_y'].updateDisplay()
 }

@@ -108,7 +108,7 @@ def get_center_of_horizontal_slice(variable, time_value, altitude_value,
         x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
     x = compute_com(map0);
-    return {'data': (x[1], x[0])}
+    return {'data': (x[0], x[1])}
 
 
 # To rework, the get_contour_of_horizontal_slice must use a contour object
