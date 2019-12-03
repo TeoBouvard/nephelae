@@ -2,7 +2,7 @@
 $('#nav_sections').addClass('active');
 
 // Chart style and options
-var chart_size = 600;
+var chart_size = 1000;
 
 var layout = {
     width: chart_size,
@@ -322,7 +322,6 @@ function drawCenter(){
 // NOT YET IMPLEMENTED -- WIP
 function drawContour(){
     var query = doQuery();
-    query += '&variable_std=LWC_std';
     $.getJSON('contour_cloud/?' + query, (response) => {
         console.log(response);
     });

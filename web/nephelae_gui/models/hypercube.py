@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 
 from nephelae.mapping import compute_com, compute_cross_section_border
+from nephelae.mapping import BorderIncertitude
 
 imcount = 0
 
@@ -95,7 +96,6 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
     return buf
 
-
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
     x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
@@ -107,18 +107,21 @@ def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None,
 def get_center_of_horizontal_slice(variable, time_value, altitude_value,
         x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
-    x = compute_com(map0);
+    x = compute_com(map0)
     return {'data': (x[0], x[1])}
 
 
 # To rework, the get_contour_of_horizontal_slice must use a contour object
-def get_contour_of_horizontal_slice(variable, variable_std, time_value,
+def get_contour_of_horizontal_slice(variable, time_value,
         altitude_value, x0=None, x1=None, y0=None, y1=None):
-    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
-    std0 = maps[variable_std][time_value, x0:x1, y0:y1, altitude_value]
-    res = compute_cross_section_border(map0, std0);
-    return {'inner_border': res[0].tolist(),
-            'outer_border': res[1].tolist()}
+    res = None
+    if variable+'_std' in maps.keys():
+        bdcloud = BorderIncertitude('LWC Bd', maps[variable],
+        maps[variable+'_std'])
+        borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
+        res = {'inner_border': borders[0].data.tolist(),
+                'outer_border': borders[1].data.tolist()}
+    return res
 
 def get_wind(variable, u_time, u_altitude, bounds, origin):
 
