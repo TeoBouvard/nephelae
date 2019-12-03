@@ -485,7 +485,6 @@ function click_display_location(e) {
         lon: e.latlng.lng
     });
     $.getJSON('/latlon_to_local/?' + query, (local) => {
-        console.log(local);
         location_popup
             .setLatLng(e.latlng)
             .setContent("Local: " + local.x.toFixed(2) + ", " + local.y.toFixed(2) +
