@@ -1,6 +1,6 @@
 import os
 import sys
-import utm
+from utm import to_latlon
 
 from . import utils
 from . import common
@@ -11,7 +11,16 @@ from .common import scenario
 db_data_tags = ['RCT', 'WT', 'THT'] 
 
 db = scenario.database
-nav_frame = list(utm.to_latlon(db.navFrame['utm_east'], db.navFrame['utm_north'], db.navFrame['utm_zone'], northern=True))
+
+# nav_frame = list(to_latlon(scenario.localFrame.position.x,
+#                            scenario.localFrame.position.y,
+#                            scenario.localFrame.utm_zone,
+#                            northern=True))
+# print(nav_frame)
+
+nav_frame   = utils.local_frame_latlon()
+flight_area = utils.flight_area_latlon()
+
 
 def discover():
     uavs = {}
@@ -20,7 +29,8 @@ def discover():
         uavs[key]['id'] = str(key)
         uavs[key]['name'] = scenario.aircrafts[key].config.ac_name
         uavs[key]['gui_color'] = scenario.aircrafts[key].config.default_gui_color
-    return {'origin': nav_frame, 'uavs':uavs, 'sample_tags':db_data_tags}
+    # return {'origin': nav_frame, 'uavs':uavs, 'sample_tags':db_data_tags}
+    return {'origin': nav_frame, 'uavs':uavs, 'sample_tags':db_data_tags, 'flight_area': flight_area}
 
 
 # GPS time is *absolute*, but SAMPLE time is relative to navFrame

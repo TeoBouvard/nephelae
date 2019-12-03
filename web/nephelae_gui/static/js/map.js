@@ -30,7 +30,7 @@ var parameters = {
     time: null,
     update_wind: updateWindData,
 
-    origin: [43.46, 1.27] // used to compute layer images
+    origin: null
 }
 
 // Initialization starts here

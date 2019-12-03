@@ -1,13 +1,34 @@
 import matplotlib.cm as cm
 import numpy as np
-import utm
+from utm import to_latlon, from_latlon
 from geopy.distance import distance
 from matplotlib.colors import ListedColormap
 
 from . import common
+from .common import scenario
+
+def local_frame_latlon():
+    return list(to_latlon(scenario.localFrame['utm_east'],
+                          scenario.localFrame['utm_north'],
+                          scenario.localFrame.utm_zone,
+                          northern=True))
+
+def flight_area_latlon():
+    localFrame = scenario.localFrame
+    flightArea = scenario.flightArea
+
+    return {
+        'lower_left': to_latlon(flightArea[0][0] + localFrame['utm_east'],
+                                flightArea[0][1] + localFrame['utm_north'],
+                                localFrame.utm_zone, northern=True),
+        'upper_right': to_latlon(flightArea[1][0] + localFrame['utm_east'],
+                                 flightArea[1][1] + localFrame['utm_north'],
+                                 localFrame.utm_zone, northern=True)
+    }
+
 
 def utm_to_latlon(message):
-    position = list(utm.to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
+    position = list(to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
     position.append(message['alt'])
     return position
 
