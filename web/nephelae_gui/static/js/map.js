@@ -97,42 +97,42 @@ function setupMap(){
         var tiles_overlay_none = L.tileLayer('');
         var tiles_overlay_dark =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
         //var tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 18});
-		//var key = "an7nvfzojv5wa96dsga5nk8w"
-		var key = "pratique"
-		var tiles_overlay_IGN = L.tileLayer(
-		        "https://wxs.ign.fr/"+key+"/geoportail/wmts?" +
-		        "&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0" +
-		        "&STYLE=normal" +
-		        "&TILEMATRIXSET=PM" +
-		        "&FORMAT=image/jpeg"+
-		        "&LAYER=ORTHOIMAGERY.ORTHOPHOTOS"+
-				"&TILEMATRIX={z}" +
-		        "&TILEROW={y}" +
-		        "&TILECOL={x}",
-			{
-				minZoom : 13,
-				maxZoom : 18,
-		        attribution : "IGN-F/Geoportail",
-				tileSize : 256 // les tuiles du Géooportail font 256x256px
-			}
-		);
-		var tiles_overlay_map_IGN = L.tileLayer(
-		        "https://wxs.ign.fr/"+key+"/geoportail/wmts?" +
-		        "&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0" +
-		        "&STYLE=normal" +
-		        "&TILEMATRIXSET=PM" +
-		        "&FORMAT=image/jpeg"+
-		        "&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS" +
-				"&TILEMATRIX={z}" +
-		        "&TILEROW={y}" +
-		        "&TILECOL={x}",
-			{
-				minZoom : 13,
-				maxZoom : 18,
-		        attribution : "IGN-F/Geoportail",
-				tileSize : 256 // les tuiles du Géooportail font 256x256px
-			}
-		);
+        //var key = "an7nvfzojv5wa96dsga5nk8w"
+        var key = "pratique"
+        var tiles_overlay_IGN = L.tileLayer(
+                "https://wxs.ign.fr/"+key+"/geoportail/wmts?" +
+                "&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0" +
+                "&STYLE=normal" +
+                "&TILEMATRIXSET=PM" +
+                "&FORMAT=image/jpeg"+
+                "&LAYER=ORTHOIMAGERY.ORTHOPHOTOS"+
+                "&TILEMATRIX={z}" +
+                "&TILEROW={y}" +
+                "&TILECOL={x}",
+            {
+                minZoom : 13,
+                maxZoom : 18,
+                attribution : "IGN-F/Geoportail",
+                tileSize : 256 // les tuiles du Géooportail font 256x256px
+            }
+        );
+        var tiles_overlay_map_IGN = L.tileLayer(
+                "https://wxs.ign.fr/"+key+"/geoportail/wmts?" +
+                "&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0" +
+                "&STYLE=normal" +
+                "&TILEMATRIXSET=PM" +
+                "&FORMAT=image/jpeg"+
+                "&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS" +
+                "&TILEMATRIX={z}" +
+                "&TILEROW={y}" +
+                "&TILECOL={x}",
+            {
+                minZoom : 13,
+                maxZoom : 18,
+                attribution : "IGN-F/Geoportail",
+                tileSize : 256 // les tuiles du Géooportail font 256x256px
+            }
+        );
 
         path_overlay = L.layerGroup();
         uavs_overlay = L.layerGroup();
