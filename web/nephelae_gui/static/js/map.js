@@ -1,7 +1,7 @@
 // Activate current menu in nav
 $("#nav_map").addClass('active');
 
-var flight_map, zoom_home, overlays;
+var flight_map, zoom_home, overlays, location_popup;
 var uavs_overlay;
 var maps_parameters;
 
@@ -185,7 +185,14 @@ function setupMap(){
         //tiles_overlay_IGN.addTo(flight_map);
         tiles_overlay_dark.addTo(flight_map);
         L.control.scale().addTo(flight_map);
-        L.marker(parameters.origin).addTo(flight_map);
+        L.marker(parameters.origin)
+            .bindTooltip("Origin", {permanent: true, direction: 'right'})
+            .addTo(flight_map);
+
+        //display location on click
+        location_popup = L.popup();
+        flight_map.on('click', click_display_location);
+
         // Prevent async conflicts by displaying uavs once map is initialized
         displayUavs();
 
@@ -468,3 +475,22 @@ function updateLayerBounds(){
 function track(id){
     parameters.tracked_uav = id
 }
+
+function click_display_location(e) {
+    ////alert("You clicked the map at " + e.latlng);
+    //latlon_to_local(e.latlng);
+
+    var query = $.param({
+        lat: e.latlng.lat,
+        lon: e.latlng.lng
+    });
+    $.getJSON('/latlon_to_local/?' + query, (local) => {
+        console.log(local);
+        location_popup
+            .setLatLng(e.latlng)
+            .setContent("Local: " + local.x.toFixed(2) + ", " + local.y.toFixed(2) +
+                        "<br>LatLon: " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4))
+            .openOn(flight_map);
+    });
+}
+

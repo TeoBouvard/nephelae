@@ -2,7 +2,10 @@ from django.http import JsonResponse
 
 # from ..models import hypercube, tracker
 from nephelae_gui.models import hypercube, tracker
+from nephelae_gui.models.common import scenario
 from nephelae_paparazzi.missions import MissionBuilder
+
+from utm import from_latlon
 
 
 # Returns discovered UAVs and navigation frame info
@@ -115,3 +118,8 @@ def get_mission_parameters(request, mission_type):
     return JsonResponse({"parameters" : MissionBuilder.get_parameter_list(mission_type)})
 
 
+def latlon_to_local(request):
+    query = request.GET
+    utm = from_latlon(float(query['lat']), float(query['lon']))
+    return JsonResponse({'x' : utm[0] - scenario.localFrame.utm_east,
+                         'y' : utm[1] - scenario.localFrame.utm_north})

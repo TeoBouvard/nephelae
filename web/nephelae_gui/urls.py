@@ -59,7 +59,10 @@ urlpatterns = [
     path('discover_maps/', views.discover_maps),
 
     path('missions/available_missions/', views.get_available_missions),
-    path('missions/mission_parameters/<str:mission_type>', views.get_mission_parameters)
+    path('missions/mission_parameters/<str:mission_type>', views.get_mission_parameters),
+
+
+    path('latlon_to_local/', views.latlon_to_local)
 ]
 
 
