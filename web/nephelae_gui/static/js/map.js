@@ -30,7 +30,8 @@ var parameters = {
     time: null,
     update_wind: updateWindData,
 
-    origin: null
+    origin: null,
+    flight_area: null
 }
 
 // Initialization starts here
@@ -40,7 +41,10 @@ function setupGUI(){
 
     $.getJSON('/discover/', (response) => {
 
-        parameters.origin = response.origin;
+        parameters.origin      = response.origin;
+        parameters.flight_area = L.latLngBounds(
+            L.latLng(response.flight_area.upper_right),
+            L.latLng(response.flight_area.lower_left));
 
         var tracked_uav_choices = ['None']
         for (var id in response.uavs)
@@ -372,26 +376,27 @@ function computeMapUrl(){
 function setBounds(){
     var screen_bounds = flight_map.getBounds();
     var south_bound, east_bound, west_bound, north_bound;
+    var flight_area = parameters.flight_area
 
-    if(screen_bounds.getSouth() >= zone_on_map.getSouth())
+    if(screen_bounds.getSouth() >= flight_area.getSouth())
         south_bound = screen_bounds.getSouth();
     else
-        south_bound = zone_on_map.getSouth();
+        south_bound = flight_area.getSouth();
 
-    if(screen_bounds.getNorth() <= zone_on_map.getNorth())
+    if(screen_bounds.getNorth() <= flight_area.getNorth())
         north_bound = screen_bounds.getNorth();
     else
-        north_bound = zone_on_map.getNorth();
+        north_bound = flight_area.getNorth();
 
-    if(screen_bounds.getEast() <= zone_on_map.getEast())
+    if(screen_bounds.getEast() <= flight_area.getEast())
         east_bound = screen_bounds.getEast();
     else
-        east_bound = zone_on_map.getEast();
+        east_bound = flight_area.getEast();
 
-    if(screen_bounds.getWest() >= zone_on_map.getWest())
+    if(screen_bounds.getWest() >= flight_area.getWest())
         west_bound = screen_bounds.getWest();
     else
-        west_bound = zone_on_map.getWest();
+        west_bound = flight_area.getWest();
     return L.latLngBounds(
         L.latLng([north_bound, east_bound]),
         L.latLng([south_bound, west_bound])

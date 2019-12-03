@@ -2,9 +2,6 @@
 global_colors = ["red", "green", "blue", "purple", "teal", "orange", "lime", "yellow", "fuchsia", "gray"];
 global_icons = [];
 
-zone_on_map = L.latLngBounds(L.latLng([43.482902222, 1.299157]),
-    L.latLng([43.457456,1.21675968]))
-
 // Icon class
 var planeIcon = L.Icon.extend({
     options: { 
