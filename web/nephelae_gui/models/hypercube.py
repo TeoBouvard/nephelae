@@ -4,6 +4,7 @@ import os
 import sys
 import time
 
+from utm import from_latlon
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
@@ -25,8 +26,16 @@ def discover_maps():
 
 
 def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
-   
-    x0, x1, y0, y1 = utils.bounds2indices(bounds, origin)
+    
+    # Converting lower left corner and upper right corner from (lat,lon) to utm
+    utmBounds = [from_latlon(latitude=bounds['south'], longitude=bounds['west']),
+                 from_latlon(latitude=bounds['north'], longitude=bounds['east'])]
+    localFrame = common.scenario.localFrame.position
+    x0 = utmBounds[0][0] - localFrame.x
+    x1 = utmBounds[1][0] - localFrame.x
+    y0 = utmBounds[0][1] - localFrame.y
+    y1 = utmBounds[1][1] - localFrame.y
+
     # indices must be adapted to the resolution of the map. Indices are related
     # to the outer limit of the image outside the pixels, whereas coordinates
     # in maps are assumed to be relative the the center of pixels (i.e. bounds
