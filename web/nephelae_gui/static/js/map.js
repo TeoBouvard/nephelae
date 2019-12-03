@@ -96,6 +96,7 @@ function setupMap(){
         // Create layers
         var tiles_overlay_none = L.tileLayer('');
         var tiles_overlay_dark =  L.tileLayer( "http://{s}.sm.mapstack.stamen.com/"+"(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/"+"{z}/{x}/{y}.png");
+        //var tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 18});
         var tiles_overlay_IGN = L.tileLayer('tile/{z}/{x}/{y}', {maxZoom : 18});
 
         path_overlay = L.layerGroup();
@@ -147,6 +148,7 @@ function setupMap(){
 
         tiles_overlay_IGN.addTo(flight_map);
         L.control.scale().addTo(flight_map);
+        L.marker(parameters.origin).addTo(flight_map);
         // Prevent async conflicts by displaying uavs once map is initialized
         displayUavs();
 

@@ -64,6 +64,8 @@ assets :
 
 	$(ECHO) -n "Downloading images ... "
 	$(FETCH) --output web/nephelae_gui/static/css/libs/images/layers.png 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/images/layers.png'
+	$(FETCH) --output web/nephelae_gui/static/css/libs/images/marker-icon.png 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/images/marker-icon.png'
+	$(FETCH) --output web/nephelae_gui/static/css/libs/images/marker-shadow.png 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/images/marker-shadow.png'
 	$(ECHO) "OK"
 
 	$(ECHO) -n "Downloading icons ... "
