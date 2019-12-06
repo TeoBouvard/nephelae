@@ -91,8 +91,8 @@ def get_section(request):
         retour = [[],[],[]]
     response = JsonResponse({
         'axes': hypercube.axes(),
-        'axe_x': retour[1],
-        'axe_y': retour[2],
+        'x_axis': retour[1],
+        'y_axis': retour[2],
         'data': retour[0]
     })
 

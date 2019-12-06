@@ -236,8 +236,8 @@ function updateStaticMapWithUAV(coord_x, coord_y){
     $.getJSON('map_section/?' + query, (response) => {
         var lay = createLayout(parameters.variable, response.data);
         var data = [{
-            x: response.axe_x,
-            y: response.axe_y,
+            x: response.x_axis,
+            y: response.y_axis,
             z: response.data,
             colorscale : lay['cmap'],
             type: 'heatmap'
@@ -245,13 +245,13 @@ function updateStaticMapWithUAV(coord_x, coord_y){
         layout.title = lay['title'];
         layout.xaxis = {
             autorange:false,
-            range: [Math.min.apply(Math, response.axe_x),
-                Math.max.apply(Math, response.axe_x)],
+            range: [Math.min.apply(Math, response.x_axis),
+                Math.max.apply(Math, response.x_axis)],
             zeroline:false};
         layout.yaxis = {
             autorange:false,
-            range: [Math.min.apply(Math, response.axe_y),
-                Math.max.apply(Math, response.axe_y)],
+            range: [Math.min.apply(Math, response.y_axis),
+                Math.max.apply(Math, response.y_axis)],
             zeroline: false};
         layout.autosize = false;
         Plotly.react('chart', data, layout, config);
@@ -280,8 +280,8 @@ function updateStaticMap(){
     $.getJSON('map_section/?' + query, (response) => {
         var lay = createLayout(parameters.variable, response.data);
         var data = [{
-            x: response.axe_x,
-            y: response.axe_y,
+            x: response.x_axis,
+            y: response.y_axis,
             z: response.data,
             colorscale : lay['cmap'],
             type: 'heatmap'
@@ -289,13 +289,13 @@ function updateStaticMap(){
         layout.title = lay['title'];
         layout.xaxis = {
             autorange:false,
-            range: [Math.min.apply(Math, response.axe_x),
-                Math.max.apply(Math, response.axe_x)],
+            range: [Math.min.apply(Math, response.x_axis),
+                Math.max.apply(Math, response.x_axis)],
             zeroline:false};
         layout.yaxis = {
             autorange:false,
-            range: [Math.min.apply(Math, response.axe_y),
-                Math.max.apply(Math, response.axe_y)],
+            range: [Math.min.apply(Math, response.y_axis),
+                Math.max.apply(Math, response.y_axis)],
             zeroline: false};
         layout.autosize = false;
         Plotly.react('chart', data, layout, config);
@@ -318,12 +318,39 @@ function drawCenter(){
     });
 }
 
-
-// NOT YET IMPLEMENTED -- WIP
 function drawContour(){
     var query = doQuery();
     $.getJSON('contour_cloud/?' + query, (response) => {
-        console.log(response);
+        var in_contour = {
+            x: response.x_axis,
+            y: response.y_axis,
+            z: response.inner_border,
+            type: 'contour',
+            name: 'Inner border',
+            contours:{
+                start: 0,
+                end: 1,
+                size: 1,
+                coloring: 'lines'
+            },
+            colorscale: [[0, 'rgb(0,0,0)'], [1, 'rgb(0,0,0)']],
+        };
+        var out_contour = {
+            x: response.x_axis,
+            y: response.y_axis,
+            z: response.outer_border,
+            type: 'contour',
+            name: 'Outer border',
+            contours:{
+                start: 0,
+                end: 1,
+                size: 1,
+                coloring: 'lines'
+            },
+            colorscale: [[0, 'rgb(255,255,255)'], [1, 'rgb(255,255,255)']]
+        };
+        data = [in_contour, out_contour];
+        Plotly.addTraces('chart', data);
     });
 }
 
