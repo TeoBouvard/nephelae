@@ -2,7 +2,7 @@ import os
 
 try:
     from nephelae_scenario import Scenario
-    
+
     # Find a way to give this as an argument to the server !
     scenario = Scenario(os.environ['NEPHELAE_CONFIG'])
     scenario.load()

@@ -17,6 +17,31 @@ def discover_maps(request):
     return JsonResponse(hypercube.discover_maps(), safe=False)
 
 
+# Returns the center of an horzontal slice
+def get_center_of_horizontal_slice(request):
+    time_value = float(request.GET.get('time'))
+    altitude_value = float(request.GET.get('altitude'))
+    variable = request.GET.get('variable')
+    min_x = float(request.GET.get('min_x'));
+    max_x = float(request.GET.get('max_x'));
+    min_y = float(request.GET.get('min_y'));
+    max_y = float(request.GET.get('max_y'));
+    return JsonResponse(data = hypercube.get_center_of_horizontal_slice(
+            variable, time_value, altitude_value,
+            x0=min_x, x1=max_x, y0=min_y, y1=max_y))
+
+def get_contour_of_horizontal_slice(request):
+    time_value = float(request.GET.get('time'))
+    altitude_value = float(request.GET.get('altitude'))
+    variable = request.GET.get('variable')
+    min_x = float(request.GET.get('min_x'));
+    max_x = float(request.GET.get('max_x'));
+    min_y = float(request.GET.get('min_y'));
+    max_y = float(request.GET.get('max_y'));
+    return JsonResponse(data = hypercube.get_contour_of_horizontal_slice(
+            variable, time_value, altitude_value,
+            x0=min_x, x1=max_x, y0=min_y, y1=max_y))
+
 # Update UAV fleet positions
 def get_positions(request):
 
@@ -63,13 +88,15 @@ def get_section(request):
     max_y = float(request.GET.get('max_y'));
     data = hypercube.get_horizontal_slice(variable, time_value, altitude_value,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y)
-    if data is not None:
-        data = data.tolist()
+    if data[0] is not None:
+        retour = [data[0].tolist(), data[1].tolist(), data[2].tolist()]
     else:
-        data = []
+        retour = [[],[],[]]
     response = JsonResponse({
         'axes': hypercube.axes(),
-        'data': data
+        'x_axis': retour[1],
+        'y_axis': retour[2],
+        'data': retour[0]
     })
 
     return response

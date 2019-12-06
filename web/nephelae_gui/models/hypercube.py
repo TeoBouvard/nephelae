@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
+from nephelae.mapping import compute_com, compute_cross_section_border
+from nephelae.mapping import BorderIncertitude
+
 imcount = 0
 
 from . import utils
@@ -20,7 +23,14 @@ hypercube = common.scenario.mesonhDataset
 def discover_maps():
     res = {}
     for key in maps.keys():
-        res[key] = {'url':key, 'name' : maps[key].name, 'sample_size': maps[key].sample_size()}
+        if maps[key].bounds()[0] is not None:
+            x = maps[key].bounds()
+            boundaries = (x[0].min, x[0].max, x[1].min, x[1].max)
+        else:
+            boundaries = maps[key].bounds()
+
+        res[key] = {'url':key, 'name' : maps[key].name, 'sample_size':
+                maps[key].sample_size(), 'range': boundaries}
     print(res)
     return res
 
@@ -98,9 +108,48 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
 
     return buf
 
-
 def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None, y0=None, y1=None):
-    return maps[variable][time_value, x0:x1, y0:y1, altitude_value].data.T
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
+            map0.data.shape[0])
+    y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
+            map0.data.shape[1])
+    return (map0.data.T, x_axis, y_axis)
+
+def get_center_of_horizontal_slice(variable, time_value, altitude_value,
+        x0=None, x1=None, y0=None, y1=None):
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    x = compute_com(map0)
+    if x is None:
+        res = {'data': (None, None)}
+    else:
+        res = {'data': (x[0], x[1])}
+    return res
+
+
+# To rework, the get_contour_of_horizontal_slice must use a contour object
+def get_contour_of_horizontal_slice(variable, time_value,
+        altitude_value, x0=None, x1=None, y0=None, y1=None):
+    res = None
+    if variable+'_std' in maps.keys():
+        map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+        bdcloud = BorderIncertitude('LWC Bd', maps[variable],
+        maps[variable+'_std'])
+        x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
+            map0.data.shape[0])
+        y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
+            map0.data.shape[1])
+        borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
+        res = {'inner_border': borders[0].data.T.tolist(),
+                'outer_border': borders[1].data.T.tolist(),
+                'x_axis': x_axis.tolist(),
+                'y_axis': y_axis.tolist()}
+    else:
+        res = {'inner_border': [],
+                'outer_border': [],
+                'x_axis': [],
+                'y_axis': []}
+    return res
 
 def get_wind(variable, u_time, u_altitude, bounds, origin):
 
@@ -130,7 +179,7 @@ def get_wind(variable, u_time, u_altitude, bounds, origin):
 
     header['parameterNumber'] = 3
     header['parameterNumberName'] = 'northward_wind'
-
+    
     s2 = json.dumps({'header': header, 'data': wind[:,:,1].ravel().tolist()})
 
     return [eval(s1), eval(s2)]

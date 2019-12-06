@@ -42,7 +42,7 @@ var config = {
 var refresh_rate = 2000; // ms
 var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
-    streaming: true,
+    streaming: false,
     socket: null,
     uav_color: {},
     start_buff : 1,
