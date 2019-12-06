@@ -132,6 +132,11 @@ def get_contour_of_horizontal_slice(variable, time_value,
                 'outer_border': borders[1].data.T.tolist(),
                 'x_axis': x_axis.tolist(),
                 'y_axis': y_axis.tolist()}
+    else:
+        res = {'inner_border': [],
+                'outer_border': [],
+                'x_axis': [],
+                'y_axis': []}
     return res
 
 def get_wind(variable, u_time, u_altitude, bounds, origin):
