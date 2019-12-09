@@ -12,6 +12,7 @@ try:
     from .data_views import latlon_to_local
     from .data_views import get_center_of_horizontal_slice
     from .data_views import get_contour_of_horizontal_slice
+    from .data_views import get_bounding_boxes_of_horizontal_slice
     
     from .template_views import render_template
     from .file_views import plane_icon, generate_plane_icon, map_tiles, texture, model3D, layer_img

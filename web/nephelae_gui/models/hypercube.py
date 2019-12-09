@@ -10,6 +10,7 @@ import numpy as np
 from PIL import Image
 
 from nephelae.mapping import compute_list_of_coms, compute_cross_section_border
+from nephelae.mapping import compute_bounding_box
 from nephelae.mapping import BorderIncertitude, BorderRaw
 
 imcount = 0
@@ -127,6 +128,13 @@ def get_center_of_horizontal_slice(variable, time_value, altitude_value,
             list_y.append(coords[1])
     return {'list_x': list_x, 'list_y': list_y}
 
+# TODO
+def get_bounding_boxes_of_horizontal_slice(variable, time_value, altitude_value,
+        x0=None, x1=None, y0=None, y1=None):
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    x = compute_bounding_box(map0)
+    print(x)
+    return {}
 
 # To rework, the get_contour_of_horizontal_slice must use a contour object
 def get_contour_of_horizontal_slice(variable, time_value,

@@ -31,6 +31,7 @@ var parameters = {
     scale: false,
     center_fun: drawCenter,
     contour_fun: drawContour,
+    boxes_fun: showBoxes,
     using_sliders: false
 }
 
@@ -86,6 +87,9 @@ function setupGUI(){
 
     gui.add(parameters, 'contour_fun')
         .name('Draw contour');
+    
+    gui.add(parameters, 'boxes_fun')
+        .name('Show bounds');
 
     $.getJSON('mesonh_dims/', (response) => {
         // Setup GUI
@@ -354,6 +358,13 @@ function drawContour(){
         };
         data = [in_contour, out_contour];
         Plotly.addTraces('chart', data);
+    });
+}
+
+function showBoxes(){
+    var query = doQuery();
+    $.getJSON('boxes_cloud/?' + query, (response) => {
+        console.log(response);
     });
 }
 
