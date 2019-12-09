@@ -88,25 +88,18 @@ def get_positions_uavs_map(uav_ids, trail_length):
 
 
 def get_data(uav_ids, variables, start, end=None, step=-1):
-
-    data = dict()
-    for variable in variables:
-        for uav_id in uav_ids:
-            messages = [entry.data for entry in db.find_entries([variable, str(uav_id)], (slice(-start, end, step), ), lambda entry: entry.data.timeStamp)]
-
+    data = {}
+    for uav_id in uav_ids:
+        data[uav_id] = {}
+        for variable in variables:
+            messages = [entry.data for entry in
+                db[variable, str(uav_id)](lambda x: x.data.timeStamp)[-start:end:step]]
+            data[uav_id][variable] = {'positions':[], 'values': []}
             for message in messages:
-
-                if uav_id not in data.keys():
-                    data[uav_id] = dict()
-                elif message.variableName not in data[uav_id].keys():
-                    data[uav_id][message.variableName] = {
-                        'positions': [message.position.data.tolist()],
-                        'values': [message.data[0]],
-                    }
-                else:
-                    data[uav_id][message.variableName]['positions'].append(message.position.data.tolist())
-                    data[uav_id][message.variableName]['values'].append(message.data[0])
+                data[uav_id][variable]['positions'].append(message.position.data.tolist())
+                data[uav_id][variable]['values'].append(message.data[0])
     return dict(data=data)
+
 
 def get_state_at_time(uav_ids, variables, at_time):
     data = dict()
@@ -120,6 +113,7 @@ def get_state_at_time(uav_ids, variables, at_time):
                     'values': [message.data],
             }
     return data
+
 
 def prettify_gps(message):
 
