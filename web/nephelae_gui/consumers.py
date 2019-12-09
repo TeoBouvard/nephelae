@@ -11,7 +11,7 @@ from .models import tracker
 class GPSConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
-        scenario.database.add_gps_observer(self)
+        scenario.database.add_status_observer(self)
 
 
     # Receive message from WebSocket
@@ -22,13 +22,17 @@ class GPSConsumer(WebsocketConsumer):
 
 
     def disconnect(self, close_code):
-        scenario.database.remove_gps_observer(self)
+        scenario.database.remove_status_observer(self)
         self.channel_layer.group_discard
 
 
-    def add_gps(self, gps):
-        message = tracker.prettify_gps(gps)
-        self.send(json.dumps(message))
+    def add_status(self, status):
+        self.send(json.dumps({
+            'uav_id'  : status.aircraftId,
+            'heading' : status.heading,
+            'position': [status.lat, status.long, status.alt],
+            'speed'   : status.speed,
+            'time'    : status.position.t}))
 
 
 class SensorConsumer(WebsocketConsumer):
