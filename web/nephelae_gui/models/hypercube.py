@@ -128,13 +128,13 @@ def get_center_of_horizontal_slice(variable, time_value, altitude_value,
             list_y.append(coords[1])
     return {'list_x': list_x, 'list_y': list_y}
 
-# TODO
 def get_bounding_boxes_of_horizontal_slice(variable, time_value, altitude_value,
         x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
     x = compute_bounding_box(map0)
-    print(x)
-    return {}
+    list_bounds_x = [[boundaries[0].min, boundaries[0].max] for boundaries in x]
+    list_bounds_y = [[boundaries[1].min, boundaries[1].max] for boundaries in x]
+    return {'boundaries_x': list_bounds_x, 'boundaries_y': list_bounds_y}
 
 # To rework, the get_contour_of_horizontal_slice must use a contour object
 def get_contour_of_horizontal_slice(variable, time_value,

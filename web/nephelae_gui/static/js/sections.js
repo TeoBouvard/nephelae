@@ -198,6 +198,7 @@ function setupGUI(){
 }
 
 function updateData(){
+    layout['shapes'] = [];
     var query = $.param({
         at_time: parameters.time,
         variables: getSelectedElements(parameters.variables),
@@ -231,14 +232,14 @@ function updateData(){
             controller_collection['bounds_position_x'].updateDisplay();
             parameters.position_y = controller_collection['bounds_position_y'].__min;
             controller_collection['bounds_position_y'].updateDisplay();
-            updateStaticMapWithUAV(coordonnees[1], coordonnees[2]);
+            updateBoundedMapWithUAV(coordonnees[1], coordonnees[2]);
         });
     } else {
         updateStaticMap();
     }
 }
 
-function updateStaticMapWithUAV(coord_x, coord_y){
+function updateBoundedMapWithUAV(coord_x, coord_y){
     var query = doQuery();
     $.getJSON('map_section/?' + query, (response) => {
         var lay = createLayout(parameters.variable, response.data);
@@ -364,7 +365,21 @@ function drawContour(){
 function showBoxes(){
     var query = doQuery();
     $.getJSON('boxes_cloud/?' + query, (response) => {
-        console.log(response);
+        var lay = {};
+        lay['shapes'] = [];
+        for (var i = 0; i < response.boundaries_x.length; i++){
+            var shape = {
+                x0: response.boundaries_x[i][0],
+                y0: response.boundaries_y[i][0],
+                x1: response.boundaries_x[i][1],
+                y1: response.boundaries_y[i][1],
+                line: {
+                    color: 'rgba(50, 171, 96, 1)'
+                },
+            };
+            lay['shapes'].push(shape);
+        }
+        Plotly.relayout('chart', lay);
     });
 }
 
