@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from nephelae.mapping import compute_com, compute_cross_section_border
+from nephelae.mapping import compute_list_of_coms, compute_cross_section_border
 from nephelae.mapping import BorderIncertitude
 
 imcount = 0
@@ -119,12 +119,13 @@ def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None,
 def get_center_of_horizontal_slice(variable, time_value, altitude_value,
         x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
-    x = compute_com(map0)
-    if x is None:
-        res = {'data': (None, None)}
-    else:
-        res = {'data': (x[0], x[1])}
-    return res
+    x = compute_list_of_coms(map0)
+    list_x, list_y = [], []
+    for coords in x:
+        if x is not None:
+            list_x.append(coords[0])
+            list_y.append(coords[1])
+    return {'list_x': list_x, 'list_y': list_y}
 
 
 # To rework, the get_contour_of_horizontal_slice must use a contour object

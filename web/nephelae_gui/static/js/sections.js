@@ -310,8 +310,8 @@ function drawCenter(){
     var query = doQuery();
     $.getJSON('center_cloud/?' + query, (response) => {
         var center = {
-            x: [response.data[0]],
-            y: [response.data[1]],
+            x: response.list_x,
+            y: response.list_y,
             mode: 'markers',
             name: 'Cloud center',
             type: 'scatter'
