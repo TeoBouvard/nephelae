@@ -85,5 +85,5 @@ class StatusConsumer(WebsocketConsumer):
         self.channel_layer.group_discard
 
 
-    def notify_status(self, status):
+    def add_status(self, status):
         self.send(json.dumps(status.to_dict()))
