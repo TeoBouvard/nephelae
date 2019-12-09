@@ -36,58 +36,56 @@ def discover():
 # GPS time is *absolute*, but SAMPLE time is relative to navFrame
 def get_positions(uav_ids, trail_length, reality=True):
     
-    positions = dict()
+    positions = {}
 
     for uav_id in uav_ids:
 
-        messages = [entry.data for entry in db.find_entries(['GPS', str(uav_id)], (slice(-trail_length, None, -1), ), lambda entry: entry.data.stamp)]
+        messages = [entry.data for entry in \
+            db['STATUS', str(uav_id)](lambda x: x.data.position.t)[-trail_length:]]
 
         # Gather most recent information for display
         positions[uav_id] = {
-            'heading': messages[-1]['course'],
-            'speed': messages[-1]['speed'],
-            'time': messages[-1]['stamp'] - db.navFrame['stamp']
+            'heading': messages[-1].heading,
+            'speed': messages[-1].speed,
+            'time': messages[-1].position.t,
+            'path': []
         }
 
         for message in messages:
-            
             if reality:
-                position = utils.utm_to_latlon(message)
+                position = [message.lat, message.long, message.alt]
             else:
-                position = utils.compute_frame_position(message, nav_frame)
-            if 'path' not in positions[uav_id]:
-                positions[uav_id]['path'] = [position]
-            else:
-                positions[uav_id]['path'].append(position)
+                position = [message.position.x,
+                            message.position.y,
+                            message.position.z]
+            positions[uav_id]['path'].append(position)
+
     return dict(positions=positions)
-            
+
+
 def get_positions_uavs_map(uav_ids, trail_length):
 
-    positions = dict()
+    positions = {}
     for uav_id in uav_ids:
-        messages = [entry.data for entry in db.find_entries(
-            ['GPS', str(uav_id)], (slice(-trail_length, None, -1), ),
-            lambda entry: entry.data.stamp)]
+        messages = [entry.data for entry in \
+            db['STATUS', str(uav_id)](lambda x: x.data.position.t)[-trail_length:]]
 
         # Gather most recent information for display
         positions[uav_id] = {
-            'heading': messages[-1]['course'],
-            'speed': messages[-1]['speed'],
-            'time': messages[-1]['stamp'] - db.navFrame['stamp']
+            'heading': messages[-1].heading,
+            'speed'  : messages[-1].speed,
+            'time'   : messages[-1].position.t,
+            'path'   : [],
+            'times'  : []
         }
         for message in messages:
-            position = utils.utm_to_latlon(message)
-            if 'path' not in positions[uav_id]:
-                positions[uav_id]['path'] = [position]
-            else:
-                positions[uav_id]['path'].append(position)
-            if 'times' not in positions[uav_id]:
-                positions[uav_id]['times'] = [message['stamp'] -
-                        db.navFrame['stamp']]
-            else:
-                positions[uav_id]['times'].append(message['stamp'] -
-                        db.navFrame['stamp'])
+            positions[uav_id]['path'].append([message.lat,
+                                              message.long,
+                                              message.alt])
+            positions[uav_id]['times'].append(message.position.t)
+
     return dict(positions=positions)
+
 
 def get_data(uav_ids, variables, start, end=None, step=-1):
 
