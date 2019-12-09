@@ -130,6 +130,22 @@ function setupGUI(){
             .step(1)
             .name('Pos. Y axis')
             .onFinishChange(updateData);
+    
+        controller_collection['bounds_position_x'] = 
+            bounds_folder.add(parameters, 'position_x', parameters.default_min,
+            parameters.default_max)
+            .setValue(5000)
+            .step(1)
+            .name('Taille x')
+            .onFinishChange(updateData);
+    
+        controller_collection['bounds_position_y'] = 
+            bounds_folder.add(parameters, 'position_y', parameters.default_min,
+            parameters.default_max)
+            .setValue(5000)
+            .step(1)
+            .name('Taille y')
+            .onFinishChange(updateData);
         
         $.getJSON('/discover/', (response) => {
             x = Object.keys(response.uavs).concat('None')
@@ -207,6 +223,10 @@ function updateData(){
             controller_collection['altitude_bounds'].updateDisplay();
             parameters.time = coordonnees[0];
             controller_collection['time_bounds'].updateDisplay();
+            parameters.position_x = controller_collection['bounds_position_x'].__min;
+            controller_collection['bounds_position_x'].updateDisplay();
+            parameters.position_y = controller_collection['bounds_position_y'].__min;
+            controller_collection['bounds_position_y'].updateDisplay();
             updateStaticMapWithUAV(coordonnees[1], coordonnees[2]);
         });
     } else {
@@ -338,54 +358,26 @@ function drawContour(){
 }
 
 function doQuery(){
-    if (map_boundaries[parameters.map][0] != null){
-        if (parameters.scale) {
-            var query = $.param({
-                time: parameters.time,
-                altitude: parameters.altitude,
-                variable: parameters.map,
-                min_x: map_boundaries[parameters.map][0] - parameters.taille/2,
-                max_x: map_boundaries[parameters.map][1] + parameters.taille/2,
-                min_y: map_boundaries[parameters.map][2] - parameters.taille/2,
-                max_y: map_boundaries[parameters.map][3] + parameters.taille/2, 
-                });
-        } else {
-            var query = $.param({
-                time: parameters.time,
-                altitude: parameters.altitude,
-                variable: parameters.map,
-                min_x: map_boundaries[parameters.map][0] -
-                parameters.taille_x/2,
-                max_x: map_boundaries[parameters.map][1] +
-                parameters.taille_x/2,
-                min_y: map_boundaries[parameters.map][2] -
-                parameters.taille_y/2,
-                max_y: map_boundaries[parameters.map][3] +
-                parameters.taille_y/2, 
-              });
-        }
+    if (parameters.scale) {
+        var query = $.param({
+            time: parameters.time,
+            altitude: parameters.altitude,
+            variable: parameters.map,
+            min_x: parameters.position_x - parameters.taille/2,
+            max_x: parameters.position_x + parameters.taille/2,
+            min_y: parameters.position_y - parameters.taille/2,
+            max_y: parameters.position_y + parameters.taille/2,
+        });
     } else {
-        if (parameters.scale) {
-                var query = $.param({
-                time: parameters.time,
-                altitude: parameters.altitude,
-                variable: parameters.map,
-                min_x: parameters.position_x - parameters.taille/2,
-                max_x: parameters.position_x + parameters.taille/2,
-                min_y: parameters.position_y - parameters.taille/2,
-                max_y: parameters.position_y + parameters.taille/2,
-            });
-        } else {
-                var query = $.param({
-                time: parameters.time,
-                altitude: parameters.altitude,
-                variable: parameters.map,
-                min_x: parameters.position_x - parameters.taille_x/2,
-                max_x: parameters.position_x + parameters.taille_x/2,
-                min_y: parameters.position_y - parameters.taille_y/2,
-                max_y: parameters.position_y + parameters.taille_y/2,
-            });
-        }
+        var query = $.param({
+            time: parameters.time,
+            altitude: parameters.altitude,
+            variable: parameters.map,
+            min_x: parameters.position_x - parameters.taille_x/2,
+            max_x: parameters.position_x + parameters.taille_x/2,
+            min_y: parameters.position_y - parameters.taille_y/2,
+            max_y: parameters.position_y + parameters.taille_y/2,
+        });
     }
     return query
 }
@@ -410,6 +402,15 @@ function boundsChangement(f1, f2){
         controller_collection['taille_y'].max(map_boundaries[parameters.map][3] +
             Math.abs(map_boundaries[parameters.map][2]))
 
+        controller_collection['bounds_position_x'].min(
+            map_boundaries[parameters.map][0])
+        controller_collection['bounds_position_x'].max(
+            map_boundaries[parameters.map][1])
+        controller_collection['bounds_position_y'].min(
+            map_boundaries[parameters.map][2])
+        controller_collection['bounds_position_y'].max(
+            map_boundaries[parameters.map][3])
+
         controller_collection['taille'].max(Math.max(
             map_boundaries[parameters.map][1] +
             Math.abs(map_boundaries[parameters.map][0]),
@@ -431,6 +432,33 @@ function boundsChangement(f1, f2){
 
                 controller_collection['taille_y'].setValue(
                     map_boundaries[parameters.map][3])
+
+        if (controller_collection['bounds_position_x'].getValue() <
+            map_boundaries[parameters.map][0])
+
+                controller_collection['bounds_position_x'].setValue(
+                    map_boundaries[parameters.map][0])
+        
+        if (controller_collection['bounds_position_x'].getValue() >
+            map_boundaries[parameters.map][1])
+
+                controller_collection['bounds_position_x'].setValue(
+                    map_boundaries[parameters.map][1])
+        
+        if (controller_collection['bounds_position_y'].getValue() <
+            map_boundaries[parameters.map][2])
+
+                controller_collection['bounds_position_y'].setValue(
+                    map_boundaries[parameters.map][2])
+ 
+        if (controller_collection['bounds_position_y'].getValue() <
+            map_boundaries[parameters.map][3])
+
+                controller_collection['bounds_position_y'].setValue(
+                    map_boundaries[parameters.map][3])
+    
+        controller_collection['bounds_position_x'].updateDisplay()
+        controller_collection['bounds_position_y'].updateDisplay()
  
         parameters.using_sliders = true;
     } else {
