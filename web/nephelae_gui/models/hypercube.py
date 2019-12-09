@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 
 from nephelae.mapping import compute_list_of_coms, compute_cross_section_border
-from nephelae.mapping import BorderIncertitude
+from nephelae.mapping import BorderIncertitude, BorderRaw
 
 imcount = 0
 
@@ -132,24 +132,26 @@ def get_center_of_horizontal_slice(variable, time_value, altitude_value,
 def get_contour_of_horizontal_slice(variable, time_value,
         altitude_value, x0=None, x1=None, y0=None, y1=None):
     res = None
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
+        map0.data.shape[0])
+    y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
+        map0.data.shape[1])
     if variable+'_std' in maps.keys():
-        map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
         bdcloud = BorderIncertitude('LWC Bd', maps[variable],
         maps[variable+'_std'])
-        x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
-            map0.data.shape[0])
-        y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
-            map0.data.shape[1])
         borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
         res = {'inner_border': borders[0].data.T.tolist(),
                 'outer_border': borders[1].data.T.tolist(),
                 'x_axis': x_axis.tolist(),
                 'y_axis': y_axis.tolist()}
     else:
-        res = {'inner_border': [],
+        bdcloud = BorderRaw('LWC Bd', maps[variable])
+        borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
+        res = {'inner_border': borders.data.T.tolist(),
                 'outer_border': [],
-                'x_axis': [],
-                'y_axis': []}
+                'x_axis': x_axis.tolist(),
+                'y_axis': y_axis.tolist()}
     return res
 
 def get_wind(variable, u_time, u_altitude, bounds, origin):
