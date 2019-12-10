@@ -50,8 +50,13 @@ function setupGUI(){
     // Construct dat.gui
     var gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
+    
+    // Set up listener (Is there a good way to do that ????)
+    Plotly.react('chart', []);
+    var chart = document.getElementById('chart');
+    chart.on('plotly_click', showVolume);
 
-    // Wwait for every ajax call to finish
+    // Wait for every ajax call to finish
     var f1 = gui.addFolder('Pixels');
     var f2 = gui.addFolder('Pixels (Scaled)');
     
@@ -380,6 +385,18 @@ function showBoxes(){
             lay['shapes'].push(shape);
         }
         Plotly.relayout('chart', lay);
+    });
+}
+
+function showVolume(data){
+    var query = doQuery();
+    var query2 = $.param({
+        c1: data.points[0].x,
+        c2: data.points[0].y,
+    });
+    query += '&' + query2;
+    $.getJSON('click_volume_cloud/?' + query, (response) => {
+        console.log(response);
     });
 }
 

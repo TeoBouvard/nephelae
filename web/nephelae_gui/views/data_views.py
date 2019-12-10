@@ -54,6 +54,20 @@ def get_bounding_boxes_of_horizontal_slice(request):
             variable, time_value, altitude_value,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
 
+def get_volume_of_selected_cloud(request):
+    time_value = float(request.GET.get('time'))
+    altitude_value = float(request.GET.get('altitude'))
+    variable = request.GET.get('variable')
+    min_x = float(request.GET.get('min_x'))
+    max_x = float(request.GET.get('max_x'))
+    min_y = float(request.GET.get('min_y'))
+    max_y = float(request.GET.get('max_y'))
+    c1 = float(request.GET.get('c1'))
+    c2 = float(request.GET.get('c2'))
+    return JsonResponse(data = hypercube.get_volume_of_selected_cloud(
+            variable, time_value, altitude_value, c1, c2,
+            x0=min_x, x1=max_x, y0=min_y, y1=max_y))
+
 # Update UAV fleet positions
 def get_positions(request):
 

@@ -11,6 +11,7 @@ from PIL import Image
 
 from nephelae.mapping import compute_list_of_coms, compute_cross_section_border
 from nephelae.mapping import compute_bounding_box
+from nephelae.mapping import compute_selected_element_volume
 from nephelae.mapping import BorderIncertitude, BorderRaw
 
 imcount = 0
@@ -136,7 +137,13 @@ def get_bounding_boxes_of_horizontal_slice(variable, time_value, altitude_value,
     list_bounds_y = [[boundaries[1].min, boundaries[1].max] for boundaries in x]
     return {'boundaries_x': list_bounds_x, 'boundaries_y': list_bounds_y}
 
-# To rework, the get_contour_of_horizontal_slice must use a contour object
+def get_volume_of_selected_cloud(variable, time_value, altitude_value, c1, c2,
+        x0=None, x1=None, y0=None, y1=None):
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    coords = map0.dimHelper.to_index((c1, c2))
+    res = compute_selected_element_volume(coords, map0)
+    return {'data': res}
+
 def get_contour_of_horizontal_slice(variable, time_value,
         altitude_value, x0=None, x1=None, y0=None, y1=None):
     res = None
