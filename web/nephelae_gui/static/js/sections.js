@@ -203,7 +203,7 @@ function setupGUI(){
 }
 
 function updateData(){
-    layout['shapes'] = [];
+    clearLayout();
     var query = $.param({
         at_time: parameters.time,
         variables: getSelectedElements(parameters.variables),
@@ -396,7 +396,21 @@ function showVolume(data){
     });
     query += '&' + query2;
     $.getJSON('click_volume_cloud/?' + query, (response) => {
-        console.log(response);
+        if (response.data != null){
+            var lay = {};
+            lay['annotations'] = []
+            annotation = {
+                text: 'Volume du nuage :' + response.data.toString(),
+                x: data.points[0].x,
+                y: data.points[0].y,
+                font: {
+                    color: '#ffffff'
+                },
+                arrowcolor: '#ffffff'
+            };
+            lay['annotations'].push(annotation)
+            Plotly.relayout('chart', lay);
+        }
     });
 }
 
@@ -523,4 +537,9 @@ function boundsChangement(f1, f2){
     }
     controller_collection['taille_x'].updateDisplay()
     controller_collection['taille_y'].updateDisplay()
+}
+
+function clearLayout(){
+    layout['shapes'] = [];
+    layout['annotations'] = [];
 }
