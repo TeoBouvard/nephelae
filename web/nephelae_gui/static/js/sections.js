@@ -404,9 +404,9 @@ function showVolume(data){
                 x: data.points[0].x,
                 y: data.points[0].y,
                 font: {
-                    color: '#ffffff'
+                    color: '#ff0000'
                 },
-                arrowcolor: '#ffffff'
+                arrowcolor: '#ff0000'
             };
             lay['annotations'].push(annotation)
             Plotly.relayout('chart', lay);
@@ -516,7 +516,9 @@ function boundsChangement(f1, f2){
     
         controller_collection['bounds_position_x'].updateDisplay()
         controller_collection['bounds_position_y'].updateDisplay()
- 
+        controller_collection['altitude_bounds'].updateDisplay()
+        controller_collection['time_bounds'].updateDisplay()
+
         parameters.using_sliders = true;
     } else {
         controller_collection['taille_x'].max(parameters.default_max)
@@ -531,7 +533,12 @@ function boundsChangement(f1, f2){
         
         if (controller_collection['taille'].getValue() > parameters.default_max)
             controller_collection['taille'].setValue(parameters.default_max)
-
+        
+        controller_collection['position_x'].updateDisplay()
+        controller_collection['position_y'].updateDisplay()
+        controller_collection['altitude'].updateDisplay()
+        controller_collection['time'].updateDisplay()
+        
         fieldsBehavior(false, f1, f2);
         parameters.using_sliders = false;
     }
