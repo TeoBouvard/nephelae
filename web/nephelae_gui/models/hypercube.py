@@ -14,13 +14,17 @@ from nephelae.mapping import compute_bounding_box
 from nephelae.mapping import compute_selected_element_volume
 from nephelae.mapping import BorderIncertitude, BorderRaw
 
+from nephelae.database import CloudData
+
 imcount = 0
 
 from . import utils
 from . import common
 
-maps      = common.scenario.maps
-hypercube = common.scenario.mesonhDataset
+maps           = common.scenario.maps
+hypercube      = common.scenario.mesonhDataset
+websockets_ids = common.websockets_ids
+
 
 def discover_maps():
     res = {}
@@ -36,9 +40,8 @@ def discover_maps():
     print(res)
     return res
 
-
-def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
-    
+def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
+        bounds, origin, thermals_cmap, clouds_cmap, transparent):
     # Converting lower left corner and upper right corner from (lat,lon) to utm
     utmBounds = [from_latlon(latitude=bounds['south'], longitude=bounds['west']),
                  from_latlon(latitude=bounds['north'], longitude=bounds['east'])]
@@ -65,7 +68,14 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
     
     if "LWC" in variable_name:
         t0 = time.time()
-    h_slice = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude].data.squeeze().T
+    map0 = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude]
+
+    if id_client in websockets_ids:
+        websockets_ids[id_client].send_cloud_data(variable_name,
+                CloudData.from_scaledArray(map0))
+    h_slice = map0.data.squeeze().T
+
+
     if "LWC" in variable_name:
         print("Ellapsed time :", time.time() - t0)
     rng     = maps[variable_name].range()
@@ -216,3 +226,11 @@ def box():
         {'min': dims[2]['data'][0], 'max':dims[2]['data'][-1]}]
     return box
 
+def prettify_cloud_data(variable, dataCloud):
+    bounding_box = dataCloud.get_bounding_box()
+    return dict(
+        variable_name=variable,
+        center_of_mass=dataCloud.get_com(),
+        surface=dataCloud.get_surface(),
+        box=[(x.min, x.max) for x in bounding_box],
+    )

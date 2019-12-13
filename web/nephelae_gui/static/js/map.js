@@ -5,6 +5,8 @@ var flight_map, zoom_home, overlays, location_popup;
 var uavs_overlay;
 var maps_parameters;
 
+const id = Date.now()
+
 /*
     fleet     : { uav_id : value_dict }
     value_dict : { 
@@ -14,7 +16,7 @@ var maps_parameters;
         heading       :   float,
         path          :   L.Polyline,
     }
-    */
+*/
 
 var fleet = {};
 var bounds;
@@ -27,9 +29,10 @@ var parameters = {
     transparent: true,
     tracked_uav: 'None',
     socket_uavs: null,
+    socket_datacloud: null,
     time: null,
     update_wind: updateWindData,
-
+    display_data: true,
     origin: null,
     flight_area: null
 }
@@ -74,12 +77,15 @@ function setupGUI(){
         f2.add(parameters, 'transparent').name('Transparent');
 
         gui.add(parameters, 'tracked_uav', tracked_uav_choices);
-
+        
+        gui.add(parameters, 'display_data').name('Cloud data')
+            .onChange(setSocketData);
+        
+        setSocketData();
         // Create map once sliders are initialized
         setupMap();
     });
 }
-
 
 function setupMap(){
 
@@ -213,7 +219,7 @@ function displayUavs(){
     $.getJSON('/discover/', (response) => {
 
         parameters.origin = response.origin;
-        parameters.uavs   = response.uavs
+        parameters.uavs   = response.uavs;
         var uav_ids = []
         for (var id in response.uavs)
             uav_ids.push(id);
@@ -415,6 +421,7 @@ function computeMapUrl(){
         thermals_cmap: parameters.thermals_cmap,
         clouds_cmap: parameters.clouds_cmap,
         transparent: parameters.transparent,
+        id: id,
     });
     return query;
 }
@@ -457,7 +464,7 @@ function infosToString(uav){
     infos += 'Altitude : ' + uav.altitude.toFixed(1) + 'm<br> ';
     infos += 'Heading : ' + uav.heading.toFixed(0) + '° <br> ';
     infos += 'Speed : ' + uav.speed.toFixed(1) + ' m/s <br><br>';
-    infos += '<a onClick="track(' + uav.id + ');" class="btn"><span class="white-text"><b>Sync MesoNH</b></span></a></p>'
+    infos += '<a onClick="track(' + uav.id + ');" class="btn"><span class="white-text"><b>Follow UAV</b></span></a></p>'
 
     return infos;
 }
@@ -493,3 +500,17 @@ function click_display_location(e) {
     });
 }
 
+function showCloudData(message){
+    console.log(message)
+}
+
+function setSocketData(){
+    if (!parameters.socket_datacloud && parameters.display_data){
+        parameters.socket = new WebSocket('ws://' + 
+            window.location.host + '/ws/sensor/cloud_data/' + id + '/');
+        parameters.socket.onmessage = (e) => showCloudData(JSON.parse(e.data));
+    } else if (parameters.socket && !parameters.display_data){
+        parameters.socket.close();
+        parameters.socket = null;
+    }
+}
