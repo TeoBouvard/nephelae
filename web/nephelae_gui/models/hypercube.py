@@ -226,10 +226,9 @@ def box():
         {'min': dims[2]['data'][0], 'max':dims[2]['data'][-1]}]
     return box
 
-def prettify_cloud_data(variable, dataCloud):
+def prettify_cloud_data(dataCloud):
     bounding_box = dataCloud.get_bounding_box()
     return dict(
-        variable_name=variable,
         center_of_mass=dataCloud.get_com(),
         surface=dataCloud.get_surface(),
         box=[(x.min, x.max) for x in bounding_box],

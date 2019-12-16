@@ -5,6 +5,7 @@ var flight_map, zoom_home, overlays, location_popup;
 var uavs_overlay;
 var maps_parameters;
 
+var marker_collection = {}
 const id = Date.now()
 
 /*
@@ -373,6 +374,7 @@ function controller_callbackLoad(){
             updateMapsUrl(maps_parameters[key]);
         } else {
             overlays[maps_parameters[key]['name']].off('load');
+            clearMarkers(key);
         }
     }
 }
@@ -486,7 +488,7 @@ function track(id){
 function click_display_location(e) {
     ////alert("You clicked the map at " + e.latlng);
     //latlon_to_local(e.latlng);
-
+    // console.log(e);
     var query = $.param({
         lat: e.latlng.lat,
         lon: e.latlng.lng
@@ -501,7 +503,30 @@ function click_display_location(e) {
 }
 
 function showCloudData(message){
-    console.log(message)
+    var variable = Object.keys(message)
+    clearMarkers(variable);
+    for (data in message[variable]){
+        var query = $.param({
+            utm_east: message[variable][data].center_of_mass[0],
+            utm_north: message[variable][data].center_of_mass[1],
+        });
+        $.getJSON('/local_to_latlon/?' + query, (latlon) => {
+            if(flight_map.hasLayer(
+                overlays[maps_parameters[variable]['name']])){
+                    marker = L.marker([latlon.x, latlon.y]);
+                    marker_collection[variable].push(marker);
+                    marker.addTo(flight_map);
+            }
+        });
+    }
+}
+
+function clearMarkers(variable_name){
+    if (variable_name in marker_collection)
+        for (var i = 0; i < marker_collection[variable_name].length; i++)
+            flight_map.removeLayer(marker_collection[variable_name][i]);
+
+    marker_collection[variable_name] = []
 }
 
 function setSocketData(){
@@ -512,5 +537,7 @@ function setSocketData(){
     } else if (parameters.socket && !parameters.display_data){
         parameters.socket.close();
         parameters.socket = null;
+        for (key in maps_parameters)
+            clearMarkers(key);
     }
 }

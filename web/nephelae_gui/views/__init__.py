@@ -10,6 +10,7 @@ try:
     from .data_views import get_state_at_time
     from .data_views import get_positions_uavs_map
     from .data_views import latlon_to_local
+    from .data_views import local_to_latlon
     from .data_views import get_center_of_horizontal_slice
     from .data_views import get_contour_of_horizontal_slice
     from .data_views import get_bounding_boxes_of_horizontal_slice

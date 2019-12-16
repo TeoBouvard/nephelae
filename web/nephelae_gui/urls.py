@@ -66,7 +66,8 @@ urlpatterns = [
     path('missions/mission_parameters/<str:mission_type>', views.get_mission_parameters),
 
 
-    path('latlon_to_local/', views.latlon_to_local)
+    path('latlon_to_local/', views.latlon_to_local),
+    path('local_to_latlon/', views.local_to_latlon)
 ]
 
 

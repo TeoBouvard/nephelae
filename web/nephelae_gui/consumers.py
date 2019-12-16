@@ -110,7 +110,8 @@ class CloudDataConsumer(WebsocketConsumer):
         print("Id Client " + self.id_client + " disconnected")
 
     def send_cloud_data(self, variable, cloudsData):
-        res = []
+        res = {}
+        res[variable] = []
         for i in range(len(cloudsData)):
-            res.append(hypercube.prettify_cloud_data(variable , cloudsData[i]))
+            res[variable].append(hypercube.prettify_cloud_data(cloudsData[i]))
         self.send(json.dumps(res))

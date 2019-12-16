@@ -5,8 +5,7 @@ from nephelae_gui.models import hypercube, tracker
 from nephelae_gui.models.common import scenario
 from nephelae_paparazzi.missions import MissionBuilder
 
-from utm import from_latlon
-
+from utm import from_latlon, to_latlon
 
 # Returns discovered UAVs and navigation frame info
 def discover(request):
@@ -176,3 +175,12 @@ def latlon_to_local(request):
     utm = from_latlon(float(query['lat']), float(query['lon']))
     return JsonResponse({'x' : utm[0] - scenario.localFrame.utm_east,
                          'y' : utm[1] - scenario.localFrame.utm_north})
+
+def local_to_latlon(request):
+    query = request.GET
+    latlon = to_latlon(
+            float(query['utm_east']) + scenario.localFrame.utm_east,
+            float(query['utm_north']) + scenario.localFrame.utm_north,
+            31, 'N')
+    return JsonResponse({'x': latlon[0],
+                         'y': latlon[1]})
