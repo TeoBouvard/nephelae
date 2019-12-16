@@ -160,7 +160,7 @@ function setupMap(){
         maps_parameters  = discovered_maps;
         for (var key in maps_parameters) {
             if (maps_parameters[key]['sample_size'] == 1) {
-                bounds = setBounds();
+                bounds = getCurrentBounds();
                 overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), bounds);
             }
             if (maps_parameters[key]['sample_size'] == 2) {
@@ -191,7 +191,10 @@ function setupMap(){
 
         //tiles_overlay_IGN.addTo(flight_map);
         tiles_overlay_dark.addTo(flight_map);
-        L.control.scale().addTo(flight_map);
+        L.control.scale({
+            maxWidth: 100,
+            imperial: false}
+        ).addTo(flight_map);
         L.marker(parameters.origin)
             .bindTooltip("Origin", {permanent: true, direction: 'right'})
             .addTo(flight_map);
@@ -428,7 +431,7 @@ function computeMapUrl(){
     return query;
 }
 
-function setBounds(){
+function getCurrentBounds(){
     var screen_bounds = flight_map.getBounds();
     var south_bound, east_bound, west_bound, north_bound;
     var flight_area = parameters.flight_area
@@ -472,7 +475,7 @@ function infosToString(uav){
 }
 
 function updateLayerBounds(){
-    bounds = setBounds();
+    bounds = getCurrentBounds();
     for(var key in maps_parameters) {
         if(maps_parameters[key]['sample_size'] == 1)
             overlays[maps_parameters[key]['name']].setBounds(bounds);
