@@ -103,7 +103,8 @@ def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
     
     # rFactor = 4
     minRes = 1080.0
-    rFactor = int(max(minRes / min(h_slice.shape), 1))
+    rFactor = (int(max(minRes / min(h_slice.shape), 1))
+        if min(h_slice.shape) != 0 else 1)
 
     img = Image.fromarray(h_slice)
     h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.BICUBIC))

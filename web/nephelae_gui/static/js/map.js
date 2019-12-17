@@ -516,7 +516,7 @@ function showCloudData(message){
         $.getJSON('/local_to_latlon/?' + query, (latlon) => {
             if(flight_map.hasLayer(
                 overlays[maps_parameters[variable]['name']])){
-                    marker = L.marker([latlon.x, latlon.y]);
+                    marker = L.circleMarker([latlon.x, latlon.y]);
                     marker_collection[variable].push(marker);
                     marker.addTo(flight_map);
             }
