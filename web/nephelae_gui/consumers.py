@@ -109,7 +109,7 @@ class CloudDataConsumer(WebsocketConsumer):
         self.channel_layer.group_discard
         print("Id Client " + self.id_client + " disconnected")
 
-    def send_cloud_data(self, variable, cloudsData):
+    def send_cloud_data(self, variable, cloudsData, border):
         res = {}
         res[variable] = []
         for i in range(len(cloudsData)):

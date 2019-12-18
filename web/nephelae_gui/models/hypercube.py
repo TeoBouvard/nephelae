@@ -71,8 +71,15 @@ def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
     map0 = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude]
 
     if id_client in websockets_ids:
+
+        if variable_name+'_std' in maps.keys():
+            bdcloud = BorderIncertitude('LWC Bd', maps[variable_name],
+                    maps[variable_name+'_std'])
+        else:
+            bdcloud = BorderRaw('Bd', maps[variable_name])
+        border = bdcloud[u_time, x0:x1, y0:y1, u_altitude]
         websockets_ids[id_client].send_cloud_data(variable_name,
-                CloudData.from_scaledArray(map0))
+            CloudData.from_scaledArray(map0), border)
     h_slice = map0.data.squeeze().T
 
 
