@@ -181,6 +181,6 @@ def local_to_latlon(request):
     latlon = to_latlon(
             float(query['utm_east']) + scenario.localFrame.utm_east,
             float(query['utm_north']) + scenario.localFrame.utm_north,
-            31, 'N')
+            scenario.localFrame.utm_zone, scenario.localFrame.utm_letter)
     return JsonResponse({'x': latlon[0],
                          'y': latlon[1]})

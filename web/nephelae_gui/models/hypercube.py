@@ -4,7 +4,7 @@ import os
 import sys
 import time
 
-from utm import from_latlon
+from utm import from_latlon, to_latlon
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
@@ -24,7 +24,7 @@ from . import common
 maps           = common.scenario.maps
 hypercube      = common.scenario.mesonhDataset
 websockets_ids = common.websockets_ids
-
+localFrame     = common.scenario.localFrame
 
 def discover_maps():
     res = {}
@@ -229,8 +229,20 @@ def box():
 
 def prettify_cloud_data(dataCloud):
     bounding_box = dataCloud.get_bounding_box()
+    south_west = tuple(x.min for x in bounding_box)
+    north_east = tuple(x.max for x in bounding_box)
     return dict(
         center_of_mass=dataCloud.get_com(),
+        center_of_mass_latlon=to_latlon(dataCloud.get_com()[0] +
+            localFrame.utm_east, dataCloud.get_com()[1] +
+            localFrame.utm_north, localFrame.utm_zone,
+            localFrame.utm_letter),
         surface=dataCloud.get_surface(),
-        box=[(x.min, x.max) for x in bounding_box],
+        box=[north_east, south_west],
+        box_latlon=[to_latlon(north_east[0] + localFrame.utm_east,
+                        north_east[1] + localFrame.utm_north,
+                        localFrame.utm_zone, localFrame.utm_letter),
+                    to_latlon(south_west[0] + localFrame.utm_east,
+                        south_west[1] + localFrame.utm_north, 
+                        localFrame.utm_zone, localFrame.utm_letter)]
     )

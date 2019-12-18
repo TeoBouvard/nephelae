@@ -506,22 +506,19 @@ function click_display_location(e) {
 }
 
 function showCloudData(message){
-    var variable = Object.keys(message)
+    var variable = Object.keys(message);
     clearMarkers(variable);
     for (data in message[variable]){
-        var query = $.param({
-            utm_east: message[variable][data].center_of_mass[0],
-            utm_north: message[variable][data].center_of_mass[1],
-        });
-        $.getJSON('/local_to_latlon/?' + query, (latlon) => {
-            if(flight_map.hasLayer(
-                overlays[maps_parameters[variable]['name']])){
-                    marker = L.circleMarker([latlon.x, latlon.y]);
-                    marker_collection[variable].push(marker);
-                    marker.addTo(flight_map);
-            }
-        });
+        marker = L.circleMarker([message[variable][data]
+            .center_of_mass_latlon[0], message[variable][data]
+            .center_of_mass_latlon[1]]).addTo(flight_map);
+        marker_collection[variable].push(marker);
     }
+}
+
+function clickOnMarker(e){
+    popup = L.popup().setLatLng(e.latlng).setContent('Ceci est un test');
+    flight_map.addLayer(popup);
 }
 
 function clearMarkers(variable_name){
