@@ -6,6 +6,7 @@ var uavs_overlay;
 var maps_parameters;
 
 var marker_collection = {}
+var box_collection = {}
 const id = Date.now()
 
 /*
@@ -512,7 +513,14 @@ function showCloudData(message){
         marker = L.circleMarker([message[variable][data]
             .center_of_mass_latlon[0], message[variable][data]
             .center_of_mass_latlon[1]]).addTo(flight_map);
+        box = L.rectangle([[message[variable][data].box_latlon[0][0],
+                            message[variable][data].box_latlon[1][1]],
+                            [message[variable][data].box_latlon[1][0],
+                            message[variable][data].box_latlon[0][1]]],
+            {color: '#FF0000'})
+            .addTo(flight_map);
         marker_collection[variable].push(marker);
+        box_collection[variable].push(box);
     }
 }
 
@@ -525,8 +533,12 @@ function clearMarkers(variable_name){
     if (variable_name in marker_collection)
         for (var i = 0; i < marker_collection[variable_name].length; i++)
             flight_map.removeLayer(marker_collection[variable_name][i]);
+    if (variable_name in box_collection)
+        for (var i = 0; i < box_collection[variable_name].length; i++)
+            flight_map.removeLayer(box_collection[variable_name][i]);
 
     marker_collection[variable_name] = []
+    box_collection[variable_name] = []
 }
 
 function setSocketData(){
