@@ -5,8 +5,10 @@ var flight_map, zoom_home, overlays, location_popup;
 var uavs_overlay;
 var maps_parameters;
 
-var marker_collection = {}
-var box_collection = {}
+var marker_collection = {};
+var box_collection = {};
+var loaded_map = {};
+
 const id = Date.now()
 
 /*
@@ -174,7 +176,7 @@ function setupMap(){
                     maxVelocity: 15
                 });
             }
-            maps_parameters[key]['lambda'] = closure_function(maps_parameters[key]);
+            maps_parameters[key]['lambda'] = closure_function(key);
         }
 
         // Add layers to the map
@@ -214,9 +216,27 @@ function setupMap(){
 // This function only exists to prevent closure problems in loop
 // If anyone has a better solution, please help me
 function closure_function(map){
+    loaded_map[map] = false;
     return function(){
-        updateMapsUrl(map);
+        waitForAllMaps(map);
     };
+}
+
+function waitForAllMaps(map){
+    loaded_map[map] = true;
+    var list_keys = Object.keys(loaded_map);
+    var i = 0;
+    var check = true;
+    while(check && i < list_keys.length){
+        check = loaded_map[list_keys[i]];
+        i += 1;
+    }
+    if (check){
+        updateMapsUrl(list_keys);
+        for(var j =0; j < list_keys.length; j++){
+            loaded_map[list_keys[j]] = false;
+        }
+    }
 }
 
 function displayUavs(){
@@ -374,22 +394,40 @@ function controller_callbackLoad(){
     for(var key in maps_parameters){
         // checks if map if currently displayed
         if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
+            loaded_map[key] = false;
             overlays[maps_parameters[key]['name']].on('load', maps_parameters[key]['lambda'])
-            updateMapsUrl(maps_parameters[key]);
+            loadMap(key);
         } else {
             overlays[maps_parameters[key]['name']].off('load');
+            delete loaded_map[key];
             clearMarkers(key);
         }
     }
 }
 
-function updateMapsUrl(map){
-    if(map['sample_size'] == 1)
-        overlays[map['name']].setUrl(map['url'] + '_img/?' + computeMapUrl());
-    else {
-        $.getJSON('wind/?' + computeMapUrl(), (response) => {
-            overlays[map['name']].setData(response);
-        });
+function loadMap(key){
+    if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
+            if(maps_parameters[key]['sample_size'] == 1)
+                overlays[maps_parameters[key]['name']].setUrl(
+                    maps_parameters[key]['url'] + '_img/?' + computeMapUrl());
+            else
+                $.getJSON('wind/?' + computeMapUrl(), (response) => {
+                    overlays[maps_parameters[key]['name']].setData(response);
+                });
+    }
+}
+
+function updateMapsUrl(list_keys){
+    for(var key of list_keys){
+        if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
+            if(maps_parameters[key]['sample_size'] == 1)
+                overlays[maps_parameters[key]['name']].setUrl(
+                    maps_parameters[key]['url'] + '_img/?' + computeMapUrl());
+            else
+                $.getJSON('wind/?' + computeMapUrl(), (response) => {
+                    overlays[maps_parameters[key]['name']].setData(response);
+                });
+        }
     }
 }
 
