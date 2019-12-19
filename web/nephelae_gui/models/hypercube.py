@@ -68,19 +68,18 @@ def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
     
     if "LWC" in variable_name:
         t0 = time.time()
+
     map0 = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude]
 
-    if id_client in websockets_ids:
-
-        if variable_name+'_std' in maps.keys():
-            bdcloud = BorderIncertitude('LWC Bd', maps[variable_name],
-                    maps[variable_name+'_std'])
-        else:
-            bdcloud = BorderRaw('Bd', maps[variable_name])
-        border = bdcloud[u_time, x0:x1, y0:y1, u_altitude]
+    if id_client in websockets_ids and not "_border" in variable_name:
         websockets_ids[id_client].send_cloud_data(variable_name,
-            CloudData.from_scaledArray(map0), border)
-    h_slice = map0.data.squeeze().T
+            CloudData.from_scaledArray(map0))
+
+    if isinstance(map0, tuple) and "_border" in variable_name:
+        h_slice_data = map0[0].data + map0[1].data
+        h_slice = h_slice_data.squeeze().T
+    else:
+        h_slice = map0.data.squeeze().T
 
 
     if "LWC" in variable_name:
