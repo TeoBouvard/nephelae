@@ -4,7 +4,9 @@ from channels.generic.websocket import WebsocketConsumer
 
 from .models.common import scenario
 
-from .models import tracker
+from .models.common import websockets_ids
+
+from .models import tracker, hypercube
 
 # propably some names to change in here
 
@@ -91,3 +93,29 @@ class StatusConsumer(WebsocketConsumer):
 
     def add_status(self, status):
         self.send(json.dumps(status.to_dict()))
+
+class CloudDataConsumer(WebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.id_client = args[0]['url_route']['kwargs']['id_client']
+
+    def connect(self):
+        self.accept()
+        websockets_ids[self.id_client] = self
+
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        print(message)
+
+    def disconnect(self, close_code):
+        del websockets_ids[self.id_client]
+        self.channel_layer.group_discard
+        print("Id Client " + self.id_client + " disconnected")
+
+    def send_cloud_data(self, variable, cloudsData):
+        res = {}
+        res[variable] = []
+        for i in range(len(cloudsData)):
+            res[variable].append(hypercube.prettify_cloud_data(cloudsData[i]))
+        self.send(json.dumps(res))

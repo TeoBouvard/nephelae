@@ -8,6 +8,8 @@ try:
     scenario.load()
     scenario.start()
 
+    websockets_ids = {}
+    clouds_ids = {}
 
     # Legacy variables. To remove when conversion to scenario is completed
     db = scenario.database

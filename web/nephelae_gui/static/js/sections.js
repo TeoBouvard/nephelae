@@ -31,6 +31,7 @@ var parameters = {
     scale: false,
     center_fun: drawCenter,
     contour_fun: drawContour,
+    boxes_fun: showBoxes,
     using_sliders: false
 }
 
@@ -49,8 +50,13 @@ function setupGUI(){
     // Construct dat.gui
     var gui = new dat.GUI({ autoplace: false });
     $('#gui_container').append(gui.domElement);
+    
+    // Set up listener (Is there a good way to do that ????)
+    Plotly.react('chart', []);
+    var chart = document.getElementById('chart');
+    chart.on('plotly_click', showVolume);
 
-    // Wwait for every ajax call to finish
+    // Wait for every ajax call to finish
     var f1 = gui.addFolder('Pixels');
     var f2 = gui.addFolder('Pixels (Scaled)');
     
@@ -86,6 +92,9 @@ function setupGUI(){
 
     gui.add(parameters, 'contour_fun')
         .name('Draw contour');
+    
+    gui.add(parameters, 'boxes_fun')
+        .name('Show bounds');
 
     $.getJSON('mesonh_dims/', (response) => {
         // Setup GUI
@@ -170,10 +179,14 @@ function setupGUI(){
                     parameters['variables'][vari] = true;
             };
             $.getJSON('/discover_maps/', (response) => {
+                list_map = [];
                 for (var map in response){
-                    map_boundaries[map] = response[map]['range']
+                    if(!map.endsWith('_border')){
+                        map_boundaries[map] = response[map]['range'];
+                        list_map.push(map);
+                    }
                 }
-                gui.add(parameters, 'map', Object.keys(response))
+                gui.add(parameters, 'map', list_map)
                     .setValue(Object.keys(response)[0])
                     .name('Map')
                     .onChange(function(){
@@ -194,6 +207,7 @@ function setupGUI(){
 }
 
 function updateData(){
+    clearLayout();
     var query = $.param({
         at_time: parameters.time,
         variables: getSelectedElements(parameters.variables),
@@ -227,14 +241,14 @@ function updateData(){
             controller_collection['bounds_position_x'].updateDisplay();
             parameters.position_y = controller_collection['bounds_position_y'].__min;
             controller_collection['bounds_position_y'].updateDisplay();
-            updateStaticMapWithUAV(coordonnees[1], coordonnees[2]);
+            updateBoundedMapWithUAV(coordonnees[1], coordonnees[2]);
         });
     } else {
         updateStaticMap();
     }
 }
 
-function updateStaticMapWithUAV(coord_x, coord_y){
+function updateBoundedMapWithUAV(coord_x, coord_y){
     var query = doQuery();
     $.getJSON('map_section/?' + query, (response) => {
         var lay = createLayout(parameters.variable, response.data);
@@ -310,8 +324,8 @@ function drawCenter(){
     var query = doQuery();
     $.getJSON('center_cloud/?' + query, (response) => {
         var center = {
-            x: [response.data[0]],
-            y: [response.data[1]],
+            x: response.list_x,
+            y: response.list_y,
             mode: 'markers',
             name: 'Cloud center',
             type: 'scatter'
@@ -354,6 +368,53 @@ function drawContour(){
         };
         data = [in_contour, out_contour];
         Plotly.addTraces('chart', data);
+    });
+}
+
+function showBoxes(){
+    var query = doQuery();
+    $.getJSON('boxes_cloud/?' + query, (response) => {
+        var lay = {};
+        lay['shapes'] = [];
+        for (var i = 0; i < response.boundaries_x.length; i++){
+            var shape = {
+                x0: response.boundaries_x[i][0],
+                y0: response.boundaries_y[i][0],
+                x1: response.boundaries_x[i][1],
+                y1: response.boundaries_y[i][1],
+                line: {
+                    color: 'rgba(50, 171, 96, 1)'
+                },
+            };
+            lay['shapes'].push(shape);
+        }
+        Plotly.relayout('chart', lay);
+    });
+}
+
+function showVolume(data){
+    var query = doQuery();
+    var query2 = $.param({
+        c1: data.points[0].x,
+        c2: data.points[0].y,
+    });
+    query += '&' + query2;
+    $.getJSON('click_volume_cloud/?' + query, (response) => {
+        if (response.data != null){
+            var lay = {};
+            lay['annotations'] = []
+            annotation = {
+                text: 'Volume du nuage :' + response.data.toString(),
+                x: data.points[0].x,
+                y: data.points[0].y,
+                font: {
+                    color: '#ff0000'
+                },
+                arrowcolor: '#ff0000'
+            };
+            lay['annotations'].push(annotation)
+            Plotly.relayout('chart', lay);
+        }
     });
 }
 
@@ -459,7 +520,9 @@ function boundsChangement(f1, f2){
     
         controller_collection['bounds_position_x'].updateDisplay()
         controller_collection['bounds_position_y'].updateDisplay()
- 
+        controller_collection['altitude_bounds'].updateDisplay()
+        controller_collection['time_bounds'].updateDisplay()
+
         parameters.using_sliders = true;
     } else {
         controller_collection['taille_x'].max(parameters.default_max)
@@ -474,10 +537,20 @@ function boundsChangement(f1, f2){
         
         if (controller_collection['taille'].getValue() > parameters.default_max)
             controller_collection['taille'].setValue(parameters.default_max)
-
+        
+        controller_collection['position_x'].updateDisplay()
+        controller_collection['position_y'].updateDisplay()
+        controller_collection['altitude'].updateDisplay()
+        controller_collection['time'].updateDisplay()
+        
         fieldsBehavior(false, f1, f2);
         parameters.using_sliders = false;
     }
     controller_collection['taille_x'].updateDisplay()
     controller_collection['taille_y'].updateDisplay()
+}
+
+function clearLayout(){
+    layout['shapes'] = [];
+    layout['annotations'] = [];
 }

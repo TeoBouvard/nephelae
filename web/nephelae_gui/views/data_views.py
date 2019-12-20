@@ -5,8 +5,7 @@ from nephelae_gui.models import hypercube, tracker
 from nephelae_gui.models.common import scenario
 from nephelae_paparazzi.missions import MissionBuilder
 
-from utm import from_latlon
-
+from utm import from_latlon, to_latlon
 
 # Returns discovered UAVs and navigation frame info
 def discover(request):
@@ -22,10 +21,10 @@ def get_center_of_horizontal_slice(request):
     time_value = float(request.GET.get('time'))
     altitude_value = float(request.GET.get('altitude'))
     variable = request.GET.get('variable')
-    min_x = float(request.GET.get('min_x'));
-    max_x = float(request.GET.get('max_x'));
-    min_y = float(request.GET.get('min_y'));
-    max_y = float(request.GET.get('max_y'));
+    min_x = float(request.GET.get('min_x'))
+    max_x = float(request.GET.get('max_x'))
+    min_y = float(request.GET.get('min_y'))
+    max_y = float(request.GET.get('max_y'))
     return JsonResponse(data = hypercube.get_center_of_horizontal_slice(
             variable, time_value, altitude_value,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
@@ -34,12 +33,38 @@ def get_contour_of_horizontal_slice(request):
     time_value = float(request.GET.get('time'))
     altitude_value = float(request.GET.get('altitude'))
     variable = request.GET.get('variable')
-    min_x = float(request.GET.get('min_x'));
-    max_x = float(request.GET.get('max_x'));
-    min_y = float(request.GET.get('min_y'));
-    max_y = float(request.GET.get('max_y'));
+    min_x = float(request.GET.get('min_x'))
+    max_x = float(request.GET.get('max_x'))
+    min_y = float(request.GET.get('min_y'))
+    max_y = float(request.GET.get('max_y'))
     return JsonResponse(data = hypercube.get_contour_of_horizontal_slice(
             variable, time_value, altitude_value,
+            x0=min_x, x1=max_x, y0=min_y, y1=max_y))
+
+def get_bounding_boxes_of_horizontal_slice(request):
+    time_value = float(request.GET.get('time'))
+    altitude_value = float(request.GET.get('altitude'))
+    variable = request.GET.get('variable')
+    min_x = float(request.GET.get('min_x'))
+    max_x = float(request.GET.get('max_x'))
+    min_y = float(request.GET.get('min_y'))
+    max_y = float(request.GET.get('max_y'))
+    return JsonResponse(data = hypercube.get_bounding_boxes_of_horizontal_slice(
+            variable, time_value, altitude_value,
+            x0=min_x, x1=max_x, y0=min_y, y1=max_y))
+
+def get_volume_of_selected_cloud(request):
+    time_value = float(request.GET.get('time'))
+    altitude_value = float(request.GET.get('altitude'))
+    variable = request.GET.get('variable')
+    min_x = float(request.GET.get('min_x'))
+    max_x = float(request.GET.get('max_x'))
+    min_y = float(request.GET.get('min_y'))
+    max_y = float(request.GET.get('max_y'))
+    c1 = float(request.GET.get('c1'))
+    c2 = float(request.GET.get('c2'))
+    return JsonResponse(data = hypercube.get_volume_of_selected_cloud(
+            variable, time_value, altitude_value, c1, c2,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
 
 # Update UAV fleet positions
@@ -150,3 +175,12 @@ def latlon_to_local(request):
     utm = from_latlon(float(query['lat']), float(query['lon']))
     return JsonResponse({'x' : utm[0] - scenario.localFrame.utm_east,
                          'y' : utm[1] - scenario.localFrame.utm_north})
+
+def local_to_latlon(request):
+    query = request.GET
+    latlon = to_latlon(
+            float(query['utm_east']) + scenario.localFrame.utm_east,
+            float(query['utm_north']) + scenario.localFrame.utm_north,
+            scenario.localFrame.utm_zone, scenario.localFrame.utm_letter)
+    return JsonResponse({'x': latlon[0],
+                         'y': latlon[1]})

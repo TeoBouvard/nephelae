@@ -5,6 +5,12 @@ var flight_map, zoom_home, overlays, location_popup;
 var uavs_overlay;
 var maps_parameters;
 
+var marker_collection = {};
+var box_collection = {};
+var loaded_map = {};
+
+const id = Date.now()
+
 /*
     fleet     : { uav_id : value_dict }
     value_dict : { 
@@ -14,7 +20,7 @@ var maps_parameters;
         heading       :   float,
         path          :   L.Polyline,
     }
-    */
+*/
 
 var fleet = {};
 var bounds;
@@ -27,9 +33,10 @@ var parameters = {
     transparent: true,
     tracked_uav: 'None',
     socket_uavs: null,
+    socket_datacloud: null,
     time: null,
     update_wind: updateWindData,
-
+    display_data: true,
     origin: null,
     flight_area: null
 }
@@ -74,12 +81,15 @@ function setupGUI(){
         f2.add(parameters, 'transparent').name('Transparent');
 
         gui.add(parameters, 'tracked_uav', tracked_uav_choices);
-
+        
+        gui.add(parameters, 'display_data').name('Cloud data')
+            .onChange(setSocketData);
+        
+        setSocketData();
         // Create map once sliders are initialized
         setupMap();
     });
 }
-
 
 function setupMap(){
 
@@ -153,7 +163,7 @@ function setupMap(){
         maps_parameters  = discovered_maps;
         for (var key in maps_parameters) {
             if (maps_parameters[key]['sample_size'] == 1) {
-                bounds = setBounds();
+                bounds = getCurrentBounds();
                 overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), bounds);
             }
             if (maps_parameters[key]['sample_size'] == 2) {
@@ -166,7 +176,7 @@ function setupMap(){
                     maxVelocity: 15
                 });
             }
-            maps_parameters[key]['lambda'] = closure_function(maps_parameters[key]);
+            maps_parameters[key]['lambda'] = closure_function(key);
         }
 
         // Add layers to the map
@@ -184,7 +194,10 @@ function setupMap(){
 
         //tiles_overlay_IGN.addTo(flight_map);
         tiles_overlay_dark.addTo(flight_map);
-        L.control.scale().addTo(flight_map);
+        L.control.scale({
+            maxWidth: 100,
+            imperial: false}
+        ).addTo(flight_map);
         L.marker(parameters.origin)
             .bindTooltip("Origin", {permanent: true, direction: 'right'})
             .addTo(flight_map);
@@ -203,9 +216,27 @@ function setupMap(){
 // This function only exists to prevent closure problems in loop
 // If anyone has a better solution, please help me
 function closure_function(map){
+    loaded_map[map] = false;
     return function(){
-        updateMapsUrl(map);
+        waitForAllMaps(map);
     };
+}
+
+function waitForAllMaps(map){
+    loaded_map[map] = true;
+    var list_keys = Object.keys(loaded_map);
+    var i = 0;
+    var check = true;
+    while(check && i < list_keys.length){
+        check = loaded_map[list_keys[i]];
+        i += 1;
+    }
+    if (check){
+        updateMapsUrl(list_keys);
+        for(var j =0; j < list_keys.length; j++){
+            loaded_map[list_keys[j]] = false;
+        }
+    }
 }
 
 function displayUavs(){
@@ -213,7 +244,7 @@ function displayUavs(){
     $.getJSON('/discover/', (response) => {
 
         parameters.origin = response.origin;
-        parameters.uavs   = response.uavs
+        parameters.uavs   = response.uavs;
         var uav_ids = []
         for (var id in response.uavs)
             uav_ids.push(id);
@@ -363,21 +394,40 @@ function controller_callbackLoad(){
     for(var key in maps_parameters){
         // checks if map if currently displayed
         if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
+            loaded_map[key] = false;
             overlays[maps_parameters[key]['name']].on('load', maps_parameters[key]['lambda'])
-            updateMapsUrl(maps_parameters[key]);
+            loadMap(key);
         } else {
             overlays[maps_parameters[key]['name']].off('load');
+            delete loaded_map[key];
+            clearMarkers(key);
         }
     }
 }
 
-function updateMapsUrl(map){
-    if(map['sample_size'] == 1)
-        overlays[map['name']].setUrl(map['url'] + '_img/?' + computeMapUrl());
-    else {
-        $.getJSON('wind/?' + computeMapUrl(), (response) => {
-            overlays[map['name']].setData(response);
-        });
+function loadMap(key){
+    if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
+            if(maps_parameters[key]['sample_size'] == 1)
+                overlays[maps_parameters[key]['name']].setUrl(
+                    maps_parameters[key]['url'] + '_img/?' + computeMapUrl());
+            else
+                $.getJSON('wind/?' + computeMapUrl(), (response) => {
+                    overlays[maps_parameters[key]['name']].setData(response);
+                });
+    }
+}
+
+function updateMapsUrl(list_keys){
+    for(var key of list_keys){
+        if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
+            if(maps_parameters[key]['sample_size'] == 1)
+                overlays[maps_parameters[key]['name']].setUrl(
+                    maps_parameters[key]['url'] + '_img/?' + computeMapUrl());
+            else
+                $.getJSON('wind/?' + computeMapUrl(), (response) => {
+                    overlays[maps_parameters[key]['name']].setData(response);
+                });
+        }
     }
 }
 
@@ -415,11 +465,12 @@ function computeMapUrl(){
         thermals_cmap: parameters.thermals_cmap,
         clouds_cmap: parameters.clouds_cmap,
         transparent: parameters.transparent,
+        id: id,
     });
     return query;
 }
 
-function setBounds(){
+function getCurrentBounds(){
     var screen_bounds = flight_map.getBounds();
     var south_bound, east_bound, west_bound, north_bound;
     var flight_area = parameters.flight_area
@@ -457,13 +508,13 @@ function infosToString(uav){
     infos += 'Altitude : ' + uav.altitude.toFixed(1) + 'm<br> ';
     infos += 'Heading : ' + uav.heading.toFixed(0) + '° <br> ';
     infos += 'Speed : ' + uav.speed.toFixed(1) + ' m/s <br><br>';
-    infos += '<a onClick="track(' + uav.id + ');" class="btn"><span class="white-text"><b>Sync MesoNH</b></span></a></p>'
+    infos += '<a onClick="track(' + uav.id + ');" class="btn"><span class="white-text"><b>Follow UAV</b></span></a></p>'
 
     return infos;
 }
 
 function updateLayerBounds(){
-    bounds = setBounds();
+    bounds = getCurrentBounds();
     for(var key in maps_parameters) {
         if(maps_parameters[key]['sample_size'] == 1)
             overlays[maps_parameters[key]['name']].setBounds(bounds);
@@ -479,7 +530,7 @@ function track(id){
 function click_display_location(e) {
     ////alert("You clicked the map at " + e.latlng);
     //latlon_to_local(e.latlng);
-
+    // console.log(e);
     var query = $.param({
         lat: e.latlng.lat,
         lon: e.latlng.lng
@@ -493,3 +544,50 @@ function click_display_location(e) {
     });
 }
 
+function showCloudData(message){
+    var variable = Object.keys(message);
+    clearMarkers(variable);
+    for (data in message[variable]){
+        marker = L.circleMarker([message[variable][data]
+            .center_of_mass_latlon[0], message[variable][data]
+            .center_of_mass_latlon[1]]).addTo(flight_map);
+        box = L.rectangle([[message[variable][data].box_latlon[0][0],
+                            message[variable][data].box_latlon[1][1]],
+                            [message[variable][data].box_latlon[1][0],
+                            message[variable][data].box_latlon[0][1]]],
+            {color: '#FF0000'})
+            .addTo(flight_map);
+        marker_collection[variable].push(marker);
+        box_collection[variable].push(box);
+    }
+}
+
+function clickOnMarker(e){
+    popup = L.popup().setLatLng(e.latlng).setContent('Ceci est un test');
+    flight_map.addLayer(popup);
+}
+
+function clearMarkers(variable_name){
+    if (variable_name in marker_collection)
+        for (var i = 0; i < marker_collection[variable_name].length; i++)
+            flight_map.removeLayer(marker_collection[variable_name][i]);
+    if (variable_name in box_collection)
+        for (var i = 0; i < box_collection[variable_name].length; i++)
+            flight_map.removeLayer(box_collection[variable_name][i]);
+
+    marker_collection[variable_name] = []
+    box_collection[variable_name] = []
+}
+
+function setSocketData(){
+    if (!parameters.socket_datacloud && parameters.display_data){
+        parameters.socket = new WebSocket('ws://' + 
+            window.location.host + '/ws/sensor/cloud_data/' + id + '/');
+        parameters.socket.onmessage = (e) => showCloudData(JSON.parse(e.data));
+    } else if (parameters.socket && !parameters.display_data){
+        parameters.socket.close();
+        parameters.socket = null;
+        for (key in maps_parameters)
+            clearMarkers(key);
+    }
+}

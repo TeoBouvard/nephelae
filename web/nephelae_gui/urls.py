@@ -37,6 +37,8 @@ urlpatterns = [
     path('sections/map_section/', views.get_section),
     path('sections/center_cloud/', views.get_center_of_horizontal_slice),
     path('sections/contour_cloud/', views.get_contour_of_horizontal_slice),
+    path('sections/boxes_cloud/', views.get_bounding_boxes_of_horizontal_slice),
+    path('sections/click_volume_cloud/', views.get_volume_of_selected_cloud),
 
     # URL for vertical profiles page
     path('profiles/', views.render_template, {'template_name': 'profiles.html'}, name='profiles'),
@@ -64,7 +66,8 @@ urlpatterns = [
     path('missions/mission_parameters/<str:mission_type>', views.get_mission_parameters),
 
 
-    path('latlon_to_local/', views.latlon_to_local)
+    path('latlon_to_local/', views.latlon_to_local),
+    path('local_to_latlon/', views.local_to_latlon)
 ]
 
 

@@ -4,21 +4,28 @@ import os
 import sys
 import time
 
-from utm import from_latlon
+from utm import from_latlon, to_latlon
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from nephelae.mapping import compute_com, compute_cross_section_border
-from nephelae.mapping import BorderIncertitude
+from nephelae.mapping import compute_list_of_coms, compute_cross_section_border
+from nephelae.mapping import compute_bounding_box
+from nephelae.mapping import compute_selected_element_volume
+from nephelae.mapping import BorderIncertitude, BorderRaw
+
+from nephelae.database import CloudData
 
 imcount = 0
 
 from . import utils
 from . import common
 
-maps      = common.scenario.maps
-hypercube = common.scenario.mesonhDataset
+maps           = common.scenario.maps
+hypercube      = common.scenario.mesonhDataset
+websockets_ids = common.websockets_ids
+clouds_ids     = common.clouds_ids
+localFrame     = common.scenario.localFrame
 
 def discover_maps():
     res = {}
@@ -34,9 +41,8 @@ def discover_maps():
     print(res)
     return res
 
-
-def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, thermals_cmap, clouds_cmap, transparent):
-    
+def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
+        bounds, origin, thermals_cmap, clouds_cmap, transparent):
     # Converting lower left corner and upper right corner from (lat,lon) to utm
     utmBounds = [from_latlon(latitude=bounds['south'], longitude=bounds['west']),
                  from_latlon(latitude=bounds['north'], longitude=bounds['east'])]
@@ -63,7 +69,20 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
     
     if "LWC" in variable_name:
         t0 = time.time()
-    h_slice = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude].data.squeeze().T
+
+    map0 = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude]
+
+    if id_client in websockets_ids and not "_border" in variable_name:
+        websockets_ids[id_client].send_cloud_data(variable_name,
+            CloudData.from_scaledArray(map0))
+
+    if isinstance(map0, tuple) and "_border" in variable_name:
+        h_slice_data = map0[0].data + map0[1].data
+        h_slice = h_slice_data.squeeze().T
+    else:
+        h_slice = map0.data.squeeze().T
+
+
     if "LWC" in variable_name:
         print("Ellapsed time :", time.time() - t0)
     rng     = maps[variable_name].range()
@@ -91,7 +110,8 @@ def print_horizontal_slice(variable_name, u_time, u_altitude, bounds, origin, th
     
     # rFactor = 4
     minRes = 1080.0
-    rFactor = int(max(minRes / min(h_slice.shape), 1))
+    rFactor = (int(max(minRes / min(h_slice.shape), 1))
+        if min(h_slice.shape) != 0 else 1)
 
     img = Image.fromarray(h_slice)
     h_slice = np.array(img.resize((h_slice.shape[0]*rFactor, h_slice.shape[1]*rFactor), Image.BICUBIC))
@@ -119,36 +139,52 @@ def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None,
 def get_center_of_horizontal_slice(variable, time_value, altitude_value,
         x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
-    x = compute_com(map0)
-    if x is None:
-        res = {'data': (None, None)}
-    else:
-        res = {'data': (x[0], x[1])}
-    return res
+    x = compute_list_of_coms(map0)
+    list_x, list_y = [], []
+    for coords in x:
+        if x is not None:
+            list_x.append(coords[0])
+            list_y.append(coords[1])
+    return {'list_x': list_x, 'list_y': list_y}
 
+def get_bounding_boxes_of_horizontal_slice(variable, time_value, altitude_value,
+        x0=None, x1=None, y0=None, y1=None):
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    x = compute_bounding_box(map0)
+    list_bounds_x = [[boundaries[0].min, boundaries[0].max] for boundaries in x]
+    list_bounds_y = [[boundaries[1].min, boundaries[1].max] for boundaries in x]
+    return {'boundaries_x': list_bounds_x, 'boundaries_y': list_bounds_y}
 
-# To rework, the get_contour_of_horizontal_slice must use a contour object
+def get_volume_of_selected_cloud(variable, time_value, altitude_value, c1, c2,
+        x0=None, x1=None, y0=None, y1=None):
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    coords = map0.dimHelper.to_index((c1, c2))
+    res = compute_selected_element_volume(coords, map0)
+    return {'data': res}
+
 def get_contour_of_horizontal_slice(variable, time_value,
         altitude_value, x0=None, x1=None, y0=None, y1=None):
     res = None
+    map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
+    x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
+        map0.data.shape[0])
+    y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
+        map0.data.shape[1])
     if variable+'_std' in maps.keys():
-        map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
         bdcloud = BorderIncertitude('LWC Bd', maps[variable],
         maps[variable+'_std'])
-        x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
-            map0.data.shape[0])
-        y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
-            map0.data.shape[1])
         borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
         res = {'inner_border': borders[0].data.T.tolist(),
                 'outer_border': borders[1].data.T.tolist(),
                 'x_axis': x_axis.tolist(),
                 'y_axis': y_axis.tolist()}
     else:
-        res = {'inner_border': [],
+        bdcloud = BorderRaw('LWC Bd', maps[variable])
+        borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
+        res = {'inner_border': borders.data.T.tolist(),
                 'outer_border': [],
-                'x_axis': [],
-                'y_axis': []}
+                'x_axis': x_axis.tolist(),
+                'y_axis': y_axis.tolist()}
     return res
 
 def get_wind(variable, u_time, u_altitude, bounds, origin):
@@ -198,3 +234,31 @@ def box():
         {'min': dims[2]['data'][0], 'max':dims[2]['data'][-1]}]
     return box
 
+def prettify_cloud_data(dataCloud):
+    bounding_box = dataCloud.get_bounding_box()
+    south_west = tuple(x.min for x in bounding_box)
+    north_east = tuple(x.max for x in bounding_box)
+    return dict(
+        center_of_mass=dataCloud.get_com(),
+        center_of_mass_latlon=to_latlon(dataCloud.get_com()[0] +
+            localFrame.utm_east, dataCloud.get_com()[1] +
+            localFrame.utm_north, localFrame.utm_zone,
+            localFrame.utm_letter),
+        surface=dataCloud.get_surface(),
+        box=[north_east, south_west],
+        box_latlon=[to_latlon(north_east[0] + localFrame.utm_east,
+                        north_east[1] + localFrame.utm_north,
+                        localFrame.utm_zone, localFrame.utm_letter),
+                    to_latlon(south_west[0] + localFrame.utm_east,
+                        south_west[1] + localFrame.utm_north, 
+                        localFrame.utm_zone, localFrame.utm_letter)]
+    )
+
+def maj_tampon_cloudData(observations, variable, index):
+    pass
+    # Recuperation du vent (fonction de changement)
+    # Bruit ? (pas obligatoire mais peut etre plus tard)
+    # if not clouds_ids or not clouds_ids[variable]:
+    #     clouds_ids[variable] = observations
+    # else:
+    #     for (observation in obversations):
