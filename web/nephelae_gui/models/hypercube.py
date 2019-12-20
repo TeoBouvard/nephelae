@@ -24,6 +24,7 @@ from . import common
 maps           = common.scenario.maps
 hypercube      = common.scenario.mesonhDataset
 websockets_ids = common.websockets_ids
+clouds_ids     = common.clouds_ids
 localFrame     = common.scenario.localFrame
 
 def discover_maps():
@@ -252,3 +253,12 @@ def prettify_cloud_data(dataCloud):
                         south_west[1] + localFrame.utm_north, 
                         localFrame.utm_zone, localFrame.utm_letter)]
     )
+
+def maj_tampon_cloudData(observations, variable, index):
+    pass
+    # Recuperation du vent (fonction de changement)
+    # Bruit ? (pas obligatoire mais peut etre plus tard)
+    # if not clouds_ids or not clouds_ids[variable]:
+    #     clouds_ids[variable] = observations
+    # else:
+    #     for (observation in obversations):

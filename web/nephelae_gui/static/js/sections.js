@@ -179,10 +179,14 @@ function setupGUI(){
                     parameters['variables'][vari] = true;
             };
             $.getJSON('/discover_maps/', (response) => {
+                list_map = [];
                 for (var map in response){
-                    map_boundaries[map] = response[map]['range']
+                    if(!map.endsWith('_border')){
+                        map_boundaries[map] = response[map]['range'];
+                        list_map.push(map);
+                    }
                 }
-                gui.add(parameters, 'map', Object.keys(response))
+                gui.add(parameters, 'map', list_map)
                     .setValue(Object.keys(response)[0])
                     .name('Map')
                     .onChange(function(){
