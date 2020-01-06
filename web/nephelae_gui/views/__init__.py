@@ -6,7 +6,7 @@ try:
     from .data_views import discover, discover_maps, get_positions, get_sensor_data
     from .data_views import mesonh_box, get_section
     from .data_views import update_cloud_data, wind_data
-    from .data_views import get_available_missions, get_mission_parameters
+    from .data_views import get_available_missions
     from .data_views import get_state_at_time
     from .data_views import get_positions_uavs_map
     from .data_views import latlon_to_local

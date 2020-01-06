@@ -1,9 +1,7 @@
 from django.http import JsonResponse
 
-# from ..models import hypercube, tracker
 from nephelae_gui.models import hypercube, tracker
 from nephelae_gui.models.common import scenario
-from nephelae_paparazzi.missions import MissionBuilder
 
 from utm import from_latlon
 
@@ -137,16 +135,23 @@ def wind_data(request, variable_name):
     return JsonResponse(data, safe=False)
 
 
-def get_available_missions(request):
-    return JsonResponse({'available_missions' : MissionBuilder.missionMessagesNames})
-
-
-def get_mission_parameters(request, mission_type):
-    return JsonResponse({"parameters" : MissionBuilder.get_parameter_list(mission_type)})
-
-
 def latlon_to_local(request):
     query = request.GET
     utm = from_latlon(float(query['lat']), float(query['lon']))
     return JsonResponse({'x' : utm[0] - scenario.localFrame.utm_east,
                          'y' : utm[1] - scenario.localFrame.utm_north})
+
+def get_available_missions(request, aircraftId):
+    response = {'aircraftId':aircraftId}
+    try:
+        response['mission_types'] =\
+            list(scenario.aircrafts[aircraftId].mission_types())
+    except AttributeError as e:
+        response['mission_types'] = []
+    except KeyError:
+        warn("Could not find aircraft '"+aircraftId+
+             "' while fetching mission types.")
+        response['mission_types'] = []
+    return JsonResponse(response)
+
+

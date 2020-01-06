@@ -29,6 +29,7 @@ urlpatterns = [
     # URL for commands page
     path('commands/', views.render_template, {'template_name': 'commands.html'}, name='commands'),
     path('commands/update/', views.get_positions),
+    path('commands/available_missions/<str:aircraftId>', views.get_available_missions),
 
     # URL for sections page
     path('sections/', views.render_template, {'template_name': 'sections.html'}, name='sections'),
@@ -60,8 +61,7 @@ urlpatterns = [
     # To discover mapping layers available (from a nephelae.mapping.MapServer
     path('discover_maps/', views.discover_maps),
 
-    path('missions/available_missions/', views.get_available_missions),
-    path('missions/mission_parameters/<str:mission_type>', views.get_mission_parameters),
+    # path('missions/available_missions/', views.get_available_missions),
 
 
     path('latlon_to_local/', views.latlon_to_local)

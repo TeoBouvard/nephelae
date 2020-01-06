@@ -21,6 +21,7 @@ var gui_parameters = {
     mission_parameters : {},
 };
 
+// This is the page init function
 $(document).ready( () => {
 	removeLoader();
     discoverFleet();
@@ -38,15 +39,15 @@ function setupGUI(){
         .onChange((selectedCommand) => updateGUI(selectedCommand));
     gui.add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
 
-    $.getJSON('/missions/available_missions/', (response) => {
-        for (mission of response.available_missions) {
-            gui_parameters.mission_list.push(mission);
-        }
-        gui_mission = gui_commands.add(gui_parameters,'mission_list', gui_parameters.mission_list)
-            .name('Mission')
-            .setValue(gui_parameters.mission_list[0])
-            .onChange((selectedMission) => updateGuiMission(selectedMission));
-    });
+    //$.getJSON('/missions/available_missions/', (response) => {
+    //    for (mission of response.available_missions) {
+    //        gui_parameters.mission_list.push(mission);
+    //    }
+    //    gui_mission = gui_commands.add(gui_parameters,'mission_list', gui_parameters.mission_list)
+    //        .name('Mission')
+    //        .setValue(gui_parameters.mission_list[0])
+    //        .onChange((selectedMission) => updateGuiMission(selectedMission));
+    //});
 
     updateGUI(parameters.commands);
 }
@@ -209,8 +210,8 @@ function generateItems(){
 
     // reseting cards
     $('.filled').removeClass("filled").addClass("free").html("");
-    for (id in parameters.fleet) {
-        var html = '<div id="'+ id +'" class="card blue-grey darken-1">';
+    for (aircraftId in parameters.fleet) {
+        var html = '<div id="'+ aircraftId +'_card" class="card blue-grey darken-1">';
             html += '<div class="card-content white-text">';
 
                 html += '<span id="uav_id" class="card-title left"></span>';
@@ -237,11 +238,56 @@ function generateItems(){
                     html += '<span class="left">Target Climb</span>    <p id="target_climb"    class="right"></p><br>';
                     html += '<span class="left">ITOW</span>            <p id="itow"            class="right"></p><br>';
                 }
+                html += '<hr>';
+                html += '<span class="left"> <button class="browser-default" onclick="new_mission_element_clicked('+aircraftId+')" type="button">New mission element</button> </span> <br>';
+                html += '<div id="mission_input">';
+                html += '</div>';
 
             html += '</div>';
         html += '</div>';
         $('.free').first().removeClass("free").addClass("filled").append(html);
     }
+}
+
+function new_mission_element_clicked(aircraftId) {
+    $.getJSON('/commands/available_missions/'+aircraftId, (response) => {
+
+        if (response.mission_types.length <= 0) {
+            newHtml = '<span class="left">No missions defined for this aircraft.</span>';
+            $('#'+aircraftId+'_card #mission_input').html(newHtml);
+        }
+        else
+        {
+            //newHtml = '<br>' +
+            //'<span class="left">Mission input:</span> <p class="right">' + aircraftId + '</p>';
+
+            // Building drop down list to select mission
+            newHtml = '<br><span class="left">';
+            newHtml += '<select id="mission_selector"' +
+                              ' class="browser-default"' +  
+                              ' name"Mission Type">';
+            for (missionType of response.mission_types) {
+                newHtml += '<option value='+missionType+'>'+missionType+'</option>';
+            }
+            newHtml += '</select></span>';
+            $('#'+aircraftId+'_card #mission_input').html(newHtml);
+            
+            // Binding select to select_mission callback
+            $('#'+aircraftId+'_card #mission_input #mission_selector')[0]
+                .onchange=function() { select_mission(aircraftId) };
+            // Calling select_mission once to initialize
+            select_mission(aircraftId);
+        }
+    });
+}
+
+function select_mission(aircraftId) {
+    missionType = $('#'+aircraftId+'_card #mission_input #mission_selector')[0].value;
+
+    
+    console.log("Selecting mission for " + aircraftId + " " + missionType);
+    //html = $('#'+aircraftId+'_card #mission_input')[0].innerHTML;
+    //console.log(html)
 }
 
 
@@ -277,28 +323,26 @@ function formatTime(seconds) {
     //return seconds.toString()
 }
 
-function updateItem(id){
-    uav = parameters.fleet[id];
+function updateItem(aircraftId){
+    uav = parameters.fleet[aircraftId];
     
-    //console.log(uav);
+    $('#'+aircraftId+'_card #uav_id').text('UAV ' + aircraftId);
+    $('#'+aircraftId+'_card #current_block').text(uav.current_block + ' : ' + formatTime(uav.block_time));
+    $('#'+aircraftId+'_card #current_block').addClass("green"); // to be replaced with task color
 
-    $('#'+id+' #uav_id').text('UAV ' + id);
-    $('#'+id+' #current_block').text(uav.current_block + ' : ' + formatTime(uav.block_time));
-    $('#'+id+' #current_block').addClass("green"); // to be replaced with task color
-
-    $('#'+id+' #flight_time').text(formatTime(uav.flight_time));
-    $('#'+id+' #altitude').text(uav.alt.toFixed(1)  + 'm');
-    $('#'+id+' #course').text(uav.course.toFixed(0) + '°');
-    $('#'+id+' #speed').text(uav.speed.toFixed(1)   + 'm/s');
-    $('#'+id+' #climb').text(uav.climb.toFixed(1)   + 'm/s');
+    $('#'+aircraftId+'_card #flight_time').text(formatTime(uav.flight_time));
+    $('#'+aircraftId+'_card #altitude').text(uav.alt.toFixed(1)  + 'm');
+    $('#'+aircraftId+'_card #course').text(uav.course.toFixed(0) + '°');
+    $('#'+aircraftId+'_card #speed').text(uav.speed.toFixed(1)   + 'm/s');
+    $('#'+aircraftId+'_card #climb').text(uav.climb.toFixed(1)   + 'm/s');
     
     if(gui_parameters.verbose) {
-        $('#'+id+' #ground_altitude').text(uav.agl.toFixed(1)+'m');
-        $('#'+id+' #target_course').text(uav.target_course.toFixed(0) + '°');
-        $('#'+id+' #heading').text(uav.heading.toFixed(0) + '°');
-        $('#'+id+' #air_speed').text(uav.air_speed.toFixed(1) + 'm/s');
-        $('#'+id+' #target_climb').text(uav.target_climb.toFixed(1) + 'm/s');
-        $('#'+id+' #itow').text(uav.itow);
+        $('#'+aircraftId+'_card #ground_altitude').text(uav.agl.toFixed(1)+'m');
+        $('#'+aircraftId+'_card #target_course').text(uav.target_course.toFixed(0) + '°');
+        $('#'+aircraftId+'_card #heading').text(uav.heading.toFixed(0) + '°');
+        $('#'+aircraftId+'_card #air_speed').text(uav.air_speed.toFixed(1) + 'm/s');
+        $('#'+aircraftId+'_card #target_climb').text(uav.target_climb.toFixed(1) + 'm/s');
+        $('#'+aircraftId+'_card #itow').text(uav.itow);
     }
 }
 
