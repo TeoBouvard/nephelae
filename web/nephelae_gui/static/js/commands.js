@@ -269,8 +269,11 @@ function secondsToHHMMSSstring(seconds) {
 function formatTime(seconds) {
     if (seconds == "NA")
         return seconds;
-    //return secondsToMMSSstring(seconds);
-    return secondsToHHMMSSstring(seconds);
+
+    if (seconds < 3600)
+        return secondsToMMSSstring(seconds);
+    else
+        return secondsToHHMMSSstring(seconds);
     //return seconds.toString()
 }
 
