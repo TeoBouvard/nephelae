@@ -548,23 +548,28 @@ function showCloudData(message){
     var variable = Object.keys(message);
     clearMarkers(variable);
     for (data in message[variable]){
-        marker = L.circleMarker([message[variable][data]
-            .center_of_mass_latlon[0], message[variable][data]
-            .center_of_mass_latlon[1]]).addTo(flight_map);
         box = L.rectangle([[message[variable][data].box_latlon[0][0],
                             message[variable][data].box_latlon[1][1]],
                             [message[variable][data].box_latlon[1][0],
                             message[variable][data].box_latlon[0][1]]],
             {color: '#FF0000'})
             .addTo(flight_map);
-        marker_collection[variable].push(marker);
+        marker = L.circleMarker([message[variable][data]
+            .center_of_mass_latlon[0], message[variable][data]
+            .center_of_mass_latlon[1]]).addTo(flight_map);
+        marker.bindPopup(contentMarkerPopup(message[variable][data]));
         box_collection[variable].push(box);
+        marker_collection[variable].push(marker);
     }
 }
 
-function clickOnMarker(e){
-    popup = L.popup().setLatLng(e.latlng).setContent('Ceci est un test');
-    flight_map.addLayer(popup);
+function contentMarkerPopup(data){
+    var infos = '<p style="font-family:Roboto-Light;font-size:10px">';
+
+    infos += 'LatLon (' + data.center_of_mass_latlon[0] + ', ' + data.center_of_mass_latlon[1] + ') <br>' ;
+    infos += 'Local : (' + data.center_of_mass[0] + ', ' + data.center_of_mass[1] + ') <br> ';
+
+    return infos;
 }
 
 function clearMarkers(variable_name){
