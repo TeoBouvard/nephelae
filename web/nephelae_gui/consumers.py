@@ -2,7 +2,7 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 
-from .models.common import scenario
+from .models.common import scenario, db_data_tags
 
 from .models import tracker
 
@@ -60,7 +60,7 @@ class SensorConsumer(WebsocketConsumer):
 
 
     def add_sample(self, sample):
-        if sample.variableName not in tracker.db_data_tags:
+        if sample.variableName not in db_data_tags:
             return
         message = tracker.prettify_sample(sample)
         self.list_of_messages.append(message)

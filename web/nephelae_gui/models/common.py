@@ -12,6 +12,9 @@ try:
     # Legacy variables. To remove when conversion to scenario is completed
     db = scenario.database
 
+    # Defines displayable samples, to keep for now. Find an alternative to put in scenario
+    db_data_tags = ['RCT', 'WT', 'THT'] 
+
     # TODO fix this
     def on_exit():
         print("Shutting down paparazzi interface... ", end='', flush=True)
