@@ -83,3 +83,20 @@ def get_positions_latlong(request):
     return JsonResponse({'positions':positions})
 
 
+def get_sample_at_time(request):
+    variables = request.GET.getlist('variables[]')
+    uavs = request.GET.getlist('uav_id[]')
+    at_time = float(request.GET.get('at_time'))
+
+    data = {}
+    for variable in variables:
+        for uav_id in uavs:
+            message = database[variable, str(uav_id)][float(at_time)][0].data
+            if not uav_id in data.keys():
+                data[uav_id] = dict()
+            data[uav_id][message.variableName] = {
+                    'positions': [message.position.data.tolist()],
+                    'values': [message.data],
+            }
+    return JsonResponse(data)
+

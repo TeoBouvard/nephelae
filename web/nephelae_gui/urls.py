@@ -35,7 +35,7 @@ try:
         # URL for sections page
         path('sections/', views.render_template, {'template_name': 'sections.html'}, name='sections'),
         path('sections/mesonh_dims/', views.mesonh_box),
-        path('sections/uav_state_at_time/', views.get_state_at_time),
+        path('sections/uav_state_at_time/', aircraft_views.get_sample_at_time),
         path('sections/map_section/', views.get_section),
         path('sections/center_cloud/', views.get_center_of_horizontal_slice),
         path('sections/contour_cloud/', views.get_contour_of_horizontal_slice),

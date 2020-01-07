@@ -5,7 +5,6 @@ try:
     from .data_views import mesonh_box, get_section
     from .data_views import update_cloud_data, wind_data
     from .data_views import get_available_missions
-    from .data_views import get_state_at_time
     from .data_views import latlon_to_local
     from .data_views import get_center_of_horizontal_slice
     from .data_views import get_contour_of_horizontal_slice
