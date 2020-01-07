@@ -13,20 +13,6 @@ nav_frame   = utils.local_frame_latlon()
 flight_area = utils.flight_area_latlon()
 
 
-def get_data(uav_ids, variables, start, end=None, step=-1):
-    data = {}
-    for uav_id in uav_ids:
-        data[uav_id] = {}
-        for variable in variables:
-            messages = [entry.data for entry in
-                db[variable, str(uav_id)](lambda x: x.data.timeStamp)[-start:end:step]]
-            data[uav_id][variable] = {'positions':[], 'values': []}
-            for message in messages:
-                data[uav_id][variable]['positions'].append(message.position.data.tolist())
-                data[uav_id][variable]['values'].append(message.data[0])
-    return dict(data=data)
-
-
 def prettify_gps(message):
 
     return dict(

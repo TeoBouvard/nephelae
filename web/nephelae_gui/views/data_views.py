@@ -5,6 +5,7 @@ from nephelae_gui.models.common import scenario
 
 from utm import from_latlon
 
+database = scenario.database
 
 def discover_maps(request):
     return JsonResponse(hypercube.discover_maps(), safe=False)
@@ -35,6 +36,7 @@ def get_contour_of_horizontal_slice(request):
             variable, time_value, altitude_value,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
 
+
 # Get sensor data with sample positions
 def get_sensor_data(request):
 
@@ -46,8 +48,43 @@ def get_sensor_data(request):
     step = (-1 if request.GET.get('step') is None else int(request.GET.get('step')))
     variables = request.GET.getlist('variables[]')
     variables.append(request.GET.get('variable'))
-    return JsonResponse(tracker.get_data(uav_ids, variables, start, end, step))
 
+    # filling response
+    data = {}
+    for uav_id in uav_ids:
+        data[uav_id] = {}
+        for variable in variables:
+            messages = [entry.data for entry in
+                db[variable, str(uav_id)](lambda x: x.data.timeStamp)[-start:end:step]]
+            data[uav_id][variable] = {'positions':[], 'values': []}
+            for message in messages:
+                data[uav_id][variable]['positions'].append(message.position.data.tolist())
+                data[uav_id][variable]['values'].append(message.data[0])
+
+    return JsonResponse({'data':data})
+
+
+def get_sample_at_time(request):
+    """
+    Returns a sensor values at a specific time for reqiuested variables and
+    aircrafts.
+    """
+
+    variables = request.GET.getlist('variables[]')
+    uavs = request.GET.getlist('uav_id[]')
+    at_time = float(request.GET.get('at_time'))
+
+    data = {}
+    for variable in variables:
+        for uav_id in uavs:
+            message = database[variable, str(uav_id)][float(at_time)][0].data
+            if not uav_id in data.keys():
+                data[uav_id] = dict()
+            data[uav_id][message.variableName] = {
+                    'positions': [message.position.data.tolist()],
+                    'values': [message.data],
+            }
+    return JsonResponse(data)
 
 # Get sections/map sliders bounds, bad design for now ..
 def mesonh_box(request):

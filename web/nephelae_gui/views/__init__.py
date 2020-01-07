@@ -1,5 +1,6 @@
 try:
     from . import aircraft_views
+    from . import data_views
 
     from .data_views import discover_maps, get_sensor_data
     from .data_views import mesonh_box, get_section
