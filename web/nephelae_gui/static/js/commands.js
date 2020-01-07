@@ -23,7 +23,7 @@ var gui_parameters = {
 
 // This is the page init function
 $(document).ready( () => {
-	removeLoader();
+    removeLoader();
     discoverFleet();
     setupChart();
 });
@@ -38,16 +38,6 @@ function setupGUI(){
         .name('Command')
         .onChange((selectedCommand) => updateGUI(selectedCommand));
     gui.add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
-
-    //$.getJSON('/missions/available_missions/', (response) => {
-    //    for (mission of response.available_missions) {
-    //        gui_parameters.mission_list.push(mission);
-    //    }
-    //    gui_mission = gui_commands.add(gui_parameters,'mission_list', gui_parameters.mission_list)
-    //        .name('Mission')
-    //        .setValue(gui_parameters.mission_list[0])
-    //        .onChange((selectedMission) => updateGuiMission(selectedMission));
-    //});
 
     updateGUI(parameters.commands);
 }
@@ -238,14 +228,33 @@ function generateItems(){
                     html += '<span class="left">Target Climb</span>    <p id="target_climb"    class="right"></p><br>';
                     html += '<span class="left">ITOW</span>            <p id="itow"            class="right"></p><br>';
                 }
-                html += '<hr>';
-                html += '<span class="left"> <button class="browser-default" onclick="new_mission_element_clicked('+aircraftId+')" type="button">New mission element</button> </span> <br>';
-                html += '<div id="mission_input">';
-                html += '</div>';
+                html += '<br>';
+
+                //html += '<span class="left">';
+                //html += '<a class="waves-effect waves-light btn-small" onclick="new_mission_element_clicked('+aircraftId+')">New mission</a>';
+                //html += '</span><br>';
+
+                //html += '<div id="mission_input">';
+                //html += '</div>';
+
+                html += '<span class="left">';
+                html += '<a class="waves-effect waves-light btn-small modal-trigger" href="#modal_'+aircraftId+'" onclick="new_mission_element_clicked('+aircraftId+')">New mission</a>';
+                html += '</span><br>';
+
+                html += '<div id="modal_'+aircraftId+'" class="modal">'
+                html +=     '<div class="modal-content black-text">'
+                html +=         '<h4>Create mission for aircraft '+aircraftId+'</h4>'
+                html +=         '<p><div id="mission_input"></div></p>'
+                html +=     '</div>'
+                html +=     '<div class="modal-footer">'
+                html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>'
+                html +=     '</div>'
+                html += '</div>'
 
             html += '</div>';
         html += '</div>';
         $('.free').first().removeClass("free").addClass("filled").append(html);
+        $('.modal').modal();
     }
 }
 
@@ -262,28 +271,34 @@ function new_mission_element_clicked(aircraftId) {
             //'<span class="left">Mission input:</span> <p class="right">' + aircraftId + '</p>';
 
             // Building drop down list to select mission
-            newHtml = '<br><span class="left">';
-            newHtml += '<select id="mission_selector"' +
-                              ' class="browser-default"' +  
-                              ' name"Mission Type">';
+            newHtml = '<select id="mission_selector" name="Mission Type">';
             for (missionType of response.mission_types) {
                 newHtml += '<option value='+missionType+'>'+missionType+'</option>';
             }
-            newHtml += '</select></span>';
+            newHtml += '</select><br>';
+            
+            // Creating div for parameter input to be filled by mission_selected
+            newHtml += '<div id="mission_params"></div>';
+            
             $('#'+aircraftId+'_card #mission_input').html(newHtml);
+
+            //  materialize select needs initialization
+            $('select').formSelect();
             
             // Binding select to select_mission callback
             $('#'+aircraftId+'_card #mission_input #mission_selector')[0]
-                .onchange=function() { select_mission(aircraftId) };
+                .onchange=function() { mission_selected(aircraftId) };
             // Calling select_mission once to initialize
-            select_mission(aircraftId);
+            mission_selected(aircraftId);
         }
     });
 }
 
-function select_mission(aircraftId) {
+function mission_selected(aircraftId) {
     missionType = $('#'+aircraftId+'_card #mission_input #mission_selector')[0].value;
 
+    $('#'+aircraftId+'_card #mission_input #mission_params').html(
+        '<p>Selected mission : '+missionType+'</p>');
     
     console.log("Selecting mission for " + aircraftId + " " + missionType);
     //html = $('#'+aircraftId+'_card #mission_input')[0].innerHTML;
@@ -355,7 +370,7 @@ function referenceLine(div){
         if(x == 0 && y == 0) height = parseFloat($(this).attr('height'));
     });
 
-	var nowWord = $('#' + div + ' text:contains("Now")');
+    var nowWord = $('#' + div + ' text:contains("Now")');
     nowWord.prev().first().attr('height', height + 'px').attr('width', '1px').attr('y', '0');
 }
 
