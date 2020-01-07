@@ -55,7 +55,7 @@ def get_sensor_data(request):
         data[uav_id] = {}
         for variable in variables:
             messages = [entry.data for entry in
-                db[variable, str(uav_id)](lambda x: x.data.timeStamp)[-start:end:step]]
+                database[variable, str(uav_id)](lambda x: x.data.timeStamp)[-start:end:step]]
             data[uav_id][variable] = {'positions':[], 'values': []}
             for message in messages:
                 data[uav_id][variable]['positions'].append(message.position.data.tolist())
