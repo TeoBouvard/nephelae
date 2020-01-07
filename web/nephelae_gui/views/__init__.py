@@ -1,16 +1,11 @@
 try:
+
     from . import aircraft_views
     from . import data_views
+    from . import template_views
+    from . import file_views
+    from . import misc_views
 
-    from .data_views import discover_maps, get_sensor_data
-    from .data_views import mesonh_box, get_section
-    from .data_views import update_cloud_data, wind_data
-    from .data_views import latlon_to_local
-    from .data_views import get_center_of_horizontal_slice
-    from .data_views import get_contour_of_horizontal_slice
-    
-    from .template_views import render_template
-    from .file_views import plane_icon, generate_plane_icon, map_tiles, texture, model3D, layer_img
 except Exception as e:
     # Have to do this because #@%*&@^*! django is hiding exceptions
    print("# Caught exception #############################################\n    ", e)

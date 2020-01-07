@@ -3,8 +3,6 @@ from django.http import JsonResponse
 from nephelae_gui.models import hypercube
 from nephelae_gui.models.common import scenario
 
-from utm import from_latlon
-
 database = scenario.database
 
 def discover_maps(request):
@@ -116,6 +114,7 @@ def get_section(request):
     return response
 
 def update_cloud_data(request):
+    # Only there to give something to the unused cloud_data page
     data = {}
     return JsonResponse(data)
 
@@ -144,10 +143,4 @@ def wind_data(request, variable_name):
     data = hypercube.get_wind(variable_name, time_value, altitude_value, map_bounds, origin)
     return JsonResponse(data, safe=False)
 
-
-def latlon_to_local(request):
-    query = request.GET
-    utm = from_latlon(float(query['lat']), float(query['lon']))
-    return JsonResponse({'x' : utm[0] - scenario.localFrame.utm_east,
-                         'y' : utm[1] - scenario.localFrame.utm_north})
 
