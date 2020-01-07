@@ -8,6 +8,8 @@ var maps_parameters;
 var marker_collection = {};
 var box_collection = {};
 var loaded_map = {};
+var marker_followed = {}
+
 
 const id = Date.now()
 
@@ -541,21 +543,32 @@ function click_display_location(e) {
     }
     dropdown += '</select>';
     $.getJSON('/latlon_to_local/?' + query, (local) => {
+        x = local.x;
+        y = local.y;
+        lat = e.latlng.lat;
+        lng = e.latlng.lng;
         location_popup
             .setLatLng(e.latlng)
             .setContent("Local: " + local.x.toFixed(2) + ", " + local.y.toFixed(2) +
                         "<br>LatLon: " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4) +
                         "<br><br> Follow with UAV: " + dropdown +
-                        '<a onClick="generateMarker();" class="btn">' +
+                        '<a onClick="generateMarker('+x+','+y+','+lat+','+lng+');" class="btn">' +
                         '<span class="white-text"><b>Choose Center</b></span>' +
                         '</a></p>')
             .openOn(flight_map);
     });
 }
 
-function generateMarker(){
+function generateMarker(x,y,lat,lng){
     var uav_selected = document.getElementById('dropdown_uav_id').value;
-    console.log(uav_selected);
+    coordinates = {'x':x, 'y':y, 'lat':lat, 'lng':lng}
+    center_of_mass = L.circleMarker([coordinates.lat, coordinates.lng],
+                    {color: '#00FF00'})
+        .on('click', function(){
+            flight_map.removeLayer(center_of_mass);
+            delete marker_followed[uav_selected];
+        }).addTo(flight_map);
+    marker_followed[uav_selected] = center_of_mass;
 }
 
 function showCloudData(message){
