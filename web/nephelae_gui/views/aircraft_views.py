@@ -83,4 +83,17 @@ def get_positions_latlong(request):
     return JsonResponse({'positions':positions})
 
 
+def get_available_missions(request, aircraftId):
+    response = {'aircraftId':aircraftId}
+    try:
+        response['mission_types'] =\
+            list(scenario.aircrafts[aircraftId].mission_types())
+    except AttributeError as e:
+        response['mission_types'] = []
+    except KeyError:
+        warn("Could not find aircraft '"+aircraftId+
+             "' while fetching mission types.")
+        response['mission_types'] = []
+    return JsonResponse(response)
+
 

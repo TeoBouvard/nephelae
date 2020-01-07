@@ -30,7 +30,7 @@ try:
 
         # URL for commands page
         path('commands/', views.render_template, {'template_name': 'commands.html'}, name='commands'),
-        path('commands/available_missions/<str:aircraftId>', views.get_available_missions),
+        path('commands/available_missions/<str:aircraftId>', aircraft_views.get_available_missions),
 
         # URL for sections page
         path('sections/', views.render_template, {'template_name': 'sections.html'}, name='sections'),
