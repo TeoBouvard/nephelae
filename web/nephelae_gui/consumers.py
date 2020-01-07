@@ -4,8 +4,6 @@ from channels.generic.websocket import WebsocketConsumer
 
 from .models.common import scenario, db_data_tags
 
-from .models import tracker
-
 # propably some names to change in here
 
 class GPSConsumer(WebsocketConsumer):
@@ -62,7 +60,10 @@ class SensorConsumer(WebsocketConsumer):
     def add_sample(self, sample):
         if sample.variableName not in db_data_tags:
             return
-        message = tracker.prettify_sample(sample)
+        message = {'uav_id':       sample.producer,
+                   'variable_name':sample.variableName,
+                   'position':     sample.position.data.tolist(),
+                   'data':         sample.data}
         self.list_of_messages.append(message)
         if(len(self.list_of_messages) >= self.number_of_messages):
             self.send(json.dumps(self.list_of_messages))

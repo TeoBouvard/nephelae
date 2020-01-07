@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-from nephelae_gui.models import hypercube, tracker
+from nephelae_gui.models import hypercube
 from nephelae_gui.models.common import scenario
 
 from utm import from_latlon
