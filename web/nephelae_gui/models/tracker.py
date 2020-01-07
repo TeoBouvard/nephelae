@@ -7,84 +7,10 @@ from . import common
 
 from .common import scenario
 
-# Defines displayable samples, to keep for now. Find an alternative to put in scenario
-db_data_tags = ['RCT', 'WT', 'THT'] 
-
 db = scenario.database
-
-# nav_frame = list(to_latlon(scenario.localFrame.position.x,
-#                            scenario.localFrame.position.y,
-#                            scenario.localFrame.utm_zone,
-#                            northern=True))
-# print(nav_frame)
 
 nav_frame   = utils.local_frame_latlon()
 flight_area = utils.flight_area_latlon()
-
-
-def discover():
-    uavs = {}
-    for key in scenario.aircrafts.keys():
-        uavs[key] = {}
-        uavs[key]['id'] = str(key)
-        uavs[key]['name'] = scenario.aircrafts[key].config.ac_name
-        uavs[key]['gui_color'] = scenario.aircrafts[key].config.default_gui_color
-    # return {'origin': nav_frame, 'uavs':uavs, 'sample_tags':db_data_tags}
-    return {'origin': nav_frame, 'uavs':uavs, 'sample_tags':db_data_tags, 'flight_area': flight_area}
-
-
-# GPS time is *absolute*, but SAMPLE time is relative to navFrame
-def get_positions(uav_ids, trail_length, reality=True):
-    
-    positions = {}
-
-    for uav_id in uav_ids:
-
-        messages = [entry.data for entry in \
-            db['STATUS', str(uav_id)](lambda x: x.data.position.t)[-trail_length:]]
-
-        # Gather most recent information for display
-        positions[uav_id] = {
-            'heading': messages[-1].heading,
-            'speed': messages[-1].speed,
-            'time': messages[-1].position.t,
-            'path': []
-        }
-
-        for message in messages:
-            if reality:
-                position = [message.lat, message.long, message.alt]
-            else:
-                position = [message.position.x,
-                            message.position.y,
-                            message.position.z]
-            positions[uav_id]['path'].append(position)
-
-    return dict(positions=positions)
-
-
-def get_positions_uavs_map(uav_ids, trail_length):
-
-    positions = {}
-    for uav_id in uav_ids:
-        messages = [entry.data for entry in \
-            db['STATUS', str(uav_id)](lambda x: x.data.position.t)[-trail_length:]]
-
-        # Gather most recent information for display
-        positions[uav_id] = {
-            'heading': messages[-1].heading,
-            'speed'  : messages[-1].speed,
-            'time'   : messages[-1].position.t,
-            'path'   : [],
-            'times'  : []
-        }
-        for message in messages:
-            positions[uav_id]['path'].append([message.lat,
-                                              message.long,
-                                              message.alt])
-            positions[uav_id]['times'].append(message.position.t)
-
-    return dict(positions=positions)
 
 
 def get_data(uav_ids, variables, start, end=None, step=-1):

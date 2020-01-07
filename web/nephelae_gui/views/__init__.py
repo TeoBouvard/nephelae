@@ -1,14 +1,11 @@
-# from .data_views import *
-# from .template_views import *
-# from .file_views import *
-
 try:
-    from .data_views import discover, discover_maps, get_positions, get_sensor_data
+    from . import aircraft_views
+
+    from .data_views import discover_maps, get_sensor_data
     from .data_views import mesonh_box, get_section
     from .data_views import update_cloud_data, wind_data
     from .data_views import get_available_missions
     from .data_views import get_state_at_time
-    from .data_views import get_positions_uavs_map
     from .data_views import latlon_to_local
     from .data_views import get_center_of_horizontal_slice
     from .data_views import get_contour_of_horizontal_slice

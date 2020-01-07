@@ -6,11 +6,6 @@ from nephelae_gui.models.common import scenario
 from utm import from_latlon
 
 
-# Returns discovered UAVs and navigation frame info
-def discover(request):
-    return JsonResponse(tracker.discover(), safe=False)
-
-
 def discover_maps(request):
     return JsonResponse(hypercube.discover_maps(), safe=False)
 
@@ -39,22 +34,6 @@ def get_contour_of_horizontal_slice(request):
     return JsonResponse(data = hypercube.get_contour_of_horizontal_slice(
             variable, time_value, altitude_value,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
-
-# Update UAV fleet positions
-def get_positions(request):
-
-    # Parse request parameters
-    trail_length = int(request.GET.get('trail_length'))
-    uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
-    reality = request.GET.get('reality') == "true"
-
-    return JsonResponse(tracker.get_positions(uav_ids, trail_length, reality))
-
-def get_positions_uavs_map(request):
-    trail_length = int(request.GET.get('trail_length'))
-    uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
-
-    return JsonResponse(tracker.get_positions_uavs_map(uav_ids, trail_length))
 
 # Get sensor data with sample positions
 def get_sensor_data(request):
