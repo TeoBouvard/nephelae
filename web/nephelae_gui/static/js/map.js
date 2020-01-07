@@ -535,13 +535,27 @@ function click_display_location(e) {
         lat: e.latlng.lat,
         lon: e.latlng.lng
     });
+    dropdown = '<select id="dropdown_uav_id" class="browser-default">';
+    for (var uav_id in fleet){
+        dropdown += '<option>' + uav_id + '</option>';
+    }
+    dropdown += '</select>';
     $.getJSON('/latlon_to_local/?' + query, (local) => {
         location_popup
             .setLatLng(e.latlng)
             .setContent("Local: " + local.x.toFixed(2) + ", " + local.y.toFixed(2) +
-                        "<br>LatLon: " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4))
+                        "<br>LatLon: " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4) +
+                        "<br><br> Follow with UAV: " + dropdown +
+                        '<a onClick="generateMarker();" class="btn">' +
+                        '<span class="white-text"><b>Choose Center</b></span>' +
+                        '</a></p>')
             .openOn(flight_map);
     });
+}
+
+function generateMarker(){
+    var uav_selected = document.getElementById('dropdown_uav_id').value;
+    console.log(uav_selected);
 }
 
 function showCloudData(message){
@@ -557,19 +571,9 @@ function showCloudData(message){
         marker = L.circleMarker([message[variable][data]
             .center_of_mass_latlon[0], message[variable][data]
             .center_of_mass_latlon[1]]).addTo(flight_map);
-        marker.bindPopup(contentMarkerPopup(message[variable][data]));
         box_collection[variable].push(box);
         marker_collection[variable].push(marker);
     }
-}
-
-function contentMarkerPopup(data){
-    var infos = '<p style="font-family:Roboto-Light;font-size:10px">';
-
-    infos += 'LatLon (' + data.center_of_mass_latlon[0] + ', ' + data.center_of_mass_latlon[1] + ') <br>' ;
-    infos += 'Local : (' + data.center_of_mass[0] + ', ' + data.center_of_mass[1] + ') <br> ';
-
-    return infos;
 }
 
 function clearMarkers(variable_name){
