@@ -4,7 +4,8 @@ from channels.generic.websocket import WebsocketConsumer
 
 from .models.common import scenario
 
-from .models.common import websockets_ids
+from .models.common import websockets_cloudData_ids
+from .models.common import websockets_point_ids
 
 from .models import tracker, hypercube
 
@@ -70,6 +71,33 @@ class SensorConsumer(WebsocketConsumer):
             self.send(json.dumps(self.list_of_messages))
             self.list_of_messages = []
 
+class PointConsumer(WebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.id_client = args[0]['url_route']['kwargs']['id_client']
+
+    def connect(self):
+        self.accept()
+        websockets_point_ids[self.id_client] = self
+        for aircraft in scenario.aircrafts.values():
+            aircraft.add_point_observer(self)
+
+    def disconnect(self, close_code):
+        for aircraft in scenario.aircrafts.values():
+            aircraft.remove_point_observer(self)
+        del websockets_point_ids[self.id_client]
+        self.channel_layer.group_discard
+        print("Id Client Point " + self.id_client + " disconnected")
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        print(message)
+
+    def new_point(self, infos):
+        message = tracker.prettify_point(infos)
+        self.send(json.dumps(message))
 
 class StatusConsumer(WebsocketConsumer):
     def connect(self):
@@ -101,7 +129,7 @@ class CloudDataConsumer(WebsocketConsumer):
 
     def connect(self):
         self.accept()
-        websockets_ids[self.id_client] = self
+        websockets_cloudData_ids[self.id_client] = self
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -109,9 +137,9 @@ class CloudDataConsumer(WebsocketConsumer):
         print(message)
 
     def disconnect(self, close_code):
-        del websockets_ids[self.id_client]
+        del websockets_cloudData_ids[self.id_client]
         self.channel_layer.group_discard
-        print("Id Client " + self.id_client + " disconnected")
+        print("Id Client Cloud Data " + self.id_client + " disconnected")
 
     def send_cloud_data(self, variable, cloudsData):
         res = {}

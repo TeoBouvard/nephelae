@@ -15,6 +15,8 @@ try:
     from .data_views import get_contour_of_horizontal_slice
     from .data_views import get_bounding_boxes_of_horizontal_slice
     from .data_views import get_volume_of_selected_cloud
+    from .data_views import center_to_update_UAV
+    from .data_views import remove_center_to_update_UAV
     
     from .template_views import render_template
     from .file_views import plane_icon, generate_plane_icon, map_tiles, texture, model3D, layer_img
