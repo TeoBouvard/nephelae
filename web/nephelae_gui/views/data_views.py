@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 
 # from ..models import hypercube, tracker
 from nephelae_gui.models import hypercube, tracker
@@ -184,3 +184,17 @@ def local_to_latlon(request):
             scenario.localFrame.utm_zone, scenario.localFrame.utm_letter)
     return JsonResponse({'x': latlon[0],
                          'y': latlon[1]})
+
+def remove_center_to_update_UAV(request):
+    query = request.GET
+    uav_id = query.get('uav_id')
+    tracker.remove_center_to_update_UAV(uav_id)
+    return HttpResponse(status=204)
+
+def center_to_update_UAV(request):
+    query = request.GET
+    uav_id = query.get('uav_id')
+    time = float(query.get('t'))
+    coordinates = (float(query.get('x')), float(query.get('y')))
+    tracker.center_to_update_UAV(uav_id, coordinates, time)
+    return HttpResponse(status=204)

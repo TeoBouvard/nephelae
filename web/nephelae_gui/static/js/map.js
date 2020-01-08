@@ -36,6 +36,7 @@ var parameters = {
     tracked_uav: 'None',
     socket_uavs: null,
     socket_datacloud: null,
+    socket_point: null,
     time: null,
     update_wind: updateWindData,
     display_data: true,
@@ -88,6 +89,7 @@ function setupGUI(){
             .onChange(setSocketData);
         
         setSocketData();
+        setSocketPoint();
         // Create map once sliders are initialized
         setupMap();
     });
@@ -561,14 +563,39 @@ function click_display_location(e) {
 
 function generateMarker(x,y,lat,lng){
     var uav_selected = document.getElementById('dropdown_uav_id').value;
-    coordinates = {'x':x, 'y':y, 'lat':lat, 'lng':lng}
-    center_of_mass = L.circleMarker([coordinates.lat, coordinates.lng],
-                    {color: '#00FF00'})
-        .on('click', function(){
-            flight_map.removeLayer(center_of_mass);
-            delete marker_followed[uav_selected];
-        }).addTo(flight_map);
-    marker_followed[uav_selected] = center_of_mass;
+    coordinates = {'x':x, 'y':y, 'lat':lat, 'lng':lng, 't':parameters.time};
+    if (uav_selected in marker_followed && marker_followed[uav_selected]
+        !== undefined){
+        marker_followed[uav_selected].setLatLng([coordinates.lat,
+            coordinates.lng]);
+    } else {
+        marker_followed[uav_selected] = L.circleMarker(
+            [coordinates.lat, coordinates.lng],
+            {color: parameters.uavs[uav_selected].gui_color})
+            .on('click', function(){
+                var query = $.param({'uav_id': uav_selected});
+                $.getJSON('remove_marker_to_uav/?' + query, function(){
+                    flight_map.removeLayer(marker_followed[uav_selected]);
+                    delete marker_followed[uav_selected];
+                })
+            });
+        marker_followed[uav_selected].addTo(flight_map);
+    }
+    sendMarkerToUAV(uav_selected, coordinates);
+}
+
+function sendMarkerToUAV(uav_selected, coordinates){
+    var query = $.param({
+        'x': coordinates.x,
+        'y': coordinates.y,
+        't': coordinates.t,
+        'uav_id': uav_selected
+    });
+    $.getJSON('send_marker_to_uav/?' + query)
+}
+
+function updateMarker(message){
+    marker_followed[message.id].setLatLng([message.lat, message.lng]);
 }
 
 function showCloudData(message){
@@ -597,19 +624,25 @@ function clearMarkers(variable_name){
         for (var i = 0; i < box_collection[variable_name].length; i++)
             flight_map.removeLayer(box_collection[variable_name][i]);
 
-    marker_collection[variable_name] = []
-    box_collection[variable_name] = []
+    marker_collection[variable_name] = [];
+    box_collection[variable_name] = [];
 }
 
 function setSocketData(){
     if (!parameters.socket_datacloud && parameters.display_data){
-        parameters.socket = new WebSocket('ws://' + 
+        parameters.socket_datacloud = new WebSocket('ws://' + 
             window.location.host + '/ws/sensor/cloud_data/' + id + '/');
-        parameters.socket.onmessage = (e) => showCloudData(JSON.parse(e.data));
-    } else if (parameters.socket && !parameters.display_data){
-        parameters.socket.close();
-        parameters.socket = null;
+        parameters.socket_datacloud.onmessage = (e) => showCloudData(JSON.parse(e.data));
+    } else if (parameters.socket_datacloud && !parameters.display_data){
+        parameters.socket_datacloud.close();
+        parameters.socket_datacloud = null;
         for (key in maps_parameters)
             clearMarkers(key);
     }
+}
+
+function setSocketPoint(){
+    parameters.socket_point = new WebSocket('ws://' + 
+        window.location.host + '/ws/sensor/point/' + id + '/');
+    parameters.socket_point.onmessage = (e) => updateMarker(JSON.parse(e.data));
 }

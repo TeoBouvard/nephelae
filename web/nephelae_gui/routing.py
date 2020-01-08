@@ -15,4 +15,5 @@ websocket_urlpatterns = [
     url('ws/status/', consumers.StatusConsumer),
     url(r'^ws/sensor/cloud_data/(?P<id_client>\d+)/$',
         consumers.CloudDataConsumer),
+    url(r'^ws/sensor/point/(?P<id_client>\d+)/$', consumers.PointConsumer),
 ]

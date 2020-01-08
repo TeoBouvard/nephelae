@@ -19,6 +19,8 @@ urlpatterns = [
     path('map/plane_icon/<int:index>', views.plane_icon, name='plane_icon'),
     path('map/generated_plane_icon/<str:color>', views.generate_plane_icon, name='generated_plane_icon'),
     path('map/<str:variable_name>_img/', views.layer_img, name='layer_img'),
+    path('map/send_marker_to_uav/', views.center_to_update_UAV),
+    path('map/remove_marker_to_uav/', views.remove_center_to_update_UAV),
 
     # URL for simulation page
     path('simulation/', views.render_template, {'template_name': 'simulation.html'}, name='simulation'),

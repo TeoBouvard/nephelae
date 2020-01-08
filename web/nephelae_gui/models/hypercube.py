@@ -21,11 +21,10 @@ imcount = 0
 from . import utils
 from . import common
 
-maps           = common.scenario.maps
-hypercube      = common.scenario.mesonhDataset
-websockets_ids = common.websockets_ids
-clouds_ids     = common.clouds_ids
-localFrame     = common.scenario.localFrame
+maps                     = common.scenario.maps
+hypercube                = common.scenario.mesonhDataset
+websockets_cloudData_ids = common.websockets_cloudData_ids
+localFrame               = common.scenario.localFrame
 
 def discover_maps():
     res = {}
@@ -72,8 +71,8 @@ def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
 
     map0 = maps[variable_name][u_time, x0:x1, y0:y1, u_altitude]
 
-    if id_client in websockets_ids and not "_border" in variable_name:
-        websockets_ids[id_client].send_cloud_data(variable_name,
+    if id_client in websockets_cloudData_ids and not "_border" in variable_name:
+        websockets_cloudData_ids[id_client].send_cloud_data(variable_name,
             CloudData.from_scaledArray(map0))
 
     if isinstance(map0, tuple) and "_border" in variable_name:

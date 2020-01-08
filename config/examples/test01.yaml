@@ -68,6 +68,8 @@ aircrafts:
                 mesonhFiles: *mesonh_files
                 mesonhVariables: ['RCT', 'WT', 'THT', ['UT', 'VT']]
                 rctFeedback: True
+            - CloudCenterTracker:
+                mapWhereCenterIs: 'LWC'
 
 maps:
     kernels:

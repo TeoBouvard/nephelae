@@ -114,6 +114,17 @@ def get_state_at_time(uav_ids, variables, at_time):
             }
     return data
 
+def center_to_update_UAV(uav_id, coordinates, time):
+    aircraft = scenario.aircrafts[uav_id]
+    if hasattr(aircraft, 'set_computing_center'):
+        aircraft.set_computing_center(True)
+    if hasattr(aircraft, 'cloud_center_to_track_setter'):
+        aircraft.cloud_center_to_track_setter(coordinates, time)
+
+def remove_center_to_update_UAV(uav_id):
+    aircraft = scenario.aircrafts[uav_id]
+    if hasattr(aircraft, 'set_computing_center'):
+        aircraft.set_computing_center(False)
 
 def prettify_gps(message):
 
@@ -134,3 +145,11 @@ def prettify_sample(message):
         position=message.position.data.tolist(),
         data=message.data,
     )
+
+def prettify_point(message):
+    localFrame = scenario.localFrame
+    position = list(to_latlon(message['x'] + localFrame.utm_east, message['y'] +
+            localFrame.utm_north, localFrame.utm_zone, localFrame.utm_letter))
+    message['lat'] = position[0]
+    message['lng'] = position[1]
+    return message
