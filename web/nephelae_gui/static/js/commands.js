@@ -259,7 +259,7 @@ function generateItems(){
 }
 
 function new_mission_element_clicked(aircraftId) {
-    $.getJSON('/commands/available_missions/'+aircraftId, (response) => {
+    $.getJSON('/aircrafts/available_missions/'+aircraftId, (response) => {
 
         if (response.mission_types.length <= 0) {
             newHtml = '<span class="left">No missions defined for this aircraft.</span>';
@@ -296,13 +296,21 @@ function new_mission_element_clicked(aircraftId) {
 
 function mission_selected(aircraftId) {
     missionType = $('#'+aircraftId+'_card #mission_input #mission_selector')[0].value;
+    $.getJSON('/aircrafts/mission_parameters/'+aircraftId+'/'+missionType,
+              (response) =>{
+        
+        html = '';
+        for (parameterName of response.parameter_names) {
 
-    $('#'+aircraftId+'_card #mission_input #mission_params').html(
-        '<p>Selected mission : '+missionType+'</p>');
-    
-    console.log("Selecting mission for " + aircraftId + " " + missionType);
-    //html = $('#'+aircraftId+'_card #mission_input')[0].innerHTML;
-    //console.log(html)
+            html += '<div id="div_'+parameterName+'" class="input-field col s12">' +
+                        '<input id="'+parameterName+'" type="text" class="validate">' + 
+                        //'<input id="'+parameterName+'" type="text" class="validate" value="test">' + 
+                        '<label for="'+parameterName+'">'+parameterName+'</label>' +
+                    '</div><br>';
+        }
+        $('#'+aircraftId+'_card #mission_input #mission_params').html(html);
+        $('input#input_text, textarea#textarea2').characterCounter();
+    });
 }
 
 

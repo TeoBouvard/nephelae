@@ -97,3 +97,17 @@ def get_available_missions(request, aircraftId):
     return JsonResponse(response)
 
 
+def get_mission_parameters(request, aircraftId, missionType):
+    response = {'aircraftId' : aircraftId,
+                'missionType': missionType}
+    try:
+        response['parameter_names'] = \
+            scenario.aircrafts[aircraftId].mission_parameter_names(missionType)
+        response['parameter_rules'] = \
+            scenario.aircrafts[aircraftId].mission_parameter_rules(missionType)
+    except KeyError:
+        warn("Error while fetching parameters for mission '" + missionType +
+             "' for aircraft " + aircraftId)
+        response['parameters_names'] = []
+        response['parameters_rules'] = {}
+    return JsonResponse(response)

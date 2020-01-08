@@ -33,7 +33,8 @@ try:
 
         # URL for commands page
         path('commands/', template_views.render_template, {'template_name': 'commands.html'}, name='commands'),
-        path('commands/available_missions/<str:aircraftId>', aircraft_views.get_available_missions),
+        path('aircrafts/available_missions/<str:aircraftId>', aircraft_views.get_available_missions),
+        path('aircrafts/mission_parameters/<str:aircraftId>/<str:missionType>', aircraft_views.get_mission_parameters),
 
         # URL for sections page
         path('sections/', template_views.render_template, {'template_name': 'sections.html'}, name='sections'),
@@ -64,8 +65,6 @@ try:
         path('discover/', aircraft_views.discover),
         # To discover mapping layers available (from a nephelae.mapping.MapServer
         path('discover_maps/', data_views.discover_maps),
-
-        # path('missions/available_missions/', views.get_available_missions),
 
 
         path('latlon_to_local/', misc_views.latlon_to_local)
