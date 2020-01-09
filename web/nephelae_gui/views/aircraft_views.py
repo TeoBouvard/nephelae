@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+import re
 
 from nephelae_gui.models import hypercube, utils
 from nephelae_gui.models.common import scenario, db_data_tags
@@ -111,3 +112,36 @@ def get_mission_parameters(request, aircraftId, missionType):
         response['parameters_names'] = []
         response['parameters_rules'] = {}
     return JsonResponse(response)
+
+
+def create_mission(request):
+    
+    def parse_parameter(param, key):
+        """Converts a string in a float or list of floats"""
+        words = re.findall("[-+]?\d*\.\d+|[-+]?\d+", param)
+        if len(words) < 1:
+            raise ValueError("invalid value ("+param+") for parameter " + key)
+        if len(words) == 1:
+            return float(words[0])
+        else:
+            return [float(w) for w in words]
+
+    aircraftId  =   str(request.GET.get('aircraftId'));
+    missionType =   str(request.GET.get('missionType'));
+    insertMode  =   int(request.GET.get('insertMode'));
+    duration    = float(request.GET.get('duration'));
+
+    params = {}
+    for key in request.GET:
+        if 'params_' not in key:
+            continue
+        params[key.split('params_')[1]] = parse_parameter(request.GET[key], key)
+
+    scenario.aircrafts[aircraftId].create_mission(
+        missionType, insertMode, duration, **params)
+
+    return JsonResponse({'called':'called!'})
+
+
+
+

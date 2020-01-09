@@ -35,6 +35,7 @@ try:
         path('commands/', template_views.render_template, {'template_name': 'commands.html'}, name='commands'),
         path('aircrafts/available_missions/<str:aircraftId>', aircraft_views.get_available_missions),
         path('aircrafts/mission_parameters/<str:aircraftId>/<str:missionType>', aircraft_views.get_mission_parameters),
+        path('aircrafts/create_mission/', aircraft_views.create_mission),
 
         # URL for sections page
         path('sections/', template_views.render_template, {'template_name': 'sections.html'}, name='sections'),

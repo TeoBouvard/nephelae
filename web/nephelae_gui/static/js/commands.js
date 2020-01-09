@@ -3,6 +3,7 @@ $('#nav_commands').addClass('active');
 
 var gui, gui_commands, gui_mission, chart;
 var command_list = ['Vertical Profile', 'Horizontal Slice', 'Volumetric Flow Rate', '...']
+var currentParameterNames;
 
 var parameters = {
     fleet: {},
@@ -230,13 +231,6 @@ function generateItems(){
                 }
                 html += '<br>';
 
-                //html += '<span class="left">';
-                //html += '<a class="waves-effect waves-light btn-small" onclick="new_mission_element_clicked('+aircraftId+')">New mission</a>';
-                //html += '</span><br>';
-
-                //html += '<div id="mission_input">';
-                //html += '</div>';
-
                 html += '<span class="left">';
                 html += '<a class="waves-effect waves-light btn-small modal-trigger" href="#modal_'+aircraftId+'" onclick="new_mission_element_clicked('+aircraftId+')">New mission</a>';
                 html += '</span><br>';
@@ -248,7 +242,7 @@ function generateItems(){
                 html +=     '</div>';
                 html +=     '<div class="modal-footer">';
                 html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>';
-                html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Send</a>';
+                html +=         '<a href="#!" class="waves-effect waves-green btn-flat" onclick="create_mission('+aircraftId+')">Create</a>';
                 html +=     '</div>';
                 html += '</div>';
 
@@ -263,13 +257,13 @@ function new_mission_element_clicked(aircraftId) {
     $.getJSON('/aircrafts/available_missions/'+aircraftId, (response) => {
 
         if (response.mission_types.length <= 0) {
-            newHtml = '<span class="left">No missions defined for this aircraft.</span>';
+            var newHtml = '<span class="left">No missions defined for this aircraft.</span>';
             $('#'+aircraftId+'_card #mission_input').html(newHtml);
         }
         else
         {
             // Building drop down list to select mission
-            newHtml = '<br><div class="input-field">';
+            var newHtml = '<br><div class="input-field">';
             newHtml += '<select id="mission_selector" name="Mission Type">';
             for (missionType of response.mission_types) {
                 newHtml += '<option value='+missionType+'>'+missionType+'</option>';
@@ -296,32 +290,52 @@ function new_mission_element_clicked(aircraftId) {
 }
 
 function mission_selected(aircraftId) {
-    missionType = $('#'+aircraftId+'_card #mission_input #mission_selector')[0].value;
+    var missionType = $('#'+aircraftId+'_card #mission_input #mission_selector')[0].value;
     $.getJSON('/aircrafts/mission_parameters/'+aircraftId+'/'+missionType,
               (response) =>{
         
-        //html = '';
         html = '<div class="input-field col s12">';
         html += '<select id="insert_mode_selector" name="Insert Mode">';
             html += '<option value=0>Append</option>';
             html += '<option value=1>Prepend</option>';
         html += '</select>';
         html += '<label>Insert mode</label>';
-        html += '</div><br>';
+        html += '</div>';
+        html += '<div id="div_duration" class="input-field col s12">' +
+                    '<input id="duration" type="text" class="validate">' + 
+                    '<label for="duration">Duration</label>' +
+                '</div>';
+        currentParameterNames = [];
         for (parameterName of response.parameter_names) {
-    
             html += '<div id="div_'+parameterName+'" class="input-field col s12">' +
                         '<input id="'+parameterName+'" type="text" class="validate">' + 
-                        //'<input id="'+parameterName+'" type="text" class="validate" value="test">' + 
                         '<label for="'+parameterName+'">'+parameterName+'</label>' +
-                    '</div><br>';
+                    '</div>';
+            currentParameterNames.push(parameterName);
         }
         $('#'+aircraftId+'_card #mission_input #mission_params').html(html);
         $('input#input_text, textarea#textarea2').characterCounter();
         $('select').formSelect();
+        $('#'+aircraftId+'_card #mission_input' + ' #duration')[0].value='-1.0';
     });
 }
 
+function create_mission(aircraftId) {
+    var missionInput = '#'+aircraftId+'_card #mission_input';
+    
+    var query = {};
+    query['aircraftId']  = aircraftId;
+    query['missionType'] = $(missionInput + ' #mission_selector')[0].value;
+    query['insertMode']  = $(missionInput + ' #insert_mode_selector')[0].value;
+    query['duration']    = $(missionInput + ' #duration')[0].value;
+    for (parameterName of currentParameterNames) {
+        query['params_' + parameterName] = $(missionInput + ' #' + parameterName)[0].value;
+    }
+
+    $.getJSON('/aircrafts/create_mission/?' + $.param(query), (response) => {
+        console.log(response);
+    });
+}
 
 function secondsToMMSSstring(seconds) {
     secs = (seconds % 60).toString();
