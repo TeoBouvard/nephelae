@@ -241,15 +241,16 @@ function generateItems(){
                 html += '<a class="waves-effect waves-light btn-small modal-trigger" href="#modal_'+aircraftId+'" onclick="new_mission_element_clicked('+aircraftId+')">New mission</a>';
                 html += '</span><br>';
 
-                html += '<div id="modal_'+aircraftId+'" class="modal">'
-                html +=     '<div class="modal-content black-text">'
-                html +=         '<h4>Create mission for aircraft '+aircraftId+'</h4>'
-                html +=         '<p><div id="mission_input"></div></p>'
-                html +=     '</div>'
-                html +=     '<div class="modal-footer">'
-                html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>'
-                html +=     '</div>'
-                html += '</div>'
+                html += '<div id="modal_'+aircraftId+'" class="modal modal-fixed-footer">';
+                html +=     '<div class="modal-content black-text">';
+                html +=         '<h4>Create mission for aircraft '+aircraftId+'</h4>';
+                html +=         '<p><div id="mission_input"></div></p>';
+                html +=     '</div>';
+                html +=     '<div class="modal-footer">';
+                html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>';
+                html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Send</a>';
+                html +=     '</div>';
+                html += '</div>';
 
             html += '</div>';
         html += '</div>';
@@ -267,15 +268,15 @@ function new_mission_element_clicked(aircraftId) {
         }
         else
         {
-            //newHtml = '<br>' +
-            //'<span class="left">Mission input:</span> <p class="right">' + aircraftId + '</p>';
-
             // Building drop down list to select mission
-            newHtml = '<select id="mission_selector" name="Mission Type">';
+            newHtml = '<br><div class="input-field">';
+            newHtml += '<select id="mission_selector" name="Mission Type">';
             for (missionType of response.mission_types) {
                 newHtml += '<option value='+missionType+'>'+missionType+'</option>';
             }
-            newHtml += '</select><br>';
+            newHtml += '</select>';
+            newHtml += '<label>Mission type</label>';
+            newHtml += '</div><br>';
             
             // Creating div for parameter input to be filled by mission_selected
             newHtml += '<div id="mission_params"></div>';
@@ -299,9 +300,16 @@ function mission_selected(aircraftId) {
     $.getJSON('/aircrafts/mission_parameters/'+aircraftId+'/'+missionType,
               (response) =>{
         
-        html = '';
+        //html = '';
+        html = '<div class="input-field col s12">';
+        html += '<select id="insert_mode_selector" name="Insert Mode">';
+            html += '<option value=0>Append</option>';
+            html += '<option value=1>Prepend</option>';
+        html += '</select>';
+        html += '<label>Insert mode</label>';
+        html += '</div><br>';
         for (parameterName of response.parameter_names) {
-
+    
             html += '<div id="div_'+parameterName+'" class="input-field col s12">' +
                         '<input id="'+parameterName+'" type="text" class="validate">' + 
                         //'<input id="'+parameterName+'" type="text" class="validate" value="test">' + 
@@ -310,6 +318,7 @@ function mission_selected(aircraftId) {
         }
         $('#'+aircraftId+'_card #mission_input #mission_params').html(html);
         $('input#input_text, textarea#textarea2').characterCounter();
+        $('select').formSelect();
     });
 }
 
