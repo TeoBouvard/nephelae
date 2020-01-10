@@ -113,15 +113,33 @@ def get_mission_parameters(request, aircraftId, missionType):
     response = {'aircraftId' : aircraftId,
                 'missionType': missionType}
     try:
-        response['parameter_names'] = \
-            scenario.aircrafts[aircraftId].mission_parameter_names(missionType)
-        response['parameter_rules'] = \
-            scenario.aircrafts[aircraftId].mission_parameter_rules(missionType)
+        aircraft = scenario.aircrafts[aircraftId]
+        response['parameter_names'] = aircraft.mission_parameter_names(missionType)
+        response['parameter_tags']  = aircraft.mission_parameter_tags(missionType)
+        response['parameter_rules'] = aircraft.mission_parameter_rules(missionType)
     except KeyError:
         warn("Error while fetching parameters for mission '" + missionType +
              "' for aircraft " + aircraftId)
         response['parameters_names'] = []
+        response['parameters_tags']  = {}
         response['parameters_rules'] = {}
+    return JsonResponse(response)
+
+
+def get_mission_updatables(request, aircraftId, missionType):
+    response = {'aircraftId' : aircraftId,
+                'missionType': missionType}
+    try:
+        aircraft = scenario.aircrafts[aircraftId]
+        response['updatable_names'] = aircraft.mission_updatable_names(missionType)
+        response['updatable_tags']  = aircraft.mission_updatable_tags(missionType)
+        response['updatable_rules'] = aircraft.mission_updatable_rules(missionType)
+    except KeyError:
+        warn("Error while fetching updatables for mission '" + missionType +
+             "' for aircraft " + aircraftId)
+        response['updatables_names'] = []
+        response['updatables_tags']  = {}
+        response['updatables_rules'] = {}
     return JsonResponse(response)
 
 
