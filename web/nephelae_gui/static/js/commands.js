@@ -293,7 +293,7 @@ function mission_selected(aircraftId) {
     var missionType = $('#'+aircraftId+'_card #mission_input #mission_selector')[0].value;
     $.getJSON('/aircrafts/mission_parameters/'+aircraftId+'/'+missionType,
               (response) =>{
-        
+
         html = '<div class="input-field col s12">';
         html += '<select id="insert_mode_selector" name="Insert Mode">';
             html += '<option value=0>Append</option>';
@@ -303,20 +303,39 @@ function mission_selected(aircraftId) {
         html += '</div>';
         html += '<div id="div_duration" class="input-field col s12">' +
                     '<input id="duration" type="text" class="validate">' + 
-                    '<label for="duration">Duration</label>' +
+                    '<label id="duration_label" for="duration">Duration</label>' +
                 '</div>';
         currentParameterNames = [];
         for (parameterName of response.parameter_names) {
             html += '<div id="div_'+parameterName+'" class="input-field col s12">' +
                         '<input id="'+parameterName+'" type="text" class="validate">' + 
-                        '<label for="'+parameterName+'">'+parameterName+'</label>' +
+                        '<label id="'+parameterName+'_label" for="'+parameterName+'">'+parameterName+'</label>' +
                     '</div>';
             currentParameterNames.push(parameterName);
         }
         $('#'+aircraftId+'_card #mission_input #mission_params').html(html);
+
+        // Setting a default value for duration input field
+        $('#'+aircraftId+'_card #mission_input' + ' #duration')[0].value='-1.0';
+        // This is to show the label correctly (overwise overlap with value on display)
+        $('#'+aircraftId+'_card #mission_input' + ' #duration_label')[0].classList.add('active');
+
+        // Setting default values for parameter fields when given
+        for (parameterName of response.parameter_names) {
+            if (!(parameterName in response.parameter_rules))
+                continue;
+            console.log(response.parameter_rules[parameterName]);
+            if (!('default' in response.parameter_rules[parameterName]))
+                continue;
+
+            // Setting a default value for this parameter
+            $('#'+aircraftId+'_card #mission_input' + ' #'+parameterName)[0].value = String(response.parameter_rules[parameterName]['default']);
+            // This is to show the label correctly (overwise overlap with value on display)
+            $('#'+aircraftId+'_card #mission_input' + ' #'+parameterName+'_label')[0].classList.add('active');
+        }
+
         $('input#input_text, textarea#textarea2').characterCounter();
         $('select').formSelect();
-        $('#'+aircraftId+'_card #mission_input' + ' #duration')[0].value='-1.0';
     });
 }
 
