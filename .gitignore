@@ -11,3 +11,4 @@ web/nephelae_gui/static/map_tiles/*
 nephelae_master
 venv
 pprzlink
+backup_*.bin

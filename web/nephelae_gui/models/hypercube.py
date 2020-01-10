@@ -9,22 +9,36 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from nephelae.mapping import compute_list_of_coms, compute_cross_section_border
-from nephelae.mapping import compute_bounding_box
-from nephelae.mapping import compute_selected_element_volume
-from nephelae.mapping import BorderIncertitude, BorderRaw
+try:
+    from nephelae.mapping import compute_list_of_coms
+    from nephelae.mapping import compute_cross_section_border
+    from nephelae.mapping import compute_bounding_box
+    from nephelae.mapping import compute_selected_element_volume
+    from nephelae.mapping import BorderIncertitude, BorderRaw
+    
+    from nephelae.database import CloudData
+    
+    imcount = 0
+    
+    from . import utils
+    from . import common
+    
+    maps                     = common.scenario.maps
+    hypercube                = common.scenario.mesonhDataset
+    websockets_cloudData_ids = common.websockets_cloudData_ids
+    websockets_point_ids     = common.websockets_point_ids
+    localFrame               = common.scenario.localFrame
 
-from nephelae.database import CloudData
-
-imcount = 0
-
-from . import utils
-from . import common
-
-maps                     = common.scenario.maps
-hypercube                = common.scenario.mesonhDataset
-websockets_cloudData_ids = common.websockets_cloudData_ids
-localFrame               = common.scenario.localFrame
+except Exception as e:
+    import sys
+    import os
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+    print("# Caught exception #############################################\n    ", e, flush=True)
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = exc_tb.tb_frame.f_code.co_filename
+    print(exc_type, fname, exc_tb.tb_lineno,
+          end="\n############################################################\n\n\n", flush=True)
+    raise e
 
 def discover_maps():
     res = {}
@@ -232,32 +246,3 @@ def box():
         {'min': dims[3]['data'][0], 'max':dims[3]['data'][-1]},
         {'min': dims[2]['data'][0], 'max':dims[2]['data'][-1]}]
     return box
-
-def prettify_cloud_data(dataCloud):
-    bounding_box = dataCloud.get_bounding_box()
-    south_west = tuple(x.min for x in bounding_box)
-    north_east = tuple(x.max for x in bounding_box)
-    return dict(
-        center_of_mass=dataCloud.get_com(),
-        center_of_mass_latlon=to_latlon(dataCloud.get_com()[0] +
-            localFrame.utm_east, dataCloud.get_com()[1] +
-            localFrame.utm_north, localFrame.utm_zone,
-            localFrame.utm_letter),
-        surface=dataCloud.get_surface(),
-        box=[north_east, south_west],
-        box_latlon=[to_latlon(north_east[0] + localFrame.utm_east,
-                        north_east[1] + localFrame.utm_north,
-                        localFrame.utm_zone, localFrame.utm_letter),
-                    to_latlon(south_west[0] + localFrame.utm_east,
-                        south_west[1] + localFrame.utm_north, 
-                        localFrame.utm_zone, localFrame.utm_letter)]
-    )
-
-def maj_tampon_cloudData(observations, variable, index):
-    pass
-    # Recuperation du vent (fonction de changement)
-    # Bruit ? (pas obligatoire mais peut etre plus tard)
-    # if not clouds_ids or not clouds_ids[variable]:
-    #     clouds_ids[variable] = observations
-    # else:
-    #     for (observation in obversations):

@@ -2,12 +2,24 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 
-from .models.common import scenario
+try:
+    from .models.common import scenario, db_data_tags
+    from .models.common import websockets_cloudData_ids, websockets_point_ids
+    from .models import hypercube
+    from utm import from_latlon, to_latlon
 
-from .models.common import websockets_cloudData_ids
-from .models.common import websockets_point_ids
+    localFrame = scenario.localFrame
 
-from .models import tracker, hypercube
+except Exception as e:
+    import sys
+    import os
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+    print("# Caught exception #############################################\n    ", e, flush=True)
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = exc_tb.tb_frame.f_code.co_filename
+    print(exc_type, fname, exc_tb.tb_lineno,
+         end="\n############################################################\n\n\n", flush=True)
+    raise e
 
 # propably some names to change in here
 
@@ -63,9 +75,12 @@ class SensorConsumer(WebsocketConsumer):
 
 
     def add_sample(self, sample):
-        if sample.variableName not in tracker.db_data_tags:
+        if sample.variableName not in db_data_tags:
             return
-        message = tracker.prettify_sample(sample)
+        message = {'uav_id':       sample.producer,
+                   'variable_name':sample.variableName,
+                   'position':     sample.position.data.tolist(),
+                   'data':         sample.data}
         self.list_of_messages.append(message)
         if(len(self.list_of_messages) >= self.number_of_messages):
             self.send(json.dumps(self.list_of_messages))
@@ -96,8 +111,12 @@ class PointConsumer(WebsocketConsumer):
         print(message)
 
     def new_point(self, infos):
-        message = tracker.prettify_point(infos)
-        self.send(json.dumps(message))
+        position = list(to_latlon(infos['x']
+            + localFrame.utm_east, infos['y'] + localFrame.utm_north,
+            localFrame.utm_number, localFrame.utm_letter))
+        infos['lat'] = position[0]
+        infos['lng'] = position[1]
+        self.send(json.dumps(infos))
 
 class StatusConsumer(WebsocketConsumer):
     def connect(self):
@@ -145,5 +164,20 @@ class CloudDataConsumer(WebsocketConsumer):
         res = {}
         res[variable] = []
         for i in range(len(cloudsData)):
-            res[variable].append(hypercube.prettify_cloud_data(cloudsData[i]))
+            bounding_box = cloudsData[i].get_bounding_box()
+            south_west = tuple(x.min for x in bounding_box)
+            north_east = tuple(x.max for x in bounding_box)
+            res[variable].append({'center_of_mass': cloudsData[i].get_com(),
+                'center_of_mass_latlon': to_latlon(cloudsData[i].get_com()[0] +
+                    localFrame.utm_east, cloudsData[i].get_com()[1] +
+                    localFrame.utm_north, localFrame.utm_number,
+                    localFrame.utm_letter),
+                'surface': cloudsData[i].get_surface(),
+                'box': [north_east, south_west],
+                'box_latlon': [to_latlon(north_east[0] + localFrame.utm_east,
+                        north_east[1] + localFrame.utm_north,
+                        localFrame.utm_number, localFrame.utm_letter),
+                    to_latlon(south_west[0] + localFrame.utm_east,
+                        south_west[1] + localFrame.utm_north, 
+                        localFrame.utm_number, localFrame.utm_letter)]})
         self.send(json.dumps(res))

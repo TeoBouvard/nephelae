@@ -20,4 +20,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    signal.signal(signal.SIGINT, lambda frame, sig: models.tracker.on_exit())
