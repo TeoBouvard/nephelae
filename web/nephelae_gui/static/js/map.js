@@ -41,6 +41,7 @@ var parameters = {
     update_wind: updateWindData,
     display_data: true,
     origin: null,
+    displayedTime: null,
     flight_area: null
 }
 
@@ -165,10 +166,13 @@ function setupMap(){
         };
 
         maps_parameters  = discovered_maps;
+        bounds = getCurrentBounds();
+        var requested_map = computeMapUrl();
         for (var key in maps_parameters) {
             if (maps_parameters[key]['sample_size'] == 1) {
-                bounds = getCurrentBounds();
-                overlays[maps_parameters[key]['name']] = L.imageOverlay(maps_parameters[key]['url'] + '_img/?' + computeMapUrl(), bounds);
+                overlays[maps_parameters[key]['name']] = L.imageOverlay(
+                    maps_parameters[key]['url'] + '_img/?' + requested_map,
+                    bounds);
             }
             if (maps_parameters[key]['sample_size'] == 2) {
                 overlays[maps_parameters[key]['name']] = L.velocityLayer({
@@ -236,6 +240,7 @@ function waitForAllMaps(map){
         i += 1;
     }
     if (check){
+        parameters.displayedTime = parameters.time;
         updateMapsUrl(list_keys);
         for(var j =0; j < list_keys.length; j++){
             loaded_map[list_keys[j]] = false;
@@ -410,25 +415,27 @@ function controller_callbackLoad(){
 }
 
 function loadMap(key){
+    var requested_map = computeMapUrl();
     if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
             if(maps_parameters[key]['sample_size'] == 1)
                 overlays[maps_parameters[key]['name']].setUrl(
-                    maps_parameters[key]['url'] + '_img/?' + computeMapUrl());
+                    maps_parameters[key]['url'] + '_img/?' + requested_map);
             else
-                $.getJSON('wind/?' + computeMapUrl(), (response) => {
+                $.getJSON('wind/?' + requested_map, (response) => {
                     overlays[maps_parameters[key]['name']].setData(response);
                 });
     }
 }
 
 function updateMapsUrl(list_keys){
+    var requested_map = computeMapUrl();
     for(var key of list_keys){
         if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) {
             if(maps_parameters[key]['sample_size'] == 1)
                 overlays[maps_parameters[key]['name']].setUrl(
-                    maps_parameters[key]['url'] + '_img/?' + computeMapUrl());
+                    maps_parameters[key]['url'] + '_img/?' + requested_map);
             else
-                $.getJSON('wind/?' + computeMapUrl(), (response) => {
+                $.getJSON('wind/?' + requested_map, (response) => {
                     overlays[maps_parameters[key]['name']].setData(response);
                 });
         }
@@ -436,10 +443,11 @@ function updateMapsUrl(list_keys){
 }
 
 function updateWindData() {
+    var requested_map = computeMapUrl();
     for(var key in maps_parameters) {
         if(flight_map.hasLayer(overlays[maps_parameters[key]['name']])) { // checks if map if currently displayed
             if(maps_parameters[key]['sample_size'] == 2) {
-                $.getJSON(maps_parameters[key]['url'] + '_wind/?' + computeMapUrl(), (response) => {
+                $.getJSON(maps_parameters[key]['url'] + '_wind/?' + requested_map, (response) => {
                     overlays[maps_parameters[key]['name']].setData(response);
                 });
             }
@@ -562,26 +570,29 @@ function click_display_location(e) {
 }
 
 function generateMarker(x,y,lat,lng){
-    var uav_selected = document.getElementById('dropdown_uav_id').value;
-    coordinates = {'x':x, 'y':y, 'lat':lat, 'lng':lng, 't':parameters.time};
-    if (uav_selected in marker_followed && marker_followed[uav_selected]
-        !== undefined){
-        marker_followed[uav_selected].setLatLng([coordinates.lat,
-            coordinates.lng]);
-    } else {
-        marker_followed[uav_selected] = L.circleMarker(
-            [coordinates.lat, coordinates.lng],
-            {color: parameters.uavs[uav_selected].gui_color})
-            .on('click', function(){
-                var query = $.param({'uav_id': uav_selected});
-                $.getJSON('remove_marker_to_uav/?' + query, function(){
-                    flight_map.removeLayer(marker_followed[uav_selected]);
-                    delete marker_followed[uav_selected];
-                })
-            });
-        marker_followed[uav_selected].addTo(flight_map);
+    if (parameters.displayedTime && Object.keys(loaded_map).length !== 0){
+        var uav_selected = document.getElementById('dropdown_uav_id').value;
+        coordinates = {'x':x, 'y':y, 'lat':lat, 'lng':lng,
+            't':parameters.displayedTime};
+        if (uav_selected in marker_followed && marker_followed[uav_selected]
+            !== undefined){
+            marker_followed[uav_selected].setLatLng([coordinates.lat,
+                coordinates.lng]);
+        } else {
+            marker_followed[uav_selected] = L.circleMarker(
+                [coordinates.lat, coordinates.lng],
+                {color: parameters.uavs[uav_selected].gui_color})
+                .on('click', function(){
+                    var query = $.param({'uav_id': uav_selected});
+                    $.getJSON('remove_marker_to_uav/?' + query, function(){
+                        flight_map.removeLayer(marker_followed[uav_selected]);
+                        delete marker_followed[uav_selected];
+                    })
+                });
+            marker_followed[uav_selected].addTo(flight_map);
+        }
+        sendMarkerToUAV(uav_selected, coordinates);
     }
-    sendMarkerToUAV(uav_selected, coordinates);
 }
 
 function sendMarkerToUAV(uav_selected, coordinates){
