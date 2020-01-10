@@ -9,16 +9,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from nephelae.mapping import compute_com, compute_cross_section_border
-from nephelae.mapping import BorderIncertitude
+try:
+    from nephelae.mapping import compute_com, compute_cross_section_border
+    from nephelae.mapping import BorderIncertitude
+    
+    imcount = 0
+    
+    from . import utils
+    from . import common
+    
+    maps      = common.scenario.maps
+    hypercube = common.scenario.mesonhDataset
 
-imcount = 0
+except Exception as e:
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+   print("# Caught exception #############################################\n    ", e)
+   exc_type, exc_obj, exc_tb = sys.exc_info()
+   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+   print(exc_type, fname, exc_tb.tb_lineno,
+         end="\n############################################################\n\n\n")
+   raise e
 
-from . import utils
-from . import common
-
-maps      = common.scenario.maps
-hypercube = common.scenario.mesonhDataset
 
 def discover_maps():
     res = {}

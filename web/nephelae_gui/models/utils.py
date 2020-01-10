@@ -4,8 +4,18 @@ from utm import to_latlon, from_latlon
 from geopy.distance import distance
 from matplotlib.colors import ListedColormap
 
-from . import common
-from .common import scenario
+try:
+    from . import common
+    from .common import scenario
+except Exception as e:
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+   print("# Caught exception #############################################\n    ", e)
+   exc_type, exc_obj, exc_tb = sys.exc_info()
+   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+   print(exc_type, fname, exc_tb.tb_lineno,
+         end="\n############################################################\n\n\n")
+   raise e
+
 
 def local_frame_latlon():
     return list(to_latlon(scenario.localFrame['utm_east'],
