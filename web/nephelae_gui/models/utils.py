@@ -22,8 +22,8 @@ except Exception as e:
 def local_frame_latlon():
     return list(to_latlon(scenario.localFrame['utm_east'],
                           scenario.localFrame['utm_north'],
-                          scenario.localFrame.utm_zone,
-                          northern=True))
+                          scenario.localFrame.utm_number,
+                          scenario.localFrame.utm_letter))
 
 def flight_area_latlon():
     localFrame = scenario.localFrame
@@ -32,20 +32,22 @@ def flight_area_latlon():
     return {
         'lower_left': to_latlon(flightArea[0][0] + localFrame['utm_east'],
                                 flightArea[0][1] + localFrame['utm_north'],
-                                localFrame.utm_zone, northern=True),
+                                localFrame.utm_number, localFrame.utm_letter),
         'upper_right': to_latlon(flightArea[1][0] + localFrame['utm_east'],
                                  flightArea[1][1] + localFrame['utm_north'],
-                                 localFrame.utm_zone, northern=True)
+                                 localFrame.utm_number, localFrame.utm_letter)
     }
 
 
 def utm_to_latlon(message):
-    position = list(to_latlon(message['utm_east'], message['utm_north'], message['utm_zone'], northern=True))
+    # probably not used. To be deleted
+    position = list(to_latlon(message['utm_east'], message['utm_north'], message['utm_number'], message['utm_letter']))
     position.append(message['alt'])
     return position
 
 
 def compute_frame_position(message, nav_frame):
+    # probably not used. To be deleted
     position = utm_to_latlon(message)
     frame_position = translate_position(position, nav_frame)
     frame_position.append(message['alt'])
