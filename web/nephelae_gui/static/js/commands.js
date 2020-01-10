@@ -3,6 +3,7 @@ $('#nav_commands').addClass('active');
 
 var gui, gui_commands, gui_mission, chart;
 var command_list = ['Vertical Profile', 'Horizontal Slice', 'Volumetric Flow Rate', '...']
+var currentParameterNames;
 
 var parameters = {
     fleet: {},
@@ -21,8 +22,9 @@ var gui_parameters = {
     mission_parameters : {},
 };
 
+// This is the page init function
 $(document).ready( () => {
-	removeLoader();
+    removeLoader();
     discoverFleet();
     setupChart();
 });
@@ -37,16 +39,6 @@ function setupGUI(){
         .name('Command')
         .onChange((selectedCommand) => updateGUI(selectedCommand));
     gui.add(gui_parameters,'verbose').name('Verbose').onChange(generateItems)
-
-    $.getJSON('/missions/available_missions/', (response) => {
-        for (mission of response.available_missions) {
-            gui_parameters.mission_list.push(mission);
-        }
-        gui_mission = gui_commands.add(gui_parameters,'mission_list', gui_parameters.mission_list)
-            .name('Mission')
-            .setValue(gui_parameters.mission_list[0])
-            .onChange((selectedMission) => updateGuiMission(selectedMission));
-    });
 
     updateGUI(parameters.commands);
 }
@@ -209,8 +201,8 @@ function generateItems(){
 
     // reseting cards
     $('.filled').removeClass("filled").addClass("free").html("");
-    for (id in parameters.fleet) {
-        var html = '<div id="'+ id +'" class="card blue-grey darken-1">';
+    for (aircraftId in parameters.fleet) {
+        var html = '<div id="'+ aircraftId +'_card" class="card blue-grey darken-1">';
             html += '<div class="card-content white-text">';
 
                 html += '<span id="uav_id" class="card-title left"></span>';
@@ -237,13 +229,113 @@ function generateItems(){
                     html += '<span class="left">Target Climb</span>    <p id="target_climb"    class="right"></p><br>';
                     html += '<span class="left">ITOW</span>            <p id="itow"            class="right"></p><br>';
                 }
+                html += '<br>';
+
+                html += '<span class="left">';
+                html += '<a class="waves-effect waves-light btn-small modal-trigger" href="#modal_'+aircraftId+'" onclick="new_mission_element_clicked('+aircraftId+')">New mission</a>';
+                html += '</span><br>';
+
+                html += '<div id="modal_'+aircraftId+'" class="modal modal-fixed-footer">';
+                html +=     '<div class="modal-content black-text">';
+                html +=         '<h4>Create mission for aircraft '+aircraftId+'</h4>';
+                html +=         '<p><div id="mission_input"></div></p>';
+                html +=     '</div>';
+                html +=     '<div class="modal-footer">';
+                html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>';
+                html +=         '<a href="#!" class="waves-effect waves-green btn-flat" onclick="create_mission('+aircraftId+')">Create</a>';
+                html +=     '</div>';
+                html += '</div>';
 
             html += '</div>';
         html += '</div>';
         $('.free').first().removeClass("free").addClass("filled").append(html);
+        $('.modal').modal();
     }
 }
 
+function new_mission_element_clicked(aircraftId) {
+    $.getJSON('/aircrafts/available_missions/'+aircraftId, (response) => {
+
+        if (response.mission_types.length <= 0) {
+            var newHtml = '<span class="left">No missions defined for this aircraft.</span>';
+            $('#'+aircraftId+'_card #mission_input').html(newHtml);
+        }
+        else
+        {
+            // Building drop down list to select mission
+            var newHtml = '<br><div class="input-field">';
+            newHtml += '<select id="mission_selector" name="Mission Type">';
+            for (missionType of response.mission_types) {
+                newHtml += '<option value='+missionType+'>'+missionType+'</option>';
+            }
+            newHtml += '</select>';
+            newHtml += '<label>Mission type</label>';
+            newHtml += '</div><br>';
+            
+            // Creating div for parameter input to be filled by mission_selected
+            newHtml += '<div id="mission_params"></div>';
+            
+            $('#'+aircraftId+'_card #mission_input').html(newHtml);
+
+            //  materialize select needs initialization
+            $('select').formSelect();
+            
+            // Binding select to select_mission callback
+            $('#'+aircraftId+'_card #mission_input #mission_selector')[0]
+                .onchange=function() { mission_selected(aircraftId) };
+            // Calling select_mission once to initialize
+            mission_selected(aircraftId);
+        }
+    });
+}
+
+function mission_selected(aircraftId) {
+    var missionType = $('#'+aircraftId+'_card #mission_input #mission_selector')[0].value;
+    $.getJSON('/aircrafts/mission_parameters/'+aircraftId+'/'+missionType,
+              (response) =>{
+        
+        html = '<div class="input-field col s12">';
+        html += '<select id="insert_mode_selector" name="Insert Mode">';
+            html += '<option value=0>Append</option>';
+            html += '<option value=1>Prepend</option>';
+        html += '</select>';
+        html += '<label>Insert mode</label>';
+        html += '</div>';
+        html += '<div id="div_duration" class="input-field col s12">' +
+                    '<input id="duration" type="text" class="validate">' + 
+                    '<label for="duration">Duration</label>' +
+                '</div>';
+        currentParameterNames = [];
+        for (parameterName of response.parameter_names) {
+            html += '<div id="div_'+parameterName+'" class="input-field col s12">' +
+                        '<input id="'+parameterName+'" type="text" class="validate">' + 
+                        '<label for="'+parameterName+'">'+parameterName+'</label>' +
+                    '</div>';
+            currentParameterNames.push(parameterName);
+        }
+        $('#'+aircraftId+'_card #mission_input #mission_params').html(html);
+        $('input#input_text, textarea#textarea2').characterCounter();
+        $('select').formSelect();
+        $('#'+aircraftId+'_card #mission_input' + ' #duration')[0].value='-1.0';
+    });
+}
+
+function create_mission(aircraftId) {
+    var missionInput = '#'+aircraftId+'_card #mission_input';
+    
+    var query = {};
+    query['aircraftId']  = aircraftId;
+    query['missionType'] = $(missionInput + ' #mission_selector')[0].value;
+    query['insertMode']  = $(missionInput + ' #insert_mode_selector')[0].value;
+    query['duration']    = $(missionInput + ' #duration')[0].value;
+    for (parameterName of currentParameterNames) {
+        query['params_' + parameterName] = $(missionInput + ' #' + parameterName)[0].value;
+    }
+
+    $.getJSON('/aircrafts/create_mission/?' + $.param(query), (response) => {
+        console.log(response);
+    });
+}
 
 function secondsToMMSSstring(seconds) {
     secs = (seconds % 60).toString();
@@ -269,33 +361,34 @@ function secondsToHHMMSSstring(seconds) {
 function formatTime(seconds) {
     if (seconds == "NA")
         return seconds;
-    //return secondsToMMSSstring(seconds);
-    return secondsToHHMMSSstring(seconds);
+
+    if (seconds < 3600)
+        return secondsToMMSSstring(seconds);
+    else
+        return secondsToHHMMSSstring(seconds);
     //return seconds.toString()
 }
 
-function updateItem(id){
-    uav = parameters.fleet[id];
+function updateItem(aircraftId){
+    uav = parameters.fleet[aircraftId];
     
-    //console.log(uav);
+    $('#'+aircraftId+'_card #uav_id').text('UAV ' + aircraftId);
+    $('#'+aircraftId+'_card #current_block').text(uav.current_block + ' : ' + formatTime(uav.block_time));
+    $('#'+aircraftId+'_card #current_block').addClass("green"); // to be replaced with task color
 
-    $('#'+id+' #uav_id').text('UAV ' + id);
-    $('#'+id+' #current_block').text(uav.current_block + ' : ' + formatTime(uav.block_time));
-    $('#'+id+' #current_block').addClass("green"); // to be replaced with task color
-
-    $('#'+id+' #flight_time').text(formatTime(uav.flight_time));
-    $('#'+id+' #altitude').text(uav.alt.toFixed(1)  + 'm');
-    $('#'+id+' #course').text(uav.course.toFixed(0) + '°');
-    $('#'+id+' #speed').text(uav.speed.toFixed(1)   + 'm/s');
-    $('#'+id+' #climb').text(uav.climb.toFixed(1)   + 'm/s');
+    $('#'+aircraftId+'_card #flight_time').text(formatTime(uav.flight_time));
+    $('#'+aircraftId+'_card #altitude').text(uav.alt.toFixed(1)  + 'm');
+    $('#'+aircraftId+'_card #course').text(uav.course.toFixed(0) + '°');
+    $('#'+aircraftId+'_card #speed').text(uav.speed.toFixed(1)   + 'm/s');
+    $('#'+aircraftId+'_card #climb').text(uav.climb.toFixed(1)   + 'm/s');
     
     if(gui_parameters.verbose) {
-        $('#'+id+' #ground_altitude').text(uav.agl.toFixed(1)+'m');
-        $('#'+id+' #target_course').text(uav.target_course.toFixed(0) + '°');
-        $('#'+id+' #heading').text(uav.heading.toFixed(0) + '°');
-        $('#'+id+' #air_speed').text(uav.air_speed.toFixed(1) + 'm/s');
-        $('#'+id+' #target_climb').text(uav.target_climb.toFixed(1) + 'm/s');
-        $('#'+id+' #itow').text(uav.itow);
+        $('#'+aircraftId+'_card #ground_altitude').text(uav.agl.toFixed(1)+'m');
+        $('#'+aircraftId+'_card #target_course').text(uav.target_course.toFixed(0) + '°');
+        $('#'+aircraftId+'_card #heading').text(uav.heading.toFixed(0) + '°');
+        $('#'+aircraftId+'_card #air_speed').text(uav.air_speed.toFixed(1) + 'm/s');
+        $('#'+aircraftId+'_card #target_climb').text(uav.target_climb.toFixed(1) + 'm/s');
+        $('#'+aircraftId+'_card #itow').text(uav.itow);
     }
 }
 
@@ -308,7 +401,7 @@ function referenceLine(div){
         if(x == 0 && y == 0) height = parseFloat($(this).attr('height'));
     });
 
-	var nowWord = $('#' + div + ' text:contains("Now")');
+    var nowWord = $('#' + div + ' text:contains("Now")');
     nowWord.prev().first().attr('height', height + 'px').attr('width', '1px').attr('y', '0');
 }
 

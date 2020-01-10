@@ -1,15 +1,19 @@
 from django.http import JsonResponse
 
-# from ..models import hypercube, tracker
-from nephelae_gui.models import hypercube, tracker
-from nephelae_gui.models.common import scenario
-from nephelae_paparazzi.missions import MissionBuilder
+try:
+    from nephelae_gui.models import hypercube
+    from nephelae_gui.models.common import scenario
+    
+    database = scenario.database
 
-from utm import from_latlon, to_latlon
-
-# Returns discovered UAVs and navigation frame info
-def discover(request):
-    return JsonResponse(tracker.discover(), safe=False)
+except Exception as e:
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+   print("# Caught exception #############################################\n    ", e)
+   exc_type, exc_obj, exc_tb = sys.exc_info()
+   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+   print(exc_type, fname, exc_tb.tb_lineno,
+         end="\n############################################################\n\n\n")
+   raise e
 
 
 def discover_maps(request):
@@ -67,22 +71,6 @@ def get_volume_of_selected_cloud(request):
             variable, time_value, altitude_value, c1, c2,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
 
-# Update UAV fleet positions
-def get_positions(request):
-
-    # Parse request parameters
-    trail_length = int(request.GET.get('trail_length'))
-    uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
-    reality = request.GET.get('reality') == "true"
-
-    return JsonResponse(tracker.get_positions(uav_ids, trail_length, reality))
-
-def get_positions_uavs_map(request):
-    trail_length = int(request.GET.get('trail_length'))
-    uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
-
-    return JsonResponse(tracker.get_positions_uavs_map(uav_ids, trail_length))
-
 # Get sensor data with sample positions
 def get_sensor_data(request):
 
@@ -94,8 +82,43 @@ def get_sensor_data(request):
     step = (-1 if request.GET.get('step') is None else int(request.GET.get('step')))
     variables = request.GET.getlist('variables[]')
     variables.append(request.GET.get('variable'))
-    return JsonResponse(tracker.get_data(uav_ids, variables, start, end, step))
 
+    # filling response
+    data = {}
+    for uav_id in uav_ids:
+        data[uav_id] = {}
+        for variable in variables:
+            messages = [entry.data for entry in
+                database[variable, str(uav_id)](lambda x: x.data.timeStamp)[-start:end:step]]
+            data[uav_id][variable] = {'positions':[], 'values': []}
+            for message in messages:
+                data[uav_id][variable]['positions'].append(message.position.data.tolist())
+                data[uav_id][variable]['values'].append(message.data[0])
+
+    return JsonResponse({'data':data})
+
+
+def get_sample_at_time(request):
+    """
+    Returns a sensor values at a specific time for reqiuested variables and
+    aircrafts.
+    """
+
+    variables = request.GET.getlist('variables[]')
+    uavs = request.GET.getlist('uav_id[]')
+    at_time = float(request.GET.get('at_time'))
+
+    data = {}
+    for variable in variables:
+        for uav_id in uavs:
+            message = database[variable, str(uav_id)][float(at_time)][0].data
+            if not uav_id in data.keys():
+                data[uav_id] = dict()
+            data[uav_id][message.variableName] = {
+                    'positions': [message.position.data.tolist()],
+                    'values': [message.data],
+            }
+    return JsonResponse(data)
 
 # Get sections/map sliders bounds, bad design for now ..
 def mesonh_box(request):
@@ -126,13 +149,8 @@ def get_section(request):
 
     return response
 
-def get_state_at_time(request):
-    variables = request.GET.getlist('variables[]')
-    uavs = request.GET.getlist('uav_id[]')
-    at_time = float(request.GET.get('at_time'))
-    return JsonResponse(tracker.get_state_at_time(uavs, variables, at_time))
-
 def update_cloud_data(request):
+    # Only there to give something to the unused cloud_data page
     data = {}
     return JsonResponse(data)
 
@@ -162,25 +180,3 @@ def wind_data(request, variable_name):
     return JsonResponse(data, safe=False)
 
 
-def get_available_missions(request):
-    return JsonResponse({'available_missions' : MissionBuilder.missionMessagesNames})
-
-
-def get_mission_parameters(request, mission_type):
-    return JsonResponse({"parameters" : MissionBuilder.get_parameter_list(mission_type)})
-
-
-def latlon_to_local(request):
-    query = request.GET
-    utm = from_latlon(float(query['lat']), float(query['lon']))
-    return JsonResponse({'x' : utm[0] - scenario.localFrame.utm_east,
-                         'y' : utm[1] - scenario.localFrame.utm_north})
-
-def local_to_latlon(request):
-    query = request.GET
-    latlon = to_latlon(
-            float(query['utm_east']) + scenario.localFrame.utm_east,
-            float(query['utm_north']) + scenario.localFrame.utm_north,
-            scenario.localFrame.utm_zone, scenario.localFrame.utm_letter)
-    return JsonResponse({'x': latlon[0],
-                         'y': latlon[1]})

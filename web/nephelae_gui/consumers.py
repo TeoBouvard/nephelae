@@ -2,11 +2,16 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 
-from .models.common import scenario
-
-from .models.common import websockets_ids
-
-from .models import tracker, hypercube
+try:
+    from .models.common import scenario, db_data_tags, websockets_ids
+except Exception as e:
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+   print("# Caught exception #############################################\n    ", e)
+   exc_type, exc_obj, exc_tb = sys.exc_info()
+   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+   print(exc_type, fname, exc_tb.tb_lineno,
+         end="\n############################################################\n\n\n")
+   raise e
 
 # propably some names to change in here
 
@@ -62,9 +67,12 @@ class SensorConsumer(WebsocketConsumer):
 
 
     def add_sample(self, sample):
-        if sample.variableName not in tracker.db_data_tags:
+        if sample.variableName not in db_data_tags:
             return
-        message = tracker.prettify_sample(sample)
+        message = {'uav_id':       sample.producer,
+                   'variable_name':sample.variableName,
+                   'position':     sample.position.data.tolist(),
+                   'data':         sample.data}
         self.list_of_messages.append(message)
         if(len(self.list_of_messages) >= self.number_of_messages):
             self.send(json.dumps(self.list_of_messages))

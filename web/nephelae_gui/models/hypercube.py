@@ -9,23 +9,35 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from nephelae.mapping import compute_list_of_coms, compute_cross_section_border
-from nephelae.mapping import compute_bounding_box
-from nephelae.mapping import compute_selected_element_volume
-from nephelae.mapping import BorderIncertitude, BorderRaw
+try:
+    from nephelae.mapping import compute_list_of_coms
+    from nephelae.mapping import compute_cross_section_border
+    from nephelae.mapping import compute_bounding_box
+    from nephelae.mapping import compute_selected_element_volume
+    from nephelae.mapping import BorderIncertitude, BorderRaw
+    
+    from nephelae.database import CloudData
+    
+    imcount = 0
+    
+    from . import utils
+    from . import common
+    
+    maps           = common.scenario.maps
+    hypercube      = common.scenario.mesonhDataset
+    websockets_ids = common.websockets_ids
+    clouds_ids     = common.clouds_ids
+    localFrame     = common.scenario.localFrame
 
-from nephelae.database import CloudData
+except Exception as e:
+    # Have to do this because #@%*&@^*! django is hiding exceptions
+   print("# Caught exception #############################################\n    ", e)
+   exc_type, exc_obj, exc_tb = sys.exc_info()
+   fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+   print(exc_type, fname, exc_tb.tb_lineno,
+         end="\n############################################################\n\n\n")
+   raise e
 
-imcount = 0
-
-from . import utils
-from . import common
-
-maps           = common.scenario.maps
-hypercube      = common.scenario.mesonhDataset
-websockets_ids = common.websockets_ids
-clouds_ids     = common.clouds_ids
-localFrame     = common.scenario.localFrame
 
 def discover_maps():
     res = {}
