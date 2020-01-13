@@ -31,8 +31,9 @@ def get_center_of_horizontal_slice(request):
     max_x = float(request.GET.get('max_x'))
     min_y = float(request.GET.get('min_y'))
     max_y = float(request.GET.get('max_y'))
+    threshold = float(request.GET.get('threshold'))
     return JsonResponse(data = hypercube.get_center_of_horizontal_slice(
-            variable, time_value, altitude_value,
+            variable, time_value, altitude_value, threshold,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
 
 def get_contour_of_horizontal_slice(request):
@@ -43,8 +44,9 @@ def get_contour_of_horizontal_slice(request):
     max_x = float(request.GET.get('max_x'))
     min_y = float(request.GET.get('min_y'))
     max_y = float(request.GET.get('max_y'))
+    threshold = float(request.GET.get('threshold'))
     return JsonResponse(data = hypercube.get_contour_of_horizontal_slice(
-            variable, time_value, altitude_value,
+            variable, time_value, altitude_value, threshold,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
 
 def get_bounding_boxes_of_horizontal_slice(request):
@@ -55,8 +57,9 @@ def get_bounding_boxes_of_horizontal_slice(request):
     max_x = float(request.GET.get('max_x'))
     min_y = float(request.GET.get('min_y'))
     max_y = float(request.GET.get('max_y'))
+    threshold = float(request.GET.get('threshold'))
     return JsonResponse(data = hypercube.get_bounding_boxes_of_horizontal_slice(
-            variable, time_value, altitude_value,
+            variable, time_value, altitude_value, threshold,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
 
 def get_volume_of_selected_cloud(request):
@@ -67,10 +70,11 @@ def get_volume_of_selected_cloud(request):
     max_x = float(request.GET.get('max_x'))
     min_y = float(request.GET.get('min_y'))
     max_y = float(request.GET.get('max_y'))
+    threshold = float(request.GET.get('threshold'))
     c1 = float(request.GET.get('c1'))
     c2 = float(request.GET.get('c2'))
     return JsonResponse(data = hypercube.get_volume_of_selected_cloud(
-            variable, time_value, altitude_value, c1, c2,
+            variable, time_value, altitude_value, c1, c2, threshold,
             x0=min_x, x1=max_x, y0=min_y, y1=max_y))
 
 # Get sensor data with sample positions
