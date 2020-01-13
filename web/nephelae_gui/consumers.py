@@ -95,11 +95,15 @@ class PointConsumer(WebsocketConsumer):
         self.accept()
         websockets_point_ids[self.id_client] = self
         for aircraft in scenario.aircrafts.values():
-            aircraft.add_point_observer(self)
+            if hasattr(aircraft, 'add_point_observer'):
+                aircraft.add_point_observer(self)
+            else:
+                print('No point observer detected for ' + aircraft.id)
 
     def disconnect(self, close_code):
         for aircraft in scenario.aircrafts.values():
-            aircraft.remove_point_observer(self)
+            if hasattr(aircraft, 'remove_point_observer'):
+                aircraft.remove_point_observer(self)
         del websockets_point_ids[self.id_client]
         self.channel_layer.group_discard
         print("Id Client Point " + self.id_client + " disconnected")
