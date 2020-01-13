@@ -48,6 +48,7 @@ assets :
 	$(FETCH) --output web/nephelae_gui/static/js/libs/OrbitControls.js 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js'
 	$(FETCH) --output web/nephelae_gui/static/js/libs/GLTFLoader.js 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js'
 	$(FETCH) --output web/nephelae_gui/static/js/libs/plotly.js 'https://cdn.plot.ly/plotly-latest.min.js'
+
 	$(FETCH) --output web/nephelae_gui/static/js/libs/googleCharts.js 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_format_module.js'
 	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_default_module.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
 	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_ui_module.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
@@ -55,6 +56,36 @@ assets :
 	$(FETCH) 'https://www.gstatic.com/charts/46.2/third_party/dygraphs/dygraph-tickers-combined.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
 	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_timeline_module.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
 	$(ECHO) "OK"
+
+# @if [ -d "apexcharts" ]; then \
+# 	git -C apexcharts pull; \
+# else \
+# 	git clone http://github.com/apexcharts/apexcharts.js.git apexcharts; \
+# fi
+# @if [ ! -d "web/nephelae_gui/static/js/libs/apexcharts" ]; then \
+# 	mkdir web/nephelae_gui/static/js/libs/apexcharts; \
+# fi
+# @cp -r apexcharts/src/* web/nephelae_gui/static/js/libs/apexcharts/
+# @rm -rf apexcharts
+
+# $(FETCH) --output web/nephelae_gui/static/js/libs/svg.filter.js 'https://raw.githubusercontent.com/svgdotjs/svg.filter.js/master/src/svg.filter.js'
+# $(FETCH) --output web/nephelae_gui/static/js/libs/svg.pathmorphing.js 'https://raw.githubusercontent.com/svgdotjs/svg.pathmorphing.js/master/src/svg.pathmorphing.js'
+# $(FETCH) --output web/nephelae_gui/static/js/libs/svg.draggable.js 'https://raw.githubusercontent.com/svgdotjs/svg.draggable.js/master/src/svg.draggable.js'
+# $(FETCH) --output web/nephelae_gui/static/js/libs/svg.resize.js 'https://github.com/svgdotjs/svg.resize.js/blob/master/src/svg.resize.js'
+# $(FETCH) --output web/nephelae_gui/static/js/libs/svg.select.js 'https://raw.githubusercontent.com/svgdotjs/svg.select.js/master/src/svg.select.js'
+# $(FETCH) --output web/nephelae_gui/static/css/libs/svg.select.js 'https://raw.githubusercontent.com/svgdotjs/svg.select.js/master/src/svg.select.css'
+
+# @if [ -d "svg_js" ]; then \
+# 	git -C svg_js pull; \
+# else \
+# 	git clone http://github.com/svgdotjs/svg.js.git  svg_js; \
+# fi
+# @if [ ! -d "web/nephelae_gui/static/js/libs/svg_js" ]; then \
+# 	mkdir web/nephelae_gui/static/js/libs/svg_js; \
+# fi
+# @cp -r svg_js/src/* web/nephelae_gui/static/js/libs/svg_js/
+# @rm -rf svg_js
+
 
 	$(ECHO) -n "Downloading css files ... "
 	$(FETCH) --output web/nephelae_gui/static/css/libs/leaflet.css 'https://unpkg.com/leaflet@1.5.1/dist/leaflet.css'
