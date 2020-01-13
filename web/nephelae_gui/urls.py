@@ -50,6 +50,8 @@ urlpatterns = [
     path('aircrafts/available_missions/<str:aircraftId>', aircraft_views.get_available_missions),
     path('aircrafts/mission_parameters/<str:aircraftId>/<str:missionType>', aircraft_views.get_mission_parameters),
     path('aircrafts/create_mission/', aircraft_views.create_mission),
+    path('aircrafts/current_mission_status/<str:aircraftId>', aircraft_views.current_mission_status),
+    path('aircrafts/current_mission_status_all/', aircraft_views.current_mission_status_all),
 
     # URL for sections page
     path('sections/', template_views.render_template, {'template_name': 'sections.html'}, name='sections'),

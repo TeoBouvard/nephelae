@@ -171,6 +171,37 @@ def create_mission(request):
 
     return JsonResponse({'called':'called!'})
 
+
+def current_mission_status(request, aircraftId):
+    
+    status = scenario.aircrafts[aircraftId].current_mission_status()
+    if status is None:
+        return JsonResponse({'aircraft': aircraftId,
+            'current_mission_time_left': -1,
+                             'missions': []})
+    else:
+        return JsonResponse({'aircraft': aircraftId,
+            'current_mission_time_left': status['current_mission_time_left'],
+                             'missions': [m.to_dict() for m in status['missions']]})
+
+
+def current_mission_status_all(request):
+    
+    res = {}
+    for aircraft in scenario.aircrafts.values():
+        status = aircraft.current_mission_status()
+        if status is None:
+            res[aircraft.id] = ({'aircraft': aircraft.id,
+                'current_mission_time_left': -1,
+                                 'missions': []})
+        else:
+            res[aircraft.id] = ({'aircraft': aircraft.id,
+                'current_mission_time_left': status['current_mission_time_left'],
+                                 'missions': [m.to_dict() for m in status['missions']]})
+    return JsonResponse(res)
+
+
+
 def remove_center_to_update_UAV(request):
     query = request.GET
     uav_id = query.get('uav_id')
@@ -178,6 +209,7 @@ def remove_center_to_update_UAV(request):
     if hasattr(aircraft, 'set_computing_center'):
         aircraft.set_computing_center(False)
     return HttpResponse(status=204)
+
 
 def center_to_update_UAV(request):
     query = request.GET
