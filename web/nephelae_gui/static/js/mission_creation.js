@@ -17,7 +17,6 @@ class Callable extends Function {
 
 function init_mission_modals() {
 
-    console.log($('.mission-modal-trigger'));
     for (button of $('.mission-modal-trigger')) {
         var aircraftId = button.attributes.aircraft.value;
         var modal = create_mission_modal(aircraftId);
@@ -45,7 +44,7 @@ function create_mission_modal(aircraftId) {
     html +=     '</div>';
     html +=     '<div class="modal-footer">';
     html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>';
-    html +=         '<a href="#!" class="waves-effect waves-green btn-flat" onclick="create_mission('+aircraftId+')">Create</a>';
+    html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat" onclick="create_mission('+aircraftId+')">Create</a>';
     html +=     '</div>';
     html += '</div>';
 
