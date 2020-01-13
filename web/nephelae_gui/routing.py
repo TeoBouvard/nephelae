@@ -10,6 +10,7 @@ def profiles_instance(*args, **kwargs):
 
 websocket_urlpatterns = [
     url('ws/GPS/', consumers.GPSConsumer),
+    url('ws/mission_upload/', consumers.MissionUploadConsumer),
     url('ws/sensor/profiles/', profiles_instance),
     url('ws/sensor/raw_data/', raw_data_instance),
     url('ws/status/', consumers.StatusConsumer),

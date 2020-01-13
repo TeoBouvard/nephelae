@@ -50,6 +50,29 @@ class GPSConsumer(WebsocketConsumer):
             'time'    : status.position.t}))
 
 
+class MissionUploadConsumer(WebsocketConsumer):
+
+    def connect(self):
+        self.accept()
+        for aircraft in scenario.aircrafts.values():
+            aircraft.attach_observer(self, 'mission_uploaded')
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        print(message)
+
+    def disconnect(self, close_code):
+        for aircraft in scenario.aircrafts.values():
+            aircraft.detach_observer(self, 'mission_uploaded')
+        self.channel_layer.group_discard
+
+    def mission_uploaded(self):
+        self.send(json.dumps({"mission":"uploaded"}))
+
+
+
 class SensorConsumer(WebsocketConsumer):
     def __init__(self, number_of_messages, *args, **kwargs):
         super().__init__(*args, **kwargs)
