@@ -25,7 +25,6 @@ try:
     maps                     = common.scenario.maps
     hypercube                = common.scenario.mesonhDataset
     websockets_cloudData_ids = common.websockets_cloudData_ids
-    websockets_point_ids     = common.websockets_point_ids
     localFrame               = common.scenario.localFrame
 
 except Exception as e:

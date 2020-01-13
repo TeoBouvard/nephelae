@@ -606,7 +606,22 @@ function sendMarkerToUAV(uav_selected, coordinates){
 }
 
 function updateMarker(message){
-    marker_followed[message.id].setLatLng([message.lat, message.lng]);
+    if (!message.id in marker_followed || marker_followed[message.id]
+        === undefined){
+        marker_followed[message.id] = L.circleMarker(
+            [message.lat, message.lng],
+            {color: parameters.uavs[message.id].gui_color})
+            .on('click', function(){
+                var query = $.param({'uav_id': message.id});
+                $.getJSON('remove_marker_to_uav/?' + query, function(){
+                flight_map.removeLayer(marker_followed[message.id]);
+                delete marker_followed[message.id];
+            })
+        });
+        marker_followed[message.id].addTo(flight_map);
+    } else {
+        marker_followed[message.id].setLatLng([message.lat, message.lng]);
+    }
 }
 
 function showCloudData(message){
@@ -654,6 +669,6 @@ function setSocketData(){
 
 function setSocketPoint(){
     parameters.socket_point = new WebSocket('ws://' + 
-        window.location.host + '/ws/sensor/point/' + id + '/');
+        window.location.host + '/ws/sensor/point/');
     parameters.socket_point.onmessage = (e) => updateMarker(JSON.parse(e.data));
 }

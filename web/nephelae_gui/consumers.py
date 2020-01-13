@@ -4,7 +4,7 @@ from channels.generic.websocket import WebsocketConsumer
 
 try:
     from .models.common import scenario, db_data_tags
-    from .models.common import websockets_cloudData_ids, websockets_point_ids
+    from .models.common import websockets_cloudData_ids
     from .models import hypercube
     from utm import from_latlon, to_latlon
 
@@ -87,13 +87,8 @@ class SensorConsumer(WebsocketConsumer):
             self.list_of_messages = []
 
 class PointConsumer(WebsocketConsumer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.id_client = args[0]['url_route']['kwargs']['id_client']
-
     def connect(self):
         self.accept()
-        websockets_point_ids[self.id_client] = self
         for aircraft in scenario.aircrafts.values():
             if hasattr(aircraft, 'add_point_observer'):
                 aircraft.add_point_observer(self)
@@ -104,9 +99,7 @@ class PointConsumer(WebsocketConsumer):
         for aircraft in scenario.aircrafts.values():
             if hasattr(aircraft, 'remove_point_observer'):
                 aircraft.remove_point_observer(self)
-        del websockets_point_ids[self.id_client]
         self.channel_layer.group_discard
-        print("Id Client Point " + self.id_client + " disconnected")
 
     # Receive message from WebSocket
     def receive(self, text_data):
