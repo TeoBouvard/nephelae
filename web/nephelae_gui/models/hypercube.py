@@ -86,7 +86,8 @@ def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
 
     if id_client in websockets_cloudData_ids and not "_border" in variable_name:
         websockets_cloudData_ids[id_client].send_cloud_data(variable_name,
-            CloudData.from_scaledArray(map0))
+            CloudData.from_scaledArray(map0,
+                threshold=maps[variable_name].threshold))
 
     if isinstance(map0, tuple) and "_border" in variable_name:
         h_slice_data = map0[0].data + map0[1].data
