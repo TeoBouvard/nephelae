@@ -4,6 +4,7 @@ $("#nav_map").addClass('active');
 var flight_map, zoom_home, overlays, location_popup;
 var uavs_overlay;
 var maps_parameters;
+var location_popup;
 
 var marker_collection = {};
 var box_collection = {};
@@ -28,7 +29,7 @@ var fleet = {};
 var bounds;
 // Parameters
 var parameters = {
-    altitude: 600,          // meters
+    altitude: 1500,          // meters
     trail_length: parseInt(Cookies.get('trail_length')),       // seconds
     thermals_cmap: 'seismic',
     clouds_cmap: 'Purples',
@@ -55,6 +56,9 @@ function setupGUI(){
         parameters.flight_area = L.latLngBounds(
             L.latLng(response.flight_area.upper_right),
             L.latLng(response.flight_area.lower_left));
+        
+        // This page really needs cleaning
+        parameters.uavs = response.uavs;
 
         var tracked_uav_choices = ['None']
         for (var id in response.uavs)
@@ -207,8 +211,8 @@ function setupMap(){
             .addTo(flight_map);
 
         //display location on click
-        location_popup = L.popup();
-        flight_map.on('click', click_display_location);
+        location_popup = create_location_popup();
+        flight_map.on('click', update_location_popup);
 
         // Prevent async conflicts by displaying uavs once map is initialized
         displayUavs();
@@ -216,6 +220,67 @@ function setupMap(){
     });
 }
 
+function create_location_popup() {
+    let dropdown = '<select id="dropdown_uav_id" class="browser-default">';
+    for (var uav_id in parameters.uavs){
+        dropdown += '<option>' + uav_id + '</option>';
+    }
+
+    dropdown += '</select>';
+    let html = 
+        '<div id="popup_click">' +
+            '<div class="display_local"></div>' + 
+            '<div class="display_latlon"></div>' + 
+            '<br> Follow with UAV : ' + dropdown + 
+            '<a class="btn track-center-btn">' +
+            '<span class="white-text"><b>Choose Center</b></span>' +
+            '</a></p>' +
+            '<a id="create_mission_btn_map" ' +
+                'class="waves-effect waves-light btn-small ' +
+                'mission-modal-trigger">New mission</a>' +
+        '</div>';
+
+    let location_popup = L.popup();
+    location_popup.setContent(html);
+
+    return location_popup;
+}
+
+function update_location_popup(e) {
+    var query = $.param({
+        lat: e.latlng.lat,
+        lon: e.latlng.lng
+    });
+    $.getJSON('/latlon_to_local/?' + query, (local) => {
+        x = local.x;
+        y = local.y;
+        lat = e.latlng.lat;
+        lng = e.latlng.lng;
+
+        let position3d = local.x.toFixed(2) +', '+ 
+                         local.y.toFixed(2) +', '+ 
+                         parameters.altitude.toFixed(2);
+
+        location_popup
+            .setLatLng(e.latlng)
+            .openOn(flight_map);
+
+        $('#popup_click .display_local')[0].innerHTML = 'Local : ' + position3d;
+        $('#popup_click .display_latlon')[0].innerHTML =
+            'LatLon : ' + e.latlng.lat.toFixed(4) +', '+ e.latlng.lng.toFixed(4);
+        $('#create_mission_btn_map')[0].setAttribute('position3d', position3d);
+        $('#create_mission_btn_map')[0].setAttribute('aircraft',
+            $('#dropdown_uav_id')[0].value);
+        init_mission_modals();
+
+        $('#popup_click .track-center-btn')[0]
+            .setAttribute('onClick', 'generateMarker('+x+','+y+','+lat+','+lng+')');
+        $('#dropdown_uav_id')[0].onchange = () => {
+            $('#create_mission_btn_map')[0].setAttribute('aircraft',
+                $('#dropdown_uav_id')[0].value);
+        };
+    });
+}
 
 // This function only exists to prevent closure problems in loop
 // If anyone has a better solution, please help me
@@ -529,36 +594,6 @@ function updateLayerBounds(){
 // Attach or remove tracked uav in parameters
 function track(id){
     parameters.tracked_uav = id
-}
-
-function click_display_location(e) {
-    ////alert("You clicked the map at " + e.latlng);
-    //latlon_to_local(e.latlng);
-    // console.log(e);
-    var query = $.param({
-        lat: e.latlng.lat,
-        lon: e.latlng.lng
-    });
-    dropdown = '<select id="dropdown_uav_id" class="browser-default">';
-    for (var uav_id in fleet){
-        dropdown += '<option>' + uav_id + '</option>';
-    }
-    dropdown += '</select>';
-    $.getJSON('/latlon_to_local/?' + query, (local) => {
-        x = local.x;
-        y = local.y;
-        lat = e.latlng.lat;
-        lng = e.latlng.lng;
-        location_popup
-            .setLatLng(e.latlng)
-            .setContent("Local: " + local.x.toFixed(2) + ", " + local.y.toFixed(2) +
-                        "<br>LatLon: " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4) +
-                        "<br><br> Follow with UAV: " + dropdown +
-                        '<a onClick="generateMarker('+x+','+y+','+lat+','+lng+');" class="btn">' +
-                        '<span class="white-text"><b>Choose Center</b></span>' +
-                        '</a></p>')
-            .openOn(flight_map);
-    });
 }
 
 function generateMarker(x,y,lat,lng){
