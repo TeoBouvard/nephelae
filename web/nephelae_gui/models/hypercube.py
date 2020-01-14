@@ -182,17 +182,18 @@ def get_contour_of_horizontal_slice(variable, time_value,
         map0.data.shape[0])
     y_axis = np.linspace(map0.bounds[1].min, map0.bounds[1].max,
         map0.data.shape[1])
-    print(threshold)
     if variable+'_std' in maps.keys():
         bdcloud = BorderIncertitude('LWC Bd', maps[variable],
-        maps[variable+'_std'], thr=threshold)
+        maps[variable+'_std'])
+        bdcloud.threshold = threshold
         borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
         res = {'inner_border': borders[0].data.T.tolist(),
                 'outer_border': borders[1].data.T.tolist(),
                 'x_axis': x_axis.tolist(),
                 'y_axis': y_axis.tolist()}
     else:
-        bdcloud = BorderRaw('LWC Bd', maps[variable], thr=threshold)
+        bdcloud = BorderRaw('LWC Bd', maps[variable])
+        bdcloud.threshold = threshold
         borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
         res = {'inner_border': borders.data.T.tolist(),
                 'outer_border': [],
