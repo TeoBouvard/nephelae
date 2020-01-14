@@ -3,134 +3,164 @@ var mission_creation_parameters = {
     aircrafts : {}
 }
 
+//var missionModalEndl = '';
+//var missionModalEndl = '<br>';
+var missionModalEndl = '<hr style="height:0px; visibility:hidden;" />'
+
 class Callable extends Function {
-	constructor(callback, ...args) {
-		super('return arguments.callee._call.apply(arguments.callee, arguments)')
-		this.callback_ = callback;
-		this.args_	   = args;	
-	}
-	
-	_call() {
-		this.callback_(...this.args_);
-	}
+    constructor(callback, ...args) {
+        super('return arguments.callee._call.apply(arguments.callee, arguments)')
+        this.callback_ = callback;
+        this.args_     = args;    
+    }
+    
+    _call() {
+        this.callback_(...this.args_);
+    }
 }
 
 function init_mission_modals() {
 
     for (button of $('.mission-modal-trigger')) {
-        var aircraftId = button.attributes.aircraft.value;
-        var modal = create_mission_modal(aircraftId);
+        let buttonId = button.attributes.id.value;
+        let modal = mission_modal_html(buttonId);
 
         button.classList.add('modal-trigger');
         button.setAttribute('href', '#' + modal['id']);
 
-        var modalContent = document.createElement('div');
+        let modalContent = document.createElement('div');
         modalContent.innerHTML = modal['html'];
-        button.parentNode.appendChild(modalContent.firstChild);
+        $('.modal_container')[0].parentNode.appendChild(modalContent.firstChild);
         
         // Calling fill_mission_modal on modal open
         $('#'+modal['id']).modal({
-            onOpenStart : new Callable(new_mission_element_clicked, aircraftId)});
+            onOpenStart : new Callable(mission_modal_on_open, modal['id'])});
     }
 }
 
-//function test_function(
+function mission_modal_html(id) {
+    let html = 
+        '<div id="modal_'+id+'" class="modal modal-fixed-footer">' +
+            '<div class="modal-content black-text">' +
+                '<span class="left"><h4>Create mission for aircraft</h4></span>' +
+                '<span class="right aircraft-selector-container"></span>' +
+                '<br><br><br><hr><br><p>' + 
+                    '<div class="mission-selector-container input-field col s12"></div>' + missionModalEndl +
+                    '<div class="insert-selector-container input-field col s12"></div>' + missionModalEndl +
+                    '<div class="duration-container input-field col s12"></div>' + missionModalEndl +
+                    '<div class="parameter-container"></div>' +
+                '</p>' +
+            '</div>' +
+            '<div class="modal-footer">' +
+                '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>' +
+                '<a href="#!" class="modal-close waves-effect waves-green btn-flat" ' +
+                'onclick="create_mission(modal_'+id+')">Create</a>' +
+            '</div>' +
+        '</div>';
 
-function create_mission_modal(aircraftId) {
-    html  = '<div id="modal_'+aircraftId+'" class="modal modal-fixed-footer">';
-    html +=     '<div class="modal-content black-text">';
-    html +=         '<h4>Create mission for aircraft '+aircraftId+'</h4>';
-    html +=         '<p><div id="mission_input_'+aircraftId+'"></div></p>';
-    html +=     '</div>';
-    html +=     '<div class="modal-footer">';
-    html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>';
-    html +=         '<a href="#!" class="modal-close waves-effect waves-green btn-flat" onclick="create_mission('+aircraftId+')">Create</a>';
-    html +=     '</div>';
-    html += '</div>';
-
-    return {id : 'modal_' + aircraftId, html : html};
+    return {id : 'modal_' + id, html : html};
 }
 
-
-function new_mission_element_clicked(aircraftId) {
-    $.getJSON('/aircrafts/available_missions/'+aircraftId, (response) => {
-
-        if (response.mission_types.length <= 0) {
-            var newHtml = '<span class="left">No missions defined for this aircraft.</span>';
-            $('#mission_input_' + aircraftId).html(newHtml);
+function mission_modal_on_open(id) {
+    $.getJSON('/discover/', (response) => {
+        let selectorOptions = '';
+        for (let aircraftId  in response.uavs) {
+            selectorOptions +=
+                '<option value='+aircraftId+'>'+aircraftId+'</option>';
         }
-        else
-        {
-            // Building drop down list to select mission
-            var newHtml = '<br><div class="input-field">';
-            newHtml += '<select id="mission_selector" name="Mission Type">';
-            for (missionType of response.mission_types) {
-                newHtml += '<option value='+missionType+'>'+missionType+'</option>';
-            }
-            newHtml += '</select>';
-            newHtml += '<label>Mission type</label>';
-            newHtml += '</div><br>';
-            
-            // Creating div for parameter input to be filled by mission_selected
-            newHtml += '<div id="mission_params"></div>';
-            
-            $('#mission_input_' + aircraftId).html(newHtml);
-
-            //  materialize select needs initialization
-            $('select').formSelect();
-            
-            // Binding select to select_mission callback
-            $('#mission_input_'+aircraftId+' #mission_selector')[0]
-                .onchange= new Callable(mission_selected, aircraftId);
-            // Calling select_mission once to initialize
-            mission_selected(aircraftId);
-        }
+        let html =
+            '<div class="select-field">' + 
+                '<select class="aircraft-selector">' +
+                    selectorOptions +
+                '</select>' +
+            '</div>';
+        $('#'+id+' .aircraft-selector-container')[0].innerHTML = html;
+        $('select').formSelect(); //Initialize selector
+        
+        $('#'+id+' .aircraft-selector')[0]
+            .onchange = new Callable(aircraft_selected, id);
+        aircraft_selected(id);
     });
 }
 
-function mission_selected(aircraftId) {
-    var inputId = '#mission_input_'+aircraftId;
-    var missionType = $(inputId + ' #mission_selector')[0].value;
+function aircraft_selected(id) {
+    let aircraftId = $('#'+id+' .aircraft-selector')[0].value;
+
+    $.getJSON('/aircrafts/available_missions/'+aircraftId, (response) => {
+
+        if (response.mission_types.length <= 0) {
+            $('#'+id+' .mission-selector-container')[0].innerHTML = 
+                '<span class="left"><h5>No missions defined for this aircraft.</h5></span>';
+            return;
+        }
+
+        let selectorOptions = '';
+        for (let missionType of response.mission_types) {
+            selectorOptions +=
+                '<option value='+missionType+'>'+missionType+'</option>';
+        }
+        let html =
+            '<select class="mission-selector">' +
+                selectorOptions +
+            '</select>' +
+            '<label>Mission Type</label>';
+
+        $('#'+id+' .mission-selector-container')[0].innerHTML = html;
+        $('select').formSelect(); //Initialize selector
+        $('#'+id+' .mission-selector')[0]
+            .onchange = new Callable(mission_selected, id);
+        mission_selected(id);
+    });
+}
+
+function mission_selected(id) {
+
+    let aircraftId  = $('#'+id+' .aircraft-selector')[0].value;
+    let missionType = $('#'+id+'  .mission-selector')[0].value;
+
+    let html = 
+        '<select class="insert-mode" name="Insert Mode">' +
+            '<option value=0>Append</option>' +
+            '<option value=1>Prepend</option>' +
+            '<option value=2>Replace Current</option>' +
+            '<option value=3>Replace All</option>' +
+        '</select>' +
+        '<label>Insert mode</label>';
+    $('#'+id+' .insert-selector-container')[0].innerHTML = html;
+
+    html = '<input class="duration" type="text" class="validate">' + 
+           '<label class="parameter-label">Duration</label>';
+    $('#'+id+' .duration-container')[0].innerHTML = html;
+    // Default duration always infinite
+    $('#'+id+ ' .duration')[0].value='-1.0';
+    
     $.getJSON('/aircrafts/mission_parameters/'+aircraftId+'/'+missionType,
               (response) =>{
 
-        var html = '<div class="input-field col s12">';
-        html += '<select id="insert_mode_selector" name="Insert Mode">';
-        html +=     '<option value=0>Append</option>';
-        html +=     '<option value=1>Prepend</option>';
-        html += '</select>';
-        html += '<label>Insert mode</label>';
-        html += '</div>';
-        html += '<div id="div_duration" class="input-field col s12">' +
-                    '<input id="duration" type="text" class="validate">' + 
-                    '<label id="duration_label" for="duration">Duration</label>' +
-                '</div>';
-        currentParameterNames = [];
+        let parameterNames = []
+        let html = '';
         for (parameterName of response.parameter_names) {
-            html += '<div id="div_'+parameterName+'" class="input-field col s12">' +
-                        '<input id="'+parameterName+'" type="text" class="validate">' + 
-                        '<label id="'+parameterName+'_label" for="'+parameterName+'">'+parameterName+'</label>' +
-                    '</div>';
-            currentParameterNames.push(parameterName);
+            html +=
+                '<div class="input-field col s12">' +
+                    '<input name="'+parameterName+'" class="parameter" type="text" class="validate">' + 
+                    '<label class=parameter-label>'+parameterName+'</label>' +
+                '</div>' + missionModalEndl;
         }
-        $(inputId + ' #mission_params').html(html);
-
-        // Setting a default value for duration input field
-        $(inputId + ' #duration')[0].value='-1.0';
-        // This is to show the label correctly (overwise overlap with value on display)
-        $(inputId + ' #duration_label')[0].classList.add('active');
-
+        $('#'+id+' .parameter-container')[0].innerHTML = html;
         // Setting default values for parameter fields when given
         for (parameterName of response.parameter_names) {
             if (!(parameterName in response.parameter_rules))
                 continue;
             if (!('default' in response.parameter_rules[parameterName]))
                 continue;
-
             // Setting a default value for this parameter
-            $(inputId + ' #'+parameterName)[0].value = String(response.parameter_rules[parameterName]['default']);
-            // This is to show the label correctly (overwise overlap with value on display)
-            $(inputId + ' #'+parameterName+'_label')[0].classList.add('active');
+            $('#'+id+ ' [name="'+parameterName+'"]')[0].value = String(response.parameter_rules[parameterName]['default']);
+        }
+
+        // This is to show the labels correctly
+        // (overwise overlap with value on display)
+        for (let label of $('#'+id+ ' .parameter-label')) {
+            label.classList.add('active');
         }
 
         $('input#input_text, textarea#textarea2').characterCounter();
@@ -138,16 +168,17 @@ function mission_selected(aircraftId) {
     });
 }
 
-function create_mission(aircraftId) {
-    var missionInput = '#mission_input_'+aircraftId;
+function create_mission(id) {
     
-    var query = {};
-    query['aircraftId']  = aircraftId;
-    query['missionType'] = $(missionInput + ' #mission_selector')[0].value;
-    query['insertMode']  = $(missionInput + ' #insert_mode_selector')[0].value;
-    query['duration']    = $(missionInput + ' #duration')[0].value;
-    for (parameterName of currentParameterNames) {
-        query['params_' + parameterName] = $(missionInput + ' #' + parameterName)[0].value;
+    id = id.attributes.id.value; // WHAT. THE. F***ING. F*** !
+
+    let query = {};
+    query['aircraftId']  = $('#'+id+' .aircraft-selector')[0].value;
+    query['missionType'] = $('#'+id+'  .mission-selector')[0].value;
+    query['insertMode']  = $('#'+id+ ' .insert-mode')[0].value
+    query['duration']    = $('#'+id+ ' .duration')[0].value
+    for (parameter of $('#'+id+' .parameter')) {
+        query['params_' + parameter.attributes.name.value] = parameter.value;
     }
 
     $.getJSON('/aircrafts/create_mission/?' + $.param(query), (response) => {
