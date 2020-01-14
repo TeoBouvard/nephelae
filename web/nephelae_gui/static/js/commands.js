@@ -346,7 +346,9 @@ function generateItems(){
                 html += '<br>';
                 
                 html += '<span class="left">';
-                html += '<a id="create_mission_btn_'+aircraftId+'" class="waves-effect waves-light btn-small mission-modal-trigger">New mission</a>';
+                html += '<a id="create_mission_btn_' + aircraftId + '" ' +
+                           'aircraft="' + aircraftId + '" ' +
+                           'class="waves-effect waves-light btn-small mission-modal-trigger">New mission</a>';
                 html += '</span><br>';
                 
             html += '</div>';

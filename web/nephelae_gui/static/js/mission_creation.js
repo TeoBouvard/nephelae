@@ -34,7 +34,8 @@ function init_mission_modals() {
         
         // Calling fill_mission_modal on modal open
         $('#'+modal['id']).modal({
-            onOpenStart : new Callable(mission_modal_on_open, modal['id'])});
+            //onOpenStart : new Callable(mission_modal_on_open, modal['id'])});
+            onOpenStart : new Callable(mission_modal_on_open, buttonId)});
     }
 }
 
@@ -61,7 +62,9 @@ function mission_modal_html(id) {
     return {id : 'modal_' + id, html : html};
 }
 
-function mission_modal_on_open(id) {
+function mission_modal_on_open(buttonId) {
+
+    let id = 'modal_' + buttonId;
     $.getJSON('/discover/', (response) => {
         let selectorOptions = '';
         for (let aircraftId  in response.uavs) {
@@ -77,6 +80,11 @@ function mission_modal_on_open(id) {
         $('#'+id+' .aircraft-selector-container')[0].innerHTML = html;
         $('select').formSelect(); //Initialize selector
         
+        if ($('#'+buttonId)[0].hasAttribute('aircraft')) {
+            $('#'+id+' .aircraft-selector')[0].value = 
+                $('#'+buttonId)[0].attributes.aircraft.value;
+        }
+
         $('#'+id+' .aircraft-selector')[0]
             .onchange = new Callable(aircraft_selected, id);
         aircraft_selected(id);
