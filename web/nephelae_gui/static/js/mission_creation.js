@@ -20,8 +20,10 @@ class Callable extends Function {
 }
 
 function init_mission_modals() {
-
+    
+    //console.log("init mission modal");
     for (button of $('.mission-modal-trigger')) {
+        //console.log(button);
         let buttonId = button.attributes.id.value;
         let modal = mission_modal_html(buttonId);
 
@@ -55,7 +57,7 @@ function mission_modal_html(id) {
             '<div class="modal-footer">' +
                 '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>' +
                 '<a href="#!" class="modal-close waves-effect waves-green btn-flat" ' +
-                'onclick="create_mission(modal_'+id+')">Create</a>' +
+                'onclick="create_mission('+id+')">Create</a>' +
             '</div>' +
         '</div>';
 
@@ -87,11 +89,13 @@ function mission_modal_on_open(buttonId) {
 
         $('#'+id+' .aircraft-selector')[0]
             .onchange = new Callable(aircraft_selected, id);
-        aircraft_selected(id);
+        aircraft_selected(buttonId);
     });
 }
 
-function aircraft_selected(id) {
+function aircraft_selected(buttonId) {
+
+    let id = 'modal_' + buttonId;
     let aircraftId = $('#'+id+' .aircraft-selector')[0].value;
 
     $.getJSON('/aircrafts/available_missions/'+aircraftId, (response) => {
@@ -117,12 +121,15 @@ function aircraft_selected(id) {
         $('select').formSelect(); //Initialize selector
         $('#'+id+' .mission-selector')[0]
             .onchange = new Callable(mission_selected, id);
-        mission_selected(id);
+        mission_selected(buttonId);
     });
 }
 
-function mission_selected(id) {
+function mission_selected(buttonId) {
+    
+    let button = $('#'+buttonId)[0];
 
+    let id = 'modal_' + buttonId;
     let aircraftId  = $('#'+id+' .aircraft-selector')[0].value;
     let missionType = $('#'+id+'  .mission-selector')[0].value;
 
@@ -144,7 +151,7 @@ function mission_selected(id) {
     
     $.getJSON('/aircrafts/mission_parameters/'+aircraftId+'/'+missionType,
               (response) =>{
-
+        
         let parameterNames = []
         let html = '';
         for (parameterName of response.parameter_names) {
@@ -157,13 +164,26 @@ function mission_selected(id) {
         $('#'+id+' .parameter-container')[0].innerHTML = html;
         // Setting default values for parameter fields when given
         for (parameterName of response.parameter_names) {
+                
+            // checking if parameter have rules.
             if (!(parameterName in response.parameter_rules))
                 continue;
-            if (!('default' in response.parameter_rules[parameterName]))
-                continue;
+
+            // Checking if parameter has a position3d tag and fill it with
+            // button position3d attribute
+            if (response.parameter_tags[parameterName].includes('position3d') &&
+                    button.hasAttribute('position3d')) {
+                $('#'+id+ ' [name="'+parameterName+'"]')[0].value =
+                    button.attributes.position3d.value;
+                continue; // Ignoring default value if position3d given
+            }
+
             // Setting a default value for this parameter
-            $('#'+id+ ' [name="'+parameterName+'"]')[0].value = String(response.parameter_rules[parameterName]['default']);
+            if ('default' in response.parameter_rules[parameterName])
+                $('#'+id+ ' [name="'+parameterName+'"]')[0].value =
+                    String(response.parameter_rules[parameterName]['default']);
         }
+        
 
         // This is to show the labels correctly
         // (overwise overlap with value on display)
@@ -178,7 +198,7 @@ function mission_selected(id) {
 
 function create_mission(id) {
     
-    id = id.attributes.id.value; // WHAT. THE. F***ING. F*** !
+    id = id.attributes.id.value;
 
     let query = {};
     query['aircraftId']  = $('#'+id+' .aircraft-selector')[0].value;
