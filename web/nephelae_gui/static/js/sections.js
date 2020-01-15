@@ -29,6 +29,7 @@ var parameters = {
     default_min: 100,
     default_max: 10000,
     scale: false,
+    threshold: 2e-4,
     center_fun: drawCenter,
     contour_fun: drawContour,
     boxes_fun: showBoxes,
@@ -36,7 +37,7 @@ var parameters = {
 }
 
 var map_boundaries = {};
-
+var map_threshold = {};
 var position_of_uav = {};
 var controller_collection = {};
 
@@ -65,7 +66,7 @@ function setupGUI(){
     
     
     controller_collection['taille_x'] = 
-    f1.add(parameters, 'taille_x', parameters.default_min,
+        f1.add(parameters, 'taille_x', parameters.default_min,
         parameters.default_max)
         .setValue(5000)
         .step(1)
@@ -73,7 +74,7 @@ function setupGUI(){
         .onFinishChange(updateData);
 
     controller_collection['taille_y'] = 
-    f1.add(parameters, 'taille_y', parameters.default_min,
+        f1.add(parameters, 'taille_y', parameters.default_min,
         parameters.default_max)
         .setValue(5000)
         .step(1)
@@ -81,11 +82,23 @@ function setupGUI(){
         .onFinishChange(updateData);
     
     controller_collection['taille'] = 
-    f2.add(parameters, 'taille', parameters.default_min, parameters.default_max)
+        f2.add(parameters, 'taille', parameters.default_min,
+            parameters.default_max)
         .setValue(5000)
         .step(1)
         .name('Taille')
         .onFinishChange(updateData);
+    
+    controller_collection['threshold'] = 
+        gui.add(parameters, 'threshold')
+        .setValue(2e-4)
+        .step(1e-5)
+        .name('Threshold')
+        .onFinishChange(function(){
+            map_threshold[parameters.map] = parameters.threshold;
+            updateData();
+        });
+
     
     gui.add(parameters, 'center_fun')
         .name('Draw center');
@@ -101,7 +114,7 @@ function setupGUI(){
         controller_collection['time'] =
             no_bounds_folder.add(parameters, 'time')
             .setValue(0)
-            .step(1)
+            .step(0.0001)
             .name('Time (s)')
             .onFinishChange(updateData);
 
@@ -115,7 +128,7 @@ function setupGUI(){
         controller_collection['time_bounds'] =
             bounds_folder.add(parameters, 'time')
             .setValue(0)
-            .step(1)
+            .step(0.0001)
             .name('Time (s)')
             .onFinishChange(updateData);
 
@@ -183,6 +196,7 @@ function setupGUI(){
                 for (var map in response){
                     if(!map.endsWith('_border')){
                         map_boundaries[map] = response[map]['range'];
+                        map_threshold[map] = response[map]['threshold'];
                         list_map.push(map);
                     }
                 }
@@ -191,6 +205,9 @@ function setupGUI(){
                     .name('Map')
                     .onChange(function(){
                         boundsChangement(bounds_folder, no_bounds_folder);
+                        controller_collection['threshold'].setValue(
+                            map_threshold[parameters.map]);
+                        controller_collection['threshold'].updateDisplay();
                         updateData();
                     });
                 gui.add(parameters, 'scale')
@@ -321,14 +338,14 @@ function updateStaticMap(){
 }
 
 function drawCenter(){
-    var query = doQuery();
+    var query = doQuery() + '&' + $.param({threshold: parameters.threshold});
     $.getJSON('center_cloud/?' + query, (response) => {
         var center = {
             x: response.list_x,
             y: response.list_y,
             mode: 'markers',
             name: 'Cloud center',
-            type: 'scatter'
+            type: 'scatter',
         }
         data = [center];
         Plotly.addTraces('chart', data);
@@ -336,7 +353,7 @@ function drawCenter(){
 }
 
 function drawContour(){
-    var query = doQuery();
+    var query = doQuery() + '&' + $.param({threshold: parameters.threshold});
     $.getJSON('contour_cloud/?' + query, (response) => {
         var in_contour = {
             x: response.x_axis,
@@ -372,7 +389,7 @@ function drawContour(){
 }
 
 function showBoxes(){
-    var query = doQuery();
+    var query = doQuery() + '&' + $.param({threshold: parameters.threshold});
     $.getJSON('boxes_cloud/?' + query, (response) => {
         var lay = {};
         lay['shapes'] = [];
@@ -397,6 +414,7 @@ function showVolume(data){
     var query2 = $.param({
         c1: data.points[0].x,
         c2: data.points[0].y,
+        threshold: parameters.threshold,
     });
     query += '&' + query2;
     $.getJSON('click_volume_cloud/?' + query, (response) => {

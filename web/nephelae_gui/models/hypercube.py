@@ -11,7 +11,6 @@ from PIL import Image
 
 try:
     from nephelae.mapping import compute_list_of_coms
-    from nephelae.mapping import compute_cross_section_border
     from nephelae.mapping import compute_bounding_box
     from nephelae.mapping import compute_selected_element_volume
     from nephelae.mapping import BorderIncertitude, BorderRaw
@@ -26,7 +25,6 @@ try:
     maps                     = common.scenario.maps
     hypercube                = common.scenario.mesonhDataset
     websockets_cloudData_ids = common.websockets_cloudData_ids
-    websockets_point_ids     = common.websockets_point_ids
     localFrame               = common.scenario.localFrame
 
 except Exception as e:
@@ -50,7 +48,8 @@ def discover_maps():
             boundaries = maps[key].bounds()
 
         res[key] = {'url':key, 'name' : maps[key].name, 'sample_size':
-                maps[key].sample_size(), 'range': boundaries}
+                maps[key].sample_size(), 'range': boundaries,
+                'threshold':maps[key].threshold}
     print(res)
     return res
 
@@ -87,7 +86,8 @@ def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
 
     if id_client in websockets_cloudData_ids and not "_border" in variable_name:
         websockets_cloudData_ids[id_client].send_cloud_data(variable_name,
-            CloudData.from_scaledArray(map0))
+            CloudData.from_scaledArray(map0,
+                threshold=maps[variable_name].threshold))
 
     if isinstance(map0, tuple) and "_border" in variable_name:
         h_slice_data = map0[0].data + map0[1].data
@@ -150,9 +150,9 @@ def get_horizontal_slice(variable, time_value, altitude_value, x0=None, x1=None,
     return (map0.data.T, x_axis, y_axis)
 
 def get_center_of_horizontal_slice(variable, time_value, altitude_value,
-        x0=None, x1=None, y0=None, y1=None):
+        threshold, x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
-    x = compute_list_of_coms(map0)
+    x = compute_list_of_coms(map0, threshold)
     list_x, list_y = [], []
     for coords in x:
         if x is not None:
@@ -161,22 +161,22 @@ def get_center_of_horizontal_slice(variable, time_value, altitude_value,
     return {'list_x': list_x, 'list_y': list_y}
 
 def get_bounding_boxes_of_horizontal_slice(variable, time_value, altitude_value,
-        x0=None, x1=None, y0=None, y1=None):
+        threshold, x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
-    x = compute_bounding_box(map0)
+    x = compute_bounding_box(map0, threshold)
     list_bounds_x = [[boundaries[0].min, boundaries[0].max] for boundaries in x]
     list_bounds_y = [[boundaries[1].min, boundaries[1].max] for boundaries in x]
     return {'boundaries_x': list_bounds_x, 'boundaries_y': list_bounds_y}
 
 def get_volume_of_selected_cloud(variable, time_value, altitude_value, c1, c2,
-        x0=None, x1=None, y0=None, y1=None):
+        threshold, x0=None, x1=None, y0=None, y1=None):
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
     coords = map0.dimHelper.to_index((c1, c2))
-    res = compute_selected_element_volume(coords, map0)
+    res = compute_selected_element_volume(coords, map0, threshold)
     return {'data': res}
 
 def get_contour_of_horizontal_slice(variable, time_value,
-        altitude_value, x0=None, x1=None, y0=None, y1=None):
+        altitude_value, threshold, x0=None, x1=None, y0=None, y1=None):
     res = None
     map0 = maps[variable][time_value, x0:x1, y0:y1, altitude_value]
     x_axis = np.linspace(map0.bounds[0].min, map0.bounds[0].max,
@@ -186,6 +186,7 @@ def get_contour_of_horizontal_slice(variable, time_value,
     if variable+'_std' in maps.keys():
         bdcloud = BorderIncertitude('LWC Bd', maps[variable],
         maps[variable+'_std'])
+        bdcloud.threshold = threshold
         borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
         res = {'inner_border': borders[0].data.T.tolist(),
                 'outer_border': borders[1].data.T.tolist(),
@@ -193,6 +194,7 @@ def get_contour_of_horizontal_slice(variable, time_value,
                 'y_axis': y_axis.tolist()}
     else:
         bdcloud = BorderRaw('LWC Bd', maps[variable])
+        bdcloud.threshold = threshold
         borders = bdcloud[time_value, x0:x1, y0:y1, altitude_value]
         res = {'inner_border': borders.data.T.tolist(),
                 'outer_border': [],

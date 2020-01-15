@@ -217,8 +217,8 @@ def center_to_update_UAV(request):
     time = float(query.get('t'))
     coordinates = (float(query.get('x')), float(query.get('y')))
     aircraft = scenario.aircrafts[uav_id]
-    if hasattr(aircraft, 'set_computing_center'):
-        aircraft.set_computing_center(True)
     if hasattr(aircraft, 'cloud_center_to_track_setter'):
         aircraft.cloud_center_to_track_setter(coordinates, time)
+    if hasattr(aircraft, 'set_computing_center'):
+        aircraft.set_computing_center(True)
     return HttpResponse(status=204)
