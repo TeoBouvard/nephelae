@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . import consumers
+from .consumers import consumers
 
 def raw_data_instance(*args, **kwargs):
     return consumers.SensorConsumer(15, *args, **kwargs)

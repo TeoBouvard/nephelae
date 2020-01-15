@@ -3,9 +3,9 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 
 try:
-    from .models.common import scenario, db_data_tags
-    from .models.common import websockets_cloudData_ids
-    from .models import hypercube
+    from ..models.common import scenario, db_data_tags
+    from ..models.common import websockets_cloudData_ids
+    from ..models import hypercube
     from utm import from_latlon, to_latlon
 
     localFrame = scenario.localFrame
