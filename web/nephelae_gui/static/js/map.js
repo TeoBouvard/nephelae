@@ -9,8 +9,7 @@ var location_popup;
 var marker_collection = {};
 var box_collection = {};
 var loaded_map = {};
-var marker_followed = {}
-
+var marker_followed = {};
 
 const id = Date.now()
 
@@ -39,11 +38,13 @@ var parameters = {
     socket_datacloud: null,
     socket_point: null,
     time: null,
-    update_wind: updateWindData,
     display_data: true,
     origin: null,
     displayedTime: null,
-    flight_area: null
+    flight_area: null,
+    north_wind: 0.01,
+    east_wind: 0.01,
+    send_wind: updateWindData,
 }
 
 // Initialization starts here
@@ -76,23 +77,30 @@ function setupGUI(){
         var f1 = gui.addFolder('Options');
         var f2 = gui.addFolder('Layer colors');
 
+        var wind_folder = gui.addFolder('Wind Status')
+
         f1.add(parameters, 'altitude', min_altitude, max_altitude)
             .step(1)
             .name('Altitude (m)')
             .onFinishChange(() => {track('None'); updateWindData();})
             .listen();
         f1.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
-        f1.add(parameters, 'update_wind').name('Update wind');
 
         f2.add(parameters, 'thermals_cmap', ['seismic', 'viridis']).name('Thermals color');
         f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
         f2.add(parameters, 'transparent').name('Transparent');
 
+        wind_folder.add(parameters, 'north_wind').name('North Value');
+        wind_folder.add(parameters, 'east_wind').name('East Value');
+
+        wind_folder.add(parameters, 'send_wind').name('Send Wind');
+        wind_folder.open();
+
         gui.add(parameters, 'tracked_uav', tracked_uav_choices);
         
         gui.add(parameters, 'display_data').name('Cloud data')
             .onChange(setSocketData);
-        
+
         setSocketData();
         setSocketPoint();
         // Create map once sliders are initialized
@@ -506,7 +514,7 @@ function updateMapsUrl(list_keys){
         }
     }
 }
-
+/*
 function updateWindData() {
     var requested_map = computeMapUrl();
     for(var key in maps_parameters) {
@@ -518,6 +526,15 @@ function updateWindData() {
             }
         }
     }
+}
+*/
+
+function updateWindData(){
+    var query = $.param({
+        north_wind: parameters.north_wind,
+        east_wind: parameters.east_wind
+    });
+    $.getJSON('/send_wind/?' + query, (local) => {});
 }
 
 function computeMapUrl(){
