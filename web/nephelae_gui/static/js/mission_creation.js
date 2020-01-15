@@ -41,9 +41,9 @@ function init_mission_modals() {
     }
 }
 
-function mission_modal_html(id) {
+function mission_modal_html(buttonId) {
     let html = 
-        '<div id="modal_'+id+'" class="modal modal-fixed-footer">' +
+        '<div id="modal_'+buttonId+'" class="modal modal-fixed-footer">' +
             '<div class="modal-content black-text">' +
                 '<span class="left"><h4>Create mission for aircraft</h4></span>' +
                 '<span class="right aircraft-selector-container"></span>' +
@@ -57,11 +57,11 @@ function mission_modal_html(id) {
             '<div class="modal-footer">' +
                 '<a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>' +
                 '<a href="#!" class="modal-close waves-effect waves-green btn-flat" ' +
-                'onclick="create_mission('+id+')">Create</a>' +
+                'onclick="create_mission('+buttonId+')">Create</a>' +
             '</div>' +
         '</div>';
 
-    return {id : 'modal_' + id, html : html};
+    return {id : 'modal_' + buttonId, html : html};
 }
 
 function mission_modal_on_open(buttonId) {
@@ -196,9 +196,13 @@ function mission_selected(buttonId) {
     });
 }
 
-function create_mission(id) {
-    
-    id = id.attributes.id.value;
+function create_mission(buttonId) {
+
+     // This function is supposed to get an id string. Investigate why we get
+     // the object instead. (Javascript ????)
+
+    buttonId = buttonId.attributes.id.value;
+    let id = 'modal_' + buttonId;
 
     let query = {};
     query['aircraftId']  = $('#'+id+' .aircraft-selector')[0].value;
