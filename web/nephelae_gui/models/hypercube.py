@@ -48,7 +48,8 @@ def discover_maps():
             boundaries = maps[key].bounds()
 
         res[key] = {'url':key, 'name' : maps[key].name, 'sample_size':
-                maps[key].sample_size(), 'range': boundaries}
+                maps[key].sample_size(), 'range': boundaries,
+                'threshold':maps[key].threshold}
     print(res)
     return res
 

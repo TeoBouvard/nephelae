@@ -37,7 +37,7 @@ var parameters = {
 }
 
 var map_boundaries = {};
-
+var map_threshold = {};
 var position_of_uav = {};
 var controller_collection = {};
 
@@ -94,7 +94,10 @@ function setupGUI(){
         .setValue(2e-4)
         .step(1e-5)
         .name('Threshold')
-        .onFinishChange(updateData);
+        .onFinishChange(function(){
+            map_threshold[parameters.map] = parameters.threshold;
+            updateData();
+        });
 
     
     gui.add(parameters, 'center_fun')
@@ -193,6 +196,7 @@ function setupGUI(){
                 for (var map in response){
                     if(!map.endsWith('_border')){
                         map_boundaries[map] = response[map]['range'];
+                        map_threshold[map] = response[map]['threshold'];
                         list_map.push(map);
                     }
                 }
@@ -201,6 +205,9 @@ function setupGUI(){
                     .name('Map')
                     .onChange(function(){
                         boundsChangement(bounds_folder, no_bounds_folder);
+                        controller_collection['threshold'].setValue(
+                            map_threshold[parameters.map]);
+                        controller_collection['threshold'].updateDisplay();
                         updateData();
                     });
                 gui.add(parameters, 'scale')
