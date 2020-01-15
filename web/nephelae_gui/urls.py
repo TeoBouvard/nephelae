@@ -53,6 +53,9 @@ urlpatterns = [
     path('aircrafts/current_mission_status/<str:aircraftId>', aircraft_views.current_mission_status),
     path('aircrafts/current_mission_status_all/', aircraft_views.current_mission_status_all),
 
+    # URL for mission_validation page
+    path('mission_validation/', template_views.render_template, {'template_name': 'mission_validation.html'}, name='mission_validation'),
+
     # URL for sections page
     path('sections/', template_views.render_template, {'template_name': 'sections.html'}, name='sections'),
     path('sections/mesonh_dims/', data_views.mesonh_box),

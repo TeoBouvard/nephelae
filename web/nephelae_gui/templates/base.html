@@ -4,116 +4,120 @@
 
 <html lang="en">
 
-	<head>
-		<meta charset="utf-8" />
-		<title>Nephelae</title>
+    <head>
+        <meta charset="utf-8" />
+        <title>Nephelae</title>
 
-		<!-- Load static CSS -->
-		<link rel="stylesheet" href="{% static 'css/base.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/libs/materialize.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/libs/material-icons.css' %}" />
-    	<link rel="stylesheet" href="{% static 'css/libs/leaflet.css' %}"/>
+        <!-- Load static CSS -->
+        <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/libs/materialize.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/libs/material-icons.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/libs/leaflet.css' %}"/>
 
-		<!-- Load favicon -->
-		<link rel="shortcut icon" href="#"></link>
+        <!-- Load favicon -->
+        <link rel="shortcut icon" href="#"></link>
 
-		<!-- Load jquery -->
-		<script src="{% static 'js/libs/jquery.js' %}"></script>
-		<script src="{% static 'js/libs/jqueryUI.js' %}"></script>
-		<script src="{% static 'js/libs/cookies.js' %}"></script>
+        <!-- Load jquery -->
+        <script src="{% static 'js/libs/jquery.js' %}"></script>
+        <script src="{% static 'js/libs/jqueryUI.js' %}"></script>
+        <script src="{% static 'js/libs/cookies.js' %}"></script>
 
-		<!-- Load dat.gui -->
-		<script src="{% static 'js/libs/dat.gui.js' %}"></script>
+        <!-- Load dat.gui -->
+        <script src="{% static 'js/libs/dat.gui.js' %}"></script>
 
-		<!-- Load materialize js -->
-		<script src="{% static 'js/libs/materialize.js' %}"></script>
-		
-		<!-- Load main js -->
-		<script src="{% static 'js/libs/leaflet.js' %}"></script>
-		<script src="{% static 'js/base.js' %}"></script>
-		<script src="{% static 'js/utils.js' %}"></script>
-		<script src="{% static 'js/app_setup.js' %}"></script>
+        <!-- Load materialize js -->
+        <script src="{% static 'js/libs/materialize.js' %}"></script>
+        
+        <!-- Load main js -->
+        <script src="{% static 'js/libs/leaflet.js' %}"></script>
+        <script src="{% static 'js/base.js' %}"></script>
+        <script src="{% static 'js/utils.js' %}"></script>
+        <script src="{% static 'js/app_setup.js' %}"></script>
 
-		{% block additional_head %}{% endblock %}
-		
-	</head>
+        {% block additional_head %}{% endblock %}
+        
+    </head>
 
-	<body>
+    <body>
 
-		<!-- horizontal navbar for large screens-->
+        <!-- horizontal navbar for large screens-->
 
-		<nav class="blue-grey darken-3 z-depth-0">
-			<div class="nav-wrapper">
+        <nav class="blue-grey darken-3 z-depth-0">
+            <div class="nav-wrapper">
 
-				<a href="#" data-target="small_nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <a href="#" data-target="small_nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
 
-				<li class= "right brand-logo">
-					<a id='nav_settings' href="{% url 'settings' %}"><i class="material-icons">settings &nbsp;</i></a>
-					<a href="https://github.com/teobouvard/nephelae_gui"><i class="material-icons">cloud</i></a>
-				</li>
+                <li class= "right brand-logo">
+                    <a id='nav_settings' href="{% url 'settings' %}"><i class="material-icons">settings &nbsp;</i></a>
+                    <a href="https://github.com/teobouvard/nephelae_gui"><i class="material-icons">cloud</i></a>
+                </li>
 
-				<ul id="large_nav" class="left hide-on-med-and-down">
-					<li id='nav_commands'><a href="{% url 'commands' %}">Fleet</a></li>
-					<li><a class="dropdown-trigger" href="#!" data-target="tracking_dropdown">Tracking<i class="material-icons right">arrow_drop_down</i></a></li>
-					<li><a class="dropdown-trigger" href="#!" data-target="sensor_data_dropdown">Sensor Data<i class="material-icons right">arrow_drop_down</i></a></li>
-					<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
-					<!-- <li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li> -->
-					<li id='nav_sections'><a href="{% url 'sections' %}">Cloud Analysis</a></li>
-				</ul>
-			</div>
-		</nav>
+                <ul id="large_nav" class="left hide-on-med-and-down">
+                    <li id='nav_commands'><a href="{% url 'commands' %}">Fleet</a></li>
+                    <li id='nav_mission_validation'><a href="{% url 'mission_validation' %}">Mission Validation</a></li>
+                    <li><a class="dropdown-trigger" href="#!" data-target="tracking_dropdown">Tracking<i class="material-icons right">arrow_drop_down</i></a></li>
+                    <li><a class="dropdown-trigger" href="#!" data-target="sensor_data_dropdown">Sensor Data<i class="material-icons right">arrow_drop_down</i></a></li>
+                    <li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
+                    <!-- <li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li> -->
+                    <li id='nav_sections'><a href="{% url 'sections' %}">Cloud Analysis</a></li>
+                </ul>
+            </div>
+        </nav>
 
-		<!-- tracking dropdown -->
+        <!-- tracking dropdown -->
 
-		<ul id="tracking_dropdown" class="dropdown-content">
-			<li><a href="{% url 'map' %}">2D map</a></li>
-			<li><a href="{% url 'simulation' %}">3D space</a></li>
-		</ul>
+        <ul id="tracking_dropdown" class="dropdown-content">
+            <li><a href="{% url 'map' %}">2D map</a></li>
+            <li><a href="{% url 'simulation' %}">3D space</a></li>
+        </ul>
 
-		<!-- sensor data dropdown -->
+        <!-- sensor data dropdown -->
 
-		<ul id="sensor_data_dropdown" class="dropdown-content">
-			<li><a href="{% url 'raw_data' %}">Temporal</a></li>
-			<li><a href="{% url 'preview' %}">Spatial</a></li>
-		</ul>
+        <ul id="sensor_data_dropdown" class="dropdown-content">
+            <li><a href="{% url 'raw_data' %}">Temporal</a></li>
+            <li><a href="{% url 'preview' %}">Spatial</a></li>
+        </ul>
 
-		<!-- vertical navbar for small screens-->
-		
-		<ul class="sidenav" id="small_nav" style="z-index:2000;">
-			<li id='nav_commands'><a href="{% url 'commands' %}">Fleet</a></li>
-			<li id='nav_map'><a href="{% url 'map' %}">2D Tracking</a></li>
-			<li id='nav_simulation'><a href="{% url 'simulation' %}">3D Tracking</a></li>
-			<li id='nav_raw_data'><a href="{% url 'raw_data' %}">Temporal Sensor Data</a></li>
-			<li id='nav_preview'><a href="{% url 'preview' %}">Spatial Sensor Data</a></li>
-			<li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
-			<!-- <li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li> -->
-			<li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
-		</ul>
+        <!-- vertical navbar for small screens-->
+        
+        <ul class="sidenav" id="small_nav" style="z-index:2000;">
+            <li id='nav_commands'><a href="{% url 'commands' %}">Fleet</a></li>
+            <li id='nav_mission_validation'><a href="{% url 'mission_validation' %}">Mission Validation</a></li>
+            <li id='nav_map'><a href="{% url 'map' %}">2D Tracking</a></li>
+            <li id='nav_simulation'><a href="{% url 'simulation' %}">3D Tracking</a></li>
+            <li id='nav_raw_data'><a href="{% url 'raw_data' %}">Temporal Sensor Data</a></li>
+            <li id='nav_preview'><a href="{% url 'preview' %}">Spatial Sensor Data</a></li>
+            <li id='nav_profiles'><a href="{% url 'profiles' %}">Vertical Profiles</a></li>
+            <!-- <li id='nav_cloud_data'><a href="{% url 'cloud_data' %}">Cloud Data</a></li> -->
+            <li id='nav_sections'><a href="{% url 'sections' %}">Sections</a></li>
+        </ul>
 
-		<!-- loader -->
+        <!-- loader -->
 
-		<div id="loader" class="preloader-wrapper big active">
-			<div class="spinner-layer">
-				<div class="circle-clipper left">
-					<div class="circle"></div>
-				</div>
-				<div class="gap-patch">
-					<div class="circle"></div>
-				</div>
-				<div class="circle-clipper right">
-					<div class="circle"></div>
-				</div>
-			</div>
-		</div>
+        <div id="loader" class="preloader-wrapper big active">
+            <div class="spinner-layer">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
 
-		<!-- rest of the page -->
+        <!-- rest of the page -->
 
-		{% block page %}{% endblock %}
+        {% block page %}{% endblock %}
 
-		<!-- additional_scripts -->
+        <!-- additional_scripts -->
 
-		{% block additional_scripts %}{% endblock %}
+        {% block additional_scripts %}{% endblock %}
 
-	</body>
+    </body>
 
 </html>
+
+
