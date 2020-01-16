@@ -217,17 +217,13 @@ def pending_missions_all(request):
 
 
 def authorize_mission(request, aircraftId, missionId):
-    try:
-        self.scenario.aircrafts[aircraftId].authorize_mission(missionId)
-    finally:
-        return JsonResponse({'status' : success})
+    scenario.aircrafts[aircraftId].authorize_mission(missionId)
+    return JsonResponse({'status' : 'Authorized !'})
 
 
 def reject_mission(request, aircraftId, missionId):
-    try:
-        self.scenario.aircrafts['aircraftId'].reject_mission(missionId)
-    finally:
-        return JsonResponse({'status' : success})
+    scenario.aircrafts['aircraftId'].reject_mission(missionId)
+    return JsonResponse({'status' : 'Rejected !'})
 
 
 def remove_center_to_update_UAV(request):
