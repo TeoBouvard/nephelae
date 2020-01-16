@@ -78,6 +78,10 @@ urlpatterns = [
     # URL for settings page
     path('settings/', template_views.render_template, {'template_name': 'settings.html'}, name='settings'),
 
+    # URL for debug page
+    path('debug/', template_views.render_template, {'template_name':
+        'debug.html'}, name='debug'),
+
     # Absolute URLs accessible by every page
     # Return reference frame, list of uav ids, list of data sample tags
     # to be renamed in discover uavs and to be separated from data_discovery

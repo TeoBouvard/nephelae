@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .consumers import consumers, aircraft_consumers
+from .consumers import consumers, aircraft_consumers, debug_consumers
 
 def raw_data_instance(*args, **kwargs):
     return consumers.SensorConsumer(15, *args, **kwargs)
@@ -19,4 +19,5 @@ websocket_urlpatterns = [
     url('ws/status/', aircraft_consumers.StatusConsumer),
     url('ws/mission_upload/', aircraft_consumers.MissionUploadConsumer),
     url('ws/GPS/', aircraft_consumers.GPSConsumer),
+    url('ws/debug_tracker/', debug_consumers.DebugTrackerConsumer),
 ]
