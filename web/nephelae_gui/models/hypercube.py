@@ -26,6 +26,7 @@ try:
     hypercube                = common.scenario.mesonhDataset
     websockets_cloudData_ids = common.websockets_cloudData_ids
     localFrame               = common.scenario.localFrame
+    windMap                  = common.scenario.windMap
 
 except Exception as e:
     import sys
@@ -52,6 +53,10 @@ def discover_maps():
                 'threshold':maps[key].threshold}
     print(res)
     return res
+
+def discover_wind():
+    return {'east_wind': windMap.get_wind()[0], 'north_wind':
+            windMap.get_wind()[1]}
 
 def print_horizontal_slice(id_client, variable_name, u_time, u_altitude,
         bounds, origin, thermals_cmap, clouds_cmap, transparent):

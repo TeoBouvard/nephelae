@@ -31,14 +31,14 @@ urlpatterns = [
 
     path('map/', template_views.render_template, {'template_name': 'map.html'}, name='map'),
     path('map/update/', aircraft_views.get_positions_latlong),
-    path('map/<str:variable_name>_wind/', data_views.wind_data),
+    # path('map/<str:variable_name>_wind/', data_views.wind_data),
     path('map/tile/<int:z>/<int:x>/<int:y>', file_views.map_tiles, name='map_tiles'),
     path('map/plane_icon/<int:index>', file_views.plane_icon, name='plane_icon'),
     path('map/generated_plane_icon/<str:color>', file_views.generate_plane_icon, name='generated_plane_icon'),
     path('map/<str:variable_name>_img/', file_views.layer_img, name='layer_img'),
     path('map/send_marker_to_uav/', aircraft_views.center_to_update_UAV),
     path('map/remove_marker_to_uav/', aircraft_views.remove_center_to_update_UAV),
-
+    path('map/send_update_wind/', data_views.send_update_wind),
     # URL for simulation page (3D web gl page)
     path('simulation/', template_views.render_template, {'template_name': 'simulation.html'}, name='simulation'),
     path('simulation/update/', aircraft_views.get_positions),
@@ -85,6 +85,7 @@ urlpatterns = [
     # To discover mapping layers available (from a nephelae.mapping.MapServer
     path('discover_maps/', data_views.discover_maps),
 
+    path('discover_wind/', data_views.discover_wind),
 
     path('latlon_to_local/', misc_views.latlon_to_local),
     path('local_to_latlon/', misc_views.local_to_latlon)

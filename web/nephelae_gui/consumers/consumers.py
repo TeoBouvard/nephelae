@@ -8,6 +8,7 @@ try:
     from utm import from_latlon, to_latlon
 
     localFrame = scenario.localFrame
+    windMap = scenario.windMap
 
 except Exception as e:
     import sys
@@ -98,11 +99,6 @@ class CloudDataConsumer(WebsocketConsumer):
         self.accept()
         websockets_cloudData_ids[self.id_client] = self
 
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        print(message)
-
     def disconnect(self, close_code):
         del websockets_cloudData_ids[self.id_client]
         self.channel_layer.group_discard
@@ -129,3 +125,15 @@ class CloudDataConsumer(WebsocketConsumer):
                         south_west[1] + localFrame.utm_north, 
                         localFrame.utm_number, localFrame.utm_letter)]})
         self.send(json.dumps(res))
+
+class WindConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+        windMap.add_wind_observer(self)
+
+    def disconnect(self):
+        windMap.remove_wind_observer(self)
+        self.channel_layer.group_discard
+
+    def send_new_wind(self, wind):
+        self.send(json.dumps({'north_wind': wind[1], 'east_wind': wind[0]}))

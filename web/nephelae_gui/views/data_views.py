@@ -5,6 +5,7 @@ try:
     from nephelae_gui.models.common import scenario
 
     database = scenario.database
+    windMap = scenario.windMap
 
 except Exception as e:
     import sys
@@ -21,6 +22,8 @@ except Exception as e:
 def discover_maps(request):
     return JsonResponse(hypercube.discover_maps(), safe=False)
 
+def discover_wind(request):
+    return JsonResponse(hypercube.discover_wind())
 
 # Returns the center of an horzontal slice
 def get_center_of_horizontal_slice(request):
@@ -160,6 +163,11 @@ def update_cloud_data(request):
     data = {}
     return JsonResponse(data)
 
+def send_update_wind(request):
+    query = request.GET
+    new_wind = [float(query.get('east_wind')), float(query.get('north_wind'))]
+    windMap.set_wind(new_wind)
+    return HttpResponse(status=204)
 
 def wind_data(request, variable_name):
 

@@ -45,6 +45,7 @@ var parameters = {
     north_wind: 0.01,
     east_wind: 0.01,
     send_wind: updateWindData,
+    wind_status_text: "",
 }
 
 // Initialization starts here
@@ -77,12 +78,12 @@ function setupGUI(){
         var f1 = gui.addFolder('Options');
         var f2 = gui.addFolder('Layer colors');
 
-        var wind_folder = gui.addFolder('Wind Status')
+        var wind_folder = gui.addFolder('Update Wind')
 
         f1.add(parameters, 'altitude', min_altitude, max_altitude)
             .step(1)
             .name('Altitude (m)')
-            .onFinishChange(() => {track('None'); updateWindData();})
+            .onFinishChange(() => {track('None');})
             .listen();
         f1.add(parameters, 'trail_length', 0, 500).step(1).name('Trail length (s)');
 
@@ -103,6 +104,7 @@ function setupGUI(){
 
         setSocketData();
         setSocketPoint();
+        setSocketWind();
         // Create map once sliders are initialized
         setupMap();
     });
@@ -202,7 +204,12 @@ function setupMap(){
         // Add layers to the map
         var layers_controller = L.control.layers(base_layers, overlays, {position:
             'bottomright'}).addTo(flight_map);
-
+        
+        $.getJSON('/discover_wind/', (wind) => {
+            parameters.wind_status_text = 'Wind value : [' + wind.east_wind + ', ' + wind.north_wind + ']';
+            flight_map.attributionControl.addAttribution(
+                parameters.wind_status_text);
+        });
         //for(key in overlays) if(key != "Wind") overlays[key].addTo(flight_map);
 
         // Display everything except vector field (wind) on initialization 
@@ -534,7 +541,7 @@ function updateWindData(){
         north_wind: parameters.north_wind,
         east_wind: parameters.east_wind
     });
-    $.getJSON('/send_wind/?' + query, (local) => {});
+    $.getJSON('send_update_wind/?' + query);
 }
 
 function computeMapUrl(){
@@ -676,6 +683,12 @@ function updateMarker(message){
     }
 }
 
+function updateWind(message){
+    flight_map.attributionControl.removeAttribution(parameters.wind_status_text);
+    parameters.wind_status_text = 'Wind value : [' + message.east_wind + ', ' + message.north_wind + ']';
+    flight_map.attributionControl.addAttribution(parameters.wind_status_text);
+}
+
 function showCloudData(message){
     var variable = Object.keys(message);
     clearMarkers(variable);
@@ -723,4 +736,10 @@ function setSocketPoint(){
     parameters.socket_point = new WebSocket('ws://' + 
         window.location.host + '/ws/sensor/point/');
     parameters.socket_point.onmessage = (e) => updateMarker(JSON.parse(e.data));
+}
+
+function setSocketWind(){
+    parameters.socket_wind = new WebSocket('ws://' + 
+        window.location.host + '/ws/wind/');
+    parameters.socket_wind.onmessage = (e) => updateWind(JSON.parse(e.data));
 }
