@@ -1,4 +1,5 @@
 import json
+import numpy as np
 
 from channels.generic.websocket import WebsocketConsumer
 
@@ -38,3 +39,16 @@ class DebugTrackerConsumer(WebsocketConsumer):
     
     def tracker_debug(self, debug_infos):
         print(debug_infos)
+        x_axis = np.linspace(debug_infos['scaledArray'].bounds[0].min,
+                debug_infos['scaledArray'].bounds[0].max,
+            debug_infos['scaledArray'].data.shape[0]).tolist()
+        y_axis = np.linspace(debug_infos['scaledArray'].bounds[0].min,
+                debug_infos['scaledArray'].bounds[0].max,
+            debug_infos['scaledArray'].data.shape[0]).tolist()
+        data = [x.tolist() for x in debug_infos['scaledArray'].data]
+        tracked_point = (debug_infos['x'], debug_infos['y'])
+        old_tracked_point = (debug_infos['x_old'], debug_infos['y_old'])
+        res = {'x_axis': x_axis, 'y_axis': y_axis, 'data': data,
+                'tracked_point': tracked_point, 'old_tracked_point':
+                old_tracked_point, 'centers': debug_infos['centers']}
+        self.send(json.dumps(res))

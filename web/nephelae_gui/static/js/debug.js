@@ -28,6 +28,10 @@ function setupDebug(){
     removeLoader();
 }
 
+function displayChart(message){
+    console.log(message);
+}
+
 function setDebugSocket(){
     parameters.socket_debug = new WebSocket('ws://' + window.location.host +
         '/ws/debug_tracker/');
