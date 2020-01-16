@@ -222,7 +222,7 @@ def authorize_mission(request, aircraftId, missionId):
 
 
 def reject_mission(request, aircraftId, missionId):
-    scenario.aircrafts['aircraftId'].reject_mission(missionId)
+    scenario.aircrafts[aircraftId].reject_mission(missionId)
     return JsonResponse({'status' : 'Rejected !'})
 
 
