@@ -131,7 +131,7 @@ class WindConsumer(WebsocketConsumer):
         self.accept()
         windMap.add_wind_observer(self)
 
-    def disconnect(self):
+    def disconnect(self, close_code):
         windMap.remove_wind_observer(self)
         self.channel_layer.group_discard
 
