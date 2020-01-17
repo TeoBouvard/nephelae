@@ -36,7 +36,6 @@ function init_mission_modals() {
         
         // Calling fill_mission_modal on modal open
         $('#'+modal['id']).modal({
-            //onOpenStart : new Callable(mission_modal_on_open, modal['id'])});
             onOpenStart : new Callable(mission_modal_on_open, buttonId)});
     }
 }
@@ -88,7 +87,7 @@ function mission_modal_on_open(buttonId) {
         }
 
         $('#'+id+' .aircraft-selector')[0]
-            .onchange = new Callable(aircraft_selected, id);
+            .onchange = new Callable(aircraft_selected, buttonId);
         aircraft_selected(buttonId);
     });
 }
@@ -120,7 +119,7 @@ function aircraft_selected(buttonId) {
         $('#'+id+' .mission-selector-container')[0].innerHTML = html;
         $('select').formSelect(); //Initialize selector
         $('#'+id+' .mission-selector')[0]
-            .onchange = new Callable(mission_selected, id);
+            .onchange = new Callable(mission_selected, buttonId);
         mission_selected(buttonId);
     });
 }

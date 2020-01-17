@@ -201,6 +201,30 @@ def current_mission_status_all(request):
     return JsonResponse(res)
 
 
+def pending_missions(request, aircraftId):
+
+    return JsonResponse([m.to_dict() for m in 
+                         scenario.aircrafts[aircraftId].get_pending_missions()])
+
+
+def pending_missions_all(request):
+    
+    res = {}
+    for aircraftId in scenario.aircrafts.keys():
+        res[aircraftId] = [m.to_dict() for m in 
+                           scenario.aircrafts[aircraftId].get_pending_missions()]
+    return JsonResponse(res)
+
+
+def authorize_mission(request, aircraftId, missionId):
+    scenario.aircrafts[aircraftId].authorize_mission(missionId)
+    return JsonResponse({'status' : 'Authorized !'})
+
+
+def reject_mission(request, aircraftId, missionId):
+    scenario.aircrafts[aircraftId].reject_mission(missionId)
+    return JsonResponse({'status' : 'Rejected !'})
+
 
 def remove_center_to_update_UAV(request):
     query = request.GET
