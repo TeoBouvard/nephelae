@@ -1,3 +1,5 @@
+var pendingMissionsWebSocket = null;
+
 // This is the page init function
 $(document).ready( () => {
     removeLoader();
@@ -7,6 +9,15 @@ $(document).ready( () => {
     mainRow.classList.add("main-row");
     //mainRow.classList.add("parent-row");
     $('#main_container')[0].appendChild(mainRow);
+
+    pendingMissionsWebSocket = new WebSocket('ws://' + window.location.host +
+        '/ws/pending_missions_update/');
+    pendingMissionsWebSocket.onmessage = (e) => {
+        console.log("Pending mission update");
+        console.log(e);
+        refresh_pending_missions();
+    };
+
 
     refresh_pending_missions();
 });
@@ -59,7 +70,6 @@ function authorize_mission(aircraftId, missionId) {
     $.getJSON('/aircrafts/authorize_mission/'+aircraftId+'/'+missionId,
               (response) => {
         console.log(response);
-        refresh_pending_missions();
     });
 }
 
@@ -67,6 +77,5 @@ function reject_mission(aircraftId, missionId) {
     $.getJSON('/aircrafts/reject_mission/'+aircraftId+'/'+missionId,
               (response) => {
         console.log(response);
-        refresh_pending_missions();
     });
 }

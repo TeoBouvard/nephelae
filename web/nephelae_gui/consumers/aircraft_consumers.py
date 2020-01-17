@@ -62,6 +62,33 @@ class MissionUploadConsumer(WebsocketConsumer):
         self.send(json.dumps({"mission":"uploaded"}))
 
 
+class PendingMissionsConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+        for aircraft in scenario.aircrafts.values():
+            aircraft.attach_observer(self, 'pending_missions_updated')
+
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        print(message)
+
+
+    def disconnect(self, close_code):
+        for aircraft in scenario.aircrafts.values():
+            aircraft.detach_observer(self, 'pending_missions_updated')
+        self.channel_layer.group_discard
+
+
+    def pending_missions_updated(self, event):
+        self.send(json.dumps({
+            'aircraftId' : event['mission'].aircraftId,
+            'event'      : event['event'],
+            'mission'    : event['mission'].to_dict()}))
+
+
 class GPSConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
@@ -87,5 +114,4 @@ class GPSConsumer(WebsocketConsumer):
             'position': [status.lat, status.long, status.alt],
             'speed'   : status.speed,
             'time'    : status.position.t}))
-
 
