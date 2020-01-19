@@ -178,45 +178,53 @@ function printLayout(variable){
 }
 
 function handleMessage(messages){
-    //Reads the list of messages
-    for (var message of messages){
-        // if variable is selected to be visible
-        if(parameters.variables[message.variable_name]){
 
-            // identify chart DOM element and compute the trace's index
-            var chart = $('#'+ message.variable_name);
-            var trace_index = getTraceIndexByName(chart, message.uav_id);
+     //Reads the list of messages
+     let dataUpdate = {};
+     for (let message of messages) {
 
-            // if such a trace exists
-            if (trace_index > -1){
+         if (!(message.variable_name in parameters.variables)) {
+             setupGUI();
+             continue;
+         }
+         let chart = $('#'+ message.variable_name);
 
-                // update data
-                var document_data = document.getElementById(message.variable_name).data;
-                for(var i = 0; i < document_data.length; i++){
-                    var first_time = document_data[i].x[0];
-                    while (typeof message.position[0] !== 'undefined' &&
-                        message.position[0]-first_time > parameters.trail_length){
-                        document_data[i].x.shift();
-                        document_data[i].y.shift();
-                        first_time = document_data[i].x[0];
-                    }
-                }
-                var update = {
-                    x:  [[message.position[0]]],
+         let trace_index = getTraceIndexByName(chart, message.uav_id);
+         if (trace_index < 0) {
+             continue;
+         }
 
-                    y: [[message.data[0]]]
-                };
-                Plotly.extendTraces(message.variable_name, update, [trace_index]);
-                // The following operation is very expensive, uncomment it only if you need fixed range streaming plot
-            } else {
-                // if trace index is not found, reload the page
-                //location.reload(); -> something has to be done
-            }
-            // if variable does not exist, re-setup the page
-        } else if (!(message.variable_name in parameters.variables)) {
-            setupGUI();
-        }
-    }
+         if (!(message.variable_name in dataUpdate)) {
+                 dataUpdate[message.variable_name] = {};
+         }
+         if (!(trace_index in dataUpdate[message.variable_name])) {
+             dataUpdate[message.variable_name][trace_index] = {x:[[]], y:[[]]};
+         }
+         dataUpdate[message.variable_name][trace_index].x[0].push(message.position[0]);
+         dataUpdate[message.variable_name][trace_index].y[0].push(message.data[0]);
+     }
+
+     for (let variable_name in dataUpdate) {
+         // limiting length of data display (check if this works. It does. WHY ???)
+         var document_data = document.getElementById(variable_name).data;
+         for (var i = 0; i < document_data.length; i++) {
+             if (document_data[i].x.length < 1) {
+                 continue;
+             }
+             let endTime = document_data[i].x[document_data[i].x.length - 1];
+             while (endTime - document_data[i].x[0] > parameters.trail_length) {
+                 document_data[i].x.shift();
+                 document_data[i].y.shift();
+             }
+         }
+
+         for (let trace_index in dataUpdate[variable_name]) {
+             let tr_index = Number(trace_index);
+             Plotly.extendTraces(variable_name,
+                                 dataUpdate[variable_name][tr_index],
+                                 [tr_index]);
+         }
+     }
 }
 
 function getTraceIndexByName(chart, name){
