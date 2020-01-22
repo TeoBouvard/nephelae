@@ -42,13 +42,12 @@ var config = {
 var refresh_rate = 2000; // ms
 var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
-    streaming: false,
+    streaming: true,
     socket: null,
     uav_color: {},
     start_buff : 1,
     end_buff : 100
 }
-var dict_values = {};
 var tracked_values = ['THT', 'RCT']
 
 $(document).ready(() => {
@@ -87,12 +86,8 @@ function setupGUI(){
             f3.add(parameters['uavs'], uav_id).name('UAV ' + uav_id)
                 .onChange(updateData);
         }
-
         for (var tag of response.sample_tags){
-            parameters['variables'][tag] = false;
-            for (var i = 0; (i < tracked_values.length && !parameters['variables'][tag]); i++){
-                parameters['variables'][tag] = (tag == tracked_values[i]);
-            }
+            parameters['variables'][tag] = (tracked_values.includes(tag));
         }
 
         // Draw charts once GUI is initialized
@@ -105,10 +100,12 @@ function updateData(){
     var query = makeQuery();
     $.getJSON('update/?'+query, function(response){
         for(var uav_id in response.data){
+            var altitudes = [];
+            var times = [];
             for(var variable_name in response.data[uav_id]){
                 var positions = response.data[uav_id][variable_name]['positions'];
-                var altitudes = [];
-                var times = [];
+                altitudes = [];
+                times = [];
                 for(var i = 0; i < positions.length ; i++){
                     altitudes.push(positions[i][3]);
                     times.push(positions[i][0]);
@@ -161,7 +158,7 @@ function updateData(){
                     align: 'left',
                 }
             };
-            'ALT' in data ? data['ALT'].push(alt_var) : data['ALT'] = [alt_var]
+            'ALT' in data ? data['ALT'].push(alt_var) : data['ALT'] = [alt_var];
         }
         updateCharts(data);
         if (parameters.streaming && parameters.socket == null) {
@@ -173,62 +170,86 @@ function updateData(){
 }
 
 function handleMessage(messages){
-    for (var data of messages){
-        if (parameters.uavs[data.uav_id] &&
-            parameters.variables[data.variable_name]){
-            dict_values[data.variable_name] = {
-                x: [[data.data[0]]],
-                y: [[data.position[3]]],
-            };
-            if (tracked_values.length == Object.keys(dict_values).length){
-                plotMessage(data, dict_values);
-                dict_values = {};
-            }
-        }
-    }
+    plotMessage(messages);
 }
 
-function plotMessage(data, dict_values){
+function plotMessage(data){
     var chart_altitude = document.getElementById('altitude_chart');
     var chart_temperature = document.getElementById('temperature_chart');
     var chart_humidity = document.getElementById('humidity_chart');
-    for(var i = 0; i < chart_altitude.data.length; i++){
-        var first_time = chart_altitude.data[i].x[0];
-        list_charts = [chart_altitude, chart_temperature, chart_humidity];
-        while (list_charts[0].data[i].x[0] !== 'undefined' &&
-            data.position[0]-first_time > parameters.trail_length){
-            list_charts.forEach(function(chart){
-                chart.data[i].x.shift();
-                chart.data[i].y.shift();
-            });
-            first_time = chart_altitude.data[i].x[0];
+    for (var message of data){
+        for(var i = 0; i < chart_altitude.data.length; i++){
+            var first_time = chart_altitude.data[i].x[0];
+            list_charts = [chart_altitude, chart_temperature, chart_humidity];
+            while (list_charts[0].data[i].x[0] !== 'undefined' &&
+                message.position[0]-first_time > parameters.trail_length){
+                list_charts.forEach(function(chart){
+                    chart.data[i].x.shift();
+                    chart.data[i].y.shift();
+                });
+                first_time = chart_altitude.data[i].x[0];
+            }
         }
     }
-    for (var tag of tracked_values){
-        if(tag =='THT'){
-            var chart_name = 'temperature_chart';
-            var trace_index = getTraceIndexByName(chart_temperature, data.uav_id);
-        } else {
-            var chart_name = 'humidity_chart';
-            var trace_index = getTraceIndexByName(chart_humidity, data.uav_id);
+    var data_temperature = {};
+    var data_altitude = {};
+    var data_humidity = {};
+    for (var message of data){
+        if (message.variable_name == 'THT'){
+            if (Object.keys(data_temperature).includes(message.uav_id)){
+                data_temperature[message.uav_id].x.push(message.data[0])
+                data_temperature[message.uav_id].y.push(message.position[3])
+            } else {
+                data_temperature[message.uav_id] = {}
+                data_temperature[message.uav_id]['x'] = [message.data[0]]
+                data_temperature[message.uav_id]['y'] = [message.position[3]]
+            }
+        } else if (message.variable_name == 'RCT'){
+            if (Object.keys(data_humidity).includes(message.uav_id)){
+                data_humidity[message.uav_id].x.push(message.data[0])
+                data_humidity[message.uav_id].y.push(message.position[3])
+                data_altitude[message.uav_id].x.push(message.position[0])
+                data_altitude[message.uav_id].y.push(message.position[3])
+            } else {
+                data_humidity[message.uav_id] = {}
+                data_humidity[message.uav_id]['x'] = [message.data[0]]
+                data_humidity[message.uav_id]['y'] = [message.position[3]]
+                data_altitude[message.uav_id] = {}
+                data_altitude[message.uav_id]['x'] = [message.position[0]]
+                data_altitude[message.uav_id]['y'] = [message.position[3]]
+            }
         }
-        if (trace_index > -1)
-            Plotly.extendTraces(chart_name, dict_values[tag], [trace_index]);
     }
-    trace_index = getTraceIndexByName(chart_altitude, data.uav_id);
-    var update = {
-        x: [[data.position[0]]],
-        y: [[data.position[3]]],
-    };
-    if (trace_index > -1)
-        Plotly.extendTraces('altitude_chart', update, [trace_index]);
+    for (var uav_id in data_temperature){
+        var trace_index = getTraceIndexByName(chart_temperature, uav_id);
+        let update = {
+            x:[data_temperature[uav_id].x],
+            y:[data_temperature[uav_id].y],
+        }
+        Plotly.extendTraces('temperature_chart', update, [trace_index])
+    }
+    for (var uav_id in data_humidity){
+        var trace_index = getTraceIndexByName(chart_humidity, uav_id);
+        let update = {
+            x:[data_humidity[uav_id].x],
+            y:[data_humidity[uav_id].y],
+        }
+        Plotly.extendTraces('humidity_chart', update, [trace_index])
+    }
+    for (var uav_id in data_altitude){
+        var trace_index = getTraceIndexByName(chart_altitude, uav_id);
+        let update = {
+            x:[data_altitude[uav_id].x],
+            y:[data_altitude[uav_id].y],
+        }
+        Plotly.extendTraces('altitude_chart', update, [trace_index])
+    }
 }
 
 function toggleStreaming(state){
     if (!state){
         parameters.socket.close();
         parameters.socket = null;
-        dict_values = {};
     }
     updateData();
 }
