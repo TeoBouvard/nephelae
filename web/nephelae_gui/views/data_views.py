@@ -90,7 +90,6 @@ def get_sensor_data(request):
     uav_ids = [int(item) for item in request.GET.getlist('uav_id[]')]
     step = (-1 if request.GET.get('step') is None else int(request.GET.get('step')))
     variables = request.GET.getlist('variables[]')
-    variables.append(request.GET.get('variable'))
 
     # filling response
     data = {}
