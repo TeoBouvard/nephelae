@@ -1,4 +1,5 @@
 import json
+import time
 
 from channels.generic.websocket import WebsocketConsumer
 
@@ -25,10 +26,11 @@ except Exception as e:
 
 
 class SensorConsumer(WebsocketConsumer):
-    def __init__(self, number_of_messages, *args, **kwargs):
+    def __init__(self, time_limit, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.list_of_messages = []
-        self.number_of_messages = number_of_messages
+        self.time_limit = time_limit
+        self.start_time = time.perf_counter()
 
     def connect(self):
         self.accept()
@@ -56,7 +58,9 @@ class SensorConsumer(WebsocketConsumer):
                    'position':     sample.position.data.tolist(),
                    'data':         sample.data}
         self.list_of_messages.append(message)
-        if(len(self.list_of_messages) >= self.number_of_messages):
+        time_now = time.perf_counter()
+        if(time_now-self.start_time >= self.time_limit):
+            self.start_time = time_now
             self.send(json.dumps(self.list_of_messages))
             self.list_of_messages = []
 
