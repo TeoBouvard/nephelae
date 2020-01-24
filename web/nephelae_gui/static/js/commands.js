@@ -88,7 +88,19 @@ function generateItems(){
                            'aircraft="' + aircraftId + '" ' +
                            'class="waves-effect waves-light btn-small mission-modal-trigger">New mission</a>';
                 html += '</span><br>';
+
+                html += '<br>';
+                html += '<span class="left">';
+                html += '<a href="/aircrafts/next_mission/' + aircraftId + '" ' +
+                           'class="waves-effect waves-light btn-small">Next mission</a>';
+                html += '</span><br>';
                 
+                html += '<br>';
+                html += '<span class="left">';
+                html += '<a href="/aircrafts/end_mission/' + aircraftId + '" ' +
+                           'class="waves-effect waves-light btn-small">End mission</a>';
+                html += '</span><br>';
+
             html += '</div>';
         html += '</div>';
         $('.free').first().removeClass("free").addClass("filled").append(html);

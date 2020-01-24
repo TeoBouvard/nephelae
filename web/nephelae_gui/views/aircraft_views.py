@@ -226,6 +226,18 @@ def reject_mission(request, aircraftId, missionId):
     return JsonResponse({'status' : 'Rejected !'})
 
 
+def next_mission(request, aircraftId):
+    scenario.aircrafts[aircraftId].next_mission()
+    # return JsonResponse({'next_mission':'next_mission'})
+    return HttpResponse(status='ok')
+
+
+def end_mission(request, aircraftId):
+    scenario.aircrafts[aircraftId].end_mission()
+    # return JsonResponse({'next_mission':'next_mission'})
+    return HttpResponse(status='ok')
+
+
 def remove_center_to_update_UAV(request):
     query = request.GET
     uav_id = query.get('uav_id')
