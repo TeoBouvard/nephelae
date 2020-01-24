@@ -50,5 +50,6 @@ class DebugTrackerConsumer(WebsocketConsumer):
         old_tracked_point = (debug_infos['x_old'], debug_infos['y_old'])
         res = {'x_axis': x_axis, 'y_axis': y_axis, 'data': data,
                 'tracked_point': tracked_point, 'old_tracked_point':
-                old_tracked_point, 'centers': debug_infos['centers']}
+                old_tracked_point, 'centers': debug_infos['centers'],
+                'producer': debug_infos['producer']}
         self.send(json.dumps(res))
