@@ -39,17 +39,21 @@ class DebugTrackerConsumer(WebsocketConsumer):
     
     def tracker_debug(self, debug_infos):
         print(debug_infos)
-        x_axis = np.linspace(debug_infos['scaledArray'].bounds[0].min,
-                debug_infos['scaledArray'].bounds[0].max,
-            debug_infos['scaledArray'].data.shape[0]).T.tolist()
-        y_axis = np.linspace(debug_infos['scaledArray'].bounds[1].min,
-                debug_infos['scaledArray'].bounds[1].max,
-            debug_infos['scaledArray'].data.shape[1]).T.tolist()
-        data = [x.tolist() for x in debug_infos['scaledArray'].data.T]
-        tracked_point = (debug_infos['x'], debug_infos['y'])
-        old_tracked_point = (debug_infos['x_old'], debug_infos['y_old'])
-        res = {'x_axis': x_axis, 'y_axis': y_axis, 'data': data,
-                'tracked_point': tracked_point, 'old_tracked_point':
-                old_tracked_point, 'centers': debug_infos['centers'],
-                'producer': debug_infos['producer'], 'time':debug_infos['t']}
+        if not debug_infos['stop']:
+            x_axis = np.linspace(debug_infos['scaledArray'].bounds[0].min,
+                    debug_infos['scaledArray'].bounds[0].max,
+                debug_infos['scaledArray'].data.shape[0]).T.tolist()
+            y_axis = np.linspace(debug_infos['scaledArray'].bounds[1].min,
+                    debug_infos['scaledArray'].bounds[1].max,
+                debug_infos['scaledArray'].data.shape[1]).T.tolist()
+            data = [x.tolist() for x in debug_infos['scaledArray'].data.T]
+            tracked_point = (debug_infos['x'], debug_infos['y'])
+            old_tracked_point = (debug_infos['x_old'], debug_infos['y_old'])
+            res = {'x_axis': x_axis, 'y_axis': y_axis, 'data': data,
+                    'tracked_point': tracked_point, 'old_tracked_point':
+                    old_tracked_point, 'centers': debug_infos['centers'],
+                    'producer': debug_infos['producer'],
+                    'time':debug_infos['t'], 'stop': False}
+        else :
+            res = {'stop': True}
         self.send(json.dumps(res))

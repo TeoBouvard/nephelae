@@ -23,6 +23,17 @@ var parameters = {
 
 var controllers = {};
 
+var no_data = {
+    x: [2],
+    y: [2],
+    mode:'text',
+    text: ['No data to display'],
+    textfont: {size: 30},
+};
+var layout_no_data = {
+    autorange: true
+};
+
 $(document).ready(function(){
     setupDebug();
 });
@@ -60,7 +71,7 @@ function setupGUI(){
 }
 
 function setChart(){
-    Plotly.react('chart', []);
+    Plotly.react('chart', [no_data], layout_no_data, config);
     var chart = document.getElementById('chart');
     chart.on('plotly_click', setNewCenter)
 }
@@ -90,6 +101,7 @@ function isChoosingNearestCenter(folder){
     var query = $.param({uav_id: controllers['uav'].getValue()});
     $.getJSON('is_choosing_nearest_center/?' + query, (response) => {
         if (response.choose_nearest === null){
+            Plotly.react('chart', [no_data], layout_no_data, config);
             parameters.time = undefined;
             folder.hide();
         } else {
@@ -100,54 +112,60 @@ function isChoosingNearestCenter(folder){
 }
 
 function displayChart(response){
-    if (response.producer == controllers['uav'].getValue()){
-        var lay = createLayout(parameters.variable, response.data);
-        var map = {
-                x: response.x_axis,
-                y: response.y_axis,
-                z: response.data,
-                colorscale : lay['cmap'],
-                type: 'heatmap',
-        };
-        var center = {
-                x: [response.tracked_point[0]],
-                y: [response.tracked_point[1]],
-                mode: 'markers',
-                name: 'Center Tracked',
-                type: 'scatter',
-                marker: {size: 14, symbol:'x', color: '#ff00ff'},
-        };
-        var old_center = {
-                x: [response.old_tracked_point[0]],
-                y: [response.old_tracked_point[1]],
-                mode: 'markers',
-                name: 'Old Center',
-                type: 'scatter',
-                marker: {size: 14, symbol:'triangle-up', color: '#ffffff',
-                    line:{color: '#000000', width:1.5},},
-        };
-        map_data = [map];
-        centers = [center, old_center];
+    if (!response.stop){
+        if (response.producer == controllers['uav'].getValue()){
+            var lay = createLayout(parameters.variable, response.data);
+            var map = {
+                    x: response.x_axis,
+                    y: response.y_axis,
+                    z: response.data,
+                    colorscale : lay['cmap'],
+                    type: 'heatmap',
+            };
+            var center = {
+                    x: [response.tracked_point[0]],
+                    y: [response.tracked_point[1]],
+                    mode: 'markers',
+                    name: 'Center Tracked',
+                    type: 'scatter',
+                    marker: {size: 14, symbol:'x', color: '#ff00ff'},
+            };
+            var old_center = {
+                    x: [response.old_tracked_point[0]],
+                    y: [response.old_tracked_point[1]],
+                    mode: 'markers',
+                    name: 'Old Center',
+                    type: 'scatter',
+                    marker: {size: 14, symbol:'triangle-up', color: '#ffffff',
+                        line:{color: '#000000', width:1.5},},
+            };
+            map_data = [map];
+            centers = [center, old_center];
 
-        for (var cloud_center of response.centers){
-            centers.push({x: [cloud_center[0]], y: [cloud_center[1]], mode: 'markers', 
-                name: 'Cloud Center', type: 'scatter', marker: {size: 14},})
-        }
-        layout.title = lay['title'];
-        layout.xaxis = {
-            autorange:false,
-            range: [Math.min.apply(Math, response.x_axis),
-                Math.max.apply(Math, response.x_axis)],
-            zeroline:false};
-        layout.yaxis = {
+            for (var cloud_center of response.centers){
+                centers.push({x: [cloud_center[0]], y: [cloud_center[1]],
+                    mode: 'markers', name: 'Cloud Center', type: 'scatter',
+                    marker: {size: 14},})
+            }
+            layout.title = lay['title'];
+            layout.xaxis = {
                 autorange:false,
-            range: [Math.min.apply(Math, response.y_axis),
-                Math.max.apply(Math, response.y_axis)],
-            zeroline: false};
-        layout.autosize = false;
-        parameters.time = response.time;
-        Plotly.react('chart', map_data, layout, config);
-        Plotly.addTraces('chart', centers);
+                range: [Math.min.apply(Math, response.x_axis),
+                    Math.max.apply(Math, response.x_axis)],
+                zeroline:false};
+            layout.yaxis = {
+                    autorange:false,
+                range: [Math.min.apply(Math, response.y_axis),
+                    Math.max.apply(Math, response.y_axis)],
+                zeroline: false};
+            layout.autosize = false;
+            parameters.time = response.time;
+            Plotly.react('chart', map_data, layout, config);
+            Plotly.addTraces('chart', centers);
+        }
+    } else {
+        Plotly.react('chart', [no_data], layout_no_data, config);
+        parameters.time = undefined;
     }
 }
 
