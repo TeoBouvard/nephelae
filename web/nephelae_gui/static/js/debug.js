@@ -21,6 +21,7 @@ var parameters = {
     time: undefined,
     deltaX: 1000,
     deltaY: 1000,
+    stopFunc: stopTracking,
 };
 
 var controllers = {};
@@ -74,6 +75,9 @@ function setupGUI(){
             .name('Delta Y')
             .onChange(setNewDeltaY)
 
+        controllers['stop'] = f1.add(parameters, 'stopFunc')
+            .name('Stop Tracking')
+
         isChoosingNearestCenter(f1);
 
         setChart();
@@ -122,6 +126,11 @@ function setNearestCenter(){
         nearest_center: controllers['nearest_center'].getValue()
     });
     $.getJSON('set_choose_nearest_center/?' + query);
+}
+
+function stopTracking(){
+    var query = $.param({uav_id: controllers['uav'].getValue()});
+    $.getJSON('stop_tracking/?' + query);
 }
 
 function isChoosingNearestCenter(folder){
