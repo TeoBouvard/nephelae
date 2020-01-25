@@ -18,6 +18,7 @@ var parameters = {
     socket_debug: null,
     uavs: [],
     nearest_center: true,
+    time: undefined
 };
 
 var controllers = {};
@@ -52,10 +53,28 @@ function setupGUI(){
         controllers['nearest_center'].onFinishChange(function(){
                 setNearestCenter();
             });
-
+        setChart();
         setDebugSocket();
         removeLoader();
     });
+}
+
+function setChart(){
+    Plotly.react('chart', []);
+    var chart = document.getElementById('chart');
+    chart.on('plotly_click', setNewCenter)
+}
+
+function setNewCenter(data){
+    if (parameters.time !== undefined){
+        var query = $.param({
+            uav_id: controllers['uav'].getValue(),
+            x: data.points[0].x,
+            y: data.points[0].y,
+            t: parameters.time
+        });
+        $.getJSON('send_marker_to_uav/?' + query)
+    }
 }
 
 function setNearestCenter(){
@@ -70,9 +89,10 @@ function setNearestCenter(){
 function isChoosingNearestCenter(folder){
     var query = $.param({uav_id: controllers['uav'].getValue()});
     $.getJSON('is_choosing_nearest_center/?' + query, (response) => {
-        if (response.choose_nearest === null)
+        if (response.choose_nearest === null){
+            parameters.time = undefined;
             folder.hide();
-        else {
+        } else {
             folder.show();
             controllers['nearest_center'].setValue(response.choose_nearest);
         }
@@ -87,7 +107,7 @@ function displayChart(response){
                 y: response.y_axis,
                 z: response.data,
                 colorscale : lay['cmap'],
-                type: 'heatmap'
+                type: 'heatmap',
         };
         var center = {
                 x: [response.tracked_point[0]],
@@ -95,6 +115,7 @@ function displayChart(response){
                 mode: 'markers',
                 name: 'Center Tracked',
                 type: 'scatter',
+                marker: {size: 14, symbol:'x', color: '#ff00ff'},
         };
         var old_center = {
                 x: [response.old_tracked_point[0]],
@@ -102,13 +123,15 @@ function displayChart(response){
                 mode: 'markers',
                 name: 'Old Center',
                 type: 'scatter',
+                marker: {size: 14, symbol:'triangle-up', color: '#ffffff',
+                    line:{color: '#000000', width:1.5},},
         };
         map_data = [map];
         centers = [center, old_center];
 
         for (var cloud_center of response.centers){
             centers.push({x: [cloud_center[0]], y: [cloud_center[1]], mode: 'markers', 
-                name: 'Cloud Center', type: 'scatter'})
+                name: 'Cloud Center', type: 'scatter', marker: {size: 14},})
         }
         layout.title = lay['title'];
         layout.xaxis = {
@@ -122,6 +145,7 @@ function displayChart(response){
                 Math.max.apply(Math, response.y_axis)],
             zeroline: false};
         layout.autosize = false;
+        parameters.time = response.time;
         Plotly.react('chart', map_data, layout, config);
         Plotly.addTraces('chart', centers);
     }

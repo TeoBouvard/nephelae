@@ -92,6 +92,7 @@ urlpatterns = [
             aircraft_views.choosing_nearest_cloud_center),
     path('debug/is_choosing_nearest_center/',
             aircraft_views.is_choosing_nearest_cloud_center),
+    path('debug/send_marker_to_uav/', aircraft_views.center_to_update_UAV),
 
 
     # Absolute URLs accessible by every page
