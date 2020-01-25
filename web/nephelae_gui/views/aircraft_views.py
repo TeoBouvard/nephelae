@@ -246,3 +246,24 @@ def center_to_update_UAV(request):
     if hasattr(aircraft, 'set_computing_center'):
         aircraft.set_computing_center(True)
     return HttpResponse(status=204)
+
+def choosing_nearest_cloud_center(request):
+    query = request.GET
+    uav_id = query.get('uav_id')
+    nearest_center = (query.get('nearest_center') == 'true')
+    aircraft = scenario.aircrafts[uav_id]
+    value = None
+    if hasattr(aircraft, 'set_choose_nearest_cloud_center'):
+        aircraft.set_choose_nearest_cloud_center(nearest_center)
+    if hasattr(aircraft, 'is_choosing_nearest_cloud_center'):
+        value = aircraft.is_choosing_nearest_cloud_center()
+    return JsonResponse({'choose_nearest': value})
+
+def is_choosing_nearest_cloud_center(request):
+    query = request.GET
+    uav_id = query.get('uav_id')
+    value = None
+    aircraft = scenario.aircrafts[uav_id]
+    if hasattr(aircraft, 'is_choosing_nearest_cloud_center'):
+        value = aircraft.is_choosing_nearest_cloud_center()
+    return JsonResponse({'choose_nearest': value})

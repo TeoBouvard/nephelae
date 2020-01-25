@@ -16,10 +16,11 @@ var config = {
 
 var parameters = {
     socket_debug: null,
-    uavs: []
+    uavs: [],
+    nearest_center: true,
 };
 
-var controller_uav = null
+var controllers = {};
 
 $(document).ready(function(){
     setupDebug();
@@ -27,8 +28,6 @@ $(document).ready(function(){
 
 function setupDebug(){
     setupGUI();
-    setDebugSocket();
-    removeLoader();
 }
 
 function setupGUI(){
@@ -36,13 +35,52 @@ function setupGUI(){
     $('#gui_container').append(gui.domElement);
     $.getJSON('/discover/', (response) => {
         x = Object.keys(response.uavs)
-        controller_uav = gui.add(parameters, 'uavs', x).setValue(x[0])
+        controllers['uav'] = gui.add(parameters, 'uavs', x)
+            .setValue(x[0])
             .name("UAV")
+
+        var f1 = gui.addFolder('Monitoring');
+        f1.open();
+        controllers['nearest_center'] = f1.add(parameters, 'nearest_center')
+            .name('Nearest center')
+
+        controllers['uav'].onFinishChange(function(){
+                isChoosingNearestCenter(f1);
+            });
+        isChoosingNearestCenter(f1);
+
+        controllers['nearest_center'].onFinishChange(function(){
+                setNearestCenter();
+            });
+
+        setDebugSocket();
+        removeLoader();
+    });
+}
+
+function setNearestCenter(){
+    var query = $.param({
+        uav_id: controllers['uav'].getValue(),
+        nearest_center: controllers['nearest_center'].getValue()
+    });
+    $.getJSON('set_choose_nearest_center/?' + query, (response) => {
+    });
+}
+
+function isChoosingNearestCenter(folder){
+    var query = $.param({uav_id: controllers['uav'].getValue()});
+    $.getJSON('is_choosing_nearest_center/?' + query, (response) => {
+        if (response.choose_nearest === null)
+            folder.hide();
+        else {
+            folder.show();
+            controllers['nearest_center'].setValue(response.choose_nearest);
+        }
     });
 }
 
 function displayChart(response){
-    if (response.producer == controller_uav.getValue()){
+    if (response.producer == controllers['uav'].getValue()){
         var lay = createLayout(parameters.variable, response.data);
         var map = {
                 x: response.x_axis,

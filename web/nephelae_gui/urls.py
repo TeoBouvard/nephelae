@@ -88,6 +88,11 @@ urlpatterns = [
     # URL for debug page
     path('debug/', template_views.render_template, {'template_name':
         'debug.html'}, name='debug'),
+    path('debug/set_choose_nearest_center/',
+            aircraft_views.choosing_nearest_cloud_center),
+    path('debug/is_choosing_nearest_center/',
+            aircraft_views.is_choosing_nearest_cloud_center),
+
 
     # Absolute URLs accessible by every page
     # Return reference frame, list of uav ids, list of data sample tags
