@@ -267,3 +267,31 @@ def is_choosing_nearest_cloud_center(request):
     if hasattr(aircraft, 'is_choosing_nearest_cloud_center'):
         value = aircraft.is_choosing_nearest_cloud_center()
     return JsonResponse({'choose_nearest': value})
+
+def get_deltas_tracker(request):
+    query = request.GET
+    uav_id = query.get('uav_id')
+    aircraft = scenario.aircrafts[uav_id]
+    res = {}
+    if hasattr(aircraft, 'get_space_x') and hasattr(aircraft, 'get_space_y'):
+        res['deltaX'] = aircraft.get_space_x()
+        res['deltaY'] = aircraft.get_space_y()
+    return JsonResponse(res)
+
+def set_delta_x_tracker(request):
+    query = request.GET
+    uav_id = query.get('uav_id')
+    deltaX = float(query.get('deltaX'))
+    aircraft = scenario.aircrafts[uav_id]
+    if hasattr(aircraft, 'set_space_x'):
+        aircraft.set_space_x(deltaX)
+    return HttpResponse(status=204)
+
+def set_delta_y_tracker(request):
+    query = request.GET
+    uav_id = query.get('uav_id')
+    deltaY = float(query.get('deltaY'))
+    aircraft = scenario.aircrafts[uav_id]
+    if hasattr(aircraft, 'set_space_y'):
+        aircraft.set_space_y(deltaY)
+    return HttpResponse(status=204) 

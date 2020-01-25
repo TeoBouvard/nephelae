@@ -93,7 +93,9 @@ urlpatterns = [
     path('debug/is_choosing_nearest_center/',
             aircraft_views.is_choosing_nearest_cloud_center),
     path('debug/send_marker_to_uav/', aircraft_views.center_to_update_UAV),
-
+    path('debug/get_deltas/', aircraft_views.get_deltas_tracker),
+    path('debug/set_delta_x/', aircraft_views.set_delta_x_tracker),
+    path('debug/set_delta_y/', aircraft_views.set_delta_y_tracker),
 
     # Absolute URLs accessible by every page
     # Return reference frame, list of uav ids, list of data sample tags

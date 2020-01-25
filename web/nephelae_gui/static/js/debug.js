@@ -18,7 +18,9 @@ var parameters = {
     socket_debug: null,
     uavs: [],
     nearest_center: true,
-    time: undefined
+    time: undefined,
+    deltaX: 1000,
+    deltaY: 1000,
 };
 
 var controllers = {};
@@ -59,11 +61,21 @@ function setupGUI(){
         controllers['uav'].onFinishChange(function(){
                 isChoosingNearestCenter(f1);
             });
-        isChoosingNearestCenter(f1);
 
         controllers['nearest_center'].onFinishChange(function(){
                 setNearestCenter();
             });
+
+        controllers['deltaX'] = f1.add(parameters, 'deltaX')
+            .name('Delta X')
+            .onChange(setNewDeltaX)
+
+        controllers['deltaY'] = f1.add(parameters, 'deltaY')
+            .name('Delta Y')
+            .onChange(setNewDeltaY)
+
+        isChoosingNearestCenter(f1);
+
         setChart();
         setDebugSocket();
         removeLoader();
@@ -88,13 +100,28 @@ function setNewCenter(data){
     }
 }
 
+function setNewDeltaX(){
+    var query = $.param({
+        uav_id: controllers['uav'].getValue(),
+        deltaX: controllers['deltaX'].getValue()
+    });
+    $.getJSON('set_delta_x/?' + query);
+}
+
+function setNewDeltaY(){
+    var query = $.param({
+        uav_id: controllers['uav'].getValue(),
+        deltaY: controllers['deltaY'].getValue()
+    });
+    $.getJSON('set_delta_y/?' + query);
+}
+
 function setNearestCenter(){
     var query = $.param({
         uav_id: controllers['uav'].getValue(),
         nearest_center: controllers['nearest_center'].getValue()
     });
-    $.getJSON('set_choose_nearest_center/?' + query, (response) => {
-    });
+    $.getJSON('set_choose_nearest_center/?' + query);
 }
 
 function isChoosingNearestCenter(folder){
@@ -107,6 +134,10 @@ function isChoosingNearestCenter(folder){
         } else {
             folder.show();
             controllers['nearest_center'].setValue(response.choose_nearest);
+            $.getJSON('get_deltas/?' + query, (response) => {
+                controllers['deltaX'].setValue(response.deltaX)
+                controllers['deltaY'].setValue(response.deltaY)
+            });
         }
     });
 }
