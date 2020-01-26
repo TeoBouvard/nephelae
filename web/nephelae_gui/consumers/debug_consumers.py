@@ -49,11 +49,13 @@ class DebugTrackerConsumer(WebsocketConsumer):
             data = [x.tolist() for x in debug_infos['scaledArray'].data.T]
             tracked_point = (debug_infos['x'], debug_infos['y'])
             old_tracked_point = (debug_infos['x_old'], debug_infos['y_old'])
+            uav_position = (debug_infos['x_uav'], debug_infos['y_uav'])
             res = {'x_axis': x_axis, 'y_axis': y_axis, 'data': data,
                     'tracked_point': tracked_point, 'old_tracked_point':
                     old_tracked_point, 'centers': debug_infos['centers'],
                     'producer': debug_infos['producer'],
-                    'time':debug_infos['t'], 'stop': False}
+                    'time':debug_infos['t'], 'stop': False,
+                    'uav_position': uav_position,}
         else :
-            res = {'stop': True}
+            res = {'stop': True, 'producer': debug_infos['producer']}
         self.send(json.dumps(res))

@@ -17,7 +17,7 @@ var config = {
 // Parameters
 var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
-    streaming: false,
+    streaming: true,
     socket: null,
     uav_color: {},
     start_buff: 1,
@@ -229,7 +229,8 @@ function handleMessage(messages){
 
 function getTraceIndexByName(chart, name){
     // find the index of the first trace in the chart with name 'name'
-    return chart[0].data.findIndex(element => element.name == name);
+    return (chart[0] !== undefined ? 
+        chart[0].data.findIndex(element => element.name == name) : -1);
 }
 
 function makeQuery(){

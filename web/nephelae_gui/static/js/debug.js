@@ -179,8 +179,17 @@ function displayChart(response){
                     marker: {size: 14, symbol:'triangle-up', color: '#ffffff',
                         line:{color: '#000000', width:1.5},},
             };
+            var uav_position = {
+                x: [response.uav_position[0]],
+                y: [response.uav_position[1]],
+                mode: 'markers',
+                name: 'UAV' + response.producer,
+                type: 'scatter',
+                marker: {size: 14, symbol:'triangle-down', color: '#000000',
+                    line:{color: '#ffffff', width:1.5},},
+            }
             map_data = [map];
-            centers = [center, old_center];
+            centers = [center, old_center, uav_position];
 
             for (var cloud_center of response.centers){
                 centers.push({x: [cloud_center[0]], y: [cloud_center[1]],
