@@ -14,7 +14,8 @@ try:
     db = scenario.database
 
     # Defines displayable samples, to keep for now. Find an alternative to put in scenario
-    db_data_tags = ['temperature', 'pressure', 'cloud_channel_0', 'RCT', 'WT', 'THT'] 
+    # db_data_tags = ['temperature', 'pressure', 'cloud_channel_0', 'cloud_channel_0', 'RCT', 'WT', 'THT'] 
+    db_data_tags = ['temperature', 'pressure', 'cloud_channel_0', 'cloud_channel_1'] 
 
     # TODO fix this
     def on_exit():
