@@ -46,7 +46,7 @@ function createLayout(variable, values=[]){
             break;
         default:
             cmap = 'Viridis';
-            title = "Unknown variable"
+            title = variable
             break;
     }
 

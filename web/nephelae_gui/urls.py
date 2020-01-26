@@ -52,6 +52,8 @@ urlpatterns = [
     path('aircrafts/create_mission/', aircraft_views.create_mission),
     path('aircrafts/current_mission_status/<str:aircraftId>', aircraft_views.current_mission_status),
     path('aircrafts/current_mission_status_all/', aircraft_views.current_mission_status_all),
+    path('aircrafts/next_mission/<str:aircraftId>', aircraft_views.next_mission),
+    path('aircrafts/end_mission/<str:aircraftId>', aircraft_views.end_mission),
 
     # URL for mission_validation page
     path('mission_validation/', template_views.render_template, {'template_name': 'mission_validation.html'}, name='mission_validation'),
