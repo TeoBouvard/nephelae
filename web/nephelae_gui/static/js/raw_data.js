@@ -17,7 +17,7 @@ var config = {
 // Parameters
 var parameters = {
     trail_length: parseInt(Cookies.get('trail_length')), // seconds
-    streaming: false,
+    streaming: true,
     socket: null,
     uav_color: {},
     start_buff: 1,
