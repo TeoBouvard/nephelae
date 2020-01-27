@@ -228,13 +228,11 @@ def reject_mission(request, aircraftId, missionId):
 
 def next_mission(request, aircraftId):
     scenario.aircrafts[aircraftId].next_mission()
-    # return JsonResponse({'next_mission':'next_mission'})
     return HttpResponse(status=204)
 
 
 def end_mission(request, aircraftId):
     scenario.aircrafts[aircraftId].end_mission()
-    # return JsonResponse({'next_mission':'next_mission'})
     return HttpResponse(status=204)
 
 
