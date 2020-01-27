@@ -75,7 +75,7 @@ function setupGUI(){
         });
         
         // for changing filtering parameters on raw_data
-        setupDataviewControl();
+        //setupDataviewControl();
 
 
         // Draw charts once GUI is initialized

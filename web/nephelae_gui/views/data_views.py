@@ -101,10 +101,10 @@ def get_sensor_data(request):
     for key in scenario.displayedViews:
         for sample in scenario.dataviews[key][-start:end:step]:
             try:
-                data[sample.producer][sample.variableName]['positions']\
-                    .append(message.position.data.tolist())
-                data[sample.producer][sample.variableName]['values']\
-                    .append(message.data[0])
+                data[int(sample.producer)][sample.variableName]['positions']\
+                    .append(sample.position.data.tolist())
+                data[int(sample.producer)][sample.variableName]['values']\
+                    .append(sample.data[0])
             except KeyError:
                 pass
 
