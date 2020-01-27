@@ -1,6 +1,8 @@
 // Activate current menu in nav
 $('#nav_raw_data').addClass('active');
 
+var gui
+
 // Chart style
 var chart_height = 250;
 var lm = 70;
@@ -21,13 +23,15 @@ var parameters = {
     socket: null,
     uav_color: {},
     start_buff: 1,
-    end_buff: 100
+    end_buff: 100,
+}
+var dataviewsParameters = {
+    selected_view: null,
+    views: {},
+    gui_folder: null
 }
 
 $(document).ready(() => {
-    $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
-        console.log(response);
-    });
     setupGUI();
 });
 
@@ -69,12 +73,36 @@ function setupGUI(){
             fieldsBehavior(state, f1, f2);
             toggleStreaming(state);
         });
+        
+        // for changing filtering parameters on raw_data
+        setupDataviewControl();
 
 
         // Draw charts once GUI is initialized
         toggleChart(true);
         updateData();
     });
+}
+
+function setupDataviewControl() {
+    $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
+        dataviewsParameters.views = response;
+        let dataviewsNames = []
+        for (let name in dataviewsParameters.views) {
+            dataviewsNames.push(name);
+        }
+        dataviewsParameters.selected_view = dataviewsNames[0];
+        dataviewsParameters.gui_folder = gui.addFolder('Dataview Controls');
+
+        dataviewsParameters.gui_folder
+            .add(dataviewsParameters, 'selected_view', dataviewsNames)
+            .onChange(updateDataviewControl);
+        updateDataviewControl();
+    });
+}
+
+function updateDataviewControl() {
+    console.log(dataviewsParameters.views[dataviewsParameters.selected_view]);
 }
 
 function updateData(){
