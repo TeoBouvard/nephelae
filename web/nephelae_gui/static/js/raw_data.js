@@ -28,7 +28,7 @@ var parameters = {
 var dataviewsParameters = {
     selected_view: null,
     views: {},
-    gui_folder: null
+    gui_folder: null,
 }
 
 $(document).ready(() => {
@@ -75,7 +75,7 @@ function setupGUI(){
         });
         
         // for changing filtering parameters on raw_data
-        //setupDataviewControl();
+        setupDataviewControl();
 
 
         // Draw charts once GUI is initialized
@@ -86,16 +86,27 @@ function setupGUI(){
 
 function setupDataviewControl() {
     $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
+        console.log(response);
         dataviewsParameters.views = response;
-        let dataviewsNames = []
+        dataviewsParameters.dataviewsNames = []
         for (let name in dataviewsParameters.views) {
-            dataviewsNames.push(name);
+            dataviewsParameters.dataviewsNames.push(name);
         }
-        dataviewsParameters.selected_view = dataviewsNames[0];
-        dataviewsParameters.gui_folder = gui.addFolder('Dataview Controls');
 
+        console.log(dataviewsParameters.dataviewsNames);
+        dataviewsParameters.gui_folder = gui.addFolder('Dataview Controls');
+        if (dataviewsParameters.dataviewsNames.length == 0) {
+            dataviewsParameters.dataviewsNames = 'No parameter views';
+            dataviewsParameters.gui_folder
+                .add(dataviewsParameters, 'dataviewsNames');
+            return;
+        }
+        
+        console.log(dataviewsParameters);
+        dataviewsParameters.selected_view = 
+            dataviewsParameters.dataviewsNames[0];
         dataviewsParameters.gui_folder
-            .add(dataviewsParameters, 'selected_view', dataviewsNames)
+            .add(dataviewsParameters, 'selected_view', dataviewsParameters.dataviewsNames)
             .onChange(updateDataviewControl);
         updateDataviewControl();
     });
