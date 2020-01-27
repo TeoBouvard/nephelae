@@ -196,3 +196,23 @@ def wind_data(request, variable_name):
 
     data = hypercube.get_wind(variable_name, time_value, altitude_value, map_bounds, origin)
     return JsonResponse(data, safe=False)
+
+
+def get_dataviews_parameters(request):
+    
+    output = {}
+    for key in scenario.dataviews.keys():
+        parameters = scenario.dataviews[key].get_parameters()
+        if len(parameters) > 0:
+            output[key] = parameters
+    return JsonResponse(output)
+
+
+def set_dataview_parameters(request):
+    query = request.GET
+    print(query)
+    
+    # view = scenario.dataviews[query.get('viewName')]
+    # params = {}
+    
+

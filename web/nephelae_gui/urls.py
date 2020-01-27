@@ -83,6 +83,7 @@ urlpatterns = [
     # URL for raw data page
     path('raw_data/', template_views.render_template, {'template_name': 'raw_data.html'}, name='raw_data'),
     path('raw_data/update/', data_views.get_sensor_data),
+    path('raw_data/get_dataviews_parameters/', data_views.get_dataviews_parameters),
 
     # URL for settings page
     path('settings/', template_views.render_template, {'template_name': 'settings.html'}, name='settings'),

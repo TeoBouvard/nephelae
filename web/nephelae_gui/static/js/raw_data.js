@@ -25,6 +25,9 @@ var parameters = {
 }
 
 $(document).ready(() => {
+    $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
+        console.log(response);
+    });
     setupGUI();
 });
 
@@ -66,6 +69,7 @@ function setupGUI(){
             fieldsBehavior(state, f1, f2);
             toggleStreaming(state);
         });
+
 
         // Draw charts once GUI is initialized
         toggleChart(true);
