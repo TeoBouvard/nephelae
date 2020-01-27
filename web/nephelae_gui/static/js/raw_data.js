@@ -42,7 +42,7 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Real-Time');
 
-    f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
+    f1.add(parameters, 'trail_length', 10, 6000).step(10).name("Log length (s)").onFinishChange(updateData);
 
     var f2 = gui.addFolder('History');
 
