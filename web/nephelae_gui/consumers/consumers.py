@@ -34,7 +34,8 @@ class SensorConsumer(WebsocketConsumer):
 
     def connect(self):
         self.accept()
-        scenario.database.add_sensor_observer(self)
+        for key in scenario.displayedViews:
+            scenario.dataviews[key].attach_observer(self)
 
 
     # Receive message from WebSocket
@@ -46,7 +47,8 @@ class SensorConsumer(WebsocketConsumer):
 
     def disconnect(self, close_code):
         print("disconnecting")
-        scenario.database.remove_sensor_observer(self)
+        for key in scenario.displayedViews:
+            scenario.dataviews[key].detach_observer(self)
         self.channel_layer.group_discard
 
 

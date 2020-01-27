@@ -96,12 +96,17 @@ def get_sensor_data(request):
     for uav_id in uav_ids:
         data[uav_id] = {}
         for variable in variables:
-            messages = [entry.data for entry in
-                database[variable, str(uav_id)](lambda x: x.data.timeStamp)[-start:end:step]]
             data[uav_id][variable] = {'positions':[], 'values': []}
-            for message in messages:
-                data[uav_id][variable]['positions'].append(message.position.data.tolist())
-                data[uav_id][variable]['values'].append(message.data[0])
+    
+    for key in scenario.displayedViews:
+        for sample in scenario.dataviews[key][-start:end:step]:
+            try:
+                data[sample.producer][sample.variableName]['positions']\
+                    .append(message.position.data.tolist())
+                data[sample.producer][sample.variableName]['values']\
+                    .append(message.data[0])
+            except KeyError:
+                pass
 
     return JsonResponse({'data':data})
 
