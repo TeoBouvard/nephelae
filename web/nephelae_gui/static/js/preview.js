@@ -49,12 +49,15 @@ function setupGUI(){
 function drawPlot(){
 
     var data = [];
-    var query = $.param({uav_id: getSelectedElements(parameters.fleet), trail_length: parameters.trail_length, variable: parameters.variable});
+    var selected_variable = {};
+    selected_variable[parameters.variable] = true;
+    var query = $.param({
+        uav_id: getSelectedElements(parameters.fleet),
+        variables: getSelectedElements(selected_variable),
+    });
 
     $.getJSON('update/?' + query, (response) => {
-
         for (var uav_id in response.data){
-
             var positions = response.data[uav_id][parameters.variable]['positions'];
             var sensor_values = response.data[uav_id][parameters.variable]['values'];
             var x = [];
