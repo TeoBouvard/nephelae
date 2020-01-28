@@ -204,9 +204,9 @@ function updateData(){
         updateCharts(data);
 
         if (parameters.streaming && parameters.socket == null) {
-            parameters.socket = new websocket('ws://' + 
+            parameters.socket = new WebSocket('ws://' + 
                 window.location.host + '/ws/sensor/raw_data/');
-            parameters.socket.onmessage = (e) => handlemessage(json.parse(e.data));
+            parameters.socket.onmessage = (e) => handleMessage(JSON.parse(e.data));
         }
 
         removeLoader();
