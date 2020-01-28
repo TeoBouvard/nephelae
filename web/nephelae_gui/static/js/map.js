@@ -29,7 +29,8 @@ var bounds;
 // Parameters
 var parameters = {
     altitude: 1500,          // meters
-    trail_length: parseInt(Cookies.get('trail_length')),       // seconds
+    //trail_length: parseInt(Cookies.get('trail_length')),       // seconds
+    trail_length: 300,
     thermals_cmap: 'seismic',
     clouds_cmap: 'Purples',
     transparent: true,

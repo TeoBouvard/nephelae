@@ -96,12 +96,17 @@ def get_sensor_data(request):
     for uav_id in uav_ids:
         data[uav_id] = {}
         for variable in variables:
-            messages = [entry.data for entry in
-                database[variable, str(uav_id)](lambda x: x.data.timeStamp)[-start:end:step]]
             data[uav_id][variable] = {'positions':[], 'values': []}
-            for message in messages:
-                data[uav_id][variable]['positions'].append(message.position.data.tolist())
-                data[uav_id][variable]['values'].append(message.data[0])
+    
+    for key in scenario.displayedViews:
+        for sample in scenario.dataviews[key][-start:end:step]:
+            try:
+                data[int(sample.producer)][sample.variableName]['positions']\
+                    .append(sample.position.data.tolist())
+                data[int(sample.producer)][sample.variableName]['values']\
+                    .append(sample.data[0])
+            except KeyError:
+                pass
 
     return JsonResponse({'data':data})
 
@@ -191,3 +196,32 @@ def wind_data(request, variable_name):
 
     data = hypercube.get_wind(variable_name, time_value, altitude_value, map_bounds, origin)
     return JsonResponse(data, safe=False)
+
+
+def get_dataviews_parameters(request):
+    
+    output = {}
+    for key in scenario.dataviews.keys():
+        parameters = scenario.dataviews[key].get_parameters()
+        if len(parameters) > 0:
+            output[key] = parameters
+    return JsonResponse(output)
+
+
+def set_dataview_parameters(request):
+    query = request.GET;
+
+    viewName = query.get('dataview_name')
+    params = {}
+    for key in query:
+        if key == 'dataview_name':
+            continue
+        params[key.split('parameter_')[1]] = float(query.get(key))
+    
+    try:
+        scenario.dataviews[viewName].set_parameters(**params)
+    except KeyError as e:
+        print('No view with name ', key)
+    return JsonResponse({'status':'ok'})
+    
+

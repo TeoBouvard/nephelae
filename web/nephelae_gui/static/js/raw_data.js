@@ -1,6 +1,8 @@
 // Activate current menu in nav
 $('#nav_raw_data').addClass('active');
 
+var gui
+
 // Chart style
 var chart_height = 250;
 var lm = 70;
@@ -21,7 +23,13 @@ var parameters = {
     socket: null,
     uav_color: {},
     start_buff: 1,
-    end_buff: 100
+    end_buff: 100,
+}
+var dataviewsParameters = {
+    selected_view: null,
+    views: {},
+    gui_folder: null,
+    gui_folder_items: []
 }
 
 var alt_variable = 'ALT'
@@ -37,7 +45,7 @@ function setupGUI(){
 
     var f1 = gui.addFolder('Real-Time');
 
-    f1.add(parameters, 'trail_length', 10, 2000).step(10).name("Log length (s)").onFinishChange(updateData);
+    f1.add(parameters, 'trail_length', 10, 6000).step(10).name("Log length (s)").onFinishChange(updateData);
 
     var f2 = gui.addFolder('History');
 
@@ -68,9 +76,82 @@ function setupGUI(){
             fieldsBehavior(state, f1, f2);
             toggleStreaming(state);
         });
+        
+        // for changing filtering parameters on raw_data
+        setupDataviewControl();
+
 
         // Draw charts once GUI is initialized
         toggleChart(true);
+        updateData();
+    });
+}
+
+function setupDataviewControl() {
+    $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
+        console.log(response);
+        dataviewsParameters.views = response;
+        dataviewsParameters.dataviewsNames = []
+        for (let name in dataviewsParameters.views) {
+            dataviewsParameters.dataviewsNames.push(name);
+        }
+
+        dataviewsParameters.gui_folder = gui.addFolder('Dataview Controls');
+        if (dataviewsParameters.dataviewsNames.length == 0) {
+            dataviewsParameters.dataviewsNames = 'No parameter views';
+            dataviewsParameters.gui_folder
+                .add(dataviewsParameters, 'dataviewsNames');
+            return;
+        }
+        
+        dataviewsParameters.selected_view = 
+            dataviewsParameters.dataviewsNames[0];
+        dataviewsParameters.gui_folder
+            .add(dataviewsParameters, 'selected_view', dataviewsParameters.dataviewsNames)
+            .onChange(updateDataviewControl);
+        updateDataviewControl();
+    });
+}
+
+function updateDataviewControl() {
+    clearViewParameters();
+    $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
+        console.log(response);
+        console.log(dataviewsParameters.gui_folder);
+        dataviewsParameters.views = response;
+
+        console.log(dataviewsParameters.views[dataviewsParameters.selected_view]);
+        let params = dataviewsParameters.views[dataviewsParameters.selected_view];
+        for (let key in params) {
+            let item = dataviewsParameters.gui_folder
+                .add(dataviewsParameters.views[dataviewsParameters.selected_view],
+                     key)
+                .onChange(updateViewParameters);
+            item.value = String(params[key]);
+            dataviewsParameters.gui_folder_items.push(item);
+        }
+    });
+}
+
+function clearViewParameters() {
+    for (let item of dataviewsParameters.gui_folder_items) {
+        dataviewsParameters.gui_folder.remove(item);
+    }
+    dataviewsParameters.gui_folder_items = [];
+}
+
+function updateViewParameters() {
+    view   = dataviewsParameters.selected_view;
+    params = dataviewsParameters.views[view];
+    console.log(params);
+
+    let queryDict = {'dataview_name':view};
+    for (param in params) {
+        queryDict['parameter_' + param] = params[param];
+    }
+    let query = $.param(queryDict);
+    $.getJSON('set_dataview_parameters/?' + query, (response) => {
+        console.log(response);
         updateData();
     });
 }

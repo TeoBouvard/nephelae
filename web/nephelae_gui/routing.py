@@ -3,10 +3,10 @@ from django.conf.urls import url
 from .consumers import consumers, aircraft_consumers, debug_consumers
 
 def raw_data_instance(*args, **kwargs):
-    return consumers.SensorConsumer(15, *args, **kwargs)
+    return consumers.SensorConsumer(1, *args, **kwargs)
 
 def profiles_instance(*args, **kwargs):
-    return consumers.SensorConsumer(10, *args, **kwargs)
+    return consumers.SensorConsumer(1, *args, **kwargs)
 
 websocket_urlpatterns = [
 
