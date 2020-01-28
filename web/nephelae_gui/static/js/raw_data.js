@@ -29,6 +29,7 @@ var dataviewsParameters = {
     selected_view: null,
     views: {},
     gui_folder: null,
+    gui_folder_items: []
 }
 
 $(document).ready(() => {
@@ -93,7 +94,6 @@ function setupDataviewControl() {
             dataviewsParameters.dataviewsNames.push(name);
         }
 
-        console.log(dataviewsParameters.dataviewsNames);
         dataviewsParameters.gui_folder = gui.addFolder('Dataview Controls');
         if (dataviewsParameters.dataviewsNames.length == 0) {
             dataviewsParameters.dataviewsNames = 'No parameter views';
@@ -102,7 +102,6 @@ function setupDataviewControl() {
             return;
         }
         
-        console.log(dataviewsParameters);
         dataviewsParameters.selected_view = 
             dataviewsParameters.dataviewsNames[0];
         dataviewsParameters.gui_folder
@@ -113,7 +112,46 @@ function setupDataviewControl() {
 }
 
 function updateDataviewControl() {
-    console.log(dataviewsParameters.views[dataviewsParameters.selected_view]);
+    clearViewParameters();
+    $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
+        console.log(response);
+        console.log(dataviewsParameters.gui_folder);
+        dataviewsParameters.views = response;
+
+        console.log(dataviewsParameters.views[dataviewsParameters.selected_view]);
+        let params = dataviewsParameters.views[dataviewsParameters.selected_view];
+        for (let key in params) {
+            let item = dataviewsParameters.gui_folder
+                .add(dataviewsParameters.views[dataviewsParameters.selected_view],
+                     key)
+                .onChange(updateViewParameters);
+            item.value = String(params[key]);
+            dataviewsParameters.gui_folder_items.push(item);
+        }
+    });
+}
+
+function clearViewParameters() {
+    for (let item of dataviewsParameters.gui_folder_items) {
+        dataviewsParameters.gui_folder.remove(item);
+    }
+    dataviewsParameters.gui_folder_items = [];
+}
+
+function updateViewParameters() {
+    view   = dataviewsParameters.selected_view;
+    params = dataviewsParameters.views[view];
+    console.log(params);
+
+    let queryDict = {'dataview_name':view};
+    for (param in params) {
+        queryDict['parameter_' + param] = params[param];
+    }
+    let query = $.param(queryDict);
+    $.getJSON('set_dataview_parameters/?' + query, (response) => {
+        console.log(response);
+        updateData();
+    });
 }
 
 function updateData(){
@@ -166,9 +204,9 @@ function updateData(){
         updateCharts(data);
 
         if (parameters.streaming && parameters.socket == null) {
-            parameters.socket = new WebSocket('ws://' + 
+            parameters.socket = new websocket('ws://' + 
                 window.location.host + '/ws/sensor/raw_data/');
-            parameters.socket.onmessage = (e) => handleMessage(JSON.parse(e.data));
+            parameters.socket.onmessage = (e) => handlemessage(json.parse(e.data));
         }
 
         removeLoader();
