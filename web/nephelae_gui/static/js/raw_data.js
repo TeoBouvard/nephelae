@@ -24,6 +24,8 @@ var parameters = {
     end_buff: 100
 }
 
+var alt_variable = 'ALT'
+
 $(document).ready(() => {
     setupGUI();
 });
@@ -81,15 +83,18 @@ function updateData(){
 
         // Parse server response
         for (var uav_id in response.data){
-
+            var timestamps = [];
+            var altitudes = [];
             for (var variable_name in response.data[uav_id]){
 
                 var positions = response.data[uav_id][variable_name]['positions'];
-                var timestamps = [];
 
+                timestamps = [];
+                altitudes = [];
                 // Compute timestamps from path
                 for(var i = 0; i < positions.length ; i++){
                     timestamps.push(positions[i][0]);
+                    altitudes.push(positions[i][3]);
                 }
 
                 var new_data = {
@@ -117,6 +122,33 @@ function updateData(){
                 };
                 variable_name in data ? data[variable_name].push(new_data) : data[variable_name] = [new_data];
             }
+            var document_alt = document.getElementById(alt_variable);
+            if (document_alt !== null && timestamps.length != 0){
+                var new_data = {
+                    type: 'line',
+                    name: uav_id,
+                    x: timestamps,
+                    y: altitudes,
+                    mode: 'line',
+                    line: {
+                        width: 1,
+                        shape: 'linear',
+                        color: parameters.uav_color[uav_id],
+                    },
+                    meta: [uav_id],
+                    hovertemplate:
+                    'Time : %{x:.1f}s <br>' +
+                    'Value : %{y:.2f} <br>' +
+                    '<extra>UAV %{meta[0]}</extra>',
+                    hoverlabel: {
+                        bgcolor: 'black',
+                        bordercolor: 'black',
+                        font: {family: 'Roboto', si1ze: '15', color: 'white'},
+                        align: 'left',
+                    }
+                };
+                alt_variable in data ? data[alt_variable].push(new_data) : data[alt_variable] = [new_data];
+            }
         }
 
         // Update charts
@@ -133,9 +165,13 @@ function updateData(){
 }
 
 function updateCharts(data){
-    for (variable of getSelectedElements(parameters.variables)){
+    list_variables = getSelectedElements(parameters.variables)
+    for (variable of list_variables){
         Plotly.react(variable, data[variable], printLayout(variable), config);
     }
+    if (list_variables.length != 0)
+        Plotly.react(alt_variable, data[alt_variable],
+            printLayout(alt_variable), config);
 }
 
 function toggleStreaming(state){
@@ -164,6 +200,21 @@ function toggleChart(state){
             }
         }
     }
+    var setAlt = false;
+    var list_keys = Object.keys(parameters.variables);
+    for (var i = 0; i < list_keys.length && !setAlt; i++)
+        setAlt = parameters.variables[list_keys[i]];
+    if (setAlt){
+        $('#charts').append(
+            '<div id="container_' + alt_variable + '" class="row">' +
+            '<div class="col s12">' +
+            '<div id=' + alt_variable + '></div>' +
+            '</div>' +
+            '</div>');
+        updateData();
+    } else {
+        $('#container_' + alt_variable).find('*').addBack().remove();
+    }
 }
 
 function printLayout(variable){
@@ -179,57 +230,75 @@ function printLayout(variable){
 
 function handleMessage(messages){
 
-     //Reads the list of messages
-     let dataUpdate = {};
-     for (let message of messages) {
+    //Reads the list of messages
+    let dataUpdate = {};
+    var tampon = undefined;
+    let chart_alt = $('#'+alt_variable);
+    for (let message of messages) {
 
-         if (!(message.variable_name in parameters.variables)) {
-             setupGUI();
-             continue;
-         }
-         let chart = $('#'+ message.variable_name);
+        if (!(message.variable_name in parameters.variables)) {
+            setupGUI();
+            continue;
+        }
+        let chart = $('#'+ message.variable_name);
 
-         let trace_index = getTraceIndexByName(chart, message.uav_id);
-         if (trace_index < 0) {
-             continue;
-         }
+        let trace_index = getTraceIndexByName(chart, message.uav_id);
+        if (trace_index < 0) {
+            continue;
+        }
 
-         if (!(message.variable_name in dataUpdate)) {
-                 dataUpdate[message.variable_name] = {};
-         }
-         if (!(trace_index in dataUpdate[message.variable_name])) {
-             dataUpdate[message.variable_name][trace_index] = {x:[[]], y:[[]]};
-         }
-         dataUpdate[message.variable_name][trace_index].x[0].push(message.position[0]);
-         dataUpdate[message.variable_name][trace_index].y[0].push(message.data[0]);
-     }
+        if (!(message.variable_name in dataUpdate)) {
+            dataUpdate[message.variable_name] = {};
+        }
+        if (!(trace_index in dataUpdate[message.variable_name])) {
+            dataUpdate[message.variable_name][trace_index] = {x:[[]], y:[[]]};
+        }
+        if (tampon === undefined)
+            tampon = message.variable_name;
+        dataUpdate[message.variable_name][trace_index].x[0].push(message.position[0]);
+        dataUpdate[message.variable_name][trace_index].y[0].push(message.data[0]);
 
-     for (let variable_name in dataUpdate) {
-         // limiting length of data display (check if this works. It does. WHY ???)
-         var document_data = document.getElementById(variable_name).data;
-         for (var i = 0; i < document_data.length; i++) {
-             if (document_data[i].x.length < 1) {
-                 continue;
-             }
-             let endTime = document_data[i].x[document_data[i].x.length - 1];
-             while (endTime - document_data[i].x[0] > parameters.trail_length) {
-                 document_data[i].x.shift();
-                 document_data[i].y.shift();
-             }
-         }
+        if (tampon == message.variable_name){
+            if (!(alt_variable in dataUpdate))
+                dataUpdate[alt_variable] = {};
+            var trace_index_alt = getTraceIndexByName(chart_alt, message.uav_id);
 
-         for (let trace_index in dataUpdate[variable_name]) {
-             let tr_index = Number(trace_index);
-             Plotly.extendTraces(variable_name,
-                                 dataUpdate[variable_name][tr_index],
-                                 [tr_index]);
-         }
-     }
+            if (!(trace_index_alt in dataUpdate[alt_variable]))
+                dataUpdate[alt_variable][trace_index_alt] = {x:[[]], y:[[]]};
+
+            dataUpdate[alt_variable][trace_index_alt].x[0].push(message.position[0]);
+            dataUpdate[alt_variable][trace_index_alt].y[0].push(message.position[3]);
+        }
+    }
+
+    for (let variable_name in dataUpdate) {
+        // limiting length of data display (check if this works. It does. WHY ???)
+        var document_data = document.getElementById(variable_name).data;
+        if (document_data !== undefined){
+            for (var i = 0; i < document_data.length; i++) {
+                if (document_data[i].x.length < 1) {
+                    continue;
+                }
+                let endTime = document_data[i].x[document_data[i].x.length - 1];
+                while (endTime - document_data[i].x[0] > parameters.trail_length) {
+                    document_data[i].x.shift();
+                    document_data[i].y.shift();
+                }
+            }
+
+            for (let trace_index in dataUpdate[variable_name]) {
+                let tr_index = Number(trace_index);
+                Plotly.extendTraces(variable_name,
+                    dataUpdate[variable_name][tr_index],
+                    [tr_index]);
+            }
+        }
+    }
 }
 
 function getTraceIndexByName(chart, name){
     // find the index of the first trace in the chart with name 'name'
-    return (chart[0] !== undefined ? 
+    return (chart[0] !== undefined && chart[0].data !== undefined ? 
         chart[0].data.findIndex(element => element.name == name) : -1);
 }
 
