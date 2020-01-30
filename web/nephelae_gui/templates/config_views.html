@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block additional_scripts %}
+	<script src="{% static 'js/config_views.js' %}"></script>
+	<script src="{% static 'js/libs/cytoscape.min.js' %}"></script>
+{% endblock %}
+
+{% block page %}
+    <div id="tree-views"> </div>
+{% endblock %}

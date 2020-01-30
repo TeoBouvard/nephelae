@@ -95,6 +95,15 @@ nav ul li a {
     font-family: 'Roboto-Light';
 }
 
+#tree-views{
+    width: 100% !important;
+    height: 100% !important;
+    padding-top:0px;
+    padding-left:0px;
+    padding-bottom:0px;
+    padding-right:0px;
+}
+
 .card {
     min-width: 230px;
 }

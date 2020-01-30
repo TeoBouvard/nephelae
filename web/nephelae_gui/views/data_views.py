@@ -224,4 +224,17 @@ def set_dataview_parameters(request):
         print('No view with name ', key)
     return JsonResponse({'status':'ok'})
     
-
+def get_graph_dataviews(request):
+    result = {}
+    result['nodes'] = {}
+    for (key, value) in scenario.dataviews.dataviews.items():
+        result['nodes'][key] = \
+                scenario.dataviews.dataviews[key].get_parameters()
+    result['edges'] = {}
+    for (key, value) in scenario.dataviews.viewGraph.edges.items():
+        result['edges'][key] = {
+                'id': scenario.dataviews.viewGraph.edges[key].id,
+                'source': scenario.dataviews.viewGraph.edges[key].parent_key(),
+                'target': scenario.dataviews.viewGraph.edges[key].child_key(),
+                }
+    return JsonResponse(result)

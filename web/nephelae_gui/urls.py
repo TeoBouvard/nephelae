@@ -102,6 +102,10 @@ urlpatterns = [
     path('debug/set_delta_y/', aircraft_views.set_delta_y_tracker),
     path('debug/stop_tracking/', aircraft_views.remove_center_to_update_UAV),
 
+    # URL for config_views page
+    path('config_views/', template_views.render_template, {'template_name':
+        'config_views.html'}, name='config_views'),
+    path('config_views/get_graph_dataviews/', data_views.get_graph_dataviews),
     # Absolute URLs accessible by every page
     # Return reference frame, list of uav ids, list of data sample tags
     # to be renamed in discover uavs and to be separated from data_discovery
