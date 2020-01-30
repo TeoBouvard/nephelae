@@ -51,10 +51,8 @@ function drawPlot(){
     var data = [];
     var selected_variable = {};
     selected_variable[parameters.variable] = true;
-    var query = $.param({
-        uav_id: getSelectedElements(parameters.fleet),
-        variables: getSelectedElements(selected_variable),
-    });
+    var query = $.param({uav_id: getSelectedElements(parameters.fleet),
+    variables: getSelectedElements(selected_variable)});
 
     $.getJSON('update/?' + query, (response) => {
         for (var uav_id in response.data){

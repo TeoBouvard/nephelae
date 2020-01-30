@@ -98,7 +98,7 @@ def get_sensor_data(request):
         for variable in variables:
             data[uav_id][variable] = {'positions':[], 'values': []}
     
-    for key in scenario.displayedViews:
+    for key in scenario.dataviews.displayedViews:
         for sample in scenario.dataviews[key][-start:end:step]:
             try:
                 data[int(sample.producer)][sample.variableName]['positions']\
