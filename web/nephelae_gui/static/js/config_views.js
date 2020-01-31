@@ -24,14 +24,14 @@ function initTree(){
             {
                 selector: 'node',
                 style:{
-                    'width': '80px',
-                    'height': '40px',
+                    'width': '140px',
+                    'height': '80px',
                     'shape': 'rectangle',
                     'text-wrap': 'wrap',
                     'text-max-width': '60px',
                     'text-halign': 'center',
                     'text-valign': 'center',
-                    'label': 'data(id)',
+                    'label': 'data(name)',
                 },
             },
         ],
@@ -39,17 +39,19 @@ function initTree(){
     });
     let cy_graph = [];
     for (node in graph.nodes){
-        cy_graph.push({group: 'nodes', data: {id: node}});
+        cy_graph.push({group: 'nodes', data: {id: node, name: graph.nodes[node].name}});
     }
     for (edge in graph.edges){
-        cy_graph.push({group: 'edges', data: graph.edges[edge]});
+        cy_graph.push({group: 'edges', data: {id: edge, 
+            source: graph.edges[edge].source,
+            target: graph.edges[edge].target}});
     }
     cy.add(cy_graph);
     var cy_layout = cy.layout({name: 'breadthfirst'});
     cy_layout.run();
     cy.fit();
     for (node in graph.nodes){
-        if (Object.keys(graph.nodes[node]).length != 0)
+        if (Object.keys(graph.nodes[node].updatable).length != 0)
             setupNode(node);
     }
     for (edge in graph.edges){
@@ -69,6 +71,11 @@ function setupEdge(id){
     createModalEdge(id);
     $('#modal_'+id).modal();
     cy.$('#'+id).on('tap', toggleModal);
+    if (graph['edges'][id].connected){
+        cy.$('#'+id).style('lineColor', 'blue');
+    } else {
+        cy.$('#'+id).style('lineColor', 'black');
+    }
 }
 
 function toggleModal(evt){
@@ -98,10 +105,10 @@ function createModalNode(id){
     html += '<div class="modal-content black-text">' +
         '<span class="left"><h4>Modify parameters for view '+id+'</h4></span>' +
         '<br><br><br><hr><br><p>';
-    for (key in object){
+    for (key in object.updatable){
         html += '<div class="row">'
         html += '<div class="input-field col s12">';
-        html += '<input type="number" step="0.001" placeholder="'+object[key]+'" id="'+id+'_'+key+'" class="validate">';
+        html += '<input type="number" step="0.001" placeholder="'+object.updatable[key]+'" id="'+id+'_'+key+'" class="validate">';
         html += '<label for="'+id+'_'+key+'" class="active" style="font-size:20px;">'+prettifyString(key)+'</label>';
         html += '</div></div>';
     }
@@ -116,8 +123,8 @@ function createModalNode(id){
 }
 
 function updateView(id){
-    let object = items[id];
-    for(key in object){
+    let object = graph['nodes'][id];
+    for(key in object.updatable){
         let value = $("#"+id+"_"+key).val();
         if (value != ''){
             $("#"+id+"_"+key).attr("placeholder", $("#"+id+"_"+key).val());
@@ -127,7 +134,18 @@ function updateView(id){
 }
 
 function updateEdge(id){
-    console.log('TODO');
+    var query = $.param({edge_id: id})
+    $.ajax({
+        dataType: 'JSON',
+        url: 'switch_state_edge/?' + query,
+        success: function(d){graph['edges'][id].connected = d.state;},
+        async: false
+    });
+    if (graph['edges'][id].connected){
+        cy.$('#'+id).style('lineColor', 'blue');
+    } else {
+        cy.$('#'+id).style('lineColor', 'black');
+    }
     //Voir les modifs de Pierre, peut etre regle en deux temps, trois mouvements
 }
 

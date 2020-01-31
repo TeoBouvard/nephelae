@@ -106,6 +106,7 @@ urlpatterns = [
     path('config_views/', template_views.render_template, {'template_name':
         'config_views.html'}, name='config_views'),
     path('config_views/get_graph_dataviews/', data_views.get_graph_dataviews),
+    path('config_views/switch_state_edge/', data_views.switch_state_edge),
     # Absolute URLs accessible by every page
     # Return reference frame, list of uav ids, list of data sample tags
     # to be renamed in discover uavs and to be separated from data_discovery

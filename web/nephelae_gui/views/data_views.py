@@ -228,13 +228,26 @@ def get_graph_dataviews(request):
     result = {}
     result['nodes'] = {}
     for (key, value) in scenario.dataviews.dataviews.items():
-        result['nodes'][key] = \
+        result['nodes'][key] = {}
+        result['nodes'][key]['updatable'] = \
                 scenario.dataviews.dataviews[key].get_parameters()
+        result['nodes'][key]['name'] = scenario.dataviews.dataviews[key].name
     result['edges'] = {}
     for (key, value) in scenario.dataviews.viewGraph.edges.items():
         result['edges'][key] = {
-                'id': scenario.dataviews.viewGraph.edges[key].id,
                 'source': scenario.dataviews.viewGraph.edges[key].parent_key(),
                 'target': scenario.dataviews.viewGraph.edges[key].child_key(),
+                'connected':
+                scenario.dataviews.viewGraph.edges[key].is_connected(),
                 }
     return JsonResponse(result)
+
+def switch_state_edge(request):
+    query = request.GET
+    edge_id = query.get('edge_id')
+    if scenario.dataviews.viewGraph.edges[edge_id].is_connected():
+        scenario.dataviews.viewGraph.edges[edge_id].disconnect()
+    else:
+        scenario.dataviews.viewGraph.edges[edge_id].connect()
+    return JsonResponse({'state':
+        scenario.dataviews.viewGraph.edges[edge_id].is_connected()})
