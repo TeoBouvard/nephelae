@@ -135,7 +135,11 @@ def get_sample_at_time(request):
 
 # Get sections/map sliders bounds, bad design for now ..
 def mesonh_box(request):
-    return JsonResponse(hypercube.box(), safe=False)
+    if hypercube is not None:
+        response = JsonResponse(hypercube.box(), safe=False)
+    else:
+        response = JsonResponse({})
+    return response
 
 
 # Update MesoNH hyperslabs
@@ -154,7 +158,6 @@ def get_section(request):
     else:
         retour = [[],[],[]]
     response = JsonResponse({
-        'axes': hypercube.axes(),
         'x_axis': retour[1],
         'y_axis': retour[2],
         'data': retour[0]

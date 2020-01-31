@@ -109,116 +109,113 @@ function setupGUI(){
     gui.add(parameters, 'boxes_fun')
         .name('Show bounds');
 
-    $.getJSON('mesonh_dims/', (response) => {
-        // Setup GUI
-        controller_collection['time'] =
-            no_bounds_folder.add(parameters, 'time')
-            .setValue(0)
-            .step(0.0001)
-            .name('Time (s)')
-            .onFinishChange(updateData);
+    controller_collection['time'] =
+        no_bounds_folder.add(parameters, 'time')
+        .setValue(0)
+        .step(0.0001)
+        .name('Time (s)')
+        .onFinishChange(updateData);
 
-        controller_collection['altitude'] =
-            no_bounds_folder.add(parameters, 'altitude')
-            .setValue(700)
-            .step(1)
-            .name('Altitude (m)')
-            .onFinishChange(updateData);
-        
-        controller_collection['time_bounds'] =
-            bounds_folder.add(parameters, 'time')
-            .setValue(0)
-            .step(0.0001)
-            .name('Time (s)')
-            .onFinishChange(updateData);
-
-        controller_collection['altitude_bounds'] =
-            bounds_folder.add(parameters, 'altitude')
-            .setValue(700)
-            .step(1)
-            .name('Altitude (m)')
-            .onFinishChange(updateData);
-
-        controller_collection['position_x'] =
-            no_bounds_folder.add(parameters, 'position_x')
-            .setValue(900)
-            .step(1)
-            .name('Pos. X axis')
-            .onFinishChange(updateData);
-
-        controller_collection['position_y'] =
-            no_bounds_folder.add(parameters, 'position_y')
-            .setValue(-900)
-            .step(1)
-            .name('Pos. Y axis')
-            .onFinishChange(updateData);
+    controller_collection['altitude'] =
+        no_bounds_folder.add(parameters, 'altitude')
+        .setValue(700)
+        .step(1)
+        .name('Altitude (m)')
+        .onFinishChange(updateData);
     
-        controller_collection['bounds_position_x'] = 
-            bounds_folder.add(parameters, 'position_x', parameters.default_min,
-            parameters.default_max)
-            .setValue(5000)
-            .step(1)
-            .name('Taille x')
-            .onFinishChange(updateData);
+    controller_collection['time_bounds'] =
+        bounds_folder.add(parameters, 'time')
+        .setValue(0)
+        .step(0.0001)
+        .name('Time (s)')
+        .onFinishChange(updateData);
+
+    controller_collection['altitude_bounds'] =
+        bounds_folder.add(parameters, 'altitude')
+        .setValue(700)
+        .step(1)
+        .name('Altitude (m)')
+        .onFinishChange(updateData);
+
+    controller_collection['position_x'] =
+        no_bounds_folder.add(parameters, 'position_x')
+        .setValue(900)
+        .step(1)
+        .name('Pos. X axis')
+        .onFinishChange(updateData);
+
+    controller_collection['position_y'] =
+        no_bounds_folder.add(parameters, 'position_y')
+        .setValue(-900)
+        .step(1)
+        .name('Pos. Y axis')
+        .onFinishChange(updateData);
     
-        controller_collection['bounds_position_y'] = 
-            bounds_folder.add(parameters, 'position_y', parameters.default_min,
-            parameters.default_max)
-            .setValue(5000)
-            .step(1)
-            .name('Taille y')
-            .onFinishChange(updateData);
-        
-        $.getJSON('/discover/', (response) => {
-            x = Object.keys(response.uavs).concat('None')
+    controller_collection['bounds_position_x'] = 
+        bounds_folder.add(parameters, 'position_x', parameters.default_min,
+        parameters.default_max)
+        .setValue(5000)
+        .step(1)
+        .name('Pos. X axis')
+        .onFinishChange(updateData);
+    
+    controller_collection['bounds_position_y'] = 
+        bounds_folder.add(parameters, 'position_y', parameters.default_min,
+        parameters.default_max)
+        .setValue(5000)
+        .step(1)
+        .name('Pos. Y axis')
+        .onFinishChange(updateData);
+    
+    $.getJSON('/discover/', (response) => {
+        x = Object.keys(response.uavs).concat('None')
 
-            gui.add(parameters, 'uav', x)
-                .setValue('None')
-                .name("UAV")
-                .onChange(function(){
-                    updateData();
-                });
-
-            fieldsBehavior(parameters.uav == 'None', f1, f2);
-            parameters['uavs'] = {};
-            parameters['variables'] = {};
-
-            for (var uav_id in response.uavs){
-                parameters['uav_color'][uav_id] = response.uavs[uav_id].gui_color;
-                parameters['uavs'][uav_id] = true;
-            };
-            for (var vari of response.sample_tags){
-                if(vari == 'RCT')
-                    parameters['variables'][vari] = true;
-            };
-            $.getJSON('/discover_maps/', (response) => {
-                list_map = [];
-                for (var map in response){
-                    if(!map.endsWith('_border')){
-                        map_boundaries[map] = response[map]['range'];
-                        map_threshold[map] = response[map]['threshold'];
-                        list_map.push(map);
-                    }
-                }
-                gui.add(parameters, 'map', list_map)
-                    .setValue(Object.keys(response)[0])
-                    .name('Map')
-                    .onChange(function(){
-                        boundsChangement(bounds_folder, no_bounds_folder);
-                        controller_collection['threshold'].setValue(
-                            map_threshold[parameters.map]);
-                        controller_collection['threshold'].updateDisplay();
-                        updateData();
-                    });
-                gui.add(parameters, 'scale')
-                    .name('Scale')
-                    .onChange(function(){
-                        fieldsBehavior(parameters.scale, f2, f1);
-                        updateData();
-                    });
-                boundsChangement(bounds_folder, no_bounds_folder);
+        gui.add(parameters, 'uav', x)
+            .setValue('None')
+            .name("UAV")
+            .onChange(function(){
                 updateData();
             });
+
+        fieldsBehavior(parameters.uav == 'None', f1, f2);
+        parameters['uavs'] = {};
+        parameters['variables'] = {};
+
+        for (var uav_id in response.uavs){
+            parameters['uav_color'][uav_id] = response.uavs[uav_id].gui_color;
+            parameters['uavs'][uav_id] = true;
+        };
+        let list_tags = Object.keys(response.sample_tags);
+        for (var i = 0; i < list_tags.length; i++){
+            parameters['variables'][list_tags[i]] = (i == 0);
+        };
+        $.getJSON('/discover_maps/', (response) => {
+            list_map = [];
+            for (var map in response){
+                if(!map.endsWith('_border')){
+                    map_boundaries[map] = response[map]['range'];
+                    map_threshold[map] = response[map]['threshold'];
+                    list_map.push(map);
+                }
+            }
+            gui.add(parameters, 'map', list_map)
+                .setValue(Object.keys(response)[0])
+                .name('Map')
+                .onChange(function(){
+                    boundsChangement(bounds_folder, no_bounds_folder);
+                    controller_collection['threshold'].setValue(
+                        map_threshold[parameters.map]);
+                    controller_collection['threshold'].updateDisplay();
+                    updateData();
+                });
+            gui.add(parameters, 'scale')
+                .name('Scale')
+                .onChange(function(){
+                    fieldsBehavior(parameters.scale, f2, f1);
+                    updateData();
+                });
+            boundsChangement(bounds_folder, no_bounds_folder);
+            updateData();
         });
     });
 }
