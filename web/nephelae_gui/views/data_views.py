@@ -251,3 +251,18 @@ def switch_state_edge(request):
         scenario.dataviews.viewGraph.edges[edge_id].connect()
     return JsonResponse({'state':
         scenario.dataviews.viewGraph.edges[edge_id].is_connected()})
+
+def change_parameters_view(request):
+    query = request.GET
+    dictionnary = query.dict()
+    updates = {};
+    for (key, value) in dictionnary.items():
+        if key == 'view_id':
+            dataview = scenario.dataviews.dataviews[value]
+        else:
+            updates[key] = float(value)
+    for (attribute, value) in updates.items():
+        setattr(dataview, attribute, value)
+    return HttpResponse(status=204)
+
+

@@ -124,13 +124,22 @@ function createModalNode(id){
 
 function updateView(id){
     let object = graph['nodes'][id];
+    query_dict = {view_id: id};
     for(key in object.updatable){
         let value = $("#"+id+"_"+key).val();
         if (value != ''){
-            $("#"+id+"_"+key).attr("placeholder", $("#"+id+"_"+key).val());
+            $("#"+id+"_"+key).attr("placeholder", value);
+            graph['nodes'][id].updatable[key] = value;
+            query_dict[key] = graph['nodes'][id].updatable[key];
             $("#"+id+"_"+key).val('');
         }
     }
+    var query = $.param(query_dict);
+    $.ajax({
+        dataType: 'JSON',
+        url: 'change_parameters_view/?' + query,
+        async: false
+    });
 }
 
 function updateEdge(id){
