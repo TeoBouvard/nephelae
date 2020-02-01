@@ -112,6 +112,8 @@ urlpatterns = [
             data_views.change_parameters_view),
     path('config_views/get_state_edge/',
             getters_views.get_state_edge),
+    path('config_views/get_state_view/',
+            getters_views.get_state_view),
     # Absolute URLs accessible by every page
     # Return reference frame, list of uav ids, list of data sample tags
     # to be renamed in discover uavs and to be separated from data_discovery

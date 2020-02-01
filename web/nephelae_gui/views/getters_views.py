@@ -23,3 +23,9 @@ def get_state_edge(request):
     edge_id = query.get('edge_id')
     return JsonResponse({'state': 
         scenario.dataviews.viewGraph.edges[edge_id].is_connected()})
+
+def get_state_view(request):
+    query = request.GET
+    view_id = query.get('view_id')
+    return JsonResponse({'parameters':
+        scenario.dataviews.dataviews[view_id].get_parameters()})

@@ -122,18 +122,16 @@ function createModalNode(id){
             '</div>';
     html += '</div>';
     $('body').append(html);
-    $('#validation_'+id).click(function(){updateView(id);});
+    $('#validation_'+id).click(function(){sendNode(id);});
 }
 
-function updateView(id){
+function sendNode(id){
     let object = graph['nodes'][id];
     query_dict = {view_id: id};
     for(key in object.updatable){
         let value = $("#"+id+"_"+key).val();
         if (value != ''){
-            $("#"+id+"_"+key).attr("placeholder", value);
-            graph['nodes'][id].updatable[key] = value;
-            query_dict[key] = graph['nodes'][id].updatable[key];
+            query_dict[key] = value;
             $("#"+id+"_"+key).val('');
         }
     }
@@ -141,7 +139,21 @@ function updateView(id){
     $.ajax({
         dataType: 'JSON',
         url: 'change_parameters_view/?' + query,
-        async: false
+        success: function(){sendRefreshSignal(id, nodeSocket);},
+    });
+}
+
+function updateNode(response){
+    var query = $.param({view_id: response.id});
+    $.ajax({
+        dataType: 'JSON',
+        url: 'get_state_view/?' + query,
+        success: function(d){
+            for (key in d.parameters){
+                $("#"+response.id+"_"+key).attr("placeholder", d.parameters[key]);
+                graph['nodes'][response.id].updatable[key] = d.parameters[key]; 
+            }
+        },
     });
 }
 
@@ -156,18 +168,18 @@ function sendEdge(id){
 
 function updateEdge(response){
     var query = $.param({edge_id: response.id});
-    console.log(response)
     $.ajax({
         dataType: 'JSON',
         url: 'get_state_edge/?' + query,
-        success: function(d){graph['edges'][response.id].connected = d.state},
-        async: false
+        success: function(d){
+            graph['edges'][response.id].connected = d.state;
+            if (graph['edges'][response.id].connected){
+                cy.$('#'+response.id).style('lineColor', 'blue');
+            } else {
+                cy.$('#'+response.id).style('lineColor', 'black');
+            }
+        },
     });
-    if (graph['edges'][response.id].connected){
-        cy.$('#'+response.id).style('lineColor', 'blue');
-    } else {
-        cy.$('#'+response.id).style('lineColor', 'black');
-    }
 }
 
 function prettifyString(ugly_string){
@@ -178,6 +190,7 @@ function prettifyString(ugly_string){
 
 function setSockets(){
     edgeSocket['type'] = refreshTypes.EDGE;
+    nodeSocket['type'] = refreshTypes.NODE;
     edgeSocket['socket'] = new WebSocket('ws://' +  window.location.host +
         '/ws/refresh_notifier/' + edgeSocket['type'] + '/');
     edgeSocket['socket'].onmessage = (e) => updateEdge(
@@ -186,5 +199,4 @@ function setSockets(){
         '/ws/refresh_notifier/'+ nodeSocket['type'] +'/');
     nodeSocket['socket'].onmessage = (e) => updateNode(
         JSON.parse(e.data));
-    nodeSocket['type'] = refreshTypes.NODE;
 }
