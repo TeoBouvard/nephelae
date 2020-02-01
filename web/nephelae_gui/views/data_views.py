@@ -252,8 +252,7 @@ def switch_state_edge(request):
         scenario.dataviews.viewGraph.edges[edge_id].disconnect()
     else:
         scenario.dataviews.viewGraph.edges[edge_id].connect()
-    return JsonResponse({'state':
-        scenario.dataviews.viewGraph.edges[edge_id].is_connected()})
+    return HttpResponse(status=204)
 
 def change_parameters_view(request):
     query = request.GET

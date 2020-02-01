@@ -1,9 +1,10 @@
 var cy = undefined;
 var graph = {};
-var socket = undefined;
+var nodeSocket = {};
+var edgeSocket = {};
 
 $(document).ready(() => {
-    setSocket(getPageName());
+    setSockets();
     getGraphJSON();
     initTree();
     removeLoader();
@@ -98,7 +99,7 @@ function createModalEdge(id){
             '</div>';
     html += '</div>';
     $('body').append(html);
-    $('#validation_'+id).click(function(){updateEdge(id);});
+    $('#validation_'+id).click(function(){sendEdge(id);});
 }
 
 function createModalNode(id){
@@ -144,18 +145,28 @@ function updateView(id){
     });
 }
 
-function updateEdge(id){
+function sendEdge(id){
     var query = $.param({edge_id: id})
     $.ajax({
         dataType: 'JSON',
         url: 'switch_state_edge/?' + query,
-        success: function(d){graph['edges'][id].connected = d.state;},
+        success: function(){sendRefreshSignal(id, edgeSocket);},
+    });
+}
+
+function updateEdge(response){
+    var query = $.param({edge_id: response.id});
+    console.log(response)
+    $.ajax({
+        dataType: 'JSON',
+        url: 'get_state_edge/?' + query,
+        success: function(d){graph['edges'][response.id].connected = d.state},
         async: false
     });
-    if (graph['edges'][id].connected){
-        cy.$('#'+id).style('lineColor', 'blue');
+    if (graph['edges'][response.id].connected){
+        cy.$('#'+response.id).style('lineColor', 'blue');
     } else {
-        cy.$('#'+id).style('lineColor', 'black');
+        cy.$('#'+response.id).style('lineColor', 'black');
     }
 }
 
@@ -165,11 +176,15 @@ function prettifyString(ugly_string){
     return pretty_string
 }
 
-function setSocket(page){
-    socket = new WebSocket('ws://' +  window.location.host +
-        '/ws/refresh_notifier/' + page + '/');
-    socket.onmessage = (e) => updateGraph(
+function setSockets(){
+    edgeSocket['type'] = refreshTypes.EDGE;
+    edgeSocket['socket'] = new WebSocket('ws://' +  window.location.host +
+        '/ws/refresh_notifier/' + edgeSocket['type'] + '/');
+    edgeSocket['socket'].onmessage = (e) => updateEdge(
         JSON.parse(e.data));
+    nodeSocket['socket'] = new WebSocket('ws://' +  window.location.host +
+        '/ws/refresh_notifier/'+ nodeSocket['type'] +'/');
+    nodeSocket['socket'].onmessage = (e) => updateNode(
+        JSON.parse(e.data));
+    nodeSocket['type'] = refreshTypes.NODE;
 }
-
-function updateGraph(){}

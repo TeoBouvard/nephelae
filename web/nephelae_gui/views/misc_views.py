@@ -1,8 +1,10 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from utm import from_latlon, to_latlon
 
 try:
     from nephelae_gui.models.common import scenario
+    
+    from nephelae_gui.models.common import refreshers
 except Exception as e:
    import sys
    import os
@@ -31,3 +33,10 @@ def local_to_latlon(request):
             scenario.localFrame.utm_number, scenario.localFrame.utm_letter)
     return JsonResponse({'x': latlon[0],
                          'y': latlon[1]})
+def refresh_page(request):
+    query = request.GET
+    id_obj = query.get('id_obj')
+    type_refresh = query.get('type')
+    for socket in refreshers[type_refresh]:
+        socket.send_refresh_signal(id_obj)
+    return HttpResponse(status=204)

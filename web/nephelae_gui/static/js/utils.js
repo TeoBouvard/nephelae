@@ -2,6 +2,13 @@
 global_colors = ["red", "green", "blue", "purple", "teal", "orange", "lime", "yellow", "fuchsia", "gray"];
 global_icons = [];
 
+const refreshTypes = {
+    VIEW: 'view',
+    NODE: 'view',
+    EDGE: 'edge',
+    MISSION: 'mission',
+};
+
 // Icon class
 var planeIcon = L.Icon.extend({
     options: { 
@@ -109,9 +116,10 @@ function removeLoader(){
     }
 }
 
-function getPageName(){
-    var url = window.location.href;
-    var splited_url = url.split("/")
-    var filename = splited_url[splited_url.length-2];
-    return filename;
+function sendRefreshSignal(id_obj, socket){
+    var query = $.param({type: socket.type, id_obj: id_obj});
+    $.ajax({
+        dataType: 'JSON',
+        url: '/send_refresh_signal/?' + query,
+    });
 }

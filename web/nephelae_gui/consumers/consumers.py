@@ -148,17 +148,19 @@ class WindConsumer(WebsocketConsumer):
 class RefreshNotifier(WebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.page_id = args[0]['url_route']['kwargs']['page_id']
+        self.type = args[0]['url_route']['kwargs']['type']
     
     def connect(self):
         self.accept()
-        refreshers.append(self)
+        if not self.type in refreshers.keys():
+            refreshers[self.type] = []
+        refreshers[self.type].append(self)
 
     def disconnect(self, close_code):
-        refreshers.remove(self)
+        refreshers[self.type].remove(self)
         self.channel_layer.group_discard
 
-    def send_refresh_signal(self, refresh_type):
-        res = {'page': self.page_id, 'type': refresh_type}
+    def send_refresh_signal(self, obj_id):
+        res = {'type': self.type, 'id': obj_id}
         self.send(json.dumps(res))
 
