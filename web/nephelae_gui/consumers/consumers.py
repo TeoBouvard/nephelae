@@ -6,6 +6,7 @@ from channels.generic.websocket import WebsocketConsumer
 try:
     from ..models.common import scenario, db_data_tags
     from ..models.common import websockets_cloudData_ids
+    from ..models.common import refreshers
     from utm import from_latlon, to_latlon
 
     localFrame = scenario.localFrame
@@ -143,3 +144,21 @@ class WindConsumer(WebsocketConsumer):
 
     def send_new_wind(self, wind):
         self.send(json.dumps({'north_wind': wind[1], 'east_wind': wind[0]}))
+
+class RefreshNotifier(WebsocketConsumer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.page_id = args[0]['url_route']['kwargs']['page_id']
+    
+    def connect(self):
+        self.accept()
+        refreshers.append(self)
+
+    def disconnect(self, close_code):
+        refreshers.remove(self)
+        self.channel_layer.group_discard
+
+    def send_refresh_signal(self, refresh_type):
+        res = {'page': self.page_id, 'type': refresh_type}
+        self.send(json.dumps(res))
+

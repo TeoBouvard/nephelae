@@ -108,3 +108,10 @@ function removeLoader(){
         element.parentNode.removeChild(element);
     }
 }
+
+function getPageName(){
+    var url = window.location.href;
+    var splited_url = url.split("/")
+    var filename = splited_url[splited_url.length-2];
+    return filename;
+}

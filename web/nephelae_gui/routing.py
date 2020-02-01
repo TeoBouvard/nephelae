@@ -21,4 +21,5 @@ websocket_urlpatterns = [
     url('ws/pending_missions_update/', aircraft_consumers.PendingMissionsConsumer),
     url('ws/GPS/', aircraft_consumers.GPSConsumer),
     url('ws/debug_tracker/', debug_consumers.DebugTrackerConsumer),
+    url(r'^ws/refresh_notifier/(?P<page_id>[\w\-]+)/$', consumers.RefreshNotifier),
 ]

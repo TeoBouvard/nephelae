@@ -1,7 +1,9 @@
 var cy = undefined;
 var graph = {};
+var socket = undefined;
 
 $(document).ready(() => {
+    setSocket(getPageName());
     getGraphJSON();
     initTree();
     removeLoader();
@@ -155,7 +157,6 @@ function updateEdge(id){
     } else {
         cy.$('#'+id).style('lineColor', 'black');
     }
-    //Voir les modifs de Pierre, peut etre regle en deux temps, trois mouvements
 }
 
 function prettifyString(ugly_string){
@@ -163,3 +164,12 @@ function prettifyString(ugly_string){
     pretty_string.replace(/_/g, ' ');
     return pretty_string
 }
+
+function setSocket(page){
+    socket = new WebSocket('ws://' +  window.location.host +
+        '/ws/refresh_notifier/' + page + '/');
+    socket.onmessage = (e) => updateGraph(
+        JSON.parse(e.data));
+}
+
+function updateGraph(){}

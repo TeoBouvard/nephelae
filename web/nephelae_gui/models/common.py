@@ -9,6 +9,7 @@ try:
     scenario.start()
 
     websockets_cloudData_ids = {}
+    refreshers = []
 
     # Legacy variables. To remove when conversion to scenario is completed
     db = scenario.database
