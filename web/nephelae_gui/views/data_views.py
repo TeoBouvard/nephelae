@@ -211,22 +211,6 @@ def get_dataviews_parameters(request):
     return JsonResponse(output)
 
 
-def set_dataview_parameters(request):
-    query = request.GET;
-
-    viewName = query.get('dataview_name')
-    params = {}
-    for key in query:
-        if key == 'dataview_name':
-            continue
-        params[key.split('parameter_')[1]] = float(query.get(key))
-    
-    try:
-        scenario.dataviews[viewName].set_parameters(**params)
-    except KeyError as e:
-        print('No view with name ', key)
-    return JsonResponse({'status':'ok'})
-    
 def get_graph_dataviews(request):
     result = {}
     result['nodes'] = {}

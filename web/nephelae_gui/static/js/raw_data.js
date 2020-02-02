@@ -1,5 +1,7 @@
 // Activate current menu in nav
 $('#nav_raw_data').addClass('active');
+var viewSocket = {};
+
 
 var gui
 
@@ -29,12 +31,13 @@ var dataviewsParameters = {
     selected_view: null,
     views: {},
     gui_folder: null,
-    gui_folder_items: []
+    gui_folder_items: {}
 }
 
 var alt_variable = 'ALT'
 
 $(document).ready(() => {
+    setSockets();
     setupGUI();
 });
 
@@ -88,8 +91,7 @@ function setupGUI(){
 }
 
 function setupDataviewControl() {
-    $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
-        console.log(response);
+    $.getJSON('/raw_data/get_dataviews_parameters/', (response) => {
         dataviewsParameters.views = response;
         dataviewsParameters.dataviewsNames = []
         for (let name in dataviewsParameters.views) {
@@ -106,55 +108,38 @@ function setupDataviewControl() {
         
         dataviewsParameters.selected_view = 
             dataviewsParameters.dataviewsNames[0];
-        dataviewsParameters.gui_folder
+        let item = dataviewsParameters.gui_folder
             .add(dataviewsParameters, 'selected_view', dataviewsParameters.dataviewsNames)
-            .onChange(updateDataviewControl);
+        item.onChange(updateDataviewControl);
         updateDataviewControl();
     });
 }
 
 function updateDataviewControl() {
     clearViewParameters();
-    $.getJSON('/raw_data/get_dataviews_parameters', (response) => {
-        console.log(response);
-        console.log(dataviewsParameters.gui_folder);
+    $.getJSON('/raw_data/get_dataviews_parameters/', (response) => {
         dataviewsParameters.views = response;
 
-        console.log(dataviewsParameters.views[dataviewsParameters.selected_view]);
         let params = dataviewsParameters.views[dataviewsParameters.selected_view];
         for (let key in params) {
             let item = dataviewsParameters.gui_folder
                 .add(dataviewsParameters.views[dataviewsParameters.selected_view],
                      key)
-                .onChange(updateViewParameters);
-            item.value = String(params[key]);
-            dataviewsParameters.gui_folder_items.push(item);
+                .setValue(params[key]);
+            dataviewsParameters.gui_folder_items[key] = item;
+            item.onChange(function(){sendView(dataviewsParameters.selected_view);});
         }
     });
 }
 
 function clearViewParameters() {
-    for (let item of dataviewsParameters.gui_folder_items) {
-        dataviewsParameters.gui_folder.remove(item);
+    for (let key in dataviewsParameters.gui_folder_items) {
+        dataviewsParameters.gui_folder.remove(
+            dataviewsParameters.gui_folder_items[key])
+        delete dataviewsParameters.gui_folder[key];
     }
-    dataviewsParameters.gui_folder_items = [];
 }
 
-function updateViewParameters() {
-    view   = dataviewsParameters.selected_view;
-    params = dataviewsParameters.views[view];
-    console.log(params);
-
-    let queryDict = {'dataview_name':view};
-    for (param in params) {
-        queryDict['parameter_' + param] = params[param];
-    }
-    let query = $.param(queryDict);
-    $.getJSON('set_dataview_parameters/?' + query, (response) => {
-        console.log(response);
-        updateData();
-    });
-}
 
 function updateData(){
 
@@ -407,4 +392,37 @@ function fieldsBehavior(state, f1, f2){
         f2.show();
         f2.open();
     }
+}
+
+function sendView(id){
+    var query_dict = {view_id: id};
+    for (key in dataviewsParameters.gui_folder_items){
+        query_dict[key] = dataviewsParameters.gui_folder_items[key].getValue();
+    }
+    let query = $.param(query_dict);
+    $.ajax({
+        dataType: 'JSON',
+        url: 'change_parameters_view/?' + query,
+        success: function(){sendRefreshSignal(id, viewSocket);},
+    });
+}
+
+function updateView(response){
+    let id = dataviewsParameters.selected_view;
+    var query = $.param({view_id: id});
+    $.ajax({
+        dataType: 'JSON',
+        url: 'get_state_view/?' + query,
+        success: function(d){
+            dataviewsParameters.views[id] = d.parameters;
+            updateData();
+        },
+    });
+}
+
+function setSockets(){
+    viewSocket['type'] = refreshTypes.VIEW;
+    viewSocket['socket'] = new WebSocket('ws://' + window.location.host +
+        '/ws/refresh_notifier/' + viewSocket['type'] + '/');
+    viewSocket['socket'].onmessage = (e) => updateView(JSON.parse(e.data));
 }
