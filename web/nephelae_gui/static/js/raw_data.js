@@ -396,6 +396,7 @@ function fieldsBehavior(state, f1, f2){
 
 function sendView(id){
     var query_dict = {view_id: id};
+    let obj_id = query_dict;
     for (key in dataviewsParameters.gui_folder_items){
         query_dict[key] = dataviewsParameters.gui_folder_items[key].getValue();
     }
@@ -403,12 +404,12 @@ function sendView(id){
     $.ajax({
         dataType: 'JSON',
         url: 'change_parameters_view/?' + query,
-        success: function(){sendRefreshSignal(id, viewSocket);},
+        success: function(){sendRefreshSignal(obj_id, viewSocket.type);},
     });
 }
 
 function updateView(response){
-    let id = dataviewsParameters.selected_view;
+    let id = response.view_id;
     var query = $.param({view_id: id});
     $.ajax({
         dataType: 'JSON',

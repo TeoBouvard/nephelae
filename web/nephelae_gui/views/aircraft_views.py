@@ -166,10 +166,10 @@ def create_mission(request):
             continue
         params[key.split('params_')[1]] = parse_parameter(request.GET[key], key)
 
-    scenario.aircrafts[aircraftId].create_mission(
+    ids = scenario.aircrafts[aircraftId].create_mission(
         missionType, insertMode, duration, **params)
 
-    return JsonResponse({'called':'called!'})
+    return JsonResponse(ids)
 
 
 def current_mission_status(request, aircraftId):

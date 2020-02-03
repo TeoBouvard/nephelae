@@ -128,6 +128,7 @@ function createModalNode(id){
 function sendNode(id){
     let object = graph['nodes'][id];
     query_dict = {view_id: id};
+    let obj_id = query_dict
     for(key in object.updatable){
         let value = $("#"+id+"_"+key).val();
         if (value != ''){
@@ -139,44 +140,47 @@ function sendNode(id){
     $.ajax({
         dataType: 'JSON',
         url: 'change_parameters_view/?' + query,
-        success: function(){sendRefreshSignal(id, nodeSocket);},
+        success: function(){sendRefreshSignal(obj_id, nodeSocket.type);},
     });
 }
 
 function updateNode(response){
-    var query = $.param({view_id: response.id});
+    let id = response.view_id;
+    var query = $.param({view_id: id});
     $.ajax({
         dataType: 'JSON',
         url: 'get_state_view/?' + query,
         success: function(d){
             for (key in d.parameters){
-                $("#"+response.id+"_"+key).attr("placeholder", d.parameters[key]);
-                graph['nodes'][response.id].updatable[key] = d.parameters[key]; 
+                $("#"+id+"_"+key).attr("placeholder", d.parameters[key]);
+                graph['nodes'][id].updatable[key] = d.parameters[key]; 
             }
         },
     });
 }
 
 function sendEdge(id){
-    var query = $.param({edge_id: id})
+    var obj_id = {edge_id: id};
+    var query = $.param(obj_id)
     $.ajax({
         dataType: 'JSON',
         url: 'switch_state_edge/?' + query,
-        success: function(){sendRefreshSignal(id, edgeSocket);},
+        success: function(){sendRefreshSignal(obj_id, edgeSocket.type);},
     });
 }
 
 function updateEdge(response){
-    var query = $.param({edge_id: response.id});
+    let id = response.edge_id;
+    var query = $.param({edge_id: id});
     $.ajax({
         dataType: 'JSON',
         url: 'get_state_edge/?' + query,
         success: function(d){
-            graph['edges'][response.id].connected = d.state;
-            if (graph['edges'][response.id].connected){
-                cy.$('#'+response.id).style('lineColor', 'blue');
+            graph['edges'][id].connected = d.state;
+            if (graph['edges'][id].connected){
+                cy.$('#'+id).style('lineColor', 'blue');
             } else {
-                cy.$('#'+response.id).style('lineColor', 'black');
+                cy.$('#'+id).style('lineColor', 'black');
             }
         },
     });

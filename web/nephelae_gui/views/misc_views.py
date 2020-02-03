@@ -35,8 +35,15 @@ def local_to_latlon(request):
                          'y': latlon[1]})
 def refresh_page(request):
     query = request.GET
-    id_obj = query.get('id_obj')
-    type_refresh = query.get('type')
-    for socket in refreshers[type_refresh]:
-        socket.send_refresh_signal(id_obj)
+    dictionnary = query.dict()
+    id_obj = {}
+    type_refresh = ''
+    for (key, value) in dictionnary.items():
+        if key == 'type':
+            type_refresh = value
+        else:
+            id_obj[key] = value
+    if type_refresh in refreshers.keys():
+        for socket in refreshers[type_refresh]:
+            socket.send_refresh_signal(id_obj)
     return HttpResponse(status=204)

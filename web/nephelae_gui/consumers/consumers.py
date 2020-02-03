@@ -161,6 +161,8 @@ class RefreshNotifier(WebsocketConsumer):
         self.channel_layer.group_discard
 
     def send_refresh_signal(self, obj_id):
-        res = {'type': self.type, 'id': obj_id}
+        res = {'type': self.type}
+        for (key, value) in obj_id.items():
+            res[key] = value;
         self.send(json.dumps(res))
 

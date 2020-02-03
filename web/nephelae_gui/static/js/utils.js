@@ -116,8 +116,11 @@ function removeLoader(){
     }
 }
 
-function sendRefreshSignal(id_obj, socket){
-    var query = $.param({type: socket.type, id_obj: id_obj});
+function sendRefreshSignal(id_obj, type){
+    var query_dict = {type: type};
+    for (let key in id_obj)
+        query_dict[key] = id_obj[key];
+    var query = $.param(query_dict);
     $.ajax({
         dataType: 'JSON',
         url: '/send_refresh_signal/?' + query,

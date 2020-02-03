@@ -29,3 +29,8 @@ def get_state_view(request):
     view_id = query.get('view_id')
     return JsonResponse({'parameters':
         scenario.dataviews.dataviews[view_id].get_parameters()})
+
+def get_state_mission(request):
+    query = request.GET
+    mission_id = query.get('mission_id')
+    return JsonResponse({'test': test})
