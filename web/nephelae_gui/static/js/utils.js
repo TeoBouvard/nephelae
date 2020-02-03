@@ -6,8 +6,41 @@ const refreshTypes = {
     VIEW: 'view',
     NODE: 'view',
     EDGE: 'edge',
-    MISSION: 'mission',
+    MISSION_CREATION: 'mission_creation',
 };
+
+class Refresher {
+    constructor(type, onMessageFunc) {
+        this.type = type;
+        this.socket = new WebSocket('ws://' +  window.location.host +
+        '/ws/refresh_notifier/' + this.type + '/');
+        this.socket.onmessage = function(e) {onMessageFunc(JSON.parse(e.data))};
+    }
+
+    static sendRefreshSignal(id_obj, type){
+        var query_dict = {type: type}
+        switch(type){
+            case refreshTypes.VIEW:
+            case refreshTypes.NODE:
+                    query_dict['view_id'] = id_obj['view_id'];
+                break;
+            case refreshTypes.EDGE:
+                    query_dict['edge_id'] = id_obj['edge_id'];
+                break;
+            case refreshTypes.MISSION_CREATION:
+                    query_dict['mission_id'] = id_obj['mission_id'];
+                    query_dict['aircraft_id'] = id_obj['aircraft_id'];
+                break;
+            default:
+                throw type + ' is not a defined Refresher Type !';
+        }
+        var query = $.param(query_dict);
+        $.ajax({
+            dataType: 'JSON',
+            url: '/send_refresh_signal/?' + query,
+        });
+    }
+}
 
 // Icon class
 var planeIcon = L.Icon.extend({
@@ -114,15 +147,4 @@ function removeLoader(){
     if (element != null){
         element.parentNode.removeChild(element);
     }
-}
-
-function sendRefreshSignal(id_obj, type){
-    var query_dict = {type: type};
-    for (let key in id_obj)
-        query_dict[key] = id_obj[key];
-    var query = $.param(query_dict);
-    $.ajax({
-        dataType: 'JSON',
-        url: '/send_refresh_signal/?' + query,
-    });
 }

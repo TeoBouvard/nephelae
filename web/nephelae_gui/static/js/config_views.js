@@ -1,10 +1,9 @@
 var cy = undefined;
 var graph = {};
-var nodeSocket = {};
-var edgeSocket = {};
+const nodeSocket = new Refresher(refreshTypes.NODE, updateNode);
+const edgeSocket = new Refresher(refreshTypes.EDGE, updateEdge);
 
 $(document).ready(() => {
-    setSockets();
     getGraphJSON();
     initTree();
     removeLoader();
@@ -140,7 +139,9 @@ function sendNode(id){
     $.ajax({
         dataType: 'JSON',
         url: 'change_parameters_view/?' + query,
-        success: function(){sendRefreshSignal(obj_id, nodeSocket.type);},
+        success: function(){
+            Refresher.sendRefreshSignal(obj_id, nodeSocket.type);
+        },
     });
 }
 
@@ -165,7 +166,9 @@ function sendEdge(id){
     $.ajax({
         dataType: 'JSON',
         url: 'switch_state_edge/?' + query,
-        success: function(){sendRefreshSignal(obj_id, edgeSocket.type);},
+        success: function(){
+            Refresher.sendRefreshSignal(obj_id, edgeSocket.type);
+        },
     });
 }
 
@@ -192,15 +195,3 @@ function prettifyString(ugly_string){
     return pretty_string
 }
 
-function setSockets(){
-    edgeSocket['type'] = refreshTypes.EDGE;
-    nodeSocket['type'] = refreshTypes.NODE;
-    edgeSocket['socket'] = new WebSocket('ws://' +  window.location.host +
-        '/ws/refresh_notifier/' + edgeSocket['type'] + '/');
-    edgeSocket['socket'].onmessage = (e) => updateEdge(
-        JSON.parse(e.data));
-    nodeSocket['socket'] = new WebSocket('ws://' +  window.location.host +
-        '/ws/refresh_notifier/'+ nodeSocket['type'] +'/');
-    nodeSocket['socket'].onmessage = (e) => updateNode(
-        JSON.parse(e.data));
-}

@@ -1,6 +1,6 @@
 // Activate current menu in nav
 $('#nav_raw_data').addClass('active');
-var viewSocket = {};
+const viewSocket = new Refresher(refreshTypes.VIEW, updateView);
 
 
 var gui
@@ -37,7 +37,6 @@ var dataviewsParameters = {
 var alt_variable = 'ALT'
 
 $(document).ready(() => {
-    setSockets();
     setupGUI();
 });
 
@@ -419,11 +418,4 @@ function updateView(response){
             updateData();
         },
     });
-}
-
-function setSockets(){
-    viewSocket['type'] = refreshTypes.VIEW;
-    viewSocket['socket'] = new WebSocket('ws://' + window.location.host +
-        '/ws/refresh_notifier/' + viewSocket['type'] + '/');
-    viewSocket['socket'].onmessage = (e) => updateView(JSON.parse(e.data));
 }
