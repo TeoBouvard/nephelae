@@ -403,7 +403,7 @@ function sendView(id){
     $.ajax({
         dataType: 'JSON',
         url: 'change_parameters_view/?' + query,
-        success: function(){sendRefreshSignal(obj_id, viewSocket.type);},
+        success: function(){Refresher.sendRefreshSignal(obj_id, viewSocket.type);},
     });
 }
 
