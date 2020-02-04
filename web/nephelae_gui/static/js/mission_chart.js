@@ -6,7 +6,7 @@ var infSize = 1.5*baseSize;
 // Mission chart display data.
 var chartData = {};
 
-const chartMissionSocket = new Refresher(refreshTypes.MISSION_VALIDATION,
+const missionManagerSocket = new Refresher(refreshTypes.MISSION_UPDATE,
     setChart);
 
 function updateChartData() {
@@ -180,36 +180,17 @@ function referenceLine(div){
 }
 
 function setChart(response){
-    var query = $.param({mission_id: response.mission_id,
-        aircraft_id: response.aircraft_id});
+    var query = $.param({aircraft_id: response.aircraft_id});
     $.ajax({
         dataType: 'JSON',
-        url: 'get_state_mission/?' + query,
-        success: function(mission){
-            if (mission.authorized){
-                switch(mission.insertMode){
-                    case 0:
-                        chartData.rawData[response.aircraft_id]
-                            .mission_data.push(mission);
-                        break;
-                    case 1:
-                        chartData.rawData[response.aircraft_id]
-                            .mission_data.unshift(mission);
-                        break;
-                    case 2:
-                        chartData.rawData[response.aircraft_id]
-                            .mission_data.shift();
-                        chartData.rawData[response.aircraft_id]
-                            .mission_data.unshift(mission);
-                        break;
-                    case 3:
-                        chartData.rawData[response.aircraft_id] = [mission];
-                        break;
-                    default:
-                        throw 'Something went wrong, insertMode is not known';
-                }
-                setupChart();
-            }
+        url: 'get_state_current_missions/?' + query,
+        success: function(obj_missions){
+            chartData.rawData[response.aircraft_id] = {
+                current_mission_time_left : obj_missions.current_mission_time_left,
+                mission_data : obj_missions.missions
+            };
+            setupChart();
         },
     });
 }
+

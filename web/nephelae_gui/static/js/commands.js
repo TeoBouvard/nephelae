@@ -53,7 +53,7 @@ function generateItems(){
 
     // reseting cards
     $('.filled').removeClass("filled").addClass("free").html("");
-    for (aircraftId in parameters.fleet) {
+    for (let aircraftId in parameters.fleet) {
         var html = '<div id="'+ aircraftId +'_card" class="card blue-grey darken-1">';
             html += '<div class="card-content white-text">';
 
@@ -91,21 +91,50 @@ function generateItems(){
 
                 html += '<br>';
                 html += '<span class="left">';
-                html += '<a href="/aircrafts/next_mission/' + aircraftId + '" ' +
-                           'class="waves-effect waves-light btn-small">Next mission</a>';
+                html += '<a id="' + aircraftId + '_nextMission" class="waves-effect waves-light btn-small">Next mission</a>';
                 html += '</span><br>';
                 
                 html += '<br>';
                 html += '<span class="left">';
-                html += '<a href="/aircrafts/end_mission/' + aircraftId + '" ' +
-                           'class="waves-effect waves-light btn-small">End mission</a>';
+                html += '<a id="' + aircraftId + '_endMission" class="waves-effect waves-light btn-small">End mission</a>';
                 html += '</span><br>';
 
             html += '</div>';
         html += '</div>';
         $('.free').first().removeClass("free").addClass("filled").append(html);
+        $('#'+aircraftId+'_nextMission').click(function(){
+            nextMission(aircraftId);
+        });
+        $('#'+aircraftId+'_endMission').click(function(){
+            endMission(aircraftId);
+        });
     }
     init_mission_modals();
+}
+
+
+function nextMission(aircraft_id){
+    var obj_id = {'aircraft_id': aircraft_id};
+    $.ajax({
+        dataType: 'JSON',
+        url: '/aircrafts/next_mission/' + aircraft_id,
+        success: function(){
+            Refresher.sendRefreshSignal(obj_id, refreshTypes.MISSION_UPDATE);
+        },
+    });
+    return false;
+}
+
+function endMission(aircraft_id){
+    var obj_id = {'aircraft_id': aircraft_id};
+    $.ajax({
+        dataType: 'JSON',
+        url: '/aircrafts/end_mission/' + aircraft_id,
+        success: function(){
+            Refresher.sendRefreshSignal(obj_id, refreshTypes.MISSION_UPDATE);
+        },
+    });
+    return false;
 }
 
 function secondsToMMSSstring(seconds) {

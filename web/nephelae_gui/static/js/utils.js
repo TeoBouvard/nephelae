@@ -8,6 +8,7 @@ const refreshTypes = {
     EDGE: 'edge',
     MISSION_CREATION: 'mission_creation',
     MISSION_VALIDATION: 'mission_validation',
+    MISSION_UPDATE: 'mission_update',
 };
 
 class Refresher {
@@ -31,6 +32,7 @@ class Refresher {
             case refreshTypes.MISSION_CREATION:
             case refreshTypes.MISSION_VALIDATION:
                     query_dict['mission_id'] = id_obj['mission_id'];
+            case refreshTypes.MISSION_UPDATE:
                     query_dict['aircraft_id'] = id_obj['aircraft_id'];
                 break;
             default:

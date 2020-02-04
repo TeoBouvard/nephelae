@@ -1,4 +1,5 @@
 from django.http import JsonResponse, HttpResponse
+import time
 
 try:
     from nephelae_gui.models import hypercube
@@ -37,3 +38,18 @@ def get_state_mission(request):
     return JsonResponse(scenario.aircrafts[aircraft_id].missions[mission_id]
             .to_dict())
 
+def get_state_current_missions(request):
+    time.sleep(2)
+    query = request.GET
+    aircraft_id = query.get('aircraft_id')
+    status = scenario.aircrafts[aircraft_id].current_mission_status()
+    if status is None:
+        res = JsonResponse({'aircraft': aircraft_id,
+            'current_mission_time_left': -1,
+                             'missions': []})
+    else:
+        res = JsonResponse({'aircraft': aircraft_id,
+            'current_mission_time_left': status['current_mission_time_left'],
+                             'missions': [m.to_dict() 
+                                 for m in status['missions']]})
+    return res

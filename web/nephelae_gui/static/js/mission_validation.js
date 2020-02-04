@@ -87,7 +87,8 @@ function authorize_mission(aircraftId, missionId) {
     $.getJSON('/aircrafts/authorize_mission/'+aircraftId+'/'+missionId,
               (response) => {
         var obj_id = {aircraft_id: aircraftId, mission_id: missionId};
-        Refresher.sendRefreshSignal(obj_id, validateMissionsSocket.type)
+        Refresher.sendRefreshSignal(obj_id, validateMissionsSocket.type);
+        Refresher.sendRefreshSignal(obj_id, refreshTypes.MISSION_UPDATE);
     });
 }
 
@@ -96,5 +97,6 @@ function reject_mission(aircraftId, missionId) {
               (response) => {
         var obj_id = {aircraft_id: aircraftId, mission_id: missionId};
         Refresher.sendRefreshSignal(obj_id, validateMissionsSocket.type)
+        Refresher.sendRefreshSignal(obj_id, refreshTypes.MISSION_UPDATE);
     });
 }
