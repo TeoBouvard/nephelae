@@ -218,12 +218,12 @@ def pending_missions_all(request):
 
 def authorize_mission(request, aircraftId, missionId):
     scenario.aircrafts[aircraftId].authorize_mission(missionId)
-    return JsonResponse({'status' : 'Authorized !'})
+    return HttpResponse(status=204)
 
 
 def reject_mission(request, aircraftId, missionId):
     scenario.aircrafts[aircraftId].reject_mission(missionId)
-    return JsonResponse({'status' : 'Rejected !'})
+    return HttpResponse(status=204)
 
 
 def next_mission(request, aircraftId):

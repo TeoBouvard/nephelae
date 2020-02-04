@@ -213,7 +213,7 @@ function create_mission(buttonId) {
     }
 
     $.getJSON('/aircrafts/create_mission/?' + $.param(query), (response) => {
-        console.log(response);
+        Refresher.sendRefreshSignal(response, refreshTypes.MISSION_CREATION)
     });
 }
 

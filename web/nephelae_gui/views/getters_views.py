@@ -32,5 +32,8 @@ def get_state_view(request):
 
 def get_state_mission(request):
     query = request.GET
-    mission_id = query.get('mission_id')
-    return JsonResponse({'test': test})
+    aircraft_id = query.get('aircraft_id')
+    mission_id = int(query.get('mission_id'))
+    return JsonResponse(scenario.aircrafts[aircraft_id].missions[mission_id]
+            .to_dict())
+

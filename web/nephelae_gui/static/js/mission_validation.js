@@ -1,4 +1,7 @@
-var pendingMissionsWebSocket = null;
+const pendingMissionsSocket = new Refresher(refreshTypes.MISSION_CREATION,
+    addMissionPending);
+const validateMissionsSocket = new Refresher(refreshTypes.MISSION_VALIDATION,
+    removeMissionPending);
 
 // This is the page init function
 $(document).ready( () => {
@@ -9,15 +12,6 @@ $(document).ready( () => {
     mainRow.classList.add("main-row");
     //mainRow.classList.add("parent-row");
     $('#main_container')[0].appendChild(mainRow);
-
-    pendingMissionsWebSocket = new WebSocket('ws://' + window.location.host +
-        '/ws/pending_missions_update/');
-    pendingMissionsWebSocket.onmessage = (e) => {
-        console.log("Pending mission update");
-        console.log(e);
-        refresh_pending_missions();
-    };
-
 
     refresh_pending_missions();
 });
@@ -38,6 +32,7 @@ function refresh_pending_missions() {
             mainRow.appendChild(column);
             
             let row = document.createElement("div");
+            row.id = aircraftId + '_missions';
             row.classList.add("row");
             column.appendChild(row);
             for (let mission of response[aircraftId]) {
@@ -50,6 +45,28 @@ function refresh_pending_missions() {
             }
         };
     });
+}
+
+function addMissionPending(response){
+    var query = $.param(response);
+    $.ajax({
+        dataType: 'JSON',
+        url: 'get_state_mission/?' + query,
+        success: function(mission){
+            let row = $('#'+ mission.aircraftId+'_missions');
+            row.append(create_mission_validation_card(mission, row));
+            let cardId = mission.aircraftId+'_'+mission.missionId;
+            $('#' + cardId + ' .authorize-button')[0]
+                .onclick = authorize_mission_clicked;
+            $('#' + cardId + ' .reject-button')[0]
+                .onclick = reject_mission_clicked;
+        },
+    });
+}
+
+function removeMissionPending(response){
+    let cardId = $('#'+response.aircraft_id+'_'+response.mission_id);
+    cardId.remove();
 }
 
 function authorize_mission_clicked(e) {
@@ -69,13 +86,15 @@ function reject_mission_clicked(e) {
 function authorize_mission(aircraftId, missionId) {
     $.getJSON('/aircrafts/authorize_mission/'+aircraftId+'/'+missionId,
               (response) => {
-        console.log(response);
+        var obj_id = {aircraft_id: aircraftId, mission_id: missionId};
+        Refresher.sendRefreshSignal(obj_id, validateMissionsSocket.type)
     });
 }
 
 function reject_mission(aircraftId, missionId) {
     $.getJSON('/aircrafts/reject_mission/'+aircraftId+'/'+missionId,
               (response) => {
-        console.log(response);
+        var obj_id = {aircraft_id: aircraftId, mission_id: missionId};
+        Refresher.sendRefreshSignal(obj_id, validateMissionsSocket.type)
     });
 }
