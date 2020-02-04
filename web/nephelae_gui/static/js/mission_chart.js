@@ -6,6 +6,9 @@ var infSize = 1.5*baseSize;
 // Mission chart display data.
 var chartData = {};
 
+const chartMissionSocket = new Refresher(refreshTypes.MISSION_VALIDATION,
+    setChart);
+
 function updateChartData() {
     // Updates chartData with current mission status of the aircrafts.
     
@@ -176,4 +179,37 @@ function referenceLine(div){
     nowWord.prev().first().attr('height', height + 'px').attr('width', '1px').attr('y', '0');
 }
 
-
+function setChart(response){
+    var query = $.param({mission_id: response.mission_id,
+        aircraft_id: response.aircraft_id});
+    $.ajax({
+        dataType: 'JSON',
+        url: 'get_state_mission/?' + query,
+        success: function(mission){
+            if (mission.authorized){
+                switch(mission.insertMode){
+                    case 0:
+                        chartData.rawData[response.aircraft_id]
+                            .mission_data.push(mission);
+                        break;
+                    case 1:
+                        chartData.rawData[response.aircraft_id]
+                            .mission_data.unshift(mission);
+                        break;
+                    case 2:
+                        chartData.rawData[response.aircraft_id]
+                            .mission_data.shift();
+                        chartData.rawData[response.aircraft_id]
+                            .mission_data.unshift(mission);
+                        break;
+                    case 3:
+                        chartData.rawData[response.aircraft_id] = [mission];
+                        break;
+                    default:
+                        throw 'Something went wrong, insertMode is not known';
+                }
+                setupChart();
+            }
+        },
+    });
+}

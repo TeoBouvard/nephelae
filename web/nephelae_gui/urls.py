@@ -48,6 +48,7 @@ urlpatterns = [
 
     # URL for commands page
     path('commands/', template_views.render_template, {'template_name': 'commands.html'}, name='commands'),
+    path('commands/get_state_mission/', getters_views.get_state_mission),
     path('aircrafts/available_missions/<str:aircraftId>', aircraft_views.get_available_missions),
     path('aircrafts/mission_parameters/<str:aircraftId>/<str:missionType>', aircraft_views.get_mission_parameters),
     path('aircrafts/create_mission/', aircraft_views.create_mission),
