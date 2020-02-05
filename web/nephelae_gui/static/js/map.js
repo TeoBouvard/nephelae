@@ -47,6 +47,11 @@ var parameters = {
     east_wind: 0.01,
     send_wind: updateWindData,
     wind_status_text: "",
+
+    wind_info_producer: 'None',
+    north_wind_info: 0.01,
+    east_wind_info: 0.01,
+    send_wind_info: sendWindInfo
 }
 
 // Initialization starts here
@@ -92,11 +97,26 @@ function setupGUI(){
         f2.add(parameters, 'clouds_cmap', ['Purples', 'viridis']).name('Clouds color');
         f2.add(parameters, 'transparent').name('Transparent');
 
-        wind_folder.add(parameters, 'north_wind').name('North Value');
         wind_folder.add(parameters, 'east_wind').name('East Value');
+        wind_folder.add(parameters, 'north_wind').name('North Value');
 
         wind_folder.add(parameters, 'send_wind').name('Send Wind');
         wind_folder.open();
+
+        let wind_producers = []
+        for (let id in response.uavs)
+            wind_producers.push(id);
+        let wind_info_folder = gui.addFolder('Wind Info')
+        wind_info_folder.add(parameters, 'wind_info_producer', wind_producers)
+            .setValue(wind_producers[0]);
+        parameters.east_wind_info_input = wind_info_folder
+            .add(parameters, 'east_wind_info').name('East Value');
+        parameters.north_wind_info_input = wind_info_folder
+            .add(parameters, 'north_wind_info').name('North Value');
+        wind_info_folder.add(parameters, 'send_wind_info').name('Send Wind');
+        wind_info_folder.open();
+
+        console.log(parameters.east_wind_info)
 
         gui.add(parameters, 'tracked_uav', tracked_uav_choices);
         
@@ -106,9 +126,32 @@ function setupGUI(){
         setSocketData();
         setSocketPoint();
         setSocketWind();
+        setSocketWindInfo();
+
         // Create map once sliders are initialized
         setupMap();
     });
+}
+
+function setSocketWindInfo(){
+    parameters.socket_wind = new WebSocket('ws://' + 
+        window.location.host + '/ws/wind_info/');
+    parameters.socket_wind.onmessage = (e) => windInfoUpdate(JSON.parse(e.data));
+}
+
+function windInfoUpdate(windInfo) {
+    if (String(windInfo.aircraftId) == String(parameters.wind_info_producer)) {
+        parameters.east_wind_info_input.setValue(windInfo.east_wind);
+        parameters.north_wind_info_input.setValue(windInfo.north_wind);
+    }
+}
+
+function sendWindInfo(){
+    var query = $.param({
+        north_wind: parameters.north_wind_info,
+        east_wind: parameters.east_wind_info
+    });
+    $.getJSON('send_update_wind/?' + query);
 }
 
 function setupMap(){
