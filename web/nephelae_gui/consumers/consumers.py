@@ -9,6 +9,8 @@ try:
     from ..models.common import refreshers
     from utm import from_latlon, to_latlon
 
+    from nephelae_paparazzi.common import messageInterface
+
     localFrame = scenario.localFrame
     windMap = scenario.windMap
 
@@ -144,6 +146,25 @@ class WindConsumer(WebsocketConsumer):
 
     def send_new_wind(self, wind):
         self.send(json.dumps({'north_wind': wind[1], 'east_wind': wind[0]}))
+
+
+class WindInfoConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+        print("New websocket", flush=True, end='\n\n\n\n')
+        self.bindId = messageInterface.bind(self.send_new_wind, '(ground_dl WIND_INFO .*)')
+        print("New websocket", flush=True, end='\n\n\n\n')
+
+    def disconnect(self, close_code):
+        messageInterface.unbind(self.bindId)
+        self.channel_layer.group_discard
+
+    def send_new_wind(self, windInfo):
+        print("Got wind message\n:", windInfo, flush=True, end='\n\n\n\n')
+        self.send(json.dumps({'aircraftId': windInfo['ac_id'],
+                              'east_wind' : windInfo['east'],
+                              'north_wind': windInfo['north']}))
+
 
 class RefreshNotifier(WebsocketConsumer):
     def __init__(self, *args, **kwargs):

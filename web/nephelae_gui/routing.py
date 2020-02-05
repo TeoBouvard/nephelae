@@ -16,6 +16,7 @@ websocket_urlpatterns = [
         consumers.CloudDataConsumer),
     url('ws/sensor/point/', consumers.PointConsumer),
     url('ws/wind/', consumers.WindConsumer),
+    url('ws/wind_info/', consumers.WindInfoConsumer),
     url('ws/status/', aircraft_consumers.StatusConsumer),
     url('ws/mission_upload/', aircraft_consumers.MissionUploadConsumer),
     url('ws/pending_missions_update/', aircraft_consumers.PendingMissionsConsumer),
