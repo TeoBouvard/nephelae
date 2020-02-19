@@ -89,7 +89,7 @@ def get_positions_latlong(request):
         for message in messages:
             positions[uav_id]['path'].append([message.lat,
                                               message.long,
-                                              message.alt])
+                                              message.position.z])
             positions[uav_id]['times'].append(message.position.t)
 
     return JsonResponse({'positions':positions})

@@ -111,7 +111,7 @@ class GPSConsumer(WebsocketConsumer):
         self.send(json.dumps({
             'uav_id'  : status.aircraftId,
             'heading' : status.heading,
-            'position': [status.lat, status.long, status.alt],
+            'position': [status.lat, status.long, status.position.z],
             'speed'   : status.speed,
             'time'    : status.position.t}))
 
