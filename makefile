@@ -48,6 +48,7 @@ assets :
 	$(FETCH) --output web/nephelae_gui/static/js/libs/OrbitControls.js 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js'
 	$(FETCH) --output web/nephelae_gui/static/js/libs/GLTFLoader.js 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/loaders/GLTFLoader.js'
 	$(FETCH) --output web/nephelae_gui/static/js/libs/plotly.js 'https://cdn.plot.ly/plotly-latest.min.js'
+	$(FETCH) --output web/nephelae_gui/static/js/libs/cytoscape.min.js 'https://raw.githubusercontent.com/cytoscape/cytoscape.js/unstable/dist/cytoscape.min.js'
 
 	$(FETCH) --output web/nephelae_gui/static/js/libs/googleCharts.js 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_format_module.js'
 	$(FETCH) 'https://www.gstatic.com/charts/46.2/js/jsapi_compiled_default_module.js' >> web/nephelae_gui/static/js/libs/googleCharts.js
